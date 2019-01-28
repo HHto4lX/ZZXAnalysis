@@ -11,12 +11,12 @@
  *  \author G. Ortona - LLR
  */
 
-#include <ZZAnalysis/AnalysisStep/interface/MCHistoryTools.h>
+#include <ZZXAnalysis/AnalysisStep/interface/MCHistoryTools.h>
 
 #include <DataFormats/HepMCCandidate/interface/GenParticle.h>
 #include <SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h>
 
-#include <ZZAnalysis/AnalysisStep/interface/FinalStates.h>
+#include <ZZXAnalysis/AnalysisStep/interface/FinalStates.h>
 
 #include <boost/algorithm/string/predicate.hpp>
 

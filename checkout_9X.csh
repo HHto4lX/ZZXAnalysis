@@ -1,7 +1,7 @@
 #!/bin/tcsh -fe
 #
 # Instructions:
-# wget -O ${TMPDIR}/checkout_9X.csh https://raw.githubusercontent.com/HHto4lX/4lXAnalysis/master/checkout_9X.csh
+# wget -O ${TMPDIR}/checkout_9X.csh https://raw.githubusercontent.com/HHto4lX/ZZXAnalysis/master/checkout_9X.csh
 # cd $CMSSW_BASE/src
 # cmsenv
 # chmod u+x ${TMPDIR}/checkout_9X.csh
@@ -41,9 +41,9 @@ sed -i 's@class HTXSRivetProducer : public edm::stream::EDProducer<> {@class HTX
 
 #### Please do not add any custom (non-CMSSW) package before this line ####
 
-#4lXAnalysis
-git clone https://github.com/HHto4lX/4lXAnalysis.git 4lXAnalysis
-(cd 4lXAnalysis; git checkout master)
+#ZZXAnalysis
+git clone https://github.com/HHto4lX/ZZXAnalysis.git ZZXAnalysis
+(cd ZZXAnalysis; git checkout master)
 
 #MuScleFit: probably tbf
 #git clone https://github.com/scasasso/usercode MuScleFit

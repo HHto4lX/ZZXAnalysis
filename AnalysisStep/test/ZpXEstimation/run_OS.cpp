@@ -11,8 +11,8 @@
 #include "TStyle.h"
 
 // My own files
-#include <ZZAnalysis/AnalysisStep/test/ZpXEstimation/include/OSmethod.h>
-#include <ZZAnalysis/AnalysisStep/test/ZpXEstimation/src/setTDRStyle.cpp>
+#include <ZZXAnalysis/AnalysisStep/test/ZpXEstimation/include/OSmethod.h>
+#include <ZZXAnalysis/AnalysisStep/test/ZpXEstimation/src/setTDRStyle.cpp>
 
 
 using namespace std;

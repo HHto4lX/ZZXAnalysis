@@ -1,5 +1,5 @@
-from ZZAnalysis.AnalysisStep.defaults import *
-from ZZAnalysis.AnalysisStep.miscenums import *
+from ZZXAnalysis.AnalysisStep.defaults import *
+from ZZXAnalysis.AnalysisStep.miscenums import *
 
 ### ----------------------------------------------------------------------
 ###
@@ -53,7 +53,7 @@ if FAILED_TREE_LEVEL and not SKIP_EMPTY_EVENTS:
 
 # Get absolute path
 import os
-PyFilePath = os.environ['CMSSW_BASE'] + "/src/ZZAnalysis/AnalysisStep/test/"
+PyFilePath = os.environ['CMSSW_BASE'] + "/src/ZZXAnalysis/AnalysisStep/test/"
 
 ### ----------------------------------------------------------------------
 ### Standard sequence

@@ -33,9 +33,9 @@
 #include "CMS_lumi.C"
 #include "plotUtils.C"
 
-#include <ZZAnalysis/AnalysisStep/src/Category.cc>
-#include <ZZAnalysis/AnalysisStep/src/bitops.cc>
-#include <ZZAnalysis/AnalysisStep/interface/FinalStates.h>
+#include <ZZXAnalysis/AnalysisStep/src/Category.cc>
+#include <ZZXAnalysis/AnalysisStep/src/bitops.cc>
+#include <ZZXAnalysis/AnalysisStep/interface/FinalStates.h>
 
 using namespace std;
 

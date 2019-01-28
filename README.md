@@ -1,4 +1,4 @@
-ZZAnalysis
+ZZXAnalysis
 ==========
 
 To install a complete CMSSW 8X area (including this package)
@@ -9,7 +9,7 @@ Please use CMSSW_8_0_29.
 
 Download and execute the setup script:
 ```
-wget -O ${TMPDIR}/checkout_80X.csh https://raw.githubusercontent.com/HHto4lX/4lXAnalysis/master/checkout_80X.csh
+wget -O ${TMPDIR}/checkout_80X.csh https://raw.githubusercontent.com/HHto4lX/ZZXAnalysis/master/checkout_80X.csh
 cd $CMSSW_BASE/src
 cmsenv
 chmod u+x ${TMPDIR}/checkout_80X.csh
@@ -24,7 +24,7 @@ Please use CMSSW_9_4_9.
 
 Download and execute the setup script:
 ```
-wget -O ${TMPDIR}/checkout_9X.csh https://raw.githubusercontent.com/HHto4lX/4lXAnalysis/master/checkout_9X.csh
+wget -O ${TMPDIR}/checkout_9X.csh https://raw.githubusercontent.com/HHto4lX/ZZXAnalysis/master/checkout_9X.csh
 cd $CMSSW_BASE/src
 cmsenv
 chmod u+x ${TMPDIR}/checkout_9X.csh
@@ -39,7 +39,7 @@ Please use CMSSW_10_2_5_patch1.
 
 Download and execute the setup script:
 ```
-wget -O ${TMPDIR}/checkout_10X.csh https://raw.githubusercontent.com/HHto4lX/4lXAnalysis/master/checkout_10X.csh
+wget -O ${TMPDIR}/checkout_10X.csh https://raw.githubusercontent.com/HHto4lX/ZZXAnalysis/master/checkout_10X.csh
 cd $CMSSW_BASE/src
 cmsenv
 chmod u+x ${TMPDIR}/checkout_10X.csh

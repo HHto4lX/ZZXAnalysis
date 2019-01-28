@@ -12,7 +12,7 @@
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 
-#include <ZZAnalysis/AnalysisStep/interface/DaughterDataHelpers.h>
+#include <ZZXAnalysis/AnalysisStep/interface/DaughterDataHelpers.h>
 #include <MelaAnalytics/GenericMEComputer/interface/GMECHelperFunctions.h>
 
 using namespace BranchHelpers;

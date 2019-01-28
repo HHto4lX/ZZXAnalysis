@@ -1,5 +1,5 @@
-#ifndef ZZAnalysis_Tools_Histograms_h
-#define ZZAnalysis_Tools_Histograms_h
+#ifndef ZZXAnalysis_Tools_Histograms_h
+#define ZZXAnalysis_Tools_Histograms_h
 
 /** \class Histograms
  *
@@ -21,7 +21,7 @@
 #include <vector>
 
 #ifdef HCMSSW
-#include <ZZAnalysis/AnalysisStep/interface/TFileServiceWrapper.h>
+#include <ZZXAnalysis/AnalysisStep/interface/TFileServiceWrapper.h>
 #endif
 
 using namespace std;

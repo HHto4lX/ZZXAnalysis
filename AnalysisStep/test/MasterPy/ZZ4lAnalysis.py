@@ -1,5 +1,5 @@
 import FWCore.ParameterSet.Config as cms
-from ZZAnalysis.AnalysisStep.defaults import *
+from ZZXAnalysis.AnalysisStep.defaults import *
 import os, sys
 
 process = cms.Process("ZZ")
@@ -840,7 +840,7 @@ process.cleanSoftElectrons = cms.EDProducer("PATElectronCleaner",
 ### Search for FSR candidates
 ### ----------------------------------------------------------------------
 
-# Create a photon collection; cfg extracted from "UFHZZAnalysisRun2.FSRPhotons.fsrPhotons_cff"
+# Create a photon collection; cfg extracted from "UFHZZXAnalysisRun2.FSRPhotons.fsrPhotons_cff"
 process.fsrPhotons = cms.EDProducer("PhotonFiller",
     electronSrc = cms.InputTag("cleanSoftElectrons"),
     sampleType = cms.int32(SAMPLE_TYPE),
@@ -1310,7 +1310,7 @@ process.QGPoolDBESSource = cms.ESSource("PoolDBESSource",
             label  = cms.untracked.string('QGL_AK4PFchs')
         ),
       ),
-      connect = cms.string('sqlite_fip:ZZAnalysis/AnalysisStep/data/QGTagging/QGL_'+qgDatabaseVersion+'.db')
+      connect = cms.string('sqlite_fip:ZZXAnalysis/AnalysisStep/data/QGTagging/QGL_'+qgDatabaseVersion+'.db')
 )
 process.es_prefer_qg = cms.ESPrefer('PoolDBESSource','QGPoolDBESSource')
 process.load('RecoJets.JetProducers.QGTagger_cfi')
@@ -1328,21 +1328,21 @@ process.dressedJets = cms.EDProducer("JetFiller",
     jecType = cms.string("AK4PFchs"),
     applyJER = cms.bool(APPLYJER),
     jerType = cms.string("AK4PFchs"),
-    bTagSFFile = cms.string("ZZAnalysis/AnalysisStep/data/BTagging/CSVv2Moriond17_2017_1_26_BtoH.csv"), #Preliminary Moriond17 SF, from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80XReReco
-    bTagMCEffFile = cms.string("ZZAnalysis/AnalysisStep/data/BTagging/bTagEfficiencies_80X_ICHEP.root"),
+    bTagSFFile = cms.string("ZZXAnalysis/AnalysisStep/data/BTagging/CSVv2Moriond17_2017_1_26_BtoH.csv"), #Preliminary Moriond17 SF, from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80XReReco
+    bTagMCEffFile = cms.string("ZZXAnalysis/AnalysisStep/data/BTagging/bTagEfficiencies_80X_ICHEP.root"),
     flags = cms.PSet()
     )
 if (LEPTON_SETUP == 2017):
     process.dressedJets.bTaggerName = cms.string("pfDeepCSVJetTags:probb") #Moving to Moriond18 new recommended DeepCSV btagger
     process.dressedJets.bTaggerThreshold = cms.double(0.4941) #https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation94X
-    process.dressedJets.bTagSFFile =  cms.string("ZZAnalysis/AnalysisStep/data/BTagging/DeepCSV_94XSF_V1_B_F.csv")
-    process.dressedJets.bTagMCEffFile  = cms.string("ZZAnalysis/AnalysisStep/data/BTagging/bTagEfficiencies_94X_Moriond18_v1.root")
+    process.dressedJets.bTagSFFile =  cms.string("ZZXAnalysis/AnalysisStep/data/BTagging/DeepCSV_94XSF_V1_B_F.csv")
+    process.dressedJets.bTagMCEffFile  = cms.string("ZZXAnalysis/AnalysisStep/data/BTagging/bTagEfficiencies_94X_Moriond18_v1.root")
 
 if (LEPTON_SETUP == 2018): #[FIXME] Update to 2018 when available
     process.dressedJets.bTaggerName = cms.string("pfDeepCSVJetTags:probb") #Moving to Moriond18 new recommended DeepCSV btagger
     process.dressedJets.bTaggerThreshold = cms.double(0.4184) #https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation102X
-    process.dressedJets.bTagSFFile =  cms.string("ZZAnalysis/AnalysisStep/data/BTagging/DeepCSV_94XSF_V1_B_F.csv")
-    process.dressedJets.bTagMCEffFile  = cms.string("ZZAnalysis/AnalysisStep/data/BTagging/bTagEfficiencies_94X_Moriond18_v1.root")
+    process.dressedJets.bTagSFFile =  cms.string("ZZXAnalysis/AnalysisStep/data/BTagging/DeepCSV_94XSF_V1_B_F.csv")
+    process.dressedJets.bTagMCEffFile  = cms.string("ZZXAnalysis/AnalysisStep/data/BTagging/bTagEfficiencies_94X_Moriond18_v1.root")
 
 
 ### Load JEC
@@ -1363,10 +1363,10 @@ if (APPLYJEC and SAMPLE_TYPE == 2016):
                     label  = cms.untracked.string('AK4PFchs')
                     ),
                 ),
-#            connect = cms.string('sqlite_fip:ZZAnalysis/AnalysisStep/data/JEC/Fall15_25nsV2_MC.db'), #for 76X
-#             connect = cms.string('sqlite_fip:ZZAnalysis/AnalysisStep/data/JEC/Spring16_25nsV1_MC.db'), #for 80X/Moriond16
-#             connect = cms.string('sqlite_fip:ZZAnalysis/AnalysisStep/data/JEC/Spring16_25nsV6_MC.db'), #for 80X/ICHEP16
-             connect = cms.string('sqlite_fip:ZZAnalysis/AnalysisStep/data/JEC/Summer16_23Sep2016V4_MC.db'), #for 80X/Moriond17
+#            connect = cms.string('sqlite_fip:ZZXAnalysis/AnalysisStep/data/JEC/Fall15_25nsV2_MC.db'), #for 76X
+#             connect = cms.string('sqlite_fip:ZZXAnalysis/AnalysisStep/data/JEC/Spring16_25nsV1_MC.db'), #for 80X/Moriond16
+#             connect = cms.string('sqlite_fip:ZZXAnalysis/AnalysisStep/data/JEC/Spring16_25nsV6_MC.db'), #for 80X/ICHEP16
+             connect = cms.string('sqlite_fip:ZZXAnalysis/AnalysisStep/data/JEC/Summer16_23Sep2016V4_MC.db'), #for 80X/Moriond17
             )
     else:
         process.jec = cms.ESSource("PoolDBESSource",
@@ -1383,8 +1383,8 @@ if (APPLYJEC and SAMPLE_TYPE == 2016):
                     label  = cms.untracked.string('AK4PFchs')
                     ),
                 ),
-#            connect = cms.string('sqlite_fip:ZZAnalysis/AnalysisStep/data/JEC/Fall15_25nsV2_DATA.db'), #for 76X
-            connect = cms.string('sqlite_fip:ZZAnalysis/AnalysisStep/data/JEC/Summer16_23Sep2016AllV4_DATA.db'), #for 80X/ICHEP16
+#            connect = cms.string('sqlite_fip:ZZXAnalysis/AnalysisStep/data/JEC/Fall15_25nsV2_DATA.db'), #for 76X
+            connect = cms.string('sqlite_fip:ZZXAnalysis/AnalysisStep/data/JEC/Summer16_23Sep2016AllV4_DATA.db'), #for 80X/ICHEP16
             )
 
     ## add an es_prefer statement to resolve a possible conflict from simultaneous connection to a global tag
@@ -1432,12 +1432,12 @@ if (APPLYJEC and SAMPLE_TYPE == 2017):
                     label  = cms.untracked.string('AK4PFchs')
                     ),
                 ),
-#            connect = cms.string('sqlite_fip:ZZAnalysis/AnalysisStep/data/JEC/Fall15_25nsV2_MC.db'), #for 76X
-#             connect = cms.string('sqlite_fip:ZZAnalysis/AnalysisStep/data/JEC/Spring16_25nsV1_MC.db'), #for 80X/Moriond16
-#             connect = cms.string('sqlite_fip:ZZAnalysis/AnalysisStep/data/JEC/Spring16_25nsV6_MC.db'), #for 80X/ICHEP16
-#             connect = cms.string('sqlite_fip:ZZAnalysis/AnalysisStep/data/JEC/Summer16_23Sep2016V4_MC.db'), #for 80X/Moriond17
-#             connect = cms.string('sqlite_fip:ZZAnalysis/AnalysisStep/data/JEC/Fall17_17Nov2017_V6_MC.db'), #for 94X/Moriond18
-              connect = cms.string('sqlite_fip:ZZAnalysis/AnalysisStep/data/JEC/Fall17_17Nov2017_V8_MC.db'), #for 94X/MET fix
+#            connect = cms.string('sqlite_fip:ZZXAnalysis/AnalysisStep/data/JEC/Fall15_25nsV2_MC.db'), #for 76X
+#             connect = cms.string('sqlite_fip:ZZXAnalysis/AnalysisStep/data/JEC/Spring16_25nsV1_MC.db'), #for 80X/Moriond16
+#             connect = cms.string('sqlite_fip:ZZXAnalysis/AnalysisStep/data/JEC/Spring16_25nsV6_MC.db'), #for 80X/ICHEP16
+#             connect = cms.string('sqlite_fip:ZZXAnalysis/AnalysisStep/data/JEC/Summer16_23Sep2016V4_MC.db'), #for 80X/Moriond17
+#             connect = cms.string('sqlite_fip:ZZXAnalysis/AnalysisStep/data/JEC/Fall17_17Nov2017_V6_MC.db'), #for 94X/Moriond18
+              connect = cms.string('sqlite_fip:ZZXAnalysis/AnalysisStep/data/JEC/Fall17_17Nov2017_V8_MC.db'), #for 94X/MET fix
             )
     else:
         process.jec = cms.ESSource("PoolDBESSource",
@@ -1455,9 +1455,9 @@ if (APPLYJEC and SAMPLE_TYPE == 2017):
                     label  = cms.untracked.string('AK4PFchs')
                     ),
                 ),
-#            connect = cms.string('sqlite_fip:ZZAnalysis/AnalysisStep/data/JEC/Fall15_25nsV2_DATA.db'), #for 76X
-#            connect = cms.string('sqlite_fip:ZZAnalysis/AnalysisStep/data/JEC/Summer16_23Sep2016AllV4_DATA.db'), #for 80X/ICHEP16
-            connect = cms.string('sqlite_fip:ZZAnalysis/AnalysisStep/data/JEC/Fall17_17Nov2017BCDEF_V6_DATA.db'),
+#            connect = cms.string('sqlite_fip:ZZXAnalysis/AnalysisStep/data/JEC/Fall15_25nsV2_DATA.db'), #for 76X
+#            connect = cms.string('sqlite_fip:ZZXAnalysis/AnalysisStep/data/JEC/Summer16_23Sep2016AllV4_DATA.db'), #for 80X/ICHEP16
+            connect = cms.string('sqlite_fip:ZZXAnalysis/AnalysisStep/data/JEC/Fall17_17Nov2017BCDEF_V6_DATA.db'),
             )
 
     ## add an es_prefer statement to resolve a possible conflict from simultaneous connection to a global tag
@@ -1664,7 +1664,7 @@ process.CR = cms.Sequence(
 ### Skim, triggers and MC filters (Only store filter result, no filter is applied)
 
 # 2012 skim, Reimplementation by Giovanni
-#process.load("ZZAnalysis.AnalysisStep.Skim2012_cfg")
+#process.load("ZZXAnalysis.AnalysisStep.Skim2012_cfg")
 #process.SkimSequence = cms.Sequence(process.HZZSkim2012)
 #process.Skim = cms.Path(process.SkimSequence)
 
@@ -1678,8 +1678,8 @@ SkimPaths = cms.vstring('PVfilter') #Do not apply skim, just require a good PV
 
 if (ADDLOOSEELE) :
     import os
-    execfile(os.environ['CMSSW_BASE'] + "/src/ZZAnalysis/AnalysisStep/test/MasterPy/LooseEle.py")
-#    execfile(os.environ['CMSSW_BASE'] + "/src/ZZAnalysis/AnalysisStep/test/MasterPy/TracklessEle.py")
+    execfile(os.environ['CMSSW_BASE'] + "/src/ZZXAnalysis/AnalysisStep/test/MasterPy/LooseEle.py")
+#    execfile(os.environ['CMSSW_BASE'] + "/src/ZZXAnalysis/AnalysisStep/test/MasterPy/TracklessEle.py")
 
 
 process.GlobalTag.toGet = cms.VPSet( (cms.PSet(

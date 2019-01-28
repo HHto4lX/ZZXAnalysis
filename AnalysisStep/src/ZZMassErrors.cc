@@ -1,4 +1,4 @@
-#include <ZZAnalysis/AnalysisStep/interface/ZZMassErrors.h>
+#include <ZZXAnalysis/AnalysisStep/interface/ZZMassErrors.h>
 
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
