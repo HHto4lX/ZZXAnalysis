@@ -1,11 +1,11 @@
 #!/bin/tcsh -fe
 #
 # Instructions:
-# wget -O ${TMPDIR}/checkout_80X.csh https://raw.githubusercontent.com/CJLST/ZZAnalysis/miniAOD_80X/checkout_80X.csh
+# wget -O ${TMPDIR}/checkout_8X.csh https://raw.githubusercontent.com/HHto4lX/4lXAnalysis/master/checkout_8X.csh
 # cd $CMSSW_BASE/src
 # cmsenv
-# chmod u+x ${TMPDIR}/checkout_80X.csh
-# ${TMPDIR}/checkout_80X.csh
+# chmod u+x ${TMPDIR}/checkout_8X.csh
+# ${TMPDIR}/checkout_8X.csh
 
 
 ############## For CMSSW_8_0_29
