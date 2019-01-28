@@ -25,9 +25,9 @@ git cms-merge-topic -u perrozzi:HTXS_clean
 
 #### Please do not add any custom (non-CMSSW) package before this line ####
 
-#ZZAnalysis
-git clone https://github.com/CJLST/ZZAnalysis.git ZZAnalysis
-(cd ZZAnalysis; git checkout miniAOD_80X)
+#4lXAnalysis
+git clone https://github.com/HHto4lX/4lXAnalysis.git 4lXAnalysis
+(cd 4lXAnalysis; git checkout master)
 
 #effective areas (to be updated)
 git clone -n https://github.com/latinos/UserCode-sixie-Muon-MuonAnalysisTools Muon/MuonAnalysisTools

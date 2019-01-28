@@ -41,9 +41,9 @@ sed -i 's@class HTXSRivetProducer : public edm::stream::EDProducer<> {@class HTX
 
 #### Please do not add any custom (non-CMSSW) package before this line ####
 
-#ZZAnalysis
-git clone https://github.com/CJLST/ZZAnalysis.git ZZAnalysis
-(cd ZZAnalysis; git checkout miniAOD_80X)
+#4lXAnalysis
+git clone https://github.com/HHto4lX/4lXAnalysis.git 4lXAnalysis
+(cd 4lXAnalysis; git checkout master)
 
 #MuScleFit: probably tbf
 #git clone https://github.com/scasasso/usercode MuScleFit
