@@ -9,7 +9,7 @@ Please use CMSSW_8_0_29.
 
 Download and execute the setup script:
 ```
-wget -O ${TMPDIR}/checkout_80X.csh https://raw.githubusercontent.com/CJLST/ZZAnalysis/miniAOD_80X/checkout_80X.csh
+wget -O ${TMPDIR}/checkout_80X.csh https://raw.githubusercontent.com/HHto4lX/4lXAnalysis/master/checkout_80X.csh
 cd $CMSSW_BASE/src
 cmsenv
 chmod u+x ${TMPDIR}/checkout_80X.csh
@@ -24,7 +24,7 @@ Please use CMSSW_9_4_9.
 
 Download and execute the setup script:
 ```
-wget -O ${TMPDIR}/checkout_9X.csh https://raw.githubusercontent.com/CJLST/ZZAnalysis/miniAOD_80X/checkout_9X.csh
+wget -O ${TMPDIR}/checkout_9X.csh https://raw.githubusercontent.com/HHto4lX/4lXAnalysis/master/checkout_9X.csh
 cd $CMSSW_BASE/src
 cmsenv
 chmod u+x ${TMPDIR}/checkout_9X.csh
@@ -39,7 +39,7 @@ Please use CMSSW_10_2_5_patch1.
 
 Download and execute the setup script:
 ```
-wget -O ${TMPDIR}/checkout_10X.csh https://raw.githubusercontent.com/CJLST/ZZAnalysis/miniAOD_80X/checkout_10X.csh
+wget -O ${TMPDIR}/checkout_10X.csh https://raw.githubusercontent.com/HHto4lX/4lXAnalysis/master/checkout_10X.csh
 cd $CMSSW_BASE/src
 cmsenv
 chmod u+x ${TMPDIR}/checkout_10X.csh
@@ -65,11 +65,9 @@ Once you are ready to commit
 git pull
 git add [files to be added]
 git commit -m ["commit message"] [files to be added]
-git push origin miniAOD_80X
+git push origin master
 ```
 
 Otherwise you can make a fork of the repository, develop therein, and make a pull request in the same way as for CMSSW.
 
-Code documentation
-------------------
-Please see the [gitHub wiki](https://github.com/CJLST/ZZAnalysis) for more documentation.
+
