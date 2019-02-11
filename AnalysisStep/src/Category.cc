@@ -14,6 +14,30 @@ using namespace std;
 
 
 
+extern "C" int categoryHH( int nExtraLep,
+                           int nExtraZ,
+                           int nCleanedJetsPt30,
+                           int nCleanedJetsPt30BTagged_bTagSF,
+                           float PFMET )  
+{
+   if( nExtraLep==0 && nCleanedJetsPt30BTagged_bTagSF==2){
+
+    return ZZ4lPlusTwoBjets;
+
+
+  }else if( nExtraLep==0 && nCleanedJetsPt30==1 ){
+
+    return ZZ4lPlusTwoTau;
+
+  }else if( nExtraLep==0 && nCleanedJetsPt30==1 ){
+
+    return ZZ4lPlusTwoGamma;
+  }else{
+    return UntaggedHH;
+
+  }
+}
+
 extern "C" int categoryLegacy( int nCleanedJetsPt30 )
 {
   if(VERBOSE) cout << "WARNING: using deprecated categorization function 'categoryLegacy'" << endl;

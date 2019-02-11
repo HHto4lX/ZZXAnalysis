@@ -3,7 +3,26 @@
 
 
 
-//---------- RunI categorization 
+
+
+//------- ZZX Categorization
+
+enum CategoryHH {
+ UntaggedHH = 0,
+ ZZ4lPlusTwoBjets = 1,
+ ZZ4lPlusTwoTau = 2,
+ ZZ4lPlusTwoGamma = 3,
+ ZZ4lPlusleptonNeutrino = 4
+};
+ 
+extern "C" int categoryHH( int nExtraLep,
+                           int nExtraZ,
+                           int nCleanedJetsPt30,
+                           int nCleanedJetsPt30BTagged_bTagSF,
+                           float PFMET
+			 );
+
+//--------- RunI canegorization 
 
 enum CategoryLegacy {
   ZeroOneJet = 0,
