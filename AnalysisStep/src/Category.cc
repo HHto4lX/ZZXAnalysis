@@ -32,6 +32,10 @@ extern "C" int categoryHH( int nExtraLep,
   }else if( nExtraLep==0 && nCleanedJetsPt30==1 ){
 
     return ZZ4lPlusTwoGamma;
+
+ }else if( nExtraLep==1 && PFMET > 100 ){
+    return ZZ4lPlusleptonNeutrino;
+
   }else{
     return UntaggedHH;
 
