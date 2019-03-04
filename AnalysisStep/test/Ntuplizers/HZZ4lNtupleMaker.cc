@@ -186,6 +186,11 @@ namespace {
   std::vector<float> LepSmear_Unc;
 
 
+  std::vector<float> photonPt;
+  std::vector<float> photonEta;
+  std::vector<float> photonPhi;
+
+
   std::vector<float> fsrPt;
   std::vector<float> fsrEta;
   std::vector<float> fsrPhi;
@@ -1590,6 +1595,12 @@ void HZZ4lNtupleMaker::FillCandidate(const pat::CompositeCandidate& cand, bool e
   LepScale_Unc.clear();
   LepSmear_Unc.clear();
 
+
+  photonPt.clear();
+  photonEta.clear();
+  photonPhi.clear();
+
+
   TLE_dR_Z = -1;
   fsrPt.clear();
   fsrEta.clear();
@@ -1648,6 +1659,11 @@ void HZZ4lNtupleMaker::FillCandidate(const pat::CompositeCandidate& cand, bool e
     pushRecoMELABranches(cand);
 
   }
+
+
+  // photon variables
+  vector<const reco::Candidate*> photon;
+
 
   //Z1 and Z2 variables
   const reco::Candidate* Z1;
@@ -1762,6 +1778,17 @@ void HZZ4lNtupleMaker::FillCandidate(const pat::CompositeCandidate& cand, bool e
     LepisLoose.push_back(userdatahelpers::hasUserFloat(leptons[i],"isLoose") == 1 ? userdatahelpers::getUserFloat(leptons[i],"isLoose") : -2);
 
   }
+
+
+  // photons
+   for (unsigned i=0; i<photon.size(); ++i) {
+    math::XYZTLorentzVector photonLV = photon[i]->p4();
+    photonPt.push_back(photonLV.pt());
+    photonEta.push_back(photonLV.eta());
+    photonPhi.push_back(photonLV.phi());
+    
+  }
+
 
   // FSR
   for (unsigned i=0; i<fsrPhot.size(); ++i) {
@@ -2453,6 +2480,10 @@ void HZZ4lNtupleMaker::BookAllBranches(){
   myTree->Book("LepSelSF_Unc",LepSelSF_Unc, false);
   myTree->Book("LepScale_Unc",LepScale_Unc, false);
   myTree->Book("LepSmear_Unc",LepSmear_Unc, false);
+
+  myTree->Book("photonPt",photonPt, false);
+  myTree->Book("photonEta",photonEta, false);
+  myTree->Book("photonPhi",photonPhi, false);
 
   myTree->Book("fsrPt",fsrPt, false);
   myTree->Book("fsrEta",fsrEta, false);

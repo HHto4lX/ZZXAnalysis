@@ -1,15 +1,10 @@
 /** \class PhotonFiller
  *
- *  Preselect photons from all packedPFCandidates, 
- *  SuperCluster-based veto with electrons and store
- *  the surviving photons in the event for further use
+ *  Preselect photons from all packedPFCandidates
  *
- *  $Date: 2012/10/17 11:32:15 $
- *  $Revision: 1.14 $
- *  \author N. Amapane (Torino)
- *  \author S. Bolognesi (JHU)
- *  \author C. Botta (CERN)
- *  \author S. Casasso (Torino)
+ *  $Date: 2019/03/04 $
+ *  \author A. Cappati (Torino)
+ *  \author B. Kiani   (Torino)
  */
 
 #include <FWCore/Framework/interface/Frameworkfwd.h>
@@ -53,7 +48,7 @@ class PhotonFiller : public edm::EDProducer {
   virtual void produce(edm::Event&, const edm::EventSetup&);
   virtual void endJob(){};
 
-  edm::EDGetTokenT<pat::ElectronCollection> electronToken;
+  edm::EDGetTokenT<std::vector<pat::Photon> > photonToken;
   edm::EDGetTokenT<edm::View<pat::PackedCandidate> > pfCandToken;
   int selectionMode;
   int sampleType;
@@ -63,24 +58,14 @@ class PhotonFiller : public edm::EDProducer {
 
 
 PhotonFiller::PhotonFiller(const edm::ParameterSet& iConfig) :
-  electronToken(consumes<pat::ElectronCollection>(iConfig.getParameter<edm::InputTag>("electronSrc"))),
+  photonToken(consumes<vector<pat::Photon> >(iConfig.getParameter<edm::InputTag>("photonSrc"))),
   sampleType(iConfig.getParameter<int>("sampleType")),
   setup(iConfig.getParameter<int>("setup")),
   debug(iConfig.getUntrackedParameter<bool>("debug",false))
 {
-  pfCandToken = consumes<edm::View<pat::PackedCandidate> >(edm::InputTag("packedPFCandidates"));
+  
+  pfCandToken = consumes<edm::View<pat::PackedCandidate> >(edm::InputTag("packedPFCandidates")); 
 
-  string mode = iConfig.getParameter<string>("photonSel");
-  
-  if      (mode == "skip")        selectionMode = 0; // no FSR
-  else if (mode == "passThrough") selectionMode = 1; // for debug
-  else if (mode == "Legacy")      selectionMode = 2;
-  else if (mode == "RunII")       selectionMode = 3;
-  else {
-    cout << "PhotonFiller: mode " << mode << " not supported" << endl;
-    abort();
-  }
-  
   produces<reco::PFCandidateCollection>(); 
 }
 
@@ -88,10 +73,9 @@ PhotonFiller::PhotonFiller(const edm::ParameterSet& iConfig) :
 void
 PhotonFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-
-  //  edm::Handle<pat::ElectronRefVector> electronHandle;
-  edm::Handle<pat::ElectronCollection> electronHandle;
-  iEvent.getByToken(electronToken, electronHandle);
+  //--- get the photon cand
+  edm::Handle<vector<pat::Photon> >photonHandle;
+  iEvent.getByToken(photonToken, photonHandle);
 
   //--- Get the PF cands
   edm::Handle<edm::View<pat::PackedCandidate> > pfCands; 
@@ -101,64 +85,28 @@ PhotonFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   auto result = std::make_unique<reco::PFCandidateCollection>();
 
 
-  if (selectionMode!=0) {
-    //----------------------
-    // Loop on photons
-    //----------------------
-    for (unsigned int i=0;i<pfCands->size();++i) {
-      
-      // Get the candidate as edm::Ptr
-      //edm::Ptr<pat::PackedCandidate> g = pfCands->ptrAt(i);
-      edm::Ptr<pat::PackedCandidate> g = pfCands->ptrAt(i);
-      
-      // We only want photons
-      if (g->pdgId()!=22) continue;
 
-      // Photon preselection (is currently already applied on pat::PackedCandidate collection)
-      if (!(g->pt()>2. && fabs(g->eta())<2.4)) continue;
+  //----------------------
+  // Loop on photons
+  //----------------------
+  for (unsigned int i=0;i<pfCands->size();++i) {
+    
+    // Get the candidate as edm::Ptr
+    edm::Ptr<pat::PackedCandidate> g = pfCands->ptrAt(i);
+    
+    // We only want photons
+    if (g->pdgId()!=22) continue;
 
-      //---------------------
-      // // Supercluster veto
-      //---------------------
-      bool SCVeto=false;
-      
-      if (electronHandle->size()>0) {
-        for (unsigned int j = 0; j< electronHandle->size(); ++j){
-          const pat::Electron* e = &((*electronHandle)[j]);
-          if (e->userFloat("isSIP")){
-            if (setup>=2016) {
-              if ((e->associatedPackedPFCandidates()).size()) {
-    	        edm::RefVector < pat::PackedCandidateCollection > pfcands = e->associatedPackedPFCandidates();
-    	        for ( auto itr: pfcands ) {
-                  if (g.get()==&(*itr)) {
-      	            SCVeto=true; 
-      	            if (debug) cout << "SC veto: " << itr->eta() << " " << itr->phi() << "   " 
-      	                	    << fabs(g->eta() - itr->eta()) << " " << reco::deltaPhi(g->phi(), itr->phi()) <<endl;
-      	            break;
-      	          }  
-                }
-              }
-            } else {
-      	      double dR = reco::deltaR(*(e->superCluster()), *g);
-              if ((fabs(g->eta() - e->superCluster()->eta())<0.05 && fabs(reco::deltaPhi(g->phi(), e->superCluster()->phi()))<2.) || dR<0.15) {
-    	        SCVeto=true;
-    	        if (debug) cout << "SC veto: "<< g->pt() << " " << e->pt() << " " << dR << " "
-    	  		        << fabs(g->eta() - e->superCluster()->eta()) << " " << reco::deltaPhi(g->phi(), e->superCluster()->phi()) <<endl;
-    	        break;
-    	      } 
-    	    }
-    	  }  
-        }
-      }
-      if (debug) cout << "PhotonFiller: gamma:" << g->pt() << " " << g->eta() << " " << g->phi() << " SCVeto: " << SCVeto << endl;
+    // Photon preselection (is currently already applied on pat::PackedCandidate collection)
+    if (!(g->pt()>2. && fabs(g->eta())<2.4)) continue;
 
-      if (SCVeto) continue;
-      
-      result->push_back(reco::PFCandidate(0, g->p4(), reco::PFCandidate::gamma));
-      result->back().setStatus(0);
+    
+    
+    result->push_back(reco::PFCandidate(0, g->p4(), reco::PFCandidate::gamma));
+    result->back().setStatus(0);
 
-    } // end of loop over photon collection
-  }
+  } // end of loop over photon collection
+
   
   //Put the result in the event
   iEvent.put(std::move(result));

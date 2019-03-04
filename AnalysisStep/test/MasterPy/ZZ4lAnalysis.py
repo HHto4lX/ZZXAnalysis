@@ -837,11 +837,23 @@ process.cleanSoftElectrons = cms.EDProducer("PATElectronCleaner",
 
 
 ### ----------------------------------------------------------------------
+### Search for Photon candidates
+### ----------------------------------------------------------------------
+
+# Create a photon collection
+process.Photons = cms.EDProducer("PhotonFiller",
+    photonSrc = cms.InputTag("slimmedPhotons"),
+    sampleType = cms.int32(SAMPLE_TYPE),
+    setup = cms.int32(LEPTON_SETUP), # define the set of effective areas, rho corrections, etc.
+)
+
+
+### ----------------------------------------------------------------------
 ### Search for FSR candidates
 ### ----------------------------------------------------------------------
 
-# Create a photon collection; cfg extracted from "UFHZZXAnalysisRun2.FSRPhotons.fsrPhotons_cff"
-process.fsrPhotons = cms.EDProducer("PhotonFiller",
+# Create a photon collection for FSR; cfg extracted from "UFHZZXAnalysisRun2.FSRPhotons.fsrPhotons_cff"
+process.fsrPhotons = cms.EDProducer("PhotonFSRFiller",
     electronSrc = cms.InputTag("cleanSoftElectrons"),
     sampleType = cms.int32(SAMPLE_TYPE),
     setup = cms.int32(LEPTON_SETUP), # define the set of effective areas, rho corrections, etc.
@@ -1634,6 +1646,7 @@ process.ZZCandFilter = cms.EDFilter("CandViewCountFilter",
 process.Candidates = cms.Path(
        process.muons             +
        process.electrons         + process.cleanSoftElectrons +
+       process.Photons           +
        process.fsrPhotons        + process.boostedFsrPhotons +
        process.appendPhotons     +
        process.softLeptons       +
