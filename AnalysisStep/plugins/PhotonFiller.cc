@@ -7,6 +7,7 @@
  *  \author B. Kiani   (Torino)
  */
 
+
 #include <FWCore/Framework/interface/Frameworkfwd.h>
 #include <FWCore/Framework/interface/EDProducer.h>
 #include <FWCore/Framework/interface/Event.h>
@@ -58,7 +59,7 @@ class PhotonFiller : public edm::EDProducer {
 
 
 PhotonFiller::PhotonFiller(const edm::ParameterSet& iConfig) :
-  photonToken(consumes<vector<pat::Photon> >(iConfig.getParameter<edm::InputTag>("photonSrc"))),
+  photonToken(consumes<vector<pat::Photon> >(iConfig.getParameter<edm::InputTag>("pikaphotonSrc"))),
   sampleType(iConfig.getParameter<int>("sampleType")),
   setup(iConfig.getParameter<int>("setup")),
   debug(iConfig.getUntrackedParameter<bool>("debug",false))

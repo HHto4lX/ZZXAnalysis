@@ -43,7 +43,8 @@ process.source.fileNames = cms.untracked.vstring(
 
 
 ### HH files
-    'root://eoscms//eos/cms/store/user/covarell/HH/SM/4lgammagamma/testMINIAOD_HHSM_4lgammagamma_1.root' 
+    'root://eoscms//eos/cms/store/user/covarell/HH/SM/4lgammagamma/testMINIAOD_HHSM_4lgammagamma_1.root'
+ 
 
 
 ### Moriond 19 sync files

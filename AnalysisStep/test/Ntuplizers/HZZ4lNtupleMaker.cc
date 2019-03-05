@@ -78,6 +78,7 @@
 
 namespace {
   bool writeJets = true;     // Write jets in the tree. FIXME: make this configurable
+  bool writePhotons = true;  // Write photons in the tree
   bool addKinRefit = true;
   bool addVtxFit = false;
   bool addFSRDetails = false;
@@ -185,10 +186,11 @@ namespace {
   std::vector<float> LepScale_Unc;
   std::vector<float> LepSmear_Unc;
 
-
+  Short_t nPhotons  =  0;
   std::vector<float> photonPt;
   std::vector<float> photonEta;
   std::vector<float> photonPhi;
+  std::vector<float> photonMass;
 
 
   std::vector<float> fsrPt;
@@ -383,6 +385,7 @@ private:
   virtual void FillLHECandidate();
   virtual void FillCandidate(const pat::CompositeCandidate& higgs, bool evtPass, const edm::Event&, const Int_t CRflag);
   virtual void FillJet(const pat::Jet& jet);
+  virtual void FillPhoton(const pat::Photon& photon);
   virtual void endJob() ;
 
   void FillHGenInfo(const math::XYZTLorentzVector Hp, float w);
@@ -469,6 +472,7 @@ private:
   edm::EDGetTokenT<edm::TriggerResults> triggerResultToken;
   edm::EDGetTokenT<vector<reco::Vertex> > vtxToken;
   edm::EDGetTokenT<edm::View<pat::Jet> > jetToken;
+  edm::EDGetTokenT<edm::View<pat::Photon> > photonToken; //H->GammaGamma photons
   edm::EDGetTokenT<pat::METCollection> metToken;
   //edm::EDGetTokenT<pat::METCollection> metNoHFToken;
   edm::EDGetTokenT<pat::MuonCollection> muonToken;
@@ -591,6 +595,7 @@ HZZ4lNtupleMaker::HZZ4lNtupleMaker(const edm::ParameterSet& pset) :
   triggerResultToken = consumes<edm::TriggerResults>(edm::InputTag("TriggerResults"));
   vtxToken = consumes<vector<reco::Vertex> >(edm::InputTag("goodPrimaryVertices"));
   jetToken = consumes<edm::View<pat::Jet> >(edm::InputTag("cleanJets"));
+  photonToken = consumes<edm::View<pat::Photon> >(edm::InputTag("pikaPhotons")); // H->GammaGamma photons
   metToken = consumes<pat::METCollection>(metTag);
   //metNoHFToken = consumes<pat::METCollection>(edm::InputTag("slimmedMETsNoHF"));
   muonToken = consumes<pat::MuonCollection>(edm::InputTag("slimmedMuons"));
@@ -1122,6 +1127,27 @@ void HZZ4lNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
   //}
 
 
+  // --- photon variables (H->GammaGamma photons)
+  Handle<edm::View<pat::Photon> >photonHandle;
+  event.getByToken(photonToken,photonHandle);
+  vector<const pat::Photon*> photons;
+  for(edm::View<pat::Photon>::const_iterator pht = photonHandle->begin(); pht != photonHandle->end(); ++pht){
+    photons.push_back(&*pht);
+  } 
+
+  for (unsigned i=0; i<photons.size(); ++i) {
+    if (photons[i]==0) {
+      continue;
+    }
+
+    ++nPhotons;   // count number of photons
+
+    if (writePhotons && theChannel!=ZL) FillPhoton(*(photons.at(i)));
+
+  }
+  // ---
+
+
   // number of reconstructed leptons
   edm::Handle<pat::MuonCollection> muonHandle;
   event.getByToken(muonToken, muonHandle);
@@ -1310,6 +1336,17 @@ void HZZ4lNtupleMaker::FillJet(const pat::Jet& jet)
    JetHadronFlavour .push_back(jet.hadronFlavour());
    JetPartonFlavour .push_back(jet.partonFlavour());
 }
+
+
+void HZZ4lNtupleMaker::FillPhoton(const pat::Photon& photon)
+{
+   photonPt  .push_back( photon.pt());
+   photonEta .push_back( photon.eta());
+   photonPhi .push_back( photon.phi());
+   photonMass.push_back( photon.p4().M());
+  
+}
+
 
 float HZZ4lNtupleMaker::EvalSpline(TSpline3* const& sp, float xval){
   double xmin = sp->GetXmin();
@@ -1595,12 +1632,6 @@ void HZZ4lNtupleMaker::FillCandidate(const pat::CompositeCandidate& cand, bool e
   LepScale_Unc.clear();
   LepSmear_Unc.clear();
 
-
-  photonPt.clear();
-  photonEta.clear();
-  photonPhi.clear();
-
-
   TLE_dR_Z = -1;
   fsrPt.clear();
   fsrEta.clear();
@@ -1660,9 +1691,6 @@ void HZZ4lNtupleMaker::FillCandidate(const pat::CompositeCandidate& cand, bool e
 
   }
 
-
-  // photon variables
-  vector<const reco::Candidate*> photon;
 
 
   //Z1 and Z2 variables
@@ -1777,16 +1805,6 @@ void HZZ4lNtupleMaker::FillCandidate(const pat::CompositeCandidate& cand, bool e
     LepCombRelIsoPF.push_back( combRelIsoPF[i] );
     LepisLoose.push_back(userdatahelpers::hasUserFloat(leptons[i],"isLoose") == 1 ? userdatahelpers::getUserFloat(leptons[i],"isLoose") : -2);
 
-  }
-
-
-  // photons
-   for (unsigned i=0; i<photon.size(); ++i) {
-    math::XYZTLorentzVector photonLV = photon[i]->p4();
-    photonPt.push_back(photonLV.pt());
-    photonEta.push_back(photonLV.eta());
-    photonPhi.push_back(photonLV.phi());
-    
   }
 
 
@@ -2481,10 +2499,6 @@ void HZZ4lNtupleMaker::BookAllBranches(){
   myTree->Book("LepScale_Unc",LepScale_Unc, false);
   myTree->Book("LepSmear_Unc",LepSmear_Unc, false);
 
-  myTree->Book("photonPt",photonPt, false);
-  myTree->Book("photonEta",photonEta, false);
-  myTree->Book("photonPhi",photonPhi, false);
-
   myTree->Book("fsrPt",fsrPt, false);
   myTree->Book("fsrEta",fsrEta, false);
   myTree->Book("fsrPhi",fsrPhi, false);
@@ -2495,6 +2509,12 @@ void HZZ4lNtupleMaker::BookAllBranches(){
     myTree->Book("fsrLeptId",fsrLeptID, false);
     myTree->Book("fsrGenPt",fsrGenPt, false);
   }
+
+  //Photon variables
+  myTree->Book("photonPt",  photonPt,   failedTreeLevel >= fullFailedTree);
+  myTree->Book("photonEta", photonEta,  failedTreeLevel >= fullFailedTree);
+  myTree->Book("photonPhi", photonPhi,  failedTreeLevel >= fullFailedTree);
+  myTree->Book("photonMass",photonMass, failedTreeLevel >= fullFailedTree);
 
   //Jet variables
   myTree->Book("JetPt",JetPt, failedTreeLevel >= fullFailedTree);

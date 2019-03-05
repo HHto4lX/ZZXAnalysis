@@ -841,11 +841,13 @@ process.cleanSoftElectrons = cms.EDProducer("PATElectronCleaner",
 ### ----------------------------------------------------------------------
 
 # Create a photon collection
-process.Photons = cms.EDProducer("PhotonFiller",
-    photonSrc = cms.InputTag("slimmedPhotons"),
+# photon from H->GammaGamma
+process.pikaPhotons = cms.EDProducer("PhotonFiller",    # https://www.youtube.com/watch?v=wDT3xJV3_28
+    pikaphotonSrc = cms.InputTag("slimmedPhotons"),
     sampleType = cms.int32(SAMPLE_TYPE),
     setup = cms.int32(LEPTON_SETUP), # define the set of effective areas, rho corrections, etc.
 )
+
 
 
 ### ----------------------------------------------------------------------
@@ -1646,11 +1648,11 @@ process.ZZCandFilter = cms.EDFilter("CandViewCountFilter",
 process.Candidates = cms.Path(
        process.muons             +
        process.electrons         + process.cleanSoftElectrons +
-       process.Photons           +
        process.fsrPhotons        + process.boostedFsrPhotons +
        process.appendPhotons     +
        process.softLeptons       +
        process.cleanJets         +
+       process.pikaPhotons       +
 # Build 4-lepton candidates
        process.bareZCand         + process.ZCand     +
        process.bareZZCand        + process.ZZCand
