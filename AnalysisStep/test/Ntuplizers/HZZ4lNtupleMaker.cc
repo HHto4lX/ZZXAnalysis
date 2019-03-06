@@ -2511,6 +2511,7 @@ void HZZ4lNtupleMaker::BookAllBranches(){
   }
 
   //Photon variables
+  myTree->Book("nPhotons",  nPhotons,   failedTreeLevel >= fullFailedTree);
   myTree->Book("photonPt",  photonPt,   failedTreeLevel >= fullFailedTree);
   myTree->Book("photonEta", photonEta,  failedTreeLevel >= fullFailedTree);
   myTree->Book("photonPhi", photonPhi,  failedTreeLevel >= fullFailedTree);
