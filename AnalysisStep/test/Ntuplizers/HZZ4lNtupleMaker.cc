@@ -1919,7 +1919,7 @@ void HZZ4lNtupleMaker::beginJob()
   const int nbins = 45;
   hCounter = fs->make<TH1F>("Counters", "Counters", nbins, 0., nbins);
   BookAllBranches();
-  buildMELABranches();
+  //buildMELABranches(); // add MELA branches in the tree: commented since we don't need MELA by now (6 March 2019)
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
