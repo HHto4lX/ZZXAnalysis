@@ -836,19 +836,6 @@ process.cleanSoftElectrons = cms.EDProducer("PATElectronCleaner",
 
 
 
-### ----------------------------------------------------------------------
-### Search for Photon candidates
-### ----------------------------------------------------------------------
-
-# Create a photon collection
-# photon from H->GammaGamma
-process.pikaPhotons = cms.EDProducer("PhotonFiller",    # https://www.youtube.com/watch?v=wDT3xJV3_28
-    pikaphotonSrc = cms.InputTag("slimmedPhotons"),
-    sampleType = cms.int32(SAMPLE_TYPE),
-    setup = cms.int32(LEPTON_SETUP), # define the set of effective areas, rho corrections, etc.
-)
-
-
 
 ### ----------------------------------------------------------------------
 ### Search for FSR candidates
@@ -1289,6 +1276,21 @@ process.ZLLCand = cms.EDProducer("ZZCandidateFiller",
     #These are actually no longer needed after we dropped the Legacy FSR algorithm
     muon_iso_cut = cms.double(MUISOCUT),
     electron_iso_cut = cms.double(ELEISOCUT),
+)
+
+
+
+
+### ----------------------------------------------------------------------
+### Search for additional Photon candidates
+### ----------------------------------------------------------------------
+
+# Create a photon collection
+# photon from H->GammaGamma
+process.pikaPhotons = cms.EDProducer("PhotonFiller",    # https://www.youtube.com/watch?v=wDT3xJV3_28
+    pikaphotonSrc = cms.InputTag("slimmedPhotons"),
+    sampleType = cms.int32(SAMPLE_TYPE),
+    setup = cms.int32(LEPTON_SETUP), # define the set of effective areas, rho corrections, etc.
 )
 
 
