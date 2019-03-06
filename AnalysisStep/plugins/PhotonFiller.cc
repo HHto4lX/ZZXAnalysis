@@ -75,10 +75,11 @@ void
 PhotonFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   //--- get the photon cand
-  edm::Handle<vector<pat::Photon> >photonHandle;
-  iEvent.getByToken(photonToken, photonHandle);
+  // edm::Handle<vector<pat::Photon> >photonHandle;
+  // iEvent.getByToken(photonToken, photonHandle);
 
   //--- Get the PF cands
+  // use pf candidates and then select photon among these
   edm::Handle<edm::View<pat::PackedCandidate> > pfCands; 
   iEvent.getByToken(pfCandToken, pfCands);
 
@@ -95,10 +96,10 @@ PhotonFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     // Get the candidate as edm::Ptr
     edm::Ptr<pat::PackedCandidate> g = pfCands->ptrAt(i);
     
-    // We only want photons
+    // We only want photons: select photons among all the pf candidates
     if (g->pdgId()!=22) continue;
 
-    // Photon preselection (is currently already applied on pat::PackedCandidate collection)
+    // Photon preselection 
     if (!(g->pt()>2. && fabs(g->eta())<2.4)) continue;
 
     
