@@ -385,7 +385,7 @@ private:
   virtual void FillLHECandidate();
   virtual void FillCandidate(const pat::CompositeCandidate& higgs, bool evtPass, const edm::Event&, const Int_t CRflag);
   virtual void FillJet(const pat::Jet& jet);
-  virtual void FillPhoton(const reco::PFCandidate& photon);
+  virtual void FillPhoton(const pat::Photon& photon);
   virtual void endJob() ;
 
   void FillHGenInfo(const math::XYZTLorentzVector Hp, float w);
@@ -472,7 +472,7 @@ private:
   edm::EDGetTokenT<edm::TriggerResults> triggerResultToken;
   edm::EDGetTokenT<vector<reco::Vertex> > vtxToken;
   edm::EDGetTokenT<edm::View<pat::Jet> > jetToken;
-  edm::EDGetTokenT<reco::PFCandidateCollection> photonToken; //H->GammaGamma photons
+  edm::EDGetTokenT<edm::View<pat::Photon> > photonToken; //H->GammaGamma photons
   edm::EDGetTokenT<pat::METCollection> metToken;
   //edm::EDGetTokenT<pat::METCollection> metNoHFToken;
   edm::EDGetTokenT<pat::MuonCollection> muonToken;
@@ -595,7 +595,7 @@ HZZ4lNtupleMaker::HZZ4lNtupleMaker(const edm::ParameterSet& pset) :
   triggerResultToken = consumes<edm::TriggerResults>(edm::InputTag("TriggerResults"));
   vtxToken = consumes<vector<reco::Vertex> >(edm::InputTag("goodPrimaryVertices"));
   jetToken = consumes<edm::View<pat::Jet> >(edm::InputTag("cleanJets"));
-  photonToken = consumes<reco::PFCandidateCollection>(edm::InputTag("pikaPhotons")); // H->GammaGamma photons
+  photonToken = consumes<edm::View<pat::Photon> >(edm::InputTag("pikaPhotons")); // H->GammaGamma photons
   metToken = consumes<pat::METCollection>(metTag);
   //metNoHFToken = consumes<pat::METCollection>(edm::InputTag("slimmedMETsNoHF"));
   muonToken = consumes<pat::MuonCollection>(edm::InputTag("slimmedMuons"));
@@ -1128,10 +1128,10 @@ void HZZ4lNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
 
 
   // --- photon variables (H->GammaGamma photons)
-  Handle<reco::PFCandidateCollection>photonHandle;
+  Handle<edm::View<pat::Photon> > photonHandle;
   event.getByToken(photonToken,photonHandle);
-  vector<const reco::PFCandidate*> photons;
-  for(reco::PFCandidateCollection::const_iterator pht = photonHandle->begin(); pht != photonHandle->end(); ++pht){
+  vector<const pat::Photon*> photons;
+  for(edm::View<pat::Photon>::const_iterator pht = photonHandle->begin(); pht != photonHandle->end(); ++pht){
     photons.push_back(&*pht);
   } 
 
@@ -1338,7 +1338,7 @@ void HZZ4lNtupleMaker::FillJet(const pat::Jet& jet)
 }
 
 
-void HZZ4lNtupleMaker::FillPhoton(const reco::PFCandidate& photon)
+void HZZ4lNtupleMaker::FillPhoton(const pat::Photon& photon)
 {
    photonPt  .push_back( photon.pt());
    photonEta .push_back( photon.eta());
