@@ -191,6 +191,7 @@ namespace {
   std::vector<float> photonEta;
   std::vector<float> photonPhi;
   std::vector<float> photonMass;
+  std::vector<float> photonR9;
 
 
   std::vector<float> fsrPt;
@@ -1344,7 +1345,8 @@ void HZZ4lNtupleMaker::FillPhoton(const pat::Photon& photon)
    photonEta .push_back( photon.eta());
    photonPhi .push_back( photon.phi());
    photonMass.push_back( photon.p4().M());
-  
+   photonR9  .push_back( photon.r9());  
+
 }
 
 
@@ -2516,6 +2518,7 @@ void HZZ4lNtupleMaker::BookAllBranches(){
   myTree->Book("photonEta", photonEta,  failedTreeLevel >= fullFailedTree);
   myTree->Book("photonPhi", photonPhi,  failedTreeLevel >= fullFailedTree);
   myTree->Book("photonMass",photonMass, failedTreeLevel >= fullFailedTree);
+  myTree->Book("photonR9",  photonR9,   failedTreeLevel >= fullFailedTree);
 
   //Jet variables
   myTree->Book("JetPt",JetPt, failedTreeLevel >= fullFailedTree);
