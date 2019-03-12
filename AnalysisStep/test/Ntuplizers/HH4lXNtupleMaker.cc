@@ -191,7 +191,8 @@ namespace {
   std::vector<float> photonEta;
   std::vector<float> photonPhi;
   std::vector<float> photonMass;
-  std::vector<float> photonR9;
+  std::vector<float> photon_r9;
+  std::vector<float> photon_sigmaIetaIeta;
 
 
   std::vector<float> fsrPt;
@@ -1345,7 +1346,8 @@ void HH4lXNtupleMaker::FillPhoton(const pat::Photon& photon)
    photonEta .push_back( photon.eta());
    photonPhi .push_back( photon.phi());
    photonMass.push_back( photon.p4().M());
-   photonR9  .push_back( photon.r9());  
+   photon_r9 .push_back( photon.full5x5_r9());
+   photon_sigmaIetaIeta.push_back( photon.full5x5_sigmaIetaIeta());
 
 }
 
@@ -2518,7 +2520,8 @@ void HH4lXNtupleMaker::BookAllBranches(){
   myTree->Book("photonEta", photonEta,  failedTreeLevel >= fullFailedTree);
   myTree->Book("photonPhi", photonPhi,  failedTreeLevel >= fullFailedTree);
   myTree->Book("photonMass",photonMass, failedTreeLevel >= fullFailedTree);
-  myTree->Book("photonR9",  photonR9,   failedTreeLevel >= fullFailedTree);
+  myTree->Book("photon_r9", photon_r9,  failedTreeLevel >= fullFailedTree);
+  myTree->Book("photon_sigmaIetaIeta", photon_sigmaIetaIeta, failedTreeLevel >= fullFailedTree); 
 
   //Jet variables
   myTree->Book("JetPt",JetPt, failedTreeLevel >= fullFailedTree);
