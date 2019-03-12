@@ -1,5 +1,5 @@
-#ifndef HZZ4lNtupleFactory_h
-#define HZZ4lNtupleFactory_h
+#ifndef HH4lXNtupleFactory_h
+#define HH4lXNtupleFactory_h
 
 #include <vector>
 #include <unordered_map>
@@ -17,14 +17,14 @@
 
 using namespace BranchHelpers;
 
-class HZZ4lNtupleFactory{
+class HH4lXNtupleFactory{
   
  
  protected:
   
  public:
-  HZZ4lNtupleFactory(TTree* outTree_input, TTree* failedTree_input=0);
-  ~HZZ4lNtupleFactory();
+  HH4lXNtupleFactory(TTree* outTree_input, TTree* failedTree_input=0);
+  ~HH4lXNtupleFactory();
 
   enum varTypes {kBool,kShort,kInt,kChar,kLong,kFloat,kVectorFloat}; 
 
@@ -76,7 +76,7 @@ class HZZ4lNtupleFactory{
 
   TTree* _outTree;
   TTree* _failedTree;
-  // MELABranches: Only branches are owned. Every other related object is owned by HZZ4lNtupleMaker.
+  // MELABranches: Only branches are owned. Every other related object is owned by HH4lXNtupleMaker.
   std::vector<MELABranch*> recome_branches;
   std::vector<MELABranch*> lheme_branches;
 

@@ -1,4 +1,4 @@
-/** \class ZZ4lAnalyzerCR  
+/** \class ZZXAnalyzerCR  
  *
  *  For the time being: retrieving all relevant information from CR collections and filling the 2011 "flagship" plots
  *
@@ -33,7 +33,7 @@
 #include <ZZXAnalysis/AnalysisStep/interface/DaughterDataHelpers.h>
 #include <ZZXAnalysis/AnalysisStep/interface/FinalStates.h>
 #include <ZZXAnalysis/AnalysisStep/interface/PileUpWeight.h>
-#include "ZZ4lConfigHelper.h"
+#include "ZZXConfigHelper.h"
 
 
 #include <iostream>
@@ -53,11 +53,11 @@ using namespace edm;
 using namespace reco;
 
 
-class ZZ4lAnalyzerCR: public edm::EDAnalyzer {
+class ZZXAnalyzerCR: public edm::EDAnalyzer {
 public:
 
-  explicit ZZ4lAnalyzerCR(const edm::ParameterSet& pset);
-  ~ZZ4lAnalyzerCR();
+  explicit ZZXAnalyzerCR(const edm::ParameterSet& pset);
+  ~ZZXAnalyzerCR();
   
   void analyze(const edm::Event & event, const edm::EventSetup& eventSetup);
   virtual void beginJob();
@@ -67,7 +67,7 @@ public:
 		     float looseIso=-1, float iso=-1, float SIP=-1);
   
 private:
-  ZZ4lConfigHelper myHelper;
+  ZZXConfigHelper myHelper;
   Channel theChannel;
   bool isMC;
   PileUpWeight* pileUpReweight;
@@ -86,7 +86,7 @@ private:
 };
 
 // Constructor
-ZZ4lAnalyzerCR::ZZ4lAnalyzerCR(const ParameterSet& pset) :
+ZZXAnalyzerCR::ZZXAnalyzerCR(const ParameterSet& pset) :
   myHelper(pset),
   pileUpReweight(nullptr),
   weight(1.),
@@ -95,7 +95,7 @@ ZZ4lAnalyzerCR::ZZ4lAnalyzerCR(const ParameterSet& pset) :
   isMC = myHelper.isMC();
   theChannel = myHelper.channel();
 //   if (theChannel!=18) {
-//     cout << "ERROR: ZZ4lAnalyzerCR: channel "<< theChannel << " is not valid" <<endl;
+//     cout << "ERROR: ZZXAnalyzerCR: channel "<< theChannel << " is not valid" <<endl;
 //     abort();
 //   }
 
@@ -104,13 +104,13 @@ ZZ4lAnalyzerCR::ZZ4lAnalyzerCR(const ParameterSet& pset) :
   if (isMC) pileUpReweight = new PileUpWeight(myHelper.sampleType(), myHelper.setup());
 }
 
-ZZ4lAnalyzerCR::~ZZ4lAnalyzerCR()
+ZZXAnalyzerCR::~ZZXAnalyzerCR()
 {
   delete pileUpReweight;
 }
 
 
-void ZZ4lAnalyzerCR::beginJob(){
+void ZZXAnalyzerCR::beginJob(){
   // Book histograms
   edm::Service<TFileService> fileService;
 
@@ -121,12 +121,12 @@ void ZZ4lAnalyzerCR::beginJob(){
    
 }
 
-void ZZ4lAnalyzerCR::endJob(){
+void ZZXAnalyzerCR::endJob(){
    
 }
 
 
-void ZZ4lAnalyzerCR::analyze(const Event & event, const EventSetup& eventSetup){
+void ZZXAnalyzerCR::analyze(const Event & event, const EventSetup& eventSetup){
     
 
   // Trigger results
@@ -247,5 +247,5 @@ void ZZ4lAnalyzerCR::analyze(const Event & event, const EventSetup& eventSetup){
 }
 
 #include "FWCore/Framework/interface/MakerMacros.h"
-DEFINE_FWK_MODULE(ZZ4lAnalyzerCR);
+DEFINE_FWK_MODULE(ZZXAnalyzerCR);
 

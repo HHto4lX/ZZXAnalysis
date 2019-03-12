@@ -1,7 +1,7 @@
-#ifndef ZZ4lConfigHelper_h
-#define ZZ4lConfigHelper_h
+#ifndef ZZXConfigHelper_h
+#define ZZXConfigHelper_h
 
-/** \class ZZ4lConfigHelper
+/** \class ZZXConfigHelper
  *
  *  No description available.
  *
@@ -19,13 +19,13 @@
 
 #include <iostream>
 
-class ZZ4lConfigHelper {
+class ZZXConfigHelper {
  public:
   /// Constructor
-  ZZ4lConfigHelper(const edm::ParameterSet& pset);
+  ZZXConfigHelper(const edm::ParameterSet& pset);
 
   /// Destructor
-  virtual ~ZZ4lConfigHelper(){}
+  virtual ~ZZXConfigHelper(){}
 
   /// Pass skim
   bool passSkim(const edm::Event & event, edm::Handle<edm::TriggerResults> & trigRes)  { short bw=0; return passSkim(event,trigRes,bw); }

@@ -65,8 +65,8 @@
 #include <MelaAnalytics/CandidateLOCaster/interface/MELACandidateRecaster.h>
 #include <CommonLHETools/LHEHandler/interface/LHEHandler.h>
 
-#include "ZZ4lConfigHelper.h"
-#include "HZZ4lNtupleFactory.h"
+#include "ZZXConfigHelper.h"
+#include "HH4lXNtupleFactory.h"
 
 #include <TRandom3.h>
 #include <TH2D.h>
@@ -362,10 +362,10 @@ using namespace edm;
 //
 // class declaration
 //
-class HZZ4lNtupleMaker : public edm::EDAnalyzer {
+class HH4lXNtupleMaker : public edm::EDAnalyzer {
 public:
-  explicit HZZ4lNtupleMaker(const edm::ParameterSet&);
-  ~HZZ4lNtupleMaker();
+  explicit HH4lXNtupleMaker(const edm::ParameterSet&);
+  ~HH4lXNtupleMaker();
 
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -423,12 +423,12 @@ private:
 	
 
   // ----------member data ---------------------------
-  ZZ4lConfigHelper myHelper;
+  ZZXConfigHelper myHelper;
   int theChannel;
   std::string theCandLabel;
   TString theFileName;
 
-  HZZ4lNtupleFactory *myTree;
+  HH4lXNtupleFactory *myTree;
   TH1F *hCounter;
 
   bool isMC;
@@ -541,7 +541,7 @@ private:
 //
 // constructors and destructor
 //
-HZZ4lNtupleMaker::HZZ4lNtupleMaker(const edm::ParameterSet& pset) :
+HH4lXNtupleMaker::HH4lXNtupleMaker(const edm::ParameterSet& pset) :
   myHelper(pset),
   theChannel(myHelper.channel()), // Valid options: ZZ, ZLL, ZL
   theCandLabel(pset.getUntrackedParameter<string>("CandCollection")), // Name of input ZZ collection
@@ -773,7 +773,7 @@ HZZ4lNtupleMaker::HZZ4lNtupleMaker(const edm::ParameterSet& pset) :
     }
     else
     {
-    	 cout<<"[ERROR] HZZ4lNtupleMaker: Electron SFs not supported for " << year << " year!!!" << endl;
+    	 cout<<"[ERROR] HH4lXNtupleMaker: Electron SFs not supported for " << year << " year!!!" << endl;
     	 abort();
 	 }
  }
@@ -808,7 +808,7 @@ HZZ4lNtupleMaker::HZZ4lNtupleMaker(const edm::ParameterSet& pset) :
     }
     else
     {
-    	 cout<<"[ERROR] HZZ4lNtupleMaker: Muon SFs not supported for " << year << " year!!!" << endl;
+    	 cout<<"[ERROR] HH4lXNtupleMaker: Muon SFs not supported for " << year << " year!!!" << endl;
     	 abort();
 	 }
   }
@@ -846,7 +846,7 @@ HZZ4lNtupleMaker::HZZ4lNtupleMaker(const edm::ParameterSet& pset) :
   }
 }
 
-HZZ4lNtupleMaker::~HZZ4lNtupleMaker()
+HH4lXNtupleMaker::~HH4lXNtupleMaker()
 {
   clearMELABranches(); // Cleans LHE branches
   delete lheHandler;
@@ -855,7 +855,7 @@ HZZ4lNtupleMaker::~HZZ4lNtupleMaker()
 
 
 // ------------ method called for each event  ------------
-void HZZ4lNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& eSetup)
+void HH4lXNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& eSetup)
 {
   myTree->InitializeVariables();
 
@@ -878,10 +878,10 @@ void HZZ4lNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
     event.getManyByType(PupInfos);
     Handle<std::vector< PileupSummaryInfo > > PupInfo = PupInfos.front();
 //     try {
-//       cout << "TRY HZZ4lNtupleMaker" <<endl;
+//       cout << "TRY HH4lXNtupleMaker" <<endl;
 //       event.getByLabel(edm::InputTag("addPileupInfo"), PupInfo);
 //     } catch (const cms::Exception& e){
-//       cout << "FAIL HZZ4lNtupleMaker" <<endl;
+//       cout << "FAIL HH4lXNtupleMaker" <<endl;
 //       event.getByLabel(edm::InputTag("slimmedAddPileupInfo"), PupInfo);
 //     }
 
@@ -1303,7 +1303,7 @@ void HZZ4lNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
 }
 
 
-void HZZ4lNtupleMaker::FillJet(const pat::Jet& jet)
+void HH4lXNtupleMaker::FillJet(const pat::Jet& jet)
 {
    JetPt  .push_back( jet.pt());
    JetEta .push_back( jet.eta());
@@ -1339,7 +1339,7 @@ void HZZ4lNtupleMaker::FillJet(const pat::Jet& jet)
 }
 
 
-void HZZ4lNtupleMaker::FillPhoton(const pat::Photon& photon)
+void HH4lXNtupleMaker::FillPhoton(const pat::Photon& photon)
 {
    photonPt  .push_back( photon.pt());
    photonEta .push_back( photon.eta());
@@ -1350,7 +1350,7 @@ void HZZ4lNtupleMaker::FillPhoton(const pat::Photon& photon)
 }
 
 
-float HZZ4lNtupleMaker::EvalSpline(TSpline3* const& sp, float xval){
+float HH4lXNtupleMaker::EvalSpline(TSpline3* const& sp, float xval){
   double xmin = sp->GetXmin();
   double xmax = sp->GetXmax();
   double res=0;
@@ -1368,7 +1368,7 @@ float HZZ4lNtupleMaker::EvalSpline(TSpline3* const& sp, float xval){
   return res;
 }
 
-void HZZ4lNtupleMaker::FillKFactors(edm::Handle<GenEventInfoProduct>& genInfo, std::vector<const reco::Candidate *>& genZLeps){
+void HH4lXNtupleMaker::FillKFactors(edm::Handle<GenEventInfoProduct>& genInfo, std::vector<const reco::Candidate *>& genZLeps){
   KFactor_QCD_ggZZ_Nominal=1;
   KFactor_QCD_ggZZ_PDFScaleDn=1;
   KFactor_QCD_ggZZ_PDFScaleUp=1;
@@ -1387,18 +1387,18 @@ void HZZ4lNtupleMaker::FillKFactors(edm::Handle<GenEventInfoProduct>& genInfo, s
   if (isMC){
     GenEventInfoProduct  genInfoP = *(genInfo.product());
     if (apply_K_NNLOQCD_ZZGG>0 && apply_K_NNLOQCD_ZZGG!=3){
-      if (spkfactor_ggzz_nnlo[0]!=0) KFactor_QCD_ggZZ_Nominal = HZZ4lNtupleMaker::EvalSpline(spkfactor_ggzz_nnlo[0], GenHMass);
-      if (spkfactor_ggzz_nnlo[1]!=0) KFactor_QCD_ggZZ_PDFScaleDn = HZZ4lNtupleMaker::EvalSpline(spkfactor_ggzz_nnlo[1], GenHMass);
-      if (spkfactor_ggzz_nnlo[2]!=0) KFactor_QCD_ggZZ_PDFScaleUp = HZZ4lNtupleMaker::EvalSpline(spkfactor_ggzz_nnlo[2], GenHMass);
-      if (spkfactor_ggzz_nnlo[3]!=0) KFactor_QCD_ggZZ_QCDScaleDn = HZZ4lNtupleMaker::EvalSpline(spkfactor_ggzz_nnlo[3], GenHMass);
-      if (spkfactor_ggzz_nnlo[4]!=0) KFactor_QCD_ggZZ_QCDScaleUp = HZZ4lNtupleMaker::EvalSpline(spkfactor_ggzz_nnlo[4], GenHMass);
-      if (spkfactor_ggzz_nnlo[5]!=0) KFactor_QCD_ggZZ_AsDn = HZZ4lNtupleMaker::EvalSpline(spkfactor_ggzz_nnlo[5], GenHMass);
-      if (spkfactor_ggzz_nnlo[6]!=0) KFactor_QCD_ggZZ_AsUp = HZZ4lNtupleMaker::EvalSpline(spkfactor_ggzz_nnlo[6], GenHMass);
-      if (spkfactor_ggzz_nnlo[7]!=0) KFactor_QCD_ggZZ_PDFReplicaDn = HZZ4lNtupleMaker::EvalSpline(spkfactor_ggzz_nnlo[7], GenHMass);
-      if (spkfactor_ggzz_nnlo[8]!=0) KFactor_QCD_ggZZ_PDFReplicaUp = HZZ4lNtupleMaker::EvalSpline(spkfactor_ggzz_nnlo[8], GenHMass);
+      if (spkfactor_ggzz_nnlo[0]!=0) KFactor_QCD_ggZZ_Nominal = HH4lXNtupleMaker::EvalSpline(spkfactor_ggzz_nnlo[0], GenHMass);
+      if (spkfactor_ggzz_nnlo[1]!=0) KFactor_QCD_ggZZ_PDFScaleDn = HH4lXNtupleMaker::EvalSpline(spkfactor_ggzz_nnlo[1], GenHMass);
+      if (spkfactor_ggzz_nnlo[2]!=0) KFactor_QCD_ggZZ_PDFScaleUp = HH4lXNtupleMaker::EvalSpline(spkfactor_ggzz_nnlo[2], GenHMass);
+      if (spkfactor_ggzz_nnlo[3]!=0) KFactor_QCD_ggZZ_QCDScaleDn = HH4lXNtupleMaker::EvalSpline(spkfactor_ggzz_nnlo[3], GenHMass);
+      if (spkfactor_ggzz_nnlo[4]!=0) KFactor_QCD_ggZZ_QCDScaleUp = HH4lXNtupleMaker::EvalSpline(spkfactor_ggzz_nnlo[4], GenHMass);
+      if (spkfactor_ggzz_nnlo[5]!=0) KFactor_QCD_ggZZ_AsDn = HH4lXNtupleMaker::EvalSpline(spkfactor_ggzz_nnlo[5], GenHMass);
+      if (spkfactor_ggzz_nnlo[6]!=0) KFactor_QCD_ggZZ_AsUp = HH4lXNtupleMaker::EvalSpline(spkfactor_ggzz_nnlo[6], GenHMass);
+      if (spkfactor_ggzz_nnlo[7]!=0) KFactor_QCD_ggZZ_PDFReplicaDn = HH4lXNtupleMaker::EvalSpline(spkfactor_ggzz_nnlo[7], GenHMass);
+      if (spkfactor_ggzz_nnlo[8]!=0) KFactor_QCD_ggZZ_PDFReplicaUp = HH4lXNtupleMaker::EvalSpline(spkfactor_ggzz_nnlo[8], GenHMass);
       if (apply_K_NNLOQCD_ZZGG==2){
         if (spkfactor_ggzz_nlo[0]!=0){
-          float divisor = HZZ4lNtupleMaker::EvalSpline(spkfactor_ggzz_nlo[0], GenHMass);
+          float divisor = HH4lXNtupleMaker::EvalSpline(spkfactor_ggzz_nlo[0], GenHMass);
           KFactor_QCD_ggZZ_Nominal /= divisor;
           KFactor_QCD_ggZZ_PDFScaleDn /= divisor;
           KFactor_QCD_ggZZ_PDFScaleUp /= divisor;
@@ -1423,15 +1423,15 @@ void HZZ4lNtupleMaker::FillKFactors(edm::Handle<GenEventInfoProduct>& genInfo, s
       }
     }
     else if (apply_K_NNLOQCD_ZZGG==3){
-      if (spkfactor_ggzz_nlo[0]!=0) KFactor_QCD_ggZZ_Nominal = HZZ4lNtupleMaker::EvalSpline(spkfactor_ggzz_nlo[0], GenHMass);
-      if (spkfactor_ggzz_nlo[1]!=0) KFactor_QCD_ggZZ_PDFScaleDn = HZZ4lNtupleMaker::EvalSpline(spkfactor_ggzz_nlo[1], GenHMass);
-      if (spkfactor_ggzz_nlo[2]!=0) KFactor_QCD_ggZZ_PDFScaleUp = HZZ4lNtupleMaker::EvalSpline(spkfactor_ggzz_nlo[2], GenHMass);
-      if (spkfactor_ggzz_nlo[3]!=0) KFactor_QCD_ggZZ_QCDScaleDn = HZZ4lNtupleMaker::EvalSpline(spkfactor_ggzz_nlo[3], GenHMass);
-      if (spkfactor_ggzz_nlo[4]!=0) KFactor_QCD_ggZZ_QCDScaleUp = HZZ4lNtupleMaker::EvalSpline(spkfactor_ggzz_nlo[4], GenHMass);
-      if (spkfactor_ggzz_nlo[5]!=0) KFactor_QCD_ggZZ_AsDn = HZZ4lNtupleMaker::EvalSpline(spkfactor_ggzz_nlo[5], GenHMass);
-      if (spkfactor_ggzz_nlo[6]!=0) KFactor_QCD_ggZZ_AsUp = HZZ4lNtupleMaker::EvalSpline(spkfactor_ggzz_nlo[6], GenHMass);
-      if (spkfactor_ggzz_nlo[7]!=0) KFactor_QCD_ggZZ_PDFReplicaDn = HZZ4lNtupleMaker::EvalSpline(spkfactor_ggzz_nlo[7], GenHMass);
-      if (spkfactor_ggzz_nlo[8]!=0) KFactor_QCD_ggZZ_PDFReplicaUp = HZZ4lNtupleMaker::EvalSpline(spkfactor_ggzz_nlo[8], GenHMass);
+      if (spkfactor_ggzz_nlo[0]!=0) KFactor_QCD_ggZZ_Nominal = HH4lXNtupleMaker::EvalSpline(spkfactor_ggzz_nlo[0], GenHMass);
+      if (spkfactor_ggzz_nlo[1]!=0) KFactor_QCD_ggZZ_PDFScaleDn = HH4lXNtupleMaker::EvalSpline(spkfactor_ggzz_nlo[1], GenHMass);
+      if (spkfactor_ggzz_nlo[2]!=0) KFactor_QCD_ggZZ_PDFScaleUp = HH4lXNtupleMaker::EvalSpline(spkfactor_ggzz_nlo[2], GenHMass);
+      if (spkfactor_ggzz_nlo[3]!=0) KFactor_QCD_ggZZ_QCDScaleDn = HH4lXNtupleMaker::EvalSpline(spkfactor_ggzz_nlo[3], GenHMass);
+      if (spkfactor_ggzz_nlo[4]!=0) KFactor_QCD_ggZZ_QCDScaleUp = HH4lXNtupleMaker::EvalSpline(spkfactor_ggzz_nlo[4], GenHMass);
+      if (spkfactor_ggzz_nlo[5]!=0) KFactor_QCD_ggZZ_AsDn = HH4lXNtupleMaker::EvalSpline(spkfactor_ggzz_nlo[5], GenHMass);
+      if (spkfactor_ggzz_nlo[6]!=0) KFactor_QCD_ggZZ_AsUp = HH4lXNtupleMaker::EvalSpline(spkfactor_ggzz_nlo[6], GenHMass);
+      if (spkfactor_ggzz_nlo[7]!=0) KFactor_QCD_ggZZ_PDFReplicaDn = HH4lXNtupleMaker::EvalSpline(spkfactor_ggzz_nlo[7], GenHMass);
+      if (spkfactor_ggzz_nlo[8]!=0) KFactor_QCD_ggZZ_PDFReplicaUp = HH4lXNtupleMaker::EvalSpline(spkfactor_ggzz_nlo[8], GenHMass);
     }
 
     if (genFinalState!=BUGGY){
@@ -1465,7 +1465,7 @@ void HZZ4lNtupleMaker::FillKFactors(edm::Handle<GenEventInfoProduct>& genInfo, s
 }
 
 
-void HZZ4lNtupleMaker::FillLHECandidate(){
+void HH4lXNtupleMaker::FillLHECandidate(){
   LHEMotherPz.clear();
   LHEMotherE.clear();
   LHEMotherId.clear();
@@ -1605,7 +1605,7 @@ void HZZ4lNtupleMaker::FillLHECandidate(){
 }
 
 
-void HZZ4lNtupleMaker::FillCandidate(const pat::CompositeCandidate& cand, bool evtPass, const edm::Event& event, Int_t CRFLAG)
+void HH4lXNtupleMaker::FillCandidate(const pat::CompositeCandidate& cand, bool evtPass, const edm::Event& event, Int_t CRFLAG)
 {
   //Initialize a new candidate into the tree
   //myTree->createNewCandidate(); // this doesn't do anything anymore
@@ -1902,7 +1902,7 @@ void HZZ4lNtupleMaker::FillCandidate(const pat::CompositeCandidate& cand, bool e
 }
 
 
-void HZZ4lNtupleMaker::getCheckedUserFloat(const pat::CompositeCandidate& cand, const std::string& strval, Float_t& setval, Float_t defaultval){
+void HH4lXNtupleMaker::getCheckedUserFloat(const pat::CompositeCandidate& cand, const std::string& strval, Float_t& setval, Float_t defaultval){
   if (cand.hasUserFloat(strval)) setval = cand.userFloat(strval);
   else setval = defaultval;
 }
@@ -1910,14 +1910,14 @@ void HZZ4lNtupleMaker::getCheckedUserFloat(const pat::CompositeCandidate& cand, 
 
 
 // ------------ method called once each job just before starting event loop  ------------
-void HZZ4lNtupleMaker::beginJob()
+void HH4lXNtupleMaker::beginJob()
 {
   edm::Service<TFileService> fs;
   TTree *candTree = fs->make<TTree>(theFileName,"Event Summary");
   TTree *candTree_failed = 0;
   if (failedTreeLevel)
     candTree_failed = fs->make<TTree>(theFileName+"_failed","Event Summary");
-  myTree = new HZZ4lNtupleFactory(candTree, candTree_failed);
+  myTree = new HH4lXNtupleFactory(candTree, candTree_failed);
   const int nbins = 45;
   hCounter = fs->make<TH1F>("Counters", "Counters", nbins, 0., nbins);
   BookAllBranches();
@@ -1925,7 +1925,7 @@ void HZZ4lNtupleMaker::beginJob()
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
-void HZZ4lNtupleMaker::endJob()
+void HH4lXNtupleMaker::endJob()
 {
   hCounter->SetBinContent(0 ,gen_sumWeights); // also stored in bin 40
   hCounter->SetBinContent(1 ,Nevt_Gen-gen_BUGGY);
@@ -1977,7 +1977,7 @@ void HZZ4lNtupleMaker::endJob()
 }
 
 // ------------ method called when starting to processes a run  ------------
-void HZZ4lNtupleMaker::beginRun(edm::Run const& iRun, edm::EventSetup const&)
+void HH4lXNtupleMaker::beginRun(edm::Run const& iRun, edm::EventSetup const&)
 {
   static bool firstRun=true;
   if (firstRun){
@@ -1991,18 +1991,18 @@ void HZZ4lNtupleMaker::beginRun(edm::Run const& iRun, edm::EventSetup const&)
 }
 
 // ------------ method called when ending the processing of a run  ------------
-void HZZ4lNtupleMaker::endRun(edm::Run const& iRun, edm::EventSetup const&)
+void HH4lXNtupleMaker::endRun(edm::Run const& iRun, edm::EventSetup const&)
 {
 }
 
 // ------------ method called when starting to processes a luminosity block  ------------
-void HZZ4lNtupleMaker::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
+void HH4lXNtupleMaker::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
 {
   Nevt_Gen_lumiBlock = 0;
 }
 
 // ------------ method called when ending the processing of a luminosity block  ------------
-void HZZ4lNtupleMaker::endLuminosityBlock(edm::LuminosityBlock const& iLumi, edm::EventSetup const& iSetup)
+void HH4lXNtupleMaker::endLuminosityBlock(edm::LuminosityBlock const& iLumi, edm::EventSetup const& iSetup)
 {
   Float_t Nevt_preskim = -1.;
   edm::Handle<edm::MergeableCounter> preSkimCounter;
@@ -2016,7 +2016,7 @@ void HZZ4lNtupleMaker::endLuminosityBlock(edm::LuminosityBlock const& iLumi, edm
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
-void HZZ4lNtupleMaker::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+void HH4lXNtupleMaker::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -2025,7 +2025,7 @@ void HZZ4lNtupleMaker::fillDescriptions(edm::ConfigurationDescriptions& descript
 }
 
 
-Float_t HZZ4lNtupleMaker::getAllWeight(const vector<const reco::Candidate*>& leptons, Float_t& muonSFUncert, Float_t& eleSFUncert) const
+Float_t HH4lXNtupleMaker::getAllWeight(const vector<const reco::Candidate*>& leptons, Float_t& muonSFUncert, Float_t& eleSFUncert) const
 {
   Float_t totWeight = 1.;
   Float_t ele_Unc_rel = 0.; //relative uncertainty for product of electron weights
@@ -2260,7 +2260,7 @@ Float_t HZZ4lNtupleMaker::getAllWeight(const vector<const reco::Candidate*>& lep
 }
 
 
-Float_t HZZ4lNtupleMaker::getHqTWeight(double mH, double genPt) const
+Float_t HH4lXNtupleMaker::getHqTWeight(double mH, double genPt) const
 {
   if (skipHqTWeight) return 1.;
 
@@ -2288,7 +2288,7 @@ Float_t HZZ4lNtupleMaker::getHqTWeight(double mH, double genPt) const
 
 
 // Added by CO
-Float_t HZZ4lNtupleMaker::getFakeWeight(Float_t LepPt, Float_t LepEta, Int_t LepID, Int_t LepZ1ID)
+Float_t HH4lXNtupleMaker::getFakeWeight(Float_t LepPt, Float_t LepEta, Int_t LepID, Int_t LepZ1ID)
 {
   if (skipFakeWeight) return 1.;
 
@@ -2329,7 +2329,7 @@ Float_t HZZ4lNtupleMaker::getFakeWeight(Float_t LepPt, Float_t LepEta, Int_t Lep
   return weight;
 
 } // end of getFakeWeight
-void HZZ4lNtupleMaker::FillZGenInfo(Short_t Z1Id, Short_t Z2Id,
+void HH4lXNtupleMaker::FillZGenInfo(Short_t Z1Id, Short_t Z2Id,
                                     const math::XYZTLorentzVector pZ1, const math::XYZTLorentzVector pZ2)
 {
   GenZ1Mass= pZ1.M();
@@ -2347,7 +2347,7 @@ void HZZ4lNtupleMaker::FillZGenInfo(Short_t Z1Id, Short_t Z2Id,
   return;
 }
 
-void HZZ4lNtupleMaker::FillLepGenInfo(Short_t Lep1Id, Short_t Lep2Id, Short_t Lep3Id, Short_t Lep4Id,
+void HH4lXNtupleMaker::FillLepGenInfo(Short_t Lep1Id, Short_t Lep2Id, Short_t Lep3Id, Short_t Lep4Id,
                                       const math::XYZTLorentzVector Lep1, const math::XYZTLorentzVector Lep2,
                                       const math::XYZTLorentzVector Lep3, const math::XYZTLorentzVector Lep4)
 {
@@ -2377,7 +2377,7 @@ void HZZ4lNtupleMaker::FillLepGenInfo(Short_t Lep1Id, Short_t Lep2Id, Short_t Le
   return;
 }
 
-void HZZ4lNtupleMaker::FillAssocLepGenInfo(std::vector<const reco::Candidate *>& AssocLeps)
+void HH4lXNtupleMaker::FillAssocLepGenInfo(std::vector<const reco::Candidate *>& AssocLeps)
 {
   if (AssocLeps.size() >= 1) {
     GenAssocLep1Pt =AssocLeps.at(0)->p4().Pt();
@@ -2396,7 +2396,7 @@ void HZZ4lNtupleMaker::FillAssocLepGenInfo(std::vector<const reco::Candidate *>&
 }
 
 
-void HZZ4lNtupleMaker::FillHGenInfo(const math::XYZTLorentzVector pH, float w)
+void HH4lXNtupleMaker::FillHGenInfo(const math::XYZTLorentzVector pH, float w)
 {
   GenHMass=pH.M();
   GenHPt=pH.Pt();
@@ -2408,7 +2408,7 @@ void HZZ4lNtupleMaker::FillHGenInfo(const math::XYZTLorentzVector pH, float w)
 }
 
 
-void HZZ4lNtupleMaker::BookAllBranches(){
+void HH4lXNtupleMaker::BookAllBranches(){
    //Event variables
   myTree->Book("RunNumber",RunNumber, failedTreeLevel >= minimalFailedTree);
   myTree->Book("EventNumber",EventNumber, failedTreeLevel >= minimalFailedTree);
@@ -2696,12 +2696,12 @@ myTree->Book("htxs_stage1_cat", htxs_stage1_cat, failedTreeLevel >= fullFailedTr
   // MELA branches are booked under buildMELA
 }
 
-void HZZ4lNtupleMaker::addweight(float &weight, float weighttoadd) {
+void HH4lXNtupleMaker::addweight(float &weight, float weighttoadd) {
   weight += weighttoadd;
 }
 
 
-void HZZ4lNtupleMaker::buildMELABranches(){
+void HH4lXNtupleMaker::buildMELABranches(){
   /***********************/
   /***********************/
   /**   Reco branches   **/
@@ -2802,7 +2802,7 @@ void HZZ4lNtupleMaker::buildMELABranches(){
   }
 }
 
-void HZZ4lNtupleMaker::computeMELABranches(MELACandidate* cand){
+void HH4lXNtupleMaker::computeMELABranches(MELACandidate* cand){
   mela.setCurrentCandidate(cand);
   // Sequantial computation
   updateMELAClusters_Common("Common");
@@ -2832,7 +2832,7 @@ void HZZ4lNtupleMaker::computeMELABranches(MELACandidate* cand){
   mela.resetInputEvent();
 }
 // Common ME computations that do not manipulate the LHE candidate
-void HZZ4lNtupleMaker::updateMELAClusters_Common(const string clustertype){
+void HH4lXNtupleMaker::updateMELAClusters_Common(const string clustertype){
   MELACandidate* melaCand = mela.getCurrentCandidate();
   if (melaCand==0) return;
 
@@ -2847,7 +2847,7 @@ void HZZ4lNtupleMaker::updateMELAClusters_Common(const string clustertype){
   }
 }
 // ME computations that require no quark initial state
-void HZZ4lNtupleMaker::updateMELAClusters_NoInitialQ(const string clustertype){
+void HH4lXNtupleMaker::updateMELAClusters_NoInitialQ(const string clustertype){
   MELACandidate* melaCand = mela.getCurrentCandidate();
   if (melaCand==0) return;
 
@@ -2873,7 +2873,7 @@ void HZZ4lNtupleMaker::updateMELAClusters_NoInitialQ(const string clustertype){
   for (int imot=0; imot<melaCand->getNMothers(); imot++) melaCand->getMother(imot)->id = motherIds.at(imot); // Restore all mother ids
 }
 // ME computations that require no gluon initial state
-void HZZ4lNtupleMaker::updateMELAClusters_NoInitialG(const string clustertype){
+void HH4lXNtupleMaker::updateMELAClusters_NoInitialG(const string clustertype){
   MELACandidate* melaCand = mela.getCurrentCandidate();
   if (melaCand==0) return;
 
@@ -2899,7 +2899,7 @@ void HZZ4lNtupleMaker::updateMELAClusters_NoInitialG(const string clustertype){
   for (int imot=0; imot<melaCand->getNMothers(); imot++) melaCand->getMother(imot)->id = motherIds.at(imot); // Restore all mother ids
 }
 // ME computations that require no gluons as associated particles
-void HZZ4lNtupleMaker::updateMELAClusters_NoAssociatedG(const string clustertype){
+void HH4lXNtupleMaker::updateMELAClusters_NoAssociatedG(const string clustertype){
   MELACandidate* melaCand = mela.getCurrentCandidate();
   if (melaCand==0) return;
 
@@ -2925,7 +2925,7 @@ void HZZ4lNtupleMaker::updateMELAClusters_NoAssociatedG(const string clustertype
   for (int ijet=0; ijet<melaCand->getNAssociatedJets(); ijet++) melaCand->getAssociatedJet(ijet)->id = ajetIds.at(ijet); // Restore all jets
 }
 // ME computations that require no gluon initial state and no gluons as associated particles
-void HZZ4lNtupleMaker::updateMELAClusters_NoInitialGNoAssociatedG(const string clustertype){
+void HH4lXNtupleMaker::updateMELAClusters_NoInitialGNoAssociatedG(const string clustertype){
   MELACandidate* melaCand = mela.getCurrentCandidate();
   if (melaCand==0) return;
 
@@ -2957,7 +2957,7 @@ void HZZ4lNtupleMaker::updateMELAClusters_NoInitialGNoAssociatedG(const string c
   for (int ijet=0; ijet<melaCand->getNAssociatedJets(); ijet++) melaCand->getAssociatedJet(ijet)->id = ajetIds.at(ijet); // Restore all jets
 }
 // ME computations that require best Z, W or VBF topology at LO (no gluons)
-void HZZ4lNtupleMaker::updateMELAClusters_BestLOAssociatedZ(const string clustertype){
+void HH4lXNtupleMaker::updateMELAClusters_BestLOAssociatedZ(const string clustertype){
   MELACandidate* melaCand = mela.getCurrentCandidate();
   if (melaCand==0) return;
 
@@ -3031,7 +3031,7 @@ void HZZ4lNtupleMaker::updateMELAClusters_BestLOAssociatedZ(const string cluster
     }
   }
 }
-void HZZ4lNtupleMaker::updateMELAClusters_BestLOAssociatedW(const string clustertype){
+void HH4lXNtupleMaker::updateMELAClusters_BestLOAssociatedW(const string clustertype){
   MELACandidate* melaCand = mela.getCurrentCandidate();
   if (melaCand==0) return;
 
@@ -3105,7 +3105,7 @@ void HZZ4lNtupleMaker::updateMELAClusters_BestLOAssociatedW(const string cluster
     }
   }
 }
-void HZZ4lNtupleMaker::updateMELAClusters_BestLOAssociatedVBF(const string clustertype){
+void HH4lXNtupleMaker::updateMELAClusters_BestLOAssociatedVBF(const string clustertype){
   // Same as updateMELAClusters_NoInitialGNoAssociatedG, but keep a separate function for future studies
   MELACandidate* melaCand = mela.getCurrentCandidate();
   if (melaCand==0) return;
@@ -3140,7 +3140,7 @@ void HZZ4lNtupleMaker::updateMELAClusters_BestLOAssociatedVBF(const string clust
 // ME computations that can approximate the NLO QCD (-/+ MiNLO extra jet) phase space to LO QCD in signal VBF or VH
 // Use these for POWHEG samples
 // MELACandidateRecaster has very specific use cases, so do not use these functions for other cases.
-void HZZ4lNtupleMaker::updateMELAClusters_BestNLOVHApproximation(const string clustertype){
+void HH4lXNtupleMaker::updateMELAClusters_BestNLOVHApproximation(const string clustertype){
   MELACandidate* melaCand = mela.getCurrentCandidate();
   if (melaCand==0) return;
 
@@ -3184,7 +3184,7 @@ void HZZ4lNtupleMaker::updateMELAClusters_BestNLOVHApproximation(const string cl
   delete candModified;
   mela.setCurrentCandidate(melaCand); // Go back to the original candidate
 }
-void HZZ4lNtupleMaker::updateMELAClusters_BestNLOVBFApproximation(const string clustertype){
+void HH4lXNtupleMaker::updateMELAClusters_BestNLOVBFApproximation(const string clustertype){
   MELACandidate* melaCand = mela.getCurrentCandidate();
   if (melaCand==0) return;
 
@@ -3225,23 +3225,23 @@ void HZZ4lNtupleMaker::updateMELAClusters_BestNLOVBFApproximation(const string c
 }
 
 
-void HZZ4lNtupleMaker::pushRecoMELABranches(const pat::CompositeCandidate& cand){
+void HH4lXNtupleMaker::pushRecoMELABranches(const pat::CompositeCandidate& cand){
   std::vector<MELABranch*>* recome_branches = myTree->getRecoMELABranches();
   // Pull + push...
   for (unsigned int ib=0; ib<recome_branches->size(); ib++){
     std::string branchname = recome_branches->at(ib)->bname.Data();
     if (cand.hasUserFloat(branchname)) recome_branches->at(ib)->setValue((Float_t)cand.userFloat(branchname));
-    else cerr << "HZZ4lNtupleMaker::pushRecoMELABranches: Candidate does not contain the reco ME " << branchname << " it should have calculated!" << endl;
+    else cerr << "HH4lXNtupleMaker::pushRecoMELABranches: Candidate does not contain the reco ME " << branchname << " it should have calculated!" << endl;
   }
 }
-void HZZ4lNtupleMaker::pushLHEMELABranches(){
+void HH4lXNtupleMaker::pushLHEMELABranches(){
   std::vector<MELABranch*>* lheme_branches = myTree->getLHEMELABranches();
   // Pull + push...
   for (unsigned int ib=0; ib<lheme_branches->size(); ib++) lheme_branches->at(ib)->setVal();
   // ...then reset
   for (unsigned int ic=0; ic<lheme_clusters.size(); ic++) lheme_clusters.at(ic)->reset();
 }
-void HZZ4lNtupleMaker::clearMELABranches(){
+void HH4lXNtupleMaker::clearMELABranches(){
   for (unsigned int it=0; it<lheme_clusters.size(); it++) delete lheme_clusters.at(it);
   for (unsigned int it=0; it<lheme_computers.size(); it++) delete lheme_computers.at(it);
   for (unsigned int it=0; it<lheme_copyopts.size(); it++) delete lheme_copyopts.at(it);
@@ -3252,7 +3252,7 @@ void HZZ4lNtupleMaker::clearMELABranches(){
   for (unsigned int it=0; it<recome_originalopts.size(); it++) delete recome_originalopts.at(it);
 }
 
-Int_t HZZ4lNtupleMaker::FindBinValue(TGraphErrors *tgraph, double value)
+Int_t HH4lXNtupleMaker::FindBinValue(TGraphErrors *tgraph, double value)
 {
    Double_t x_prev,x,y;
    Int_t bin = 0;
@@ -3270,4 +3270,4 @@ Int_t HZZ4lNtupleMaker::FindBinValue(TGraphErrors *tgraph, double value)
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(HZZ4lNtupleMaker);
+DEFINE_FWK_MODULE(HH4lXNtupleMaker);

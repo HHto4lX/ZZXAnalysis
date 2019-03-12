@@ -1,4 +1,4 @@
-/** \class ZZ4lAnalyzer  
+/** \class ZZXAnalyzer  
  *
  *  For the time being: retrieving all relevant information from candidates and filling the 2011 "flagship" plots
  *
@@ -39,7 +39,7 @@
 #include <ZZXAnalysis/AnalysisStep/interface/MCHistoryTools.h>
 #include <ZZXAnalysis/AnalysisStep/interface/PileUpWeight.h>
 #include <ZZXAnalysis/AnalysisStep/interface/Fisher.h>
-#include "ZZ4lConfigHelper.h"
+#include "ZZXConfigHelper.h"
 #include <boost/lexical_cast.hpp>
 
 #include <iostream>
@@ -72,11 +72,11 @@ namespace {
 }
 
 
-class ZZ4lAnalyzer: public edm::EDAnalyzer {
+class ZZXAnalyzer: public edm::EDAnalyzer {
 public:
 
-  explicit ZZ4lAnalyzer(const edm::ParameterSet& pset);
-  ~ZZ4lAnalyzer();
+  explicit ZZXAnalyzer(const edm::ParameterSet& pset);
+  ~ZZXAnalyzer();
   
   void analyze(const edm::Event & event, const edm::EventSetup& eventSetup);
   void endLuminosityBlock(const edm::LuminosityBlock &, const edm::EventSetup&);
@@ -87,7 +87,7 @@ public:
 		     float iso=-1, float SIP=-1);
   
 private:
-  ZZ4lConfigHelper myHelper;
+  ZZXConfigHelper myHelper;
   std::string theCandLabel;
   bool isMC;
   bool dumpMC;
@@ -189,7 +189,7 @@ private:
 };
 
 // Constructor
-ZZ4lAnalyzer::ZZ4lAnalyzer(const ParameterSet& pset) :
+ZZXAnalyzer::ZZXAnalyzer(const ParameterSet& pset) :
   myHelper(pset),
   theCandLabel(pset.getUntrackedParameter<string>("candCollection")),
   dumpMC(pset.getUntrackedParameter<bool>("dumpMC",false)),
@@ -231,12 +231,12 @@ ZZ4lAnalyzer::ZZ4lAnalyzer(const ParameterSet& pset) :
   if (isMC) pileUpReweight = new PileUpWeight(myHelper.sampleType(), myHelper.setup());
 }
 
-ZZ4lAnalyzer::~ZZ4lAnalyzer()
+ZZXAnalyzer::~ZZXAnalyzer()
 {
   delete pileUpReweight;
 }
 
-void ZZ4lAnalyzer::beginJob(){
+void ZZXAnalyzer::beginJob(){
   // Book some control histograms
   edm::Service<TFileService> fileService;
 
@@ -290,7 +290,7 @@ void ZZ4lAnalyzer::beginJob(){
 }
 
 
-void ZZ4lAnalyzer::endLuminosityBlock(const edm::LuminosityBlock & iLumi, const edm::EventSetup & iSetup) 
+void ZZXAnalyzer::endLuminosityBlock(const edm::LuminosityBlock & iLumi, const edm::EventSetup & iSetup) 
 {
 
   double Nevt_preskim = -1.;
@@ -317,7 +317,7 @@ void ZZ4lAnalyzer::endLuminosityBlock(const edm::LuminosityBlock & iLumi, const 
 
 
 
-void ZZ4lAnalyzer::endJob(){
+void ZZXAnalyzer::endJob(){
 
   cout << endl;
   cout << "*************************" <<endl;
@@ -382,7 +382,7 @@ void ZZ4lAnalyzer::endJob(){
 
 
 
-void ZZ4lAnalyzer::analyze(const Event & event, const EventSetup& eventSetup){  
+void ZZXAnalyzer::analyze(const Event & event, const EventSetup& eventSetup){  
   int irun=event.id().run();
   long long int ievt=event.id().event(); 
   int ils =event.luminosityBlock();
@@ -440,10 +440,10 @@ void ZZ4lAnalyzer::analyze(const Event & event, const EventSetup& eventSetup){
     event.getManyByType(PupInfos);
     Handle<std::vector< PileupSummaryInfo > > PupInfo = PupInfos.front(); 
 //     try {
-//       cout << "TRY HZZ4lNtupleMaker" <<endl;
+//       cout << "TRY HZZXNtupleMaker" <<endl;
 //       event.getByLabel(edm::InputTag("addPileupInfo"), PupInfo); 
 //     } catch (const cms::Exception& e){
-//       cout << "FAIL HZZ4lNtupleMaker" <<endl;
+//       cout << "FAIL HZZXNtupleMaker" <<endl;
 //       event.getByLabel(edm::InputTag("slimmedAddPileupInfo"), PupInfo); 
 //     }
 
@@ -666,7 +666,7 @@ void ZZ4lAnalyzer::analyze(const Event & event, const EventSetup& eventSetup){
 
 
 
-void ZZ4lAnalyzer::printParticle(const reco::Candidate* c, string idx, int pdgId, 
+void ZZXAnalyzer::printParticle(const reco::Candidate* c, string idx, int pdgId, 
 				 float iso, float SIP) {
 	
   const int precision = 3;
@@ -703,5 +703,5 @@ void ZZ4lAnalyzer::printParticle(const reco::Candidate* c, string idx, int pdgId
 }
 
 #include "FWCore/Framework/interface/MakerMacros.h"
-DEFINE_FWK_MODULE(ZZ4lAnalyzer);
+DEFINE_FWK_MODULE(ZZXAnalyzer);
 

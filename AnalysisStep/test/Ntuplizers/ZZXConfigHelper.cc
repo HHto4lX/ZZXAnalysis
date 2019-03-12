@@ -1,11 +1,11 @@
-#include "ZZ4lConfigHelper.h"
-#include "ZZ4lConfigHelper.h"
+#include "ZZXConfigHelper.h"
+#include "ZZXConfigHelper.h"
 #include <ZZXAnalysis/AnalysisStep/interface/bitops.h>
 
 using namespace std;
 using namespace edm;
 
-ZZ4lConfigHelper::ZZ4lConfigHelper(const ParameterSet& pset) :
+ZZXConfigHelper::ZZXConfigHelper(const ParameterSet& pset) :
   PD(pset.getParameter<std::string>("PD")),
   isMC_(pset.getUntrackedParameter<bool>("isMC")),
   theSetup(pset.getParameter<int>("setup")),
@@ -24,18 +24,18 @@ ZZ4lConfigHelper::ZZ4lConfigHelper(const ParameterSet& pset) :
        ( theSampleType!=theSetup ) // No sample rescaling supported as of now.
        // We may add exception for MC only when needed.
        ) {
-    cout << "ERROR: ZZ4lConfigHelper: inconsistent setup: sampleType=" << theSampleType << ", setup=" << theSetup << ", isMC=" <<isMC_ << endl;
+    cout << "ERROR: ZZXConfigHelper: inconsistent setup: sampleType=" << theSampleType << ", setup=" << theSetup << ", isMC=" <<isMC_ << endl;
     abort();
   }
   
   
   if ((isMC_&&PD!="") || (!isMC_ && (PD!="DoubleEle" && PD!="DoubleMu" && PD!="MuEG" && PD!="DoubleEG" && PD!="DoubleMuon" && PD!="MuonEG" && PD!="SingleElectron" && PD!="SingleMuon" && PD!="EGamma"))) {
-    cout << "ERROR: ZZ4lConfigHelper: isMC: " << isMC_ << " PD: " << PD << endl;
+    cout << "ERROR: ZZXConfigHelper: isMC: " << isMC_ << " PD: " << PD << endl;
     abort();
   }    
 
   if (!isMC_&&MCFilter!="") {
-    cout << "ERROR: ZZ4lConfigHelper: MCFilter= " << MCFilter << " when isMC=0" 
+    cout << "ERROR: ZZXConfigHelper: MCFilter= " << MCFilter << " when isMC=0" 
 	 << endl;
     abort();
   }    
@@ -43,13 +43,13 @@ ZZ4lConfigHelper::ZZ4lConfigHelper(const ParameterSet& pset) :
 }
 
 bool 
-ZZ4lConfigHelper::passMCFilter(const edm::Event & event, edm::Handle<edm::TriggerResults> & trigRes){
+ZZXConfigHelper::passMCFilter(const edm::Event & event, edm::Handle<edm::TriggerResults> & trigRes){
   if (MCFilter=="") return true;
   return passFilter(event, trigRes, MCFilter);
 }
 
 bool 
-ZZ4lConfigHelper::passSkim(const edm::Event & event, edm::Handle<edm::TriggerResults> & trigRes, short& trigworld){
+ZZXConfigHelper::passSkim(const edm::Event & event, edm::Handle<edm::TriggerResults> & trigRes, short& trigworld){
   bool evtPassSkim = false;
   if (skimPaths.size()==0) {
     evtPassSkim=true;
@@ -66,7 +66,7 @@ ZZ4lConfigHelper::passSkim(const edm::Event & event, edm::Handle<edm::TriggerRes
 }
 
 bool 
-ZZ4lConfigHelper::passTrigger(const edm::Event & event, edm::Handle<edm::TriggerResults> & trigRes, short& trigworld){
+ZZXConfigHelper::passTrigger(const edm::Event & event, edm::Handle<edm::TriggerResults> & trigRes, short& trigworld){
 
   bool passDiMu  = passFilter(event, trigRes, "triggerDiMu");
   bool passDiEle = passFilter(event, trigRes, "triggerDiEle");
@@ -111,7 +111,7 @@ ZZ4lConfigHelper::passTrigger(const edm::Event & event, edm::Handle<edm::Trigger
   }
   
   else {
-    cout << "[ERROR]: ZZ4lConfigHelper: unexpected config " << theChannel << endl;
+    cout << "[ERROR]: ZZXConfigHelper: unexpected config " << theChannel << endl;
     abort();
   }
 
@@ -130,7 +130,7 @@ ZZ4lConfigHelper::passTrigger(const edm::Event & event, edm::Handle<edm::Trigger
 }
 
 bool
-ZZ4lConfigHelper::passMETTrigger(const edm::Event & event, edm::Handle<edm::TriggerResults> & trigRes){
+ZZXConfigHelper::passMETTrigger(const edm::Event & event, edm::Handle<edm::TriggerResults> & trigRes){
 
   bool passMETFilter  = true;
 	
@@ -142,7 +142,7 @@ ZZ4lConfigHelper::passMETTrigger(const edm::Event & event, edm::Handle<edm::Trig
 
 
 bool
-ZZ4lConfigHelper::passFilter(const edm::Event & event, edm::Handle<edm::TriggerResults> & trigRes, const string& filterPath) {
+ZZXConfigHelper::passFilter(const edm::Event & event, edm::Handle<edm::TriggerResults> & trigRes, const string& filterPath) {
 
   //if (event.id()==cachedEvtId) return;
   //cachedEvtId = event.id();
@@ -159,7 +159,7 @@ ZZ4lConfigHelper::passFilter(const edm::Event & event, edm::Handle<edm::TriggerR
   unsigned i =  triggerNames->triggerIndex(filterPath);
   
   if (i== triggerNames->size()){
-    cout << "ERROR: ZZ4lConfigHelper::isTriggerBit: path does not exist! " << filterPath << endl;
+    cout << "ERROR: ZZXConfigHelper::isTriggerBit: path does not exist! " << filterPath << endl;
     abort();
   }
   //  cout << " Trigger result for " << filterPath << " : accept=" << triggerResults->accept(i) << endl;

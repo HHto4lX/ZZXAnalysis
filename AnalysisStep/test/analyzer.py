@@ -59,7 +59,7 @@ PyFilePath = os.environ['CMSSW_BASE'] + "/src/ZZXAnalysis/AnalysisStep/test/"
 ### Standard sequence
 ### ----------------------------------------------------------------------
 
-execfile(PyFilePath + "MasterPy/ZZ4lAnalysis.py")
+execfile(PyFilePath + "MasterPy/ZZXAnalysis.py")
 
 
 ### ----------------------------------------------------------------------
@@ -73,7 +73,7 @@ process.maxEvents.input = -1
 ### Output root file (monitoring histograms)
 ### ----------------------------------------------------------------------
 process.TFileService=cms.Service('TFileService',
-                                fileName=cms.string('ZZ4lAnalysis.root')
+                                fileName=cms.string('ZZXAnalysis.root')
                                 )
 
 ### ----------------------------------------------------------------------
@@ -81,7 +81,7 @@ process.TFileService=cms.Service('TFileService',
 ### ----------------------------------------------------------------------
 
 # All events together
-process.PlotsZZ    = cms.EDAnalyzer("ZZ4lAnalyzer",
+process.PlotsZZ    = cms.EDAnalyzer("ZZXAnalyzer",
                                     channel = cms.untracked.string('ZZ'),
                                     candCollection = cms.untracked.string('ZZCand'),
                                     isMC = cms.untracked.bool(IsMC),
@@ -96,7 +96,7 @@ process.PlotsZZ    = cms.EDAnalyzer("ZZ4lAnalyzer",
 
 ### Control Region Plots
 
-# PlotCRSetup    = cms.EDAnalyzer("ZZ4lAnalyzerCR",
+# PlotCRSetup    = cms.EDAnalyzer("ZZXAnalyzerCR",
 #                                 channel = cms.untracked.string('aChannel'),
 #                                 candCollection = cms.untracked.string('aCand'),
 #                                 isMC = cms.untracked.bool(IsMC),
@@ -140,7 +140,7 @@ process.PlotsZZ    = cms.EDAnalyzer("ZZ4lAnalyzer",
 ### Analyzer for Trees
 ### ----------------------------------------------------------------------
 
-TreeSetup = cms.EDAnalyzer("HZZ4lNtupleMaker",
+TreeSetup = cms.EDAnalyzer("HH4lXNtupleMaker",
                            channel = cms.untracked.string('aChannel'),
                            CandCollection = cms.untracked.string('ZZCand'),
                            fileName = cms.untracked.string('candTree'),

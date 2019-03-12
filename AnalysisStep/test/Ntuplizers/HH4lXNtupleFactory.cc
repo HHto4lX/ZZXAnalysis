@@ -1,16 +1,16 @@
 #include <cassert>
 #include <iostream>
 
-#include "HZZ4lNtupleFactory.h"
+#include "HH4lXNtupleFactory.h"
 
 /*
 bool addKinRefit = false;
 bool addVtxFit = false;
-bool writePhotons = false;  // Write photons in the tree. Must be set also in HZZ4lNtupleMaker.cc
+bool writePhotons = false;  // Write photons in the tree. Must be set also in HH4lXNtupleMaker.cc
 */
 using namespace std;
 
-HZZ4lNtupleFactory::HZZ4lNtupleFactory(TTree* outTree_input, TTree *failedTree_input)
+HH4lXNtupleFactory::HH4lXNtupleFactory(TTree* outTree_input, TTree *failedTree_input)
 {
   //---- create output tree ----
   _outTree = outTree_input;
@@ -42,7 +42,7 @@ HZZ4lNtupleFactory::HZZ4lNtupleFactory(TTree* outTree_input, TTree *failedTree_i
 }
 
 ///--- Destructor ---
-HZZ4lNtupleFactory::~HZZ4lNtupleFactory()
+HH4lXNtupleFactory::~HH4lXNtupleFactory()
 {
   // Delete MELA branches
   for (unsigned int ib=0; ib<recome_branches.size(); ib++) delete recome_branches.at(ib);
@@ -50,28 +50,28 @@ HZZ4lNtupleFactory::~HZZ4lNtupleFactory()
 }
 
 ///---- Write an event to TTree ----
-void HZZ4lNtupleFactory::FillCurrentTree(bool passed)
+void HH4lXNtupleFactory::FillCurrentTree(bool passed)
 {
   if (passed)
     _outTree->Fill();
   else if (_failedTree)
     _failedTree->Fill();
 }
-void HZZ4lNtupleFactory::FillEvent(bool passed)
+void HH4lXNtupleFactory::FillEvent(bool passed)
 {
   FillCurrentTree(passed);
   InitializeVariables(); // Reset all values and clean vectors
 }
 
 ///---- Write to a text file branches declaration ----
-void HZZ4lNtupleFactory::DumpBranches(TString filename) const
+void HH4lXNtupleFactory::DumpBranches(TString filename) const
 {
   //----- symply use MakeClass
   _outTree->MakeClass(filename);
   return;
 }
 
-void HZZ4lNtupleFactory::Book(TString name, Float_t &variable, bool putinfailedtree){
+void HH4lXNtupleFactory::Book(TString name, Float_t &variable, bool putinfailedtree){
   TString leafname=name.Data();
   leafname.Append("/F");
   defaultsFloat[&variable] = variable; // defaultT is a map<T*, value>
@@ -79,7 +79,7 @@ void HZZ4lNtupleFactory::Book(TString name, Float_t &variable, bool putinfailedt
   if (putinfailedtree && _failedTree)
     _failedTree->Branch(name.Data(), &variable, leafname.Data());
 }
-void HZZ4lNtupleFactory::Book(TString name, Int_t &value, bool putinfailedtree){
+void HH4lXNtupleFactory::Book(TString name, Int_t &value, bool putinfailedtree){
   TString leafname=name.Data();
   leafname.Append("/I");
   defaultsInt[&value] = value; // defaultT is a map<T*, value>
@@ -87,7 +87,7 @@ void HZZ4lNtupleFactory::Book(TString name, Int_t &value, bool putinfailedtree){
   if (putinfailedtree && _failedTree)
     _failedTree->Branch(name.Data(), &value, leafname.Data());
 }
-void HZZ4lNtupleFactory::Book(TString name, Bool_t &value, bool putinfailedtree){
+void HH4lXNtupleFactory::Book(TString name, Bool_t &value, bool putinfailedtree){
   TString leafname=name.Data();
   leafname.Append("/O");
   defaultsBool[&value] = value; // defaultT is a map<T*, value>
@@ -95,7 +95,7 @@ void HZZ4lNtupleFactory::Book(TString name, Bool_t &value, bool putinfailedtree)
   if (putinfailedtree && _failedTree)
     _failedTree->Branch(name.Data(), &value, leafname.Data());
 }
-void HZZ4lNtupleFactory::Book(TString name, Short_t &value, bool putinfailedtree){
+void HH4lXNtupleFactory::Book(TString name, Short_t &value, bool putinfailedtree){
   TString leafname=name.Data();
   leafname.Append("/S");
   defaultsShort[&value] = value; // defaultT is a map<T*, value>
@@ -103,7 +103,7 @@ void HZZ4lNtupleFactory::Book(TString name, Short_t &value, bool putinfailedtree
   if (putinfailedtree && _failedTree)
     _failedTree->Branch(name.Data(), &value, leafname.Data());
 }
-void HZZ4lNtupleFactory::Book(TString name, Long64_t &value, bool putinfailedtree){
+void HH4lXNtupleFactory::Book(TString name, Long64_t &value, bool putinfailedtree){
   TString leafname=name.Data();
   leafname.Append("/L");
   defaultsLong[&value] = value; // defaultT is a map<T*, value>
@@ -111,7 +111,7 @@ void HZZ4lNtupleFactory::Book(TString name, Long64_t &value, bool putinfailedtre
   if (putinfailedtree && _failedTree)
     _failedTree->Branch(name.Data(), &value, leafname.Data());
 }
-void HZZ4lNtupleFactory::Book(TString name, Char_t &value, bool putinfailedtree){
+void HH4lXNtupleFactory::Book(TString name, Char_t &value, bool putinfailedtree){
   TString leafname=name.Data();
   leafname.Append("/B");
   defaultsChar[&value] = value; // defaultT is a map<T*, value>
@@ -119,31 +119,31 @@ void HZZ4lNtupleFactory::Book(TString name, Char_t &value, bool putinfailedtree)
   if (putinfailedtree && _failedTree)
     _failedTree->Branch(name.Data(), &value, leafname.Data());
 }
-void HZZ4lNtupleFactory::Book(TString name, std::vector<float> &value, bool putinfailedtree){
+void HH4lXNtupleFactory::Book(TString name, std::vector<float> &value, bool putinfailedtree){
   defaultsVectorFloat[&value] = value; // defaultT is a map<T*, value>
   _outTree->Branch(name.Data(), &value);
   if (putinfailedtree && _failedTree)
     _failedTree->Branch(name.Data(), &value);
 }
-void HZZ4lNtupleFactory::Book(TString name, std::vector<short> &value, bool putinfailedtree){
+void HH4lXNtupleFactory::Book(TString name, std::vector<short> &value, bool putinfailedtree){
   defaultsVectorShort[&value] = value;
   _outTree->Branch(name.Data(), &value);
   if (putinfailedtree && _failedTree)
     _failedTree->Branch(name.Data(), &value);
 }
-void HZZ4lNtupleFactory::Book(TString name, std::vector<char> &value, bool putinfailedtree){
+void HH4lXNtupleFactory::Book(TString name, std::vector<char> &value, bool putinfailedtree){
   defaultsVectorChar[&value] = value;
   _outTree->Branch(name.Data(), &value);
   if (putinfailedtree && _failedTree)
     _failedTree->Branch(name.Data(), &value);
 }
-void HZZ4lNtupleFactory::Book(TString name, std::vector<bool> &value, bool putinfailedtree){
+void HH4lXNtupleFactory::Book(TString name, std::vector<bool> &value, bool putinfailedtree){
   defaultsVectorBool[&value] = value;
   _outTree->Branch(name.Data(), &value);
   if (putinfailedtree && _failedTree)
     _failedTree->Branch(name.Data(), &value);
 }
-void HZZ4lNtupleFactory::BookMELABranches(MELAOptionParser* me_opt, bool isGen, MELAComputation* computer_){
+void HH4lXNtupleFactory::BookMELABranches(MELAOptionParser* me_opt, bool isGen, MELAComputation* computer_){
   MELAComputation* computer;
   std::vector<MELABranch*>* me_branches;
   if (!isGen){
@@ -154,7 +154,7 @@ void HZZ4lNtupleFactory::BookMELABranches(MELAOptionParser* me_opt, bool isGen, 
     me_branches = &lheme_branches;
     computer=computer_;
     if (computer==0){
-      cerr << "HZZ4lNtupleFactory::BookMELABranches: LHE ME computation for the LHE MELABranch " << me_opt->getName() << " is null. Something went wrong." << endl;
+      cerr << "HH4lXNtupleFactory::BookMELABranches: LHE ME computation for the LHE MELABranch " << me_opt->getName() << " is null. Something went wrong." << endl;
       assert(0);
     }
   }
@@ -192,11 +192,11 @@ void HZZ4lNtupleFactory::BookMELABranches(MELAOptionParser* me_opt, bool isGen, 
     }
   }
 }
-std::vector<MELABranch*>* HZZ4lNtupleFactory::getRecoMELABranches(){ return &recome_branches; }
-std::vector<MELABranch*>* HZZ4lNtupleFactory::getLHEMELABranches(){ return &lheme_branches; }
+std::vector<MELABranch*>* HH4lXNtupleFactory::getRecoMELABranches(){ return &recome_branches; }
+std::vector<MELABranch*>* HH4lXNtupleFactory::getLHEMELABranches(){ return &lheme_branches; }
 
 
-void HZZ4lNtupleFactory::InitializeVariables()
+void HH4lXNtupleFactory::InitializeVariables()
 {
  for (auto it = defaultsFloat.begin(); it != defaultsFloat.end(); ++it ) *(it->first) = it->second;
  for (auto it = defaultsInt.begin(); it != defaultsInt.end(); ++it ) *(it->first) = it->second;
@@ -224,7 +224,7 @@ void HZZ4lNtupleFactory::InitializeVariables()
 }
 
 /*
-void HZZ4lNtupleFactory::createNewCandidate()
+void HH4lXNtupleFactory::createNewCandidate()
 {
   _firstZStored = false;
   _LeptonIndex = 1;

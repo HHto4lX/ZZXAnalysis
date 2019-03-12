@@ -39,8 +39,8 @@
 #include <ZZXAnalysis/AnalysisStep/interface/PileUpWeight.h>
 #include <ZZXAnalysis/AnalysisStep/interface/bitops.h>
 #include <ZZXAnalysis/AnalysisStep/interface/LeptonIsoHelper.h>
-#include "ZZ4lConfigHelper.h"
-#include "HZZ4lNtupleFactory.h"
+#include "ZZXConfigHelper.h"
+#include "HH4lXNtupleFactory.h"
 
 #include "Math/VectorUtil.h"
 #include "TH1.h"
@@ -177,11 +177,11 @@ private:
   Float_t getAllWeight(const reco::Candidate* Lep) const;
 
   // ----------member data ---------------------------
-  ZZ4lConfigHelper myHelper;
+  ZZXConfigHelper myHelper;
   std::string theCandLabel;
   TString theFileName;
 
-  HZZ4lNtupleFactory *myTree;
+  HH4lXNtupleFactory *myTree;
   TH1F *hCounter;
 
   Bool_t isMC;
@@ -745,7 +745,7 @@ void ZNtupleMaker::FillJet(const pat::Jet& jet)
 void ZNtupleMaker::beginJob()
 {
   edm::Service<TFileService> fs;
-  myTree = new HZZ4lNtupleFactory( fs->make<TTree>(theFileName,"Event Summary"));
+  myTree = new HH4lXNtupleFactory( fs->make<TTree>(theFileName,"Event Summary"));
   hCounter = fs->make<TH1F>("Counters", "Counters", 5, 0., 5.);
   BookAllBranches();
 }
@@ -807,7 +807,7 @@ void ZNtupleMaker::fillDescriptions(edm::ConfigurationDescriptions& descriptions
 }
 
 
-Float_t ZNtupleMaker::getAllWeight(const reco::Candidate* Lep) const //FIXME: synchronize with HZZ4lNtupleMaker
+Float_t ZNtupleMaker::getAllWeight(const reco::Candidate* Lep) const //FIXME: synchronize with HH4lXNtupleMaker
 {
  Int_t   myLepID = abs(Lep->pdgId());
  if (skipMuDataMCWeight&& myLepID==13) return 1.;
