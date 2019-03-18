@@ -67,6 +67,6 @@ namespace userdatahelpers {
 			std::vector<const reco::Candidate*>& fsr,
 			std::vector<short>& fsrIndex);
 
-
+bool isAncestor(const reco::Candidate* ancestor, const reco::Candidate * particle);
 }
 #endif
