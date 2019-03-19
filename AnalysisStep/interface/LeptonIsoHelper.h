@@ -11,7 +11,6 @@
 #include <FWCore/Utilities/interface/InputTag.h>
 #include <DataFormats/PatCandidates/interface/Muon.h>
 #include <DataFormats/PatCandidates/interface/Electron.h>
-#include <DataFormats/PatCandidates/interface/Tau.h>
 #include <DataFormats/PatCandidates/interface/Photon.h>
 
 #include <DataFormats/ParticleFlowCandidate/interface/PFCandidate.h>
@@ -31,9 +30,6 @@ namespace LeptonIsoHelper {
   
   /// Compute combRelIsoPF for an ele
   float combRelIsoPF(int sampleType, int setup, double rho, const pat::Electron& ele, float fsr=0, int correctionType=defaultCorrTypeEle);
-
-  /// Compute combRelIsoPF for a tau
-  float combRelIsoPF(const pat::Tau& mu);
 
   /// Compute combRelIsoPF for a photon (coming from a track-less electron)
   float combRelIsoPF(int sampleType, int setup, double rho, const pat::Photon& ele, float fsr=0, int correctionType=defaultCorrTypeEle);
