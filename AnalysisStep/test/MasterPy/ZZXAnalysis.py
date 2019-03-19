@@ -1295,6 +1295,21 @@ process.pikaPhotons = cms.EDProducer("PhotonFiller",    # https://www.youtube.co
 
 
 
+
+### ----------------------------------------------------------------------
+### Search for additional Tau candidates
+### ----------------------------------------------------------------------
+
+# Create a tau collection
+# Taus from H->TauTau
+process.pikaTaus = cms.EDProducer("TauFiller",    # https://www.youtube.com/watch?v=wDT3xJV3_28
+    pikatauSrc = cms.InputTag("slimmedTaus"),
+    sampleType = cms.int32(SAMPLE_TYPE),
+    setup = cms.int32(LEPTON_SETUP), 
+)
+
+
+
 ### ----------------------------------------------------------------------
 ### Jets
 ### ----------------------------------------------------------------------
@@ -1655,6 +1670,7 @@ process.Candidates = cms.Path(
        process.softLeptons       +
        process.cleanJets         +
        process.pikaPhotons       +
+       process.pikaTaus          +
 # Build 4-lepton candidates
        process.bareZCand         + process.ZCand     +
        process.bareZZCand        + process.ZZCand

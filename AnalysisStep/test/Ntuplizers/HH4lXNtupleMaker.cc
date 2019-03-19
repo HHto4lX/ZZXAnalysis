@@ -79,6 +79,7 @@
 namespace {
   bool writeJets = true;     // Write jets in the tree. FIXME: make this configurable
   bool writePhotons = true;  // Write photons in the tree
+  bool writeTaus = true;     // Write taus in the tree
   bool addKinRefit = true;
   bool addVtxFit = false;
   bool addFSRDetails = false;
@@ -194,6 +195,11 @@ namespace {
   std::vector<float> photon_r9;
   std::vector<float> photon_sigmaIetaIeta;
 
+  Short_t nTaus  =  0;
+  std::vector<float> tauPt;
+  std::vector<float> tauEta;
+  std::vector<float> tauPhi;
+  std::vector<float> tauMass;
 
   std::vector<float> fsrPt;
   std::vector<float> fsrEta;
@@ -388,6 +394,7 @@ private:
   virtual void FillCandidate(const pat::CompositeCandidate& higgs, bool evtPass, const edm::Event&, const Int_t CRflag);
   virtual void FillJet(const pat::Jet& jet);
   virtual void FillPhoton(const pat::Photon& photon);
+  virtual void FillTau(const pat::Tau& tau);
   virtual void endJob() ;
 
   void FillHGenInfo(const math::XYZTLorentzVector Hp, float w);
@@ -475,6 +482,7 @@ private:
   edm::EDGetTokenT<vector<reco::Vertex> > vtxToken;
   edm::EDGetTokenT<edm::View<pat::Jet> > jetToken;
   edm::EDGetTokenT<edm::View<pat::Photon> > photonToken; //H->GammaGamma photons
+  edm::EDGetTokenT<edm::View<pat::Tau> > tauToken; // H->TauTau
   edm::EDGetTokenT<pat::METCollection> metToken;
   //edm::EDGetTokenT<pat::METCollection> metNoHFToken;
   edm::EDGetTokenT<pat::MuonCollection> muonToken;
@@ -598,6 +606,7 @@ HH4lXNtupleMaker::HH4lXNtupleMaker(const edm::ParameterSet& pset) :
   vtxToken = consumes<vector<reco::Vertex> >(edm::InputTag("goodPrimaryVertices"));
   jetToken = consumes<edm::View<pat::Jet> >(edm::InputTag("cleanJets"));
   photonToken = consumes<edm::View<pat::Photon> >(edm::InputTag("pikaPhotons")); // H->GammaGamma photons
+  tauToken = consumes<edm::View<pat::Tau> >(edm::InputTag("pikaTaus")); // H->TauTau 
   metToken = consumes<pat::METCollection>(metTag);
   //metNoHFToken = consumes<pat::METCollection>(edm::InputTag("slimmedMETsNoHF"));
   muonToken = consumes<pat::MuonCollection>(edm::InputTag("slimmedMuons"));
@@ -1149,6 +1158,26 @@ void HH4lXNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
   }
   // ---
 
+  // --- tau variables (H->TauTau )
+  
+  Handle<edm::View<pat::Tau> > tauHandle;
+  event.getByToken(tauToken,tauHandle);
+  vector<const pat::Tau*> taus;
+  for(edm::View<pat::Tau>::const_iterator tau_it = tauHandle->begin(); tau_it != tauHandle->end(); ++tau_it){
+    taus.push_back(&*tau_it);
+  }
+
+  for (unsigned i=0; i<taus.size(); ++i) {
+    if (taus[i]==0) {
+      continue;
+    }
+
+    ++nTaus;   // count number of photons
+
+    if (writeTaus && theChannel!=ZL) FillTau(*(taus.at(i)));
+
+  }
+  // ---
 
   // number of reconstructed leptons
   edm::Handle<pat::MuonCollection> muonHandle;
@@ -1348,6 +1377,16 @@ void HH4lXNtupleMaker::FillPhoton(const pat::Photon& photon)
    photonMass.push_back( photon.p4().M());
    photon_r9 .push_back( photon.full5x5_r9());
    photon_sigmaIetaIeta.push_back( photon.full5x5_sigmaIetaIeta());
+
+}
+
+
+void HH4lXNtupleMaker::FillTau(const pat::Tau& tau)
+{
+   tauPt  .push_back( tau.pt());
+   tauEta .push_back( tau.eta());
+   tauPhi .push_back( tau.phi());
+   tauMass.push_back( tau.p4().M());
 
 }
 
@@ -2522,6 +2561,15 @@ void HH4lXNtupleMaker::BookAllBranches(){
   myTree->Book("photonMass",photonMass, failedTreeLevel >= fullFailedTree);
   myTree->Book("photon_r9", photon_r9,  failedTreeLevel >= fullFailedTree);
   myTree->Book("photon_sigmaIetaIeta", photon_sigmaIetaIeta, failedTreeLevel >= fullFailedTree); 
+
+
+  //Tau variables
+  myTree->Book("nTaus",  nTaus,   failedTreeLevel >= fullFailedTree);
+  myTree->Book("tauPt",  tauPt,   failedTreeLevel >= fullFailedTree);
+  myTree->Book("tauEta", tauEta,  failedTreeLevel >= fullFailedTree);
+  myTree->Book("tauPhi", tauPhi,  failedTreeLevel >= fullFailedTree);
+  myTree->Book("tauMass",tauMass, failedTreeLevel >= fullFailedTree);
+
 
   //Jet variables
   myTree->Book("JetPt",JetPt, failedTreeLevel >= fullFailedTree);

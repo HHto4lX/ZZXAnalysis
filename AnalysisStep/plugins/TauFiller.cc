@@ -1,6 +1,5 @@
 /** \class TauFiller
  *
- *  Preselect taus from all packedPFCandidates
  *
  *  $Date: 2019/03/04 $
  *  \author A. Cappati (Torino)
@@ -14,12 +13,7 @@
 #include <FWCore/ParameterSet/interface/ParameterSet.h>
 #include <FWCore/Framework/interface/ESHandle.h>
 
-#include <DataFormats/PatCandidates/interface/Electron.h>
 #include <DataFormats/PatCandidates/interface/Tau.h>
-//#include <DataFormats/PatCandidates/interface/PFParticle.h>
-//#include <ZZXAnalysis/AnalysisStep/interface/TauFwd.h>
-//#include <EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h>
-//#include <DataFormats/GeometryVector/interface/VectorUtil.h> 
 #include <DataFormats/VertexReco/interface/Vertex.h>
 #include <DataFormats/ParticleFlowCandidate/interface/PFCandidate.h>
 
@@ -50,7 +44,6 @@ class TauFiller : public edm::EDProducer {
   virtual void endJob(){};
 
   edm::EDGetTokenT<edm::View<pat::Tau> > tauToken;
-  //edm::EDGetTokenT<edm::View<pat::PackedCandidate> > pfCandToken;
   int selectionMode;
   int sampleType;
   int setup;
@@ -65,8 +58,6 @@ TauFiller::TauFiller(const edm::ParameterSet& iConfig) :
   debug(iConfig.getUntrackedParameter<bool>("debug",false))
 {
   
-  //pfCandToken = consumes<edm::View<pat::PackedCandidate> >(edm::InputTag("packedPFCandidates")); 
-
   produces<pat::TauCollection>(); 
 }
 
@@ -76,15 +67,11 @@ TauFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
   //--- get the tau cand
-//  edm::Handle<edm::View<pat::Tau> > tauHandle;
-  edm::Handle<pat::TauRefVector> tauHandle;
+  edm::Handle<edm::View<pat::Tau> > tauHandle;
+  //edm::Handle<pat::TauRefVector> tauHandle;
   iEvent.getByToken(tauToken, tauHandle);
 
-  //--- Get the PF cands
-  // use pf candidates and then select tau among these
-  //edm::Handle<edm::View<pat::PackedCandidate> > pfCands; 
-  //iEvent.getByToken(pfCandToken, pfCands);
-
+  
   // Output collections
   auto result = std::make_unique<pat::TauCollection>();
 
@@ -93,23 +80,21 @@ TauFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //----------------------
   // Loop on taus
   //----------------------
-    for (unsigned int itau = 0; itau < tauHandle->size(); ++itau){
-    //---Clone the pat::Tau
-    pat::Tau g(*((*tauHandle)[itau].get()));
+  for (auto itau = tauHandle->begin(); itau != tauHandle->end(); ++itau){
+
+
+    pat::Tau t(*itau);
+    double t_pt  = t.pt();
+    double t_eta = t.eta();
+    //double t_phi = t.phi();
     
-    double g_pt  = g.pt();
-    double g_eta = g.eta();
-    //double g_phi = g.phi();
-    
-    // We only want taus: select taus among all the pf candidates
-    //if (g->pdgId()!=22) continue;
 
     // Tau preselection 
-    if (!(g_pt>2. && fabs(g_eta)<2.4)) continue;
+    if (!(t_pt>0.5 && fabs(t_eta)<2.4)) continue;
 
     
     
-    result->push_back(g); 
+    result->push_back(t); 
     //result->back().setStatus(0);
 
   } // end of loop over tau collection
@@ -117,9 +102,10 @@ TauFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
   //--- Reorder taus by pT
-  //std::sort(result->begin(),result->end(), [](const Tau& g1, const Tau& g2){
-  //  return g1.pt()>g2.pt();
-  //});
+  //    object type is BaseTau from DataFormats/PatCandidates/interface/Tau.h class definition:  class Tau : public Lepton<reco::BaseTau> 
+  std::sort(result->begin(),result->end(), [](const BaseTau& t1, const BaseTau& t2){    
+   return t1.pt()>t2.pt();
+  });
 
   
   //Put the result in the event
