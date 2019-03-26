@@ -1302,11 +1302,102 @@ process.pikaPhotons = cms.EDProducer("PhotonFiller",    # https://www.youtube.co
 
 # Create a tau collection
 # Taus from H->TauTau
-process.pikaTaus = cms.EDProducer("TauFiller",    # https://www.youtube.com/watch?v=wDT3xJV3_28
-    pikatauSrc = cms.InputTag("slimmedTaus"),
-    sampleType = cms.int32(SAMPLE_TYPE),
-    setup = cms.int32(LEPTON_SETUP), 
+
+# process.pikaTaus = cms.EDProducer("TauFiller_basic",    # https://www.youtube.com/watch?v=wDT3xJV3_28
+#     pikatauSrc = cms.InputTag("slimmedTaus"),
+#     sampleType = cms.int32(SAMPLE_TYPE),
+#     setup = cms.int32(LEPTON_SETUP), 
+# )
+
+
+# FIXME:  to be updated for 2018
+from ZZXAnalysis.AnalysisStep.runTauIdMVA import *
+na = TauIDEmbedder(process, cms, # pass tour process object
+    debug=True,
+    toKeep = ["2017v1", "2017v2", "dR0p32017v2"] # pick the one you need: ["2017v1", "2017v2", "newDM2017v2", "dR0p32017v2", "2016v1", "newDM2016v1"]
 )
+na.runTauID()
+
+# old sequence starts here
+process.bareTaus = cms.EDFilter("PATTauRefSelector",
+   #src = cms.InputTag("slimmedTaus"),
+   src = cms.InputTag("NewTauIDsEmbedded"),
+   cut = cms.string(TAUCUT),
+   )
+
+
+##NOT USED FOR NOW, TBD Later
+process.cleanTaus = cms.EDProducer("PATTauCleaner",
+    src = cms.InputTag("bareTaus"),
+    # preselection (any string-based cut on pat::Tau)
+    preselection = cms.string(
+            'tauID("decayModeFinding") > 0.5 &'
+            ' tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits") > 0.5 &'
+            ' tauID("againstMuonTight") > 0.5 &'
+            ' tauID("againstElectronMedium") > 0.5'
+        ),
+    
+   # overlap checking configurables
+   checkOverlaps = cms.PSet(
+      muons = cms.PSet(
+          src       = cms.InputTag("cleanPatMuons"),
+          algorithm = cms.string("byDeltaR"),
+          preselection        = cms.string(""),
+          deltaR              = cms.double(0.3),
+          checkRecoComponents = cms.bool(False), # don't check if they share some AOD object ref
+          pairCut             = cms.string(""),
+          requireNoOverlaps   = cms.bool(False), # overlaps don't cause the electron to be discared
+          ),
+      electrons = cms.PSet(
+          src       = cms.InputTag("cleanPatElectrons"),
+          algorithm = cms.string("byDeltaR"),
+          preselection        = cms.string(""),
+          deltaR              = cms.double(0.3),
+          checkRecoComponents = cms.bool(False), # don't check if they share some AOD object ref
+          pairCut             = cms.string(""),
+          requireNoOverlaps   = cms.bool(False), # overlaps don't cause the electron to be discared
+          ),
+      ),
+        # finalCut (any string-based cut on pat::Tau)
+        finalCut = cms.string(' '),
+)
+
+
+# NominalTESCorrection=-1#in percent\
+APPLYTESCORRECTION = APPLYTESCORRECTION if IsMC else False # always false if data
+process.softTaus = cms.EDProducer("TauFiller",
+   src = cms.InputTag("bareTaus"),
+   genCollection = cms.InputTag("prunedGenParticles"),
+   vtxCollection = cms.InputTag("goodPrimaryVertices"),
+   cut = cms.string(TAUCUT),
+   discriminator = cms.string(TAUDISCRIMINATOR),
+   # --> Correct values for 2017 data - Uncertainty 3.0%
+   # NominalTESUncertainty      = cms.double(3.0) , # in percent, up/down uncertainty of TES
+   # NominalTESCorrection1Pr    = cms.double(-3.0), #DecayMode==0
+   # NominalTESCorrection1PrPi0 = cms.double(-2.0), #DecayMode==1
+   # NominalTESCorrection3Pr    = cms.double(-1.0), #DecayMode==10
+
+   # --> Correct values for 2017 data - Chiara update Jan2019
+   NominalTESUncertainty1Pr         = cms.double(0.8) , # in percent, up/down uncertainty of TES      
+   NominalTESUncertainty1PrPi0      = cms.double(0.8) , # in percent, up/down uncertainty of TES      
+   NominalTESUncertainty3Pr         = cms.double(0.9) , # in percent, up/down uncertainty of TES      
+   NominalTESUncertainty3PrPi0      = cms.double(1.0) , # in percent, up/down uncertainty of TES      
+   NominalTESCorrection1Pr          = cms.double(0.7), #DecayMode==0                                 
+   NominalTESCorrection1PrPi0       = cms.double(-0.2), #DecayMode==1                                 
+   NominalTESCorrection3Pr          = cms.double(0.1), #DecayMode==10                                
+   NominalTESCorrection3PrPi0       = cms.double(-0.1), #DecayMode==11                                
+
+   ApplyTESCentralCorr = cms.bool(APPLYTESCORRECTION),
+   # ApplyTESUpDown = cms.bool(True if IsMC else False), # no shift computation when data
+   flags = cms.PSet(
+        isGood = cms.string("")
+        )
+   )
+
+
+# https://www.youtube.com/watch?v=wDT3xJV3_28
+process.pikaTaus=cms.Sequence(process.rerunMvaIsolationSequence + process.NewTauIDsEmbedded + process.bareTaus + process.softTaus)
+
 
 
 

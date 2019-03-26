@@ -188,6 +188,23 @@ float LeptonIsoHelper::combRelIsoPF(int sampleType, int setup, double rho, const
 }
 
 
+float LeptonIsoHelper::combRelIsoPF(const pat::Tau& l) {
+
+  float PFChargedHadIso   = l.tauID ("chargedIsoPtSum");
+  float PFNeutralHadIso   = l.tauID ("neutralIsoPtSum");
+  float PFPhotonIso       = 0;//l.photonIso();
+  float PFPUChargedHadIso = l.tauID ("puCorrPtSum");
+
+  return  (PFChargedHadIso + max(0., PFNeutralHadIso + PFPhotonIso - 0.5*PFPUChargedHadIso))/l.pt();
+
+//    return (l.pfIsolationVariables().sumChargedHadronPt + max(
+//           l.pfIsolationVariables().sumNeutralHadronEt +
+//           l.pfIsolationVariables().sumPhotonEt -
+//           0.5 * l.pfIsolationVariables().sumPUPt, 0.0)) / l.pt();
+
+}
+
+
 float LeptonIsoHelper::combRelIsoPF(int sampleType, int setup, double rho, const Candidate* lep, float fsr, int correctionType) {
   if (lep->isMuon()) {
     const pat::Muon* mu = dynamic_cast<const pat::Muon*>(lep->masterClone().get());
