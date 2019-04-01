@@ -171,9 +171,9 @@ namespace {
   std::vector<short> LepLepId;
   std::vector<float> LepSIP;
   std::vector<float> LepTime;
-  std::vector<bool> LepisID;
+  std::vector<bool>  LepisID;
   std::vector<float> LepBDT;
-  std::vector<char> LepMissingHit;
+  std::vector<char>  LepMissingHit;
   std::vector<float> LepChargedHadIso;
   std::vector<float> LepNeutralHadIso;
   std::vector<float> LepPhotonIso;
