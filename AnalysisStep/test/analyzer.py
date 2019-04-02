@@ -156,8 +156,8 @@ TreeSetup = cms.EDAnalyzer("HH4lXNtupleMaker",
                            skipEmptyEvents = cms.bool(SKIP_EMPTY_EVENTS),
                            failedTreeLevel = cms.int32(FAILED_TREE_LEVEL),
                            sampleName = cms.string(SAMPLENAME),
-									GenXSEC = cms.double(GENXSEC),
-									GenBR = cms.double(GENBR),
+			   GenXSEC = cms.double(GENXSEC),
+			   GenBR = cms.double(GENBR),
 									
                            # MELA parameters
                            superMelaMass = cms.double(SUPERMELA_MASS),

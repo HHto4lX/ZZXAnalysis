@@ -14,12 +14,29 @@ APPLYTRIG = False    # Skip events failing required triggers. They are stored wi
 #KEEPLOOSECOMB = True # Do not skip loose lepton ZZ combinations (for debugging)
 ADDZTREE = False      # Add tree for Z analysis
 
+# tau parameters
+TAUCUT = "pt>15"
+APPLYTESCORRECTION = False # shift the central value of the tau energy scale before computing up/down variations
+TAUDISCRIMINATOR = "byIsolationMVA3oldDMwoLTraw"
+
+
 PD = ""
 MCFILTER = ""
+
+
+XSEC    = 33.49 # fb 
+GENXSEC = XSEC
+GENBR   = 0.00014    # 4lbb
+#GENBR  = 0.000015   # 4ltautau
+#GENBR  = 0.0000023  # 6l2nu
+#GENBR  = 0.00000054 # 4lgammagamma
+
+
 
 #For DATA: 
 #IsMC = False
 #PD = "DoubleMu"
+
 
 # Get absolute path
 import os
@@ -43,20 +60,12 @@ process.source.fileNames = cms.untracked.vstring(
 
 
 ### HH files
+    'root://eoscms//eos/cms/store/user/covarell/HH/SM/4lbb/testMINIAOD_HHSM_4lbb_1.root'
     #'root://eoscms//eos/cms/store/user/covarell/HH/SM/4lgammagamma/testMINIAOD_HHSM_4lgammagamma_1.root'
-     'root://eoscms//eos/cms/store/user/covarell/HH/SM/4ltautau/testMINIAOD_HHSM_4ltautau_0.root' 
+    #'root://eoscms//eos/cms/store/user/covarell/HH/SM/4ltautau/testMINIAOD_HHSM_4ltautau_0.root' 
+    #'root://eoscms//eos/cms/store/user/covarell/HH/SM/6l2nu/testMINIAOD_HHSM_4lWW_1.root'
 
 
-### Moriond 19 sync files
-    ## Low mass
-#    '/store/mc/RunIIAutumn18MiniAOD/GluGluHToZZTo4L_M125_13TeV_powheg2_JHUGenV7011_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/270000/E5E2F122-AA57-5248-8177-594EC87DD494.root',
-#    '/store/mc/RunIIAutumn18MiniAOD/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUGenV7011_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/90000/96A5F68D-DCB8-3D4E-8615-919D86D1534F.root',
-#    '/store/mc/RunIIAutumn18MiniAOD/ttH_HToZZ_4LFilter_M125_13TeV_powheg2_JHUGenV7011_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/60000/19B6ADC2-4F62-AA4D-9488-F53CE2936856.root'
-
-
-
-###Run2018A-v3 
-#     '/store/data/Run2018A/DoubleMuon/MINIAOD/PromptReco-v3/000/316/569/00000/0CBC961D-6264-E811-B36E-FA163E4C1970.root'
     )
 
 #process.calibratedPatElectrons.isSynchronization = cms.bool(True)
