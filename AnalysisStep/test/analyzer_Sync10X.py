@@ -52,21 +52,27 @@ execfile(PyFilePath + "prod/pyFragments/RecoProbabilities.py")
 if not IsMC:
 	process.source.inputCommands = cms.untracked.vstring("keep *", "drop LHERunInfoProduct_*_*_*", "drop LHEEventProduct_*_*_*") ###FIXME In 9X this removes all collections for MC
 
+
 ### ----------------------------------------------------------------------
 ### Replace parameters
 ### ----------------------------------------------------------------------
 
+# keep events even if they have same runNumber:lumiNumber:eventNumber
+# (useful if we are reading more than 1 file here)
+process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
+
+
+# --- input files
 process.source.fileNames = cms.untracked.vstring(
 
-
 ### HH files
-    'root://eoscms//eos/cms/store/user/covarell/HH/SM/4lbb/testMINIAOD_HHSM_4lbb_1.root'
+    'root://eoscms//eos/cms/store/user/covarell/HH/SM/4lbb/testMINIAOD_HHSM_4lbb_1.root',
     #'root://eoscms//eos/cms/store/user/covarell/HH/SM/4lgammagamma/testMINIAOD_HHSM_4lgammagamma_1.root'
     #'root://eoscms//eos/cms/store/user/covarell/HH/SM/4ltautau/testMINIAOD_HHSM_4ltautau_0.root' 
     #'root://eoscms//eos/cms/store/user/covarell/HH/SM/6l2nu/testMINIAOD_HHSM_4lWW_1.root'
 
-
     )
+
 
 #process.calibratedPatElectrons.isSynchronization = cms.bool(True)
 process.calibratedMuons.isSynchronization = cms.bool(True)
