@@ -1365,7 +1365,7 @@ process.cleanTaus = cms.EDProducer("PATTauCleaner",
 
 # NominalTESCorrection=-1#in percent\
 APPLYTESCORRECTION = APPLYTESCORRECTION if IsMC else False # always false if data
-process.softTaus = cms.EDProducer("TauFiller",
+process.pikaTaus = cms.EDProducer("TauFiller",
    src = cms.InputTag("bareTaus"),
    genCollection = cms.InputTag("prunedGenParticles"),
    vtxCollection = cms.InputTag("goodPrimaryVertices"),
@@ -1396,7 +1396,7 @@ process.softTaus = cms.EDProducer("TauFiller",
 
 
 # https://www.youtube.com/watch?v=wDT3xJV3_28
-process.pikaTaus=cms.Sequence(process.rerunMvaIsolationSequence + process.NewTauIDsEmbedded + process.bareTaus + process.softTaus)
+process.tauSequence=cms.Sequence(process.rerunMvaIsolationSequence + process.NewTauIDsEmbedded + process.bareTaus + process.pikaTaus)
 
 
 
@@ -1761,7 +1761,7 @@ process.Candidates = cms.Path(
        process.softLeptons       +
        process.cleanJets         +
        process.pikaPhotons       +
-       process.pikaTaus          +
+       process.tauSequence       +
 # Build 4-lepton candidates
        process.bareZCand         + process.ZCand     +
        process.bareZZCand        + process.ZZCand
