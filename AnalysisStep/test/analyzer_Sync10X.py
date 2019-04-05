@@ -24,7 +24,7 @@ PD = ""
 MCFILTER = ""
 
 
-XSEC    = 33.49 # fb 
+XSEC    = 0.03349 # pb 
 GENXSEC = XSEC
 GENBR   = 0.00014    # 4lbb
 #GENBR  = 0.000015   # 4ltautau
