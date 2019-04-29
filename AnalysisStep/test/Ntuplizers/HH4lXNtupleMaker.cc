@@ -1376,8 +1376,8 @@ void HH4lXNtupleMaker::FillJet(const pat::Jet& jet)
 void HH4lXNtupleMaker::FillPhoton(const pat::Photon& photon)
 {
    photonPt    .push_back( photon.pt());
-   photonEta   .push_back( photon.eta());
-   photonPhi   .push_back( photon.phi());
+   photonEta   .push_back( photon.superCluster()->eta());
+   photonPhi   .push_back( photon.superCluster()->phi());
    photonMass  .push_back( photon.p4().M());
    photon_5x5r9.push_back( photon.full5x5_r9());
    photon_5x5sigmaIetaIeta.push_back( photon.full5x5_sigmaIetaIeta());
