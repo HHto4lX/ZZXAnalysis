@@ -194,6 +194,10 @@ namespace {
   std::vector<float> photonMass;
   std::vector<float> photon_5x5r9;
   std::vector<float> photon_5x5sigmaIetaIeta;
+  std::vector<float> photon_chargedHadronIso;
+  std::vector<float> photon_neutralHadronIso;
+  std::vector<float> photon_photonIso;
+  std::vector<float> photon_hadronicOverEm;
 
   Short_t nTaus  =  0;
   std::vector<float> tauPt;
@@ -1378,6 +1382,17 @@ void HH4lXNtupleMaker::FillPhoton(const pat::Photon& photon)
    photon_5x5r9.push_back( photon.full5x5_r9());
    photon_5x5sigmaIetaIeta.push_back( photon.full5x5_sigmaIetaIeta());
 
+   // --- Isolation (https://github.com/cms-sw/cmssw/blob/master/DataFormats/PatCandidates/interface/Photon.h#L127-L135)
+   // isolation calculated with only the charged hadron PFCandidates
+   photon_chargedHadronIso.push_back( photon.chargedHadronIso());
+   // isolation calculated with only the neutral hadron PFCandidates
+   photon_neutralHadronIso.push_back( photon.neutralHadronIso());
+   // isolation calculated with only the gamma PFCandidates
+   photon_photonIso.push_back( photon.photonIso());
+
+   // hadronic response over EM response
+   photon_hadronicOverEm.push_back( photon.hadronicOverEm());
+
 }
 
 
@@ -2561,6 +2576,10 @@ void HH4lXNtupleMaker::BookAllBranches(){
   myTree->Book("photonMass",   photonMass, failedTreeLevel >= fullFailedTree);
   myTree->Book("photon_5x5r9", photon_5x5r9,  failedTreeLevel >= fullFailedTree);
   myTree->Book("photon_5x5sigmaIetaIeta", photon_5x5sigmaIetaIeta, failedTreeLevel >= fullFailedTree); 
+  myTree->Book("photon_chargedHadronIso", photon_chargedHadronIso, failedTreeLevel >= fullFailedTree);
+  myTree->Book("photon_neutralHadronIso", photon_neutralHadronIso, failedTreeLevel >= fullFailedTree);
+  myTree->Book("photon_photonIso",        photon_photonIso,        failedTreeLevel >= fullFailedTree);
+  myTree->Book("photon_hadronicOverEm",   photon_hadronicOverEm,   failedTreeLevel >= fullFailedTree);
 
 
   //Tau variables
