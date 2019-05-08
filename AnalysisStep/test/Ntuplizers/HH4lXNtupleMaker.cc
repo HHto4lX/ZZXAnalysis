@@ -29,6 +29,8 @@
 #include <DataFormats/PatCandidates/interface/CompositeCandidate.h>
 #include <DataFormats/PatCandidates/interface/Muon.h>
 #include <DataFormats/PatCandidates/interface/Electron.h>
+#include "DataFormats/EgammaCandidates/interface/Photon.h"
+#include "DataFormats/PatCandidates/interface/Photon.h"
 #include <DataFormats/PatCandidates/interface/Jet.h>
 #include <DataFormats/PatCandidates/interface/MET.h>
 #include <DataFormats/METReco/interface/PFMET.h>
@@ -77,6 +79,7 @@
 #include <string>
 
 namespace {
+  bool writeGenJets = true;  // Write GenJets in the tree.
   bool writeJets = true;     // Write jets in the tree. FIXME: make this configurable
   bool writePhotons = true;  // Write photons in the tree
   bool writeTaus = true;     // Write taus in the tree
@@ -198,6 +201,7 @@ namespace {
   std::vector<float> photon_neutralHadronIso;
   std::vector<float> photon_photonIso;
   std::vector<float> photon_hadronicOverEm;
+  //  std::vector<float> photon_fixedGridRhoFastjetAll;
 
   Short_t nTaus  =  0;
   std::vector<float> tauPt;
@@ -236,6 +240,14 @@ namespace {
 
   std::vector<float> JetJERUp ;
   std::vector<float> JetJERDown ;
+
+
+  std::vector<float> GENjetPt;
+  std::vector<float> GENjetEta;
+  std::vector<float> GENjetPhi;
+  std::vector<float> GENjetMass;
+  //std::vector<int>   GENjetParentID;
+
 
   Float_t DiJetMass  = -99;
 //   Float_t DiJetMassPlus  = -99;
@@ -401,6 +413,8 @@ private:
   virtual void FillTau(const pat::Tau& tau);
   virtual void endJob() ;
 
+  void FillJetGenInfo(const reco::GenJet& genjet);
+
   void FillHGenInfo(const math::XYZTLorentzVector Hp, float w);
   void FillZGenInfo(Short_t Z1Id, Short_t Z2Id,
                     const math::XYZTLorentzVector pZ1, const math::XYZTLorentzVector pZ2);
@@ -484,6 +498,7 @@ private:
   edm::EDGetTokenT<edm::View<pat::CompositeCandidate> > lhecandToken;
   edm::EDGetTokenT<edm::TriggerResults> triggerResultToken;
   edm::EDGetTokenT<vector<reco::Vertex> > vtxToken;
+  edm::EDGetTokenT<edm::View<reco::GenJet> > jetGenToken; //GenJet
   edm::EDGetTokenT<edm::View<pat::Jet> > jetToken;
   edm::EDGetTokenT<edm::View<pat::Photon> > photonToken; //H->GammaGamma photons
   edm::EDGetTokenT<edm::View<pat::Tau> > tauToken; // H->TauTau
@@ -608,6 +623,7 @@ HH4lXNtupleMaker::HH4lXNtupleMaker(const edm::ParameterSet& pset) :
   }
   triggerResultToken = consumes<edm::TriggerResults>(edm::InputTag("TriggerResults"));
   vtxToken = consumes<vector<reco::Vertex> >(edm::InputTag("goodPrimaryVertices"));
+  jetGenToken = consumes<edm::View<reco::GenJet> >(edm::InputTag("slimmedGenJets")); //GenJet
   jetToken = consumes<edm::View<pat::Jet> >(edm::InputTag("cleanJets"));
   photonToken = consumes<edm::View<pat::Photon> >(edm::InputTag("pikaPhotons")); // H->GammaGamma photons
   tauToken = consumes<edm::View<pat::Tau> >(edm::InputTag("pikaTaus")); // H->TauTau 
@@ -1116,6 +1132,23 @@ void HH4lXNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
   Nvtx=vertices->size();
 
 
+  // --- GenJets
+  Handle<edm::View<reco::GenJet> > genJetHandle;
+  event.getByToken(jetGenToken, genJetHandle);
+  vector<const reco::GenJet*> genJetVector;
+  for(edm::View<reco::GenJet>::const_iterator genjet = genJetHandle->begin(); genjet != genJetHandle->end(); ++genjet){
+    genJetVector.push_back(&*genjet);
+  }
+  for (unsigned i=0; i<genJetVector.size(); ++i) {
+    if (genJetVector[i]==0) {
+      continue;
+    }
+
+    if (writeGenJets && theChannel!=ZL) FillJetGenInfo(*(genJetVector.at(i)));
+
+  }
+  // ---
+
   // Jets (cleaned wrt all tight isolated leptons)
   Handle<edm::View<pat::Jet> > CleanedJets;
   event.getByToken(jetToken, CleanedJets);
@@ -1176,7 +1209,7 @@ void HH4lXNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
       continue;
     }
 
-    ++nTaus;   // count number of photons
+    ++nTaus;   // count number of taus
 
     if (writeTaus && theChannel!=ZL) FillTau(*(taus.at(i)));
 
@@ -1373,6 +1406,18 @@ void HH4lXNtupleMaker::FillJet(const pat::Jet& jet)
 }
 
 
+void HH4lXNtupleMaker::FillJetGenInfo(const reco::GenJet& genjet)
+{
+  GENjetPt  .push_back( genjet.pt() );
+  GENjetEta .push_back( genjet.eta() );
+  GENjetPhi .push_back( genjet.phi() );
+  GENjetMass.push_back( genjet.p4().M() );
+  //GENjetParentID.push_back( genjet.parentID );
+
+
+}
+
+
 void HH4lXNtupleMaker::FillPhoton(const pat::Photon& photon)
 {
    photonPt    .push_back( photon.pt());
@@ -1392,6 +1437,9 @@ void HH4lXNtupleMaker::FillPhoton(const pat::Photon& photon)
 
    // hadronic response over EM response
    photon_hadronicOverEm.push_back( photon.hadronicOverEm());
+
+
+   //   photon_fixedGridRhoFastjetAll.push_back( photon.fixedGridRhoFastjetAll());
 
 }
 
@@ -2580,6 +2628,7 @@ void HH4lXNtupleMaker::BookAllBranches(){
   myTree->Book("photon_neutralHadronIso", photon_neutralHadronIso, failedTreeLevel >= fullFailedTree);
   myTree->Book("photon_photonIso",        photon_photonIso,        failedTreeLevel >= fullFailedTree);
   myTree->Book("photon_hadronicOverEm",   photon_hadronicOverEm,   failedTreeLevel >= fullFailedTree);
+  //  myTree->Book("photon_fixedGridRhoFastjetAll", photon_fixedGridRhoFastjetAll, failedTreeLevel >= fullFailedTree);
 
 
   //Tau variables
@@ -2615,6 +2664,14 @@ void HH4lXNtupleMaker::BookAllBranches(){
 
   myTree->Book("JetPUID", JetPUID, failedTreeLevel >= fullFailedTree);
   myTree->Book("JetPUValue", JetPUValue, failedTreeLevel >= fullFailedTree);
+
+
+  myTree->Book("GENjetPt",   GENjetPt,   failedTreeLevel >= fullFailedTree);
+  myTree->Book("GENjetEta",  GENjetEta,  failedTreeLevel >= fullFailedTree);
+  myTree->Book("GENjetPhi",  GENjetPhi,  failedTreeLevel >= fullFailedTree);
+  myTree->Book("GENjetMass", GENjetMass, failedTreeLevel >= fullFailedTree);  
+  //myTree->Book("GENjetParentID", GENjetParentID, failedTreeLevel >= fullFailedTree);
+
 
   myTree->Book("DiJetMass",DiJetMass, false);
 //   myTree->Book("DiJetMassPlus",DiJetMassPlus, false); // FIXME: add back once filled again
