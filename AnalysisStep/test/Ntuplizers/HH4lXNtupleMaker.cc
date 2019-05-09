@@ -246,7 +246,7 @@ namespace {
   std::vector<float> GENjetEta;
   std::vector<float> GENjetPhi;
   std::vector<float> GENjetMass;
-  //std::vector<int>   GENjetParentID;
+  //std::vector<short> GENjetParentID;
 
 
   Float_t DiJetMass  = -99;
@@ -1412,8 +1412,7 @@ void HH4lXNtupleMaker::FillJetGenInfo(const reco::GenJet& genjet)
   GENjetEta .push_back( genjet.eta() );
   GENjetPhi .push_back( genjet.phi() );
   GENjetMass.push_back( genjet.p4().M() );
-  //GENjetParentID.push_back( genjet.parentID );
-
+  //GENjetParentID.push_back( genjet.mother()->pdgId() );
 
 }
 
