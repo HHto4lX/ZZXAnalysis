@@ -37,6 +37,22 @@ GENBR   = 0.00014    # 4lbb
 #IsMC = False
 #PD = "DoubleMu"
 
+# var parsing
+import FWCore.ParameterSet.VarParsing as VarParsing
+import sys
+
+options = VarParsing.VarParsing()
+
+options.register('inputFile',
+                 'root://eoscms//eos/cms/store/user/covarell/HH/SM/4lbb/testMINIAOD_HHSM_4lbb_1.root', #default value 
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.string,
+                 "inputFile")
+
+options.parseArguments()
+
+
+
 
 # Get absolute path
 import os
@@ -63,12 +79,13 @@ process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
 
 
 # --- input files
-process.source.fileNames = cms.untracked.vstring(
+process.source.fileNames = cms.untracked.vstring( options.inputFile
 
 ### HH files
-    'root://eoscms//eos/cms/store/user/covarell/HH/SM/4lbb/testMINIAOD_HHSM_4lbb_1.root'
-    #'root://eoscms//eos/cms/store/user/covarell/HH/SM/4lgammagamma/testMINIAOD_HHSM_4lgammagamma_1.root'
-    #'root://eoscms//eos/cms/store/user/covarell/HH/SM/4ltautau/testMINIAOD_HHSM_4ltautau_0.root' 
+    
+    #'root://eoscms//eos/cms/store/user/covarell/HH/SM/4lbb/testMINIAOD_HHSM_4lbb_1.root'
+    #'root://eoscms//eos/cms/store/user/covarell/HH/SM/4lgammagamma/testMINIAOD_HHSM_4lgammagamma_3.root'
+    #'root://eoscms//eos/cms/store/user/covarell/HH/SM/4ltautau/testMINIAOD_HHSM_4ltautau_1.root' 
     #'root://eoscms//eos/cms/store/user/covarell/HH/SM/6l2nu/testMINIAOD_HHSM_4lWW_1.root'
 
     )

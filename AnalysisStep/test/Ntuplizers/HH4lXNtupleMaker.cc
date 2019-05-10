@@ -938,7 +938,8 @@ void HH4lXNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
     MCHistoryTools mch(event, sampleName, genParticles, genInfo);
     genFinalState = mch.genFinalState();
     genProcessId = mch.getProcessID();
-    genHEPMCweight_NNLO = genHEPMCweight = mch.gethepMCweight(); // Overridden by LHEHandler if genHEPMCweight==1.
+    genHEPMCweight_NNLO = genHEPMCweight = mch.gethepMCweight(); // It assigns the value taken from MC sample 
+                                                                 // It was Overridden by LHEHandler if genHEPMCweight==1.
                                                                  // For 2017 MC, genHEPMCweight is reweighted later from NNLO to NLO
     const auto& genweights = genInfo->weights();
     if (genweights.size() > 1){
@@ -1681,15 +1682,15 @@ void HH4lXNtupleMaker::FillLHECandidate(){
     pushLHEMELABranches();
   }
 
-  LHEPDFScale = lheHandler->getPDFScale();
-  if (genHEPMCweight==1.){
-    genHEPMCweight_NNLO = genHEPMCweight = lheHandler->getLHEOriginalWeight();
-    if (!printedLHEweightwarning && genHEPMCweight!=1.) {
-      printedLHEweightwarning = true;
-      edm::LogWarning("InconsistentWeights") << "Gen weight is 1, LHE weight is " << genHEPMCweight;
-    }
-  }
-  genHEPMCweight *= lheHandler->getWeightRescale();
+  // LHEPDFScale = lheHandler->getPDFScale();
+  // if (genHEPMCweight==1.){
+  //   genHEPMCweight_NNLO = genHEPMCweight = lheHandler->getLHEOriginalWeight();
+  //   if (!printedLHEweightwarning && genHEPMCweight!=1.) {
+  //     printedLHEweightwarning = true;
+  //     edm::LogWarning("InconsistentWeights") << "Gen weight is 1, LHE weight is " << genHEPMCweight;
+  //   }
+  // }
+  // genHEPMCweight *= lheHandler->getWeightRescale();
 
   genHEPMCweight_POWHEGonly = lheHandler->getMemberZeroWeight();
   LHEweight_QCDscale_muR1_muF1 = lheHandler->getLHEWeight(0, 1.);
@@ -1990,17 +1991,18 @@ void HH4lXNtupleMaker::FillCandidate(const pat::CompositeCandidate& cand, bool e
   //Store an overall event weight (which is normalized by gen_sumWeights)
   overallEventWeight = PUWeight * genHEPMCweight * dataMCWeight * trigEffWeight;
 
-  /* // debug printout for weights
-  cout<<"Event "<<event.id().run()<<":"<<event.luminosityBlock()<<":"<<event.id().event()<<endl;
-  cout<<" pileup weight =         "<<PUWeight<<endl;
-  cout<<" sign of gen. weight =   "<<genHEPMCweight/fabs(genHEPMCweight)<<endl;
-  cout<<" lepton data/MC weight = "<<dataMCWeight<<endl;
-  for(unsigned int i=0; i<leptons.size(); ++i)
-    cout<<"   lepton ID="<<leptons[i]->pdgId()<<", pT="<<leptons[i]->pt()<<", weight="<<getAllWeight(leptons[i])<<endl;
-  cout<<" trigger eff. weight =   "<<trigEffWeight<<endl;
-  cout<<"product of all =         "<<overallEventWeight/fabs(genHEPMCweight)<<endl;
-  cout<<endl;
-  //*/
+  // // debug printout for weights
+  // cout<<"****************************************************************************"<<endl;
+  // cout<<"Event "<<event.id().run()<<":"<<event.luminosityBlock()<<":"<<event.id().event()<<endl;
+  // cout<<" pileup weight =         "<<PUWeight<<endl;
+  // cout<<" sign of gen. weight =   "<<genHEPMCweight/fabs(genHEPMCweight)<<endl;
+  // cout<<" lepton data/MC weight = "<<dataMCWeight<<endl;
+  // // for(unsigned int i=0; i<leptons.size(); ++i)
+  // //   cout<<"   lepton ID="<<leptons[i]->pdgId()<<", pT="<<leptons[i]->pt()<<", weight="<<getAllWeight(leptons[i])<<endl;
+  // cout<<" trigger eff. weight =   "<<trigEffWeight<<endl;
+  // cout<<"product of all =         "<<overallEventWeight/fabs(genHEPMCweight)<<endl;
+  // cout<<endl;
+  // //
 
 }
 
