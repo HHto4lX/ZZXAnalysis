@@ -194,6 +194,8 @@ namespace {
   std::vector<float> photonPt;
   std::vector<float> photonEta;
   std::vector<float> photonPhi;
+  std::vector<float> photonEtaSC;
+  std::vector<float> photonPhiSC;
   std::vector<float> photonMass;
   std::vector<float> photon_5x5r9;
   std::vector<float> photon_5x5sigmaIetaIeta;
@@ -1421,8 +1423,10 @@ void HH4lXNtupleMaker::FillJetGenInfo(const reco::GenJet& genjet)
 void HH4lXNtupleMaker::FillPhoton(const pat::Photon& photon)
 {
    photonPt    .push_back( photon.pt());
-   photonEta   .push_back( photon.superCluster()->eta());
-   photonPhi   .push_back( photon.superCluster()->phi());
+   photonEta   .push_back( photon.eta());
+   photonPhi   .push_back( photon.phi());
+   photonEtaSC .push_back( photon.superCluster()->eta());
+   photonPhiSC .push_back( photon.superCluster()->phi());
    photonMass  .push_back( photon.p4().M());
    photon_5x5r9.push_back( photon.full5x5_r9());
    photon_5x5sigmaIetaIeta.push_back( photon.full5x5_sigmaIetaIeta());
@@ -2622,6 +2626,8 @@ void HH4lXNtupleMaker::BookAllBranches(){
   myTree->Book("photonPt",     photonPt,   failedTreeLevel >= fullFailedTree);
   myTree->Book("photonEta",    photonEta,  failedTreeLevel >= fullFailedTree);
   myTree->Book("photonPhi",    photonPhi,  failedTreeLevel >= fullFailedTree);
+  myTree->Book("photonEtaSC",  photonEtaSC,failedTreeLevel >= fullFailedTree);
+  myTree->Book("photonPhiSC",  photonPhiSC,failedTreeLevel >= fullFailedTree);
   myTree->Book("photonMass",   photonMass, failedTreeLevel >= fullFailedTree);
   myTree->Book("photon_5x5r9", photon_5x5r9,  failedTreeLevel >= fullFailedTree);
   myTree->Book("photon_5x5sigmaIetaIeta", photon_5x5sigmaIetaIeta, failedTreeLevel >= fullFailedTree); 
