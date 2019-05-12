@@ -95,22 +95,62 @@ PhotonFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   for (auto pht_i = photonHandle->begin(); pht_i != photonHandle->end(); ++pht_i) {
     
 
-    // Get the candidate as edm::Ptr
-    //edm::Ptr<pat::PackedCandidate> g = pfCands->ptrAt(i);
-    //edm::Ptr<pat::Photon> g = photonHandle->ptrAt(i);
-
     pat::Photon g(*pht_i);
-    double g_pt  = g.pt();
-    double g_eta = g.eta();
-    double g_phi = g.phi();
+    float g_pt     = g.pt();
+    float g_etaSC  = g.superCluster()->eta();
+    float g_HoverE = g.hadronicOverEm();
+    float g_sigmaIEtaIEta    = g.full5x5_sigmaIetaIeta();
+    float g_chargedHadronIso = g.chargedHadronIso();
+    float g_neutralHadronIso = g.neutralHadronIso();
+    float g_photonIso        = g.photonIso();
+   
     
-    // We only want photons: select photons among all the pf candidates
-    //if (g->pdgId()!=22) continue;
-
-    // Photon preselection 
-    if (!(g_pt>2. && fabs(g_eta)<2.4)) continue;
-
+    // -------------
+    // Photon LOOSE selection
+    // https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedPhotonIdentificationRun2 
+    bool photonID_loose = false;
     
+    // barrel photons
+    if( fabs(g_etaSC) <= 1.479 ){
+
+      if( g_HoverE           < 0.04596 &&
+          g_sigmaIEtaIEta    < 0.0106  &&
+          g_chargedHadronIso < 1.694   &&
+          g_neutralHadronIso < 24.032 + 0.01512*g_pt + 2.259e-05*g_pt*g_pt &&
+          g_photonIso        < 2.876  + 0.004017*g_pt 
+        )
+      {
+	photonID_loose = true;
+      }
+
+    }
+    // endcap photons
+    else if( fabs(g_etaSC) > 1.479  &&  fabs(g_etaSC) <= 2.8 ){
+
+      if( g_HoverE           < 0.0590 &&
+          g_sigmaIEtaIEta    < 0.0272 &&
+          g_chargedHadronIso < 2.089  &&
+          g_neutralHadronIso < 19.722 + 0.0117*g_pt + 2.3e-05*g_pt*g_pt &&
+          g_photonIso        < 4.162  + 0.0037*g_pt 
+        )
+      {
+	photonID_loose = true;
+      }
+
+    }
+    // drop photons with eta>2.8
+    else { continue; }
+
+    // -------------
+
+
+
+
+    // add variable to the photon collection
+    g.addUserFloat("photonID_loose",photonID_loose);
+    
+
+
     
     result->push_back(g); 
     //result->back().setStatus(0);

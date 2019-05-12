@@ -203,7 +203,7 @@ namespace {
   std::vector<float> photon_neutralHadronIso;
   std::vector<float> photon_photonIso;
   std::vector<float> photon_hadronicOverEm;
-  //  std::vector<float> photon_fixedGridRhoFastjetAll;
+  std::vector<float> photonIsID;
 
   Short_t nTaus  =  0;
   std::vector<float> tauPt;
@@ -1442,8 +1442,9 @@ void HH4lXNtupleMaker::FillPhoton(const pat::Photon& photon)
    // hadronic response over EM response
    photon_hadronicOverEm.push_back( photon.hadronicOverEm());
 
-
-   //   photon_fixedGridRhoFastjetAll.push_back( photon.fixedGridRhoFastjetAll());
+   // photon ID
+   photonIsID.push_back( photon.userFloat("photonID_loose"));
+   
 
 }
 
@@ -2635,7 +2636,7 @@ void HH4lXNtupleMaker::BookAllBranches(){
   myTree->Book("photon_neutralHadronIso", photon_neutralHadronIso, failedTreeLevel >= fullFailedTree);
   myTree->Book("photon_photonIso",        photon_photonIso,        failedTreeLevel >= fullFailedTree);
   myTree->Book("photon_hadronicOverEm",   photon_hadronicOverEm,   failedTreeLevel >= fullFailedTree);
-  //  myTree->Book("photon_fixedGridRhoFastjetAll", photon_fixedGridRhoFastjetAll, failedTreeLevel >= fullFailedTree);
+  myTree->Book("photonIsID",              photonIsID,              failedTreeLevel >= fullFailedTree);
 
 
   //Tau variables
