@@ -50,7 +50,7 @@ class PhotonFiller : public edm::EDProducer {
   virtual void endJob(){};
 
   edm::EDGetTokenT<edm::View<pat::Photon> > photonToken;
-  //edm::EDGetTokenT<edm::View<pat::PackedCandidate> > pfCandToken;
+  edm::EDGetTokenT<double> rhoToken;
   int selectionMode;
   int sampleType;
   int setup;
@@ -65,7 +65,7 @@ PhotonFiller::PhotonFiller(const edm::ParameterSet& iConfig) :
   debug(iConfig.getUntrackedParameter<bool>("debug",false))
 {
   
-  //pfCandToken = consumes<edm::View<pat::PackedCandidate> >(edm::InputTag("packedPFCandidates")); 
+  rhoToken = consumes<double> (edm::InputTag("fixedGridRhoFastjetAll")); 
 
   produces<pat::PhotonCollection>(); 
 }
@@ -79,13 +79,31 @@ PhotonFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<edm::View<pat::Photon> > photonHandle;
   iEvent.getByToken(photonToken, photonHandle);
 
-  //--- Get the PF cands
-  // use pf candidates and then select photon among these
-  //edm::Handle<edm::View<pat::PackedCandidate> > pfCands; 
-  //iEvent.getByToken(pfCandToken, pfCands);
-
+ 
   // Output collections
   auto result = std::make_unique<pat::PhotonCollection>();
+
+
+
+
+  //--- Get the fixedGridRhoFastjetAll value 
+  //    (for isolation ID criteria)
+  edm::Handle<double> rhoHandle; 
+  iEvent.getByToken(rhoToken, rhoHandle);
+  double rho = *rhoHandle;
+
+
+  //--- Define Effective Area vectors
+  //    (for isolation ID criteria) - 2017 v2 ID
+  //    https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedPhotonIdentificationRun2#Offline_selection_criteria_AN1 
+  //
+  //    values for different eta regions: 
+  //    |eta|<1, 1<|eta|<1.479, 1.479<|eta|<2, 2<|eta|<2.2, 2.2<|eta|<2.3, 2.3<|eta|<2.4, |eta|>2.4
+  double EA_chargedHadrons[7] = {0.0112, 0.0108, 0.0106, 0.01002, 0.0098, 0.0089, 0.0087};
+  double EA_neutralHadrons[7] = {0.0668, 0.1054, 0.0786, 0.0233,  0.0078, 0.0028, 0.0137};
+  double EA_photons[7]        = {0.1113, 0.0953, 0.0619, 0.0837,  0.1070, 0.1212, 0.1466};
+
+
 
 
 
@@ -103,21 +121,73 @@ PhotonFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     float g_chargedHadronIso = g.chargedHadronIso();
     float g_neutralHadronIso = g.neutralHadronIso();
     float g_photonIso        = g.photonIso();
-   
+
+
+    // compute iso rho corrected
+    float g_chargedHadronIso_corr = 0.;
+    float g_neutralHadronIso_corr = 0.;
+    float g_photonIso_corr        = 0.;
+
+    if( fabs(g_etaSC) <= 1. )
+    {
+      g_chargedHadronIso_corr = max(g_chargedHadronIso - rho*EA_chargedHadrons[0], 0.);
+      g_neutralHadronIso_corr = max(g_neutralHadronIso - rho*EA_neutralHadrons[0], 0.);
+      g_photonIso_corr        = max(g_photonIso        - rho*EA_photons[0],        0.);
+    }
+    else if( fabs(g_etaSC) > 1. && fabs(g_etaSC) <= 1.479 )
+    {
+      g_chargedHadronIso_corr = max(g_chargedHadronIso - rho*EA_chargedHadrons[1], 0.);
+      g_neutralHadronIso_corr = max(g_neutralHadronIso - rho*EA_neutralHadrons[1], 0.);
+      g_photonIso_corr        = max(g_photonIso        - rho*EA_photons[1],        0.);
+    }
+    else if( fabs(g_etaSC) > 1.479 && fabs(g_etaSC) <= 2. )
+    {
+      g_chargedHadronIso_corr = max(g_chargedHadronIso - rho*EA_chargedHadrons[2], 0.);
+      g_neutralHadronIso_corr = max(g_neutralHadronIso - rho*EA_neutralHadrons[2], 0.);
+      g_photonIso_corr        = max(g_photonIso        - rho*EA_photons[2],        0.);
+    }
+    else if( fabs(g_etaSC) > 2. && fabs(g_etaSC) <= 2.2 )
+    {
+      g_chargedHadronIso_corr = max(g_chargedHadronIso - rho*EA_chargedHadrons[3], 0.);
+      g_neutralHadronIso_corr = max(g_neutralHadronIso - rho*EA_neutralHadrons[3], 0.);
+      g_photonIso_corr        = max(g_photonIso        - rho*EA_photons[3],        0.);
+    }
+    else if( fabs(g_etaSC) > 2.2 && fabs(g_etaSC) <= 2.3 )
+    {
+      g_chargedHadronIso_corr = max(g_chargedHadronIso - rho*EA_chargedHadrons[4], 0.);
+      g_neutralHadronIso_corr = max(g_neutralHadronIso - rho*EA_neutralHadrons[4], 0.);
+      g_photonIso_corr        = max(g_photonIso        - rho*EA_photons[4],        0.);
+    }
+    else if( fabs(g_etaSC) > 2.3 && fabs(g_etaSC) <= 2.4 )
+    {
+      g_chargedHadronIso_corr = max(g_chargedHadronIso - rho*EA_chargedHadrons[5], 0.);
+      g_neutralHadronIso_corr = max(g_neutralHadronIso - rho*EA_neutralHadrons[5], 0.);
+      g_photonIso_corr        = max(g_photonIso        - rho*EA_photons[5],        0.);
+    }
+    else if( fabs(g_etaSC) > 2.4 )
+    {
+      g_chargedHadronIso_corr = max(g_chargedHadronIso - rho*EA_chargedHadrons[6], 0.);
+      g_neutralHadronIso_corr = max(g_neutralHadronIso - rho*EA_neutralHadrons[6], 0.);
+      g_photonIso_corr        = max(g_photonIso        - rho*EA_photons[6],        0.);
+    }
+    else continue;
+
+
+    
     
     // -------------
     // Photon LOOSE selection
-    // https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedPhotonIdentificationRun2 
+    // https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedPhotonIdentificationRun2#Offline_selection_criteria_AN1
     bool photonID_loose = false;
     
     // barrel photons
     if( fabs(g_etaSC) <= 1.479 ){
 
-      if( g_HoverE           < 0.04596 &&
-          g_sigmaIEtaIEta    < 0.0106  &&
-          g_chargedHadronIso < 1.694   &&
-          g_neutralHadronIso < 24.032 + 0.01512*g_pt + 2.259e-05*g_pt*g_pt &&
-          g_photonIso        < 2.876  + 0.004017*g_pt 
+      if( g_HoverE                < 0.04596 &&
+          g_sigmaIEtaIEta         < 0.0106  &&
+          g_chargedHadronIso_corr < 1.694   &&
+          g_neutralHadronIso_corr < 24.032 + 0.01512*g_pt + 2.259e-05*g_pt*g_pt &&
+          g_photonIso_corr        < 2.876  + 0.004017*g_pt 
         )
       {
 	photonID_loose = true;
@@ -127,11 +197,11 @@ PhotonFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     // endcap photons
     else if( fabs(g_etaSC) > 1.479  &&  fabs(g_etaSC) <= 2.8 ){
 
-      if( g_HoverE           < 0.0590 &&
-          g_sigmaIEtaIEta    < 0.0272 &&
-          g_chargedHadronIso < 2.089  &&
-          g_neutralHadronIso < 19.722 + 0.0117*g_pt + 2.3e-05*g_pt*g_pt &&
-          g_photonIso        < 4.162  + 0.0037*g_pt 
+      if( g_HoverE                < 0.0590 &&
+          g_sigmaIEtaIEta         < 0.0272 &&
+          g_chargedHadronIso_corr < 2.089  &&
+          g_neutralHadronIso_corr < 19.722 + 0.0117*g_pt + 2.3e-05*g_pt*g_pt &&
+          g_photonIso_corr        < 4.162  + 0.0037*g_pt 
         )
       {
 	photonID_loose = true;
@@ -148,7 +218,10 @@ PhotonFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     // add variable to the photon collection
     g.addUserFloat("photonID_loose",photonID_loose);
-    
+    g.addUserFloat("photon_rho",    rho );
+    g.addUserFloat("photon_chargedHadronIso_corr", g_chargedHadronIso_corr );
+    g.addUserFloat("photon_neutralHadronIso_corr", g_neutralHadronIso_corr );
+    g.addUserFloat("photon_photonIso_corr",        g_photonIso_corr );
 
 
     

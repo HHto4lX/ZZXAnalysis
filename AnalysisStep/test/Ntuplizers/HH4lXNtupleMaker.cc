@@ -203,7 +203,11 @@ namespace {
   std::vector<float> photon_neutralHadronIso;
   std::vector<float> photon_photonIso;
   std::vector<float> photon_hadronicOverEm;
+  std::vector<float> photon_rho;
   std::vector<float> photonIsID;
+  std::vector<float> photon_chargedHadronIso_corr;
+  std::vector<float> photon_neutralHadronIso_corr;
+  std::vector<float> photon_photonIso_corr;
 
   Short_t nTaus  =  0;
   std::vector<float> tauPt;
@@ -1442,8 +1446,17 @@ void HH4lXNtupleMaker::FillPhoton(const pat::Photon& photon)
    // hadronic response over EM response
    photon_hadronicOverEm.push_back( photon.hadronicOverEm());
 
+   // photon rho
+   photon_rho.push_back( photon.userFloat("photon_rho"));
+
    // photon ID
+   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedPhotonIdentificationRun2#Offline_selection_criteria_AN1
    photonIsID.push_back( photon.userFloat("photonID_loose"));
+
+   // isolation rho corrected
+   photon_chargedHadronIso_corr.push_back( photon.userFloat("photon_chargedHadronIso_corr"));
+   photon_neutralHadronIso_corr.push_back( photon.userFloat("photon_neutralHadronIso_corr"));
+   photon_photonIso_corr       .push_back( photon.userFloat("photon_photonIso_corr"));
    
 
 }
@@ -2636,7 +2649,11 @@ void HH4lXNtupleMaker::BookAllBranches(){
   myTree->Book("photon_neutralHadronIso", photon_neutralHadronIso, failedTreeLevel >= fullFailedTree);
   myTree->Book("photon_photonIso",        photon_photonIso,        failedTreeLevel >= fullFailedTree);
   myTree->Book("photon_hadronicOverEm",   photon_hadronicOverEm,   failedTreeLevel >= fullFailedTree);
+  myTree->Book("photon_rho",              photon_rho,              failedTreeLevel >= fullFailedTree);
   myTree->Book("photonIsID",              photonIsID,              failedTreeLevel >= fullFailedTree);
+  myTree->Book("photon_chargedHadronIso_corr", photon_chargedHadronIso_corr, failedTreeLevel >= fullFailedTree);
+  myTree->Book("photon_neutralHadronIso_corr", photon_neutralHadronIso_corr, failedTreeLevel >= fullFailedTree);
+  myTree->Book("photon_photonIso_corr",        photon_photonIso_corr,        failedTreeLevel >= fullFailedTree); 
 
 
   //Tau variables
