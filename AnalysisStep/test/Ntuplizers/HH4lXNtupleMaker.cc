@@ -252,7 +252,7 @@ namespace {
   std::vector<float> GENjetEta;
   std::vector<float> GENjetPhi;
   std::vector<float> GENjetMass;
-  //std::vector<short> GENjetParentID;
+  std::vector<short> GENjetParentID;
 
 
   Float_t DiJetMass  = -99;
@@ -1154,7 +1154,7 @@ void HH4lXNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
     if (writeGenJets && theChannel!=ZL) FillJetGenInfo(*(genJetVector.at(i)));
 
   }
-  // ---
+
 
   // Jets (cleaned wrt all tight isolated leptons)
   Handle<edm::View<pat::Jet> > CleanedJets;
@@ -1202,7 +1202,7 @@ void HH4lXNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
   }
   // ---
 
-  // --- tau variables (H->TauTau )
+  // --- tau variables (H->TauTau  << jet.mother() << endl; )
   
   Handle<edm::View<pat::Tau> > tauHandle;
   event.getByToken(tauToken,tauHandle);
@@ -1383,6 +1383,11 @@ void HH4lXNtupleMaker::FillJet(const pat::Jet& jet)
    JetEta .push_back( jet.eta());
    JetPhi .push_back( jet.phi());
    JetMass .push_back( jet.p4().M());
+   const reco::Candidate * parton=jet.genParton();
+   if (parton !=0){
+     const reco::Candidate  * mo = parton->mother();
+     GENjetParentID.push_back(mo->pdgId());
+   } 
    JetBTagger .push_back( jet.userFloat("bTagger"));
    JetIsBtagged .push_back( jet.userFloat("isBtagged"));
    JetIsBtaggedWithSF .push_back( jet.userFloat("isBtaggedWithSF"));
@@ -1419,7 +1424,8 @@ void HH4lXNtupleMaker::FillJetGenInfo(const reco::GenJet& genjet)
   GENjetEta .push_back( genjet.eta() );
   GENjetPhi .push_back( genjet.phi() );
   GENjetMass.push_back( genjet.p4().M() );
-  //GENjetParentID.push_back( genjet.mother()->pdgId() );
+//  GENjetParentID.push_back( genjet.mother()->pdgId() );
+//  std::cout << "The Genjet mother: "<<  genjet.mother() << "The GenjetID: " << genjet.pdgId() << std::endl;
 
 }
 
@@ -2695,7 +2701,7 @@ void HH4lXNtupleMaker::BookAllBranches(){
   myTree->Book("GENjetEta",  GENjetEta,  failedTreeLevel >= fullFailedTree);
   myTree->Book("GENjetPhi",  GENjetPhi,  failedTreeLevel >= fullFailedTree);
   myTree->Book("GENjetMass", GENjetMass, failedTreeLevel >= fullFailedTree);  
-  //myTree->Book("GENjetParentID", GENjetParentID, failedTreeLevel >= fullFailedTree);
+  myTree->Book("GENjetParentID", GENjetParentID, failedTreeLevel >= fullFailedTree);
 
 
   myTree->Book("DiJetMass",DiJetMass, false);
