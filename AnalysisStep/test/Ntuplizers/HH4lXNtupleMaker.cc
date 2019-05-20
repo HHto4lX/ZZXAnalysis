@@ -78,6 +78,8 @@
 
 #include <string>
 
+
+
 namespace {
   bool writeGenJets = true;  // Write GenJets in the tree.
   bool writeJets = true;     // Write jets in the tree. FIXME: make this configurable
@@ -1387,6 +1389,9 @@ void HH4lXNtupleMaker::FillJet(const pat::Jet& jet)
    if (parton !=0){
      const reco::Candidate  * mo = parton->mother();
      GENjetParentID.push_back(mo->pdgId());
+   }
+   else{
+     GENjetParentID.push_back(-999.);
    } 
    JetBTagger .push_back( jet.userFloat("bTagger"));
    JetIsBtagged .push_back( jet.userFloat("isBtagged"));
