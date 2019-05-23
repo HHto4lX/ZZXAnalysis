@@ -81,6 +81,7 @@
 
 
 namespace {
+  bool writePrunedGenParticles = true;
   bool writeGenJets = true;  // Write GenJets in the tree.
   bool writeJets = true;     // Write jets in the tree. FIXME: make this configurable
   bool writePhotons = true;  // Write photons in the tree
@@ -256,6 +257,13 @@ namespace {
   std::vector<float> GENjetMass;
   std::vector<short> GENjetParentID;
 
+  std::vector<float> prunedGenPartPt;
+  std::vector<float> prunedGenPartEta; 
+  std::vector<float> prunedGenPartPhi; 
+  std::vector<float> prunedGenPartMass;
+  std::vector<short> prunedGenPartID;  
+  std::vector<short> prunedGenMotherID;
+
 
   Float_t DiJetMass  = -99;
 //   Float_t DiJetMassPlus  = -99;
@@ -421,6 +429,7 @@ private:
   virtual void FillTau(const pat::Tau& tau);
   virtual void endJob() ;
 
+  void FillPrunedGenParticlesInfo(const reco::Candidate& prunedGenPart);
   void FillJetGenInfo(const reco::GenJet& genjet);
 
   void FillHGenInfo(const math::XYZTLorentzVector Hp, float w);
@@ -1141,6 +1150,19 @@ void HH4lXNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
   Nvtx=vertices->size();
 
 
+  // --- GenParticles (prunedGenParticles)
+  vector<const reco::Candidate*> genPrunedParticlesVector;
+  for(edm::View<reco::Candidate>::const_iterator prunedPart_it = genParticles->begin(); prunedPart_it != genParticles->end(); ++prunedPart_it){
+    genPrunedParticlesVector.push_back(&*prunedPart_it);
+  }
+  for(unsigned i=0; i<genPrunedParticlesVector.size(); ++i){
+    if (genPrunedParticlesVector[i]==0) {
+      continue;
+    }
+    if (writePrunedGenParticles) FillPrunedGenParticlesInfo(*(genPrunedParticlesVector.at(i)));
+  }
+
+
   // --- GenJets
   Handle<edm::View<reco::GenJet> > genJetHandle;
   event.getByToken(jetGenToken, genJetHandle);
@@ -1420,6 +1442,20 @@ void HH4lXNtupleMaker::FillJet(const pat::Jet& jet)
 
    JetHadronFlavour .push_back(jet.hadronFlavour());
    JetPartonFlavour .push_back(jet.partonFlavour());
+}
+
+
+void HH4lXNtupleMaker::FillPrunedGenParticlesInfo(const reco::Candidate& prunedGenPart)
+{
+  if(fabs(prunedGenPart.pdgId()) == 5 || fabs(prunedGenPart.pdgId()) == 25 ){
+    prunedGenPartPt  .push_back( prunedGenPart.pt() );
+    prunedGenPartEta .push_back( prunedGenPart.eta() );
+    prunedGenPartPhi .push_back( prunedGenPart.phi() );
+    prunedGenPartMass.push_back( prunedGenPart.p4().M() );
+    prunedGenPartID  .push_back( prunedGenPart.pdgId() );
+    prunedGenMotherID.push_back( prunedGenPart.mother()->pdgId() );
+  }
+
 }
 
 
@@ -2707,6 +2743,14 @@ void HH4lXNtupleMaker::BookAllBranches(){
   myTree->Book("GENjetPhi",  GENjetPhi,  failedTreeLevel >= fullFailedTree);
   myTree->Book("GENjetMass", GENjetMass, failedTreeLevel >= fullFailedTree);  
   myTree->Book("GENjetParentID", GENjetParentID, failedTreeLevel >= fullFailedTree);
+
+
+  myTree->Book("prunedGenPartPt",   prunedGenPartPt,   failedTreeLevel >= fullFailedTree);
+  myTree->Book("prunedGenPartEta",  prunedGenPartEta,  failedTreeLevel >= fullFailedTree);
+  myTree->Book("prunedGenPartPhi",  prunedGenPartPhi,  failedTreeLevel >= fullFailedTree);
+  myTree->Book("prunedGenPartMass", prunedGenPartMass, failedTreeLevel >= fullFailedTree);
+  myTree->Book("prunedGenPartID",   prunedGenPartID,   failedTreeLevel >= fullFailedTree);
+  myTree->Book("prunedGenMotherID", prunedGenMotherID, failedTreeLevel >= fullFailedTree);
 
 
   myTree->Book("DiJetMass",DiJetMass, false);
