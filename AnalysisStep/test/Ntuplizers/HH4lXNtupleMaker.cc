@@ -1159,7 +1159,7 @@ void HH4lXNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
     if (genPrunedParticlesVector[i]==0) {
       continue;
     }
-    if (writePrunedGenParticles) FillPrunedGenParticlesInfo(*(genPrunedParticlesVector.at(i)));
+    if (writePrunedGenParticles && isMC) FillPrunedGenParticlesInfo(*(genPrunedParticlesVector.at(i)));
   }
 
 
@@ -1407,13 +1407,15 @@ void HH4lXNtupleMaker::FillJet(const pat::Jet& jet)
    JetEta .push_back( jet.eta());
    JetPhi .push_back( jet.phi());
    JetMass .push_back( jet.p4().M());
-   const reco::Candidate * parton=jet.genParton();
-   if (parton !=0){
-     const reco::Candidate  * mo = parton->mother();
-     GENjetParentID.push_back(mo->pdgId());
-   }
-   else{
-     GENjetParentID.push_back(-999.);
+   if (isMC){
+     const reco::Candidate * parton=jet.genParton();
+     if (parton !=0){
+       const reco::Candidate  * mo = parton->mother();
+       GENjetParentID.push_back(mo->pdgId());
+     }
+     else{
+       GENjetParentID.push_back(-999.);
+     }
    } 
    JetBTagger .push_back( jet.userFloat("bTagger"));
    JetIsBtagged .push_back( jet.userFloat("isBtagged"));
@@ -1447,7 +1449,7 @@ void HH4lXNtupleMaker::FillJet(const pat::Jet& jet)
 
 void HH4lXNtupleMaker::FillPrunedGenParticlesInfo(const reco::Candidate& prunedGenPart)
 {
-  if(fabs(prunedGenPart.pdgId()) == 5 || fabs(prunedGenPart.pdgId()) == 25 ){
+  if(fabs(prunedGenPart.pdgId()) == 5 ){
     prunedGenPartPt  .push_back( prunedGenPart.pt() );
     prunedGenPartEta .push_back( prunedGenPart.eta() );
     prunedGenPartPhi .push_back( prunedGenPart.phi() );
