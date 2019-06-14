@@ -80,11 +80,11 @@ echo 'cmsRun done at: ' $(date) with exit status: ${cmsRunStatus+0}
 gzip log.txt
 
 export ROOT_HIST=0
-if [ -s ZZ4lAnalysis.root ]; then
- root -q -b '${CMSSW_BASE}/src/ZZXAnalysis/AnalysisStep/test/prod/rootFileIntegrity.r("ZZ4lAnalysis.root")'
+if [ -s ZZXAnalysis.root ]; then
+ root -q -b '${CMSSW_BASE}/src/ZZXAnalysis/AnalysisStep/test/prod/rootFileIntegrity.r("ZZXAnalysis.root")'
 else
  echo moving empty file
- mv ZZ4lAnalysis.root ZZ4lAnalysis.root.empty
+ mv ZZXAnalysis.root ZZXAnalysis.root.empty
 fi
 
 #delete mela stuff and $USER.cc
@@ -96,7 +96,7 @@ exit $cmsRunStatus
 
 #note cping back is handled automatically by condor
 if $runninglocally; then
-  cp ZZ4lAnalysis.root* *.txt *.gz $SUBMIT_DIR
+  cp ZZXAnalysis.root* *.txt *.gz $SUBMIT_DIR
 fi
 """ 
    return script
@@ -120,6 +120,8 @@ x509userproxy           = {home}/x509up_u{uid}
 periodic_remove         = JobStatus == 5
 
 WhenToTransferOutput    = ON_EXIT_OR_EVICT
+
+requirements            = (OpSysAndVer =?= "CentOS7")
 """
    return script.format(home=os.path.expanduser("~"), uid=os.getuid(), mainDir=mainDir)
 
