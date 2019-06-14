@@ -11,7 +11,7 @@ foreach chunk ( *Chunk* )
 
 
  # Check that root file is existing and not empty
- set filename=${chunk}/ZZ4lAnalysis.root
+ set filename=${chunk}/ZZXAnalysis.root
  if ( ! -e $filename ) then
 #   echo "Missing root file in " ${chunk}
    set fail="true"

@@ -95,9 +95,9 @@ echo
 #echo
 echo 'Sending the job directory back...'
 cp *.root *.txt *.gz $LS_SUBCWD
-if ( -z ZZ4lAnalysis.root ) then
- echo 'Empty file:  ZZ4lAnalysis.root'
- if ( -s ZZ4lAnalysis.root ) then
+if ( -z ZZXAnalysis.root ) then
+ echo 'Empty file:  ZZXAnalysis.root'
+ if ( -s ZZXAnalysis.root ) then
    echo Retrying...
    sleep 10
    cp *.root $LS_SUBCWD
@@ -108,11 +108,11 @@ cd $LS_SUBCWD
 #pwd
 #ls -l
 setenv ROOT_HIST 0
-if ( -s ZZ4lAnalysis.root ) then
- root -q -b '${CMSSW_BASE}/src/ZZXAnalysis/AnalysisStep/test/prod/rootFileIntegrity.r(\"ZZ4lAnalysis.root\")'
+if ( -s ZZXAnalysis.root ) then
+ root -q -b '${CMSSW_BASE}/src/ZZXAnalysis/AnalysisStep/test/prod/rootFileIntegrity.r(\"ZZXAnalysis.root\")'
 else
  echo moving empty file
- mv ZZ4lAnalysis.root ZZ4lAnalysis.root.empty
+ mv ZZXAnalysis.root ZZXAnalysis.root.empty
 endif
 
 echo '...done at' `date`

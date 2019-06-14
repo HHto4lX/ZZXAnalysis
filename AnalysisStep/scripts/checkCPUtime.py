@@ -61,9 +61,9 @@ def checkCPUtime(folder, forcedata=False):
   except IOError:
     return "no log.txt.gz"
 
-  f = ROOT.TFile(os.path.join(folder, "ZZ4lAnalysis.root"))
-  if not f: return "no ZZ4lAnalysis.root"
-  if f.TestBit(ROOT.TFile.kRecovered): return "ZZ4lAnalysis.root is recovered (probably not all there)"
+  f = ROOT.TFile(os.path.join(folder, "ZZXAnalysis.root"))
+  if not f: return "no ZZXAnalysis.root"
+  if f.TestBit(ROOT.TFile.kRecovered): return "ZZXAnalysis.root is recovered (probably not all there)"
   if not f.ZZTree: return "no ZZTree"
   t = f.ZZTree.Get("candTree")
   if not t: return "no candTree"

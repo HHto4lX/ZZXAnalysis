@@ -19,7 +19,7 @@ eval `scram runtime -csh`
 
 set SETNAME=`basename $PWD`
 
-set STORAGEPATH=/data3/Higgs
+set STORAGEPATH=/data3/HH
 set TREEPATH=${STORAGEPATH}/$1
 
 
@@ -88,9 +88,9 @@ rmdir ${SETNAME} # If any of the above fails (eg because a sample was already pr
 if ($MERGEDATA16 || $MERGEDATA17 || $MERGEDATA18) then
     mkdir AllData
     echo "Merging data trees ..."
-    if ($MERGEDATA16) hadd AllData/ZZ4lAnalysis2016.root *2016*/ZZ4lAnalysis.root >&! haddlog_${SETNAME}_mergingData.txt
-    if ($MERGEDATA17) hadd AllData/ZZ4lAnalysis.root *2017*/ZZ4lAnalysis.root >&! haddlog_${SETNAME}_mergingData.txt
-    if ($MERGEDATA18) hadd AllData/ZZ4lAnalysis.root *2018*/ZZ4lAnalysis.root >&! haddlog_${SETNAME}_mergingData.txt
+    if ($MERGEDATA16) hadd AllData/ZZXAnalysis2016.root *2016*/ZZXAnalysis.root >&! haddlog_${SETNAME}_mergingData.txt
+    if ($MERGEDATA17) hadd AllData/ZZXAnalysis.root *2017*/ZZXAnalysis.root >&! haddlog_${SETNAME}_mergingData.txt
+    if ($MERGEDATA18) hadd AllData/ZZXAnalysis.root *2018*/ZZXAnalysis.root >&! haddlog_${SETNAME}_mergingData.txt
 endif
 
 cd - > /dev/null
