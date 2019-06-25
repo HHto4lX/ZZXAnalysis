@@ -93,7 +93,11 @@ MCHistoryTools::MCHistoryTools(const edm::Event & event, std::string sampleName,
     if (boost::starts_with(sampleName,"TTZ")) processID=900104;
     if (boost::starts_with(sampleName,"TTTo2L2Nu")) processID=900104;
     // for WWZ
-    if (boost::starts_with(sampleName,"WWZ")) processID=900105;      
+    if (boost::starts_with(sampleName,"WWZ")) processID=900105;   
+    //for ttWW
+    if (boost::starts_with(sampleName,"TTWW")) processID=900106;   
+    //for TTW
+    if (boost::starts_with(sampleName,"TTW")) processID=900107;
     
 
     // take the MC weight
@@ -318,7 +322,7 @@ MCHistoryTools::init() {
     }
 
     bool do_SF_OS_check = true;
-    if (processID == 900104 || processID == 900105) do_SF_OS_check = false;
+    if (processID == 900104 || processID == 900105 || processID == 900106 || processID == 900107) do_SF_OS_check = false;
     if ( do_SF_OS_check && (iZ22==-1 || theGenLeps[iZ21]->pdgId()+theGenLeps[iZ22]->pdgId()!=0) ) {  //Test remaining conditions: Z2 is found and SF, OS
       cout << "MCHistoryTools: Cannot sort leptons ";
       for (int i=0; i<4; ++i) cout << theGenLeps[i]->pdgId() << " ";

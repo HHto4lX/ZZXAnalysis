@@ -275,6 +275,7 @@ namespace {
   std::vector<float> ExtraLepPt;
   std::vector<float> ExtraLepEta;
   std::vector<float> ExtraLepPhi ;
+  std::vector<float> ExtraLepMass;
   std::vector<short> ExtraLepLepId;
   Short_t genFinalState  = 0;
   Int_t genProcessId  = 0;
@@ -1816,6 +1817,7 @@ void HH4lXNtupleMaker::FillCandidate(const pat::CompositeCandidate& cand, bool e
   ExtraLepPt.clear();
   ExtraLepEta.clear();
   ExtraLepPhi.clear();
+  ExtraLepMass.clear();
   ExtraLepLepId.clear();
 
   CRflag = CRFLAG;
@@ -2031,6 +2033,7 @@ void HH4lXNtupleMaker::FillCandidate(const pat::CompositeCandidate& cand, bool e
         ExtraLepPt.push_back(candPtr->pt());
         ExtraLepEta.push_back(candPtr->eta());
         ExtraLepPhi.push_back(candPtr->phi());
+        ExtraLepMass.push_back(candPtr->p4().M());
         ExtraLepLepId.push_back(candPtr->pdgId());
       }
     }
@@ -2765,6 +2768,7 @@ void HH4lXNtupleMaker::BookAllBranches(){
   myTree->Book("ExtraLepPt",ExtraLepPt, false);
   myTree->Book("ExtraLepEta",ExtraLepEta, false);
   myTree->Book("ExtraLepPhi",ExtraLepPhi, false);
+  myTree->Book("ExtraLepMass",ExtraLepMass, false);
   myTree->Book("ExtraLepLepId",ExtraLepLepId, false);
 
   myTree->Book("ZXFakeweight", ZXFakeweight, false);
