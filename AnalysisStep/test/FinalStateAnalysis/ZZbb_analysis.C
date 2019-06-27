@@ -705,10 +705,23 @@ void doPlot(const std::string outputFile)
 */
 
 
-void ZZbb_analysis(const std::string inputFileMC, const std::string outputFile, double lumi=140) 
+void ZZbb_analysis() 
 {
-  doHisto(inputFileMC, outputFile, lumi);
 
+  double lumi = 140; // full Run2 Lumi
+
+  string inputFilePath = "/eos/user/a/acappati/samples_4lX/190626/";
+  Int_t   nInputFiles = 1;
+  string inputFileName[1] = {"ttH125"};
+
+  string outputFilePath = "histos_4lbb";
+  gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
+  
+
+  //call function
+  for(int i=0; i<nInputFiles; i++){
+    doHisto(Form("%s%s%s",inputFilePath.c_str(),inputFileName[i].c_str(),"/ZZXAnalysis.root"), Form("%s%s%s%s",outputFilePath.c_str(), "/histos_", (inputFileName[i]).c_str(), ".root"), lumi);
+  }
   
   //  doPlot(ouputFile);
 }
