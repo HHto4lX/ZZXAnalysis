@@ -177,7 +177,7 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 
       Float_t kfactor = 1.;
       
-      Double_t eventWeight = partialSampleWeight * xsec * genBR * kfactor * overallEventWeight ;
+      Double_t eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight ;
     
       //Double_t eventWeight = 1;
       std::cout << "-----------------------------------------------------------------------\nevent: " << entry << " weight: " << eventWeight << endl;
