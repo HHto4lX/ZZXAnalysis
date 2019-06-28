@@ -350,7 +350,7 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
       else if (counterH == 1) event_1H = true;
       else if (counterH == 0) event_0H = true;
  
-      for (int j = 0; j < JetPt->size(); j++)
+      for (UInt_t j = 0; j < JetPt->size(); j++)
 	{
 	  if ( fabs ( JetEta->at(j) ) > 2.4 ) continue;
 	  
@@ -375,10 +375,10 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 
       // build pairs of jets
       
-      for (int i = 0; i < JetVec.size() -1; i++)
+      for (UInt_t i = 0; i < JetVec.size() -1; i++)
 	{
 	  TLorentzVector jet0 = JetVec[i];
-	  for (int j = i+1; j < JetVec.size(); j++)
+	  for (UInt_t j = i+1; j < JetVec.size(); j++)
 	    {
 	      TLorentzVector jet1 = JetVec[j];
 	      
@@ -440,7 +440,7 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
       // loop on pairs to find best pairs
     
 
-      for (int p = 0; p<JetPair.size(); p++)
+      for (UInt_t p = 0; p<JetPair.size(); p++)
 	{
 	  if ( JetPairBinfo[p] > 0 )
 	    {
@@ -473,7 +473,7 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 	}
 
       
-      for (int pr = 0; pr < prunedGenPartEta->size(); pr ++)
+      for (UInt_t pr = 0; pr < prunedGenPartEta->size(); pr ++)
 	{
 	  if (fabs(prunedGenPartID->at(pr)) == 5 && prunedGenMotherID->at(pr) == 25)
 	    {
@@ -538,7 +538,7 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 
       if ((event_1H == true) || (event_2H == true))
 	{
-	  for (int i = 0; i < index_GEN.size(); i++)
+	  for (UInt_t i = 0; i < index_GEN.size(); i++)
 	    {
 	      if ((BESTpair_methodPTjet_index1 == index_GEN[i]) || (BESTpair_methodPTjet_index2 == index_GEN[i])) efficiency_pt++;
 	      if ((BESTpair_methodM_index1 == index_GEN[i]) || (BESTpair_methodM_index2 == index_GEN[i])) efficiency_mass++;	  
@@ -711,15 +711,37 @@ void ZZbb_analysis()
   double lumi = 140; // full Run2 Lumi
 
   string inputFilePath = "/eos/user/a/acappati/samples_4lX/190626/";
-  Int_t   nInputFiles = 1;
-  string inputFileName[1] = {"ttH125"};
+  string inputFileName[] = {"ggH125",
+                             "VBFH125",
+                             "WplusH125",
+                             "WminusH125",
+                             "ZH125",
+                             "bbH125",
+                             "ttH125",
+                             "ggTo4e_Contin_MCFM701",
+                             "ggTo4mu_Contin_MCFM701",
+                             "ggTo4tau_Contin_MCFM701",
+                             "ggTo2e2mu_Contin_MCFM701",
+                             "ggTo2e2tau_Contin_MCFM701",
+                             "ggTo2mu2tau_Contin_MCFM701",
+                             "ZZTo4lext1",
+                             "TTZJets_M10_MLMext1",
+                             "TTZToLL_M1to1O_MLM",
+                             "TTWJetsToLNu",
+                             //"DYJetsToLL_M50",
+                             //"TTTo2L2Nu",
+                            };
+
+  size_t nInputFiles = sizeof(inputFileName)/sizeof(inputFileName[0]);
+  cout<<nInputFiles<<endl;
 
   string outputFilePath = "histos_4lbb";
   gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
   
 
   //call function
-  for(int i=0; i<nInputFiles; i++){
+  for(UInt_t i=0; i<nInputFiles; i++){
+    cout<<"Processing sample "<<inputFileName[i]<<" ... "<<endl;
     doHisto(Form("%s%s%s",inputFilePath.c_str(),inputFileName[i].c_str(),"/ZZXAnalysis.root"), Form("%s%s%s%s",outputFilePath.c_str(), "/histos_", (inputFileName[i]).c_str(), ".root"), lumi);
   }
   

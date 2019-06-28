@@ -214,7 +214,7 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 
       std::cout <<"\n extra lep size " << ExtraLepPt->size() << endl;
       
-      for (int j = 0; j < ExtraLepPt->size(); j++)
+      for (UInt_t j = 0; j < ExtraLepPt->size(); j++)
 	{
 	  if (ExtraLepPt->at(j) > 15 && fabs(ExtraLepEta->at(j)) < 2.4)
 	    {
@@ -300,9 +300,46 @@ void doPlot(const std::string outputFile)
 */
 
 
-void ZZWW_analysis(const std::string inputFileMC, const std::string outputFile, double lumi=140) 
+void ZZWW_analysis() 
 {
-  doHisto(inputFileMC, outputFile, lumi);
 
+  double lumi = 140; // full Run2 Lumi
+
+  string inputFilePath = "/eos/user/a/acappati/samples_4lX/190626/";
+  string inputFileName[] = {"ggH125",
+                             "VBFH125",
+                             "WplusH125",
+                             "WminusH125",
+                             "ZH125",
+                             "bbH125",
+                             "ttH125",
+                             "ggTo4e_Contin_MCFM701",
+                             "ggTo4mu_Contin_MCFM701",
+                             "ggTo4tau_Contin_MCFM701",
+                             "ggTo2e2mu_Contin_MCFM701",
+                             "ggTo2e2tau_Contin_MCFM701",
+                             "ggTo2mu2tau_Contin_MCFM701",
+                             "ZZTo4lext1",
+                             "TTZJets_M10_MLMext1",
+                             "TTZToLL_M1to1O_MLM",
+                             "TTWJetsToLNu",
+                             //"DYJetsToLL_M50",
+                             //"TTTo2L2Nu",
+                            };
+
+  size_t nInputFiles = sizeof(inputFileName)/sizeof(inputFileName[0]);
+  cout<<nInputFiles<<endl;
+
+  string outputFilePath = "histos_4lWW";
+  gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
+  
+
+  //call function
+  for(UInt_t i=0; i<nInputFiles; i++){
+    cout<<"Processing sample "<<inputFileName[i]<<" ... "<<endl;
+    doHisto(Form("%s%s%s",inputFilePath.c_str(),inputFileName[i].c_str(),"/ZZXAnalysis.root"), Form("%s%s%s%s",outputFilePath.c_str(), "/histos_", (inputFileName[i]).c_str(), ".root"), lumi);
+  }
+  
   //  doPlot(ouputFile);
 }
+
