@@ -62,14 +62,17 @@ Histo1D myHisto1D[nHisto] = {
   {"MZ2", "m_{Z2}", "Events", "", 0, 200, 100, 0, 0},
   {"pt4L", "p_{T}^{4L}", "Events", "", 0, 1000, 200, 0, 0},
   {"eta4L", "#eta^{4L}", "Events", "", -4, 4, 80, 0, 0},
-  {"yield", "", "Events", "", 0, 10, 10, 0, 0},
-  {"yield1", "", "Events", "", 0, 10, 10, 0, 0},
-  {"ExtraLepPT", "p_{T}^{l}", "Events", "", 0, 1000, 200, 0, 0},
-  {"ExtraLepEta", "#eta^{l}", "Events", "", -4, 4, 80, 0, 0}
+  {"yield_1extraL", "", "Events", "", 0, 4, 4, 0, 0},
+  {"yield_2extraL", "", "Events", "", 0, 4, 4, 0, 0},
+  {"yield_2extraLOS", "", "Events", "", 0, 4, 4, 0, 0},
+  {"yield_2extraLemu", "", "Events", "", 0, 4, 4, 0, 0},
 };
   
 void doHisto(const std::string inputFileMC, const std::string outputFile, double lumi=1)
 {
+
+  bool VERBOSE = true;
+
   TFile* inputFile;
   TTree* inputTree;
   TH1F* hCounters;
@@ -97,10 +100,11 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
   vector<Float_t> *ExtraLepPt = 0;
   vector<Float_t> *ExtraLepEta = 0;
   vector<Int_t> *ExtraLepLepId = 0;
-  
-  Int_t nextraLep = 0;
-  Int_t YIELD = 0;
-  Int_t YIELD1 = 0;
+
+  Int_t NUMBER_1extraL = 0;  
+  Int_t NUMBER_2extraL = 0;
+  Int_t NUMBER_2extraLOS = 0;
+  Int_t NUMBER_2extraLemu = 0;
   
   TH1F* h1[nHisto][nFinalState+1];
   
@@ -171,18 +175,21 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 
       Float_t kfactor = 1.;
       
-      Double_t eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight ;
+      //USE genBR only for signal
+      //      Double_t eventWeight = partialSampleWeight * xsec * genBR * kfactor * overallEventWeight ; //signal
+      Double_t eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight ; //background
     
-      //Double_t eventWeight = 1;
-      std::cout << "-----------------------------------------------------------------------\nevent: " << entry << " weight: " << eventWeight << endl;
-      
-      std::cout << "lumi " << lumi << endl;
-      std::cout << "xsec " << xsec << endl;
-      std::cout << "genBR " << genBR << endl;
-      std::cout << "genSumwweight " << gen_sumWeights << endl;
-      std::cout << "overallEventwweight " << overallEventWeight << endl;
-      std::cout << "Bin 0 " << NGenEvt << endl;
-      
+      if (VERBOSE)
+	{
+	  std::cout << "---------------------------------------------------------------------\nevent: " << entry << " weight: " << eventWeight << endl;
+	  
+	  // std::cout << "lumi " << lumi << endl;
+	  //std::cout << "xsec " << xsec << endl;
+	  //std::cout << "genBR " << genBR << endl;
+	  //std::cout << "genSumwweight " << gen_sumWeights << endl;
+	  //std::cout << "overallEventwweight " << overallEventWeight << endl;
+	  //std::cout << "Bin 0 " << NGenEvt << endl;
+	}
       currentFinalState = -1;
       if (Z1Flav == -121)
 	{
@@ -207,40 +214,52 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 	  cerr << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; Z1Flav = " << Z1Flav << endl;
 	}
       if(MERGE2E2MU && ( currentFinalState == fs_2mu2e )) currentFinalState = fs_2e2mu;
-      
-      nextraLep = 0;
-      YIELD = 0;
-      YIELD1 = 0;
 
-      std::cout <<"\n extra lep size " << ExtraLepPt->size() << endl;
+      NUMBER_1extraL = 0;  
+      NUMBER_2extraL = 0;    
+      NUMBER_2extraLOS = 0;
+      NUMBER_2extraLemu = 0;
+
+      if (VERBOSE) std::cout <<"\nextra lep size " << ExtraLepPt->size() << endl;
+	  
       
       for (UInt_t j = 0; j < ExtraLepPt->size(); j++)
 	{
-	  if (ExtraLepPt->at(j) > 15 && fabs(ExtraLepEta->at(j)) < 2.4)
-	    {
-	      nextraLep++;
-	    }
+	  if (VERBOSE) std::cout << "j: " << j << " PT: " << ExtraLepPt->at(j) << " eta: " << ExtraLepEta->at(j) << " ID: " << ExtraLepLepId->at(j) <<  endl;
+	  if (ExtraLepPt->at(j) < 10 || fabs(ExtraLepEta->at(j)) > 2.4) continue;// decreased to 10 GeV the pT threshold (from 15)
 	}	  
       
-      std::cout << "N extra in acceptance " << nextraLep << endl;
-      if (nextraLep > 1)
+      if (VERBOSE) std::cout <<"\nextra lep size IN ACCEPTANCE: " << ExtraLepPt->size() << endl;
+	
+      if (ExtraLepPt->size() > 0) 
 	{
-	  for (int i = 0; i < nextraLep -1; i++)
+	  NUMBER_1extraL++;
+	  if (VERBOSE) std::cout << "# events: 1 extra Lepton " << NUMBER_1extraL << endl;
+
+	  if (ExtraLepPt->size() > 1)
 	    {
-	      for (int j = i+1; j < nextraLep; j++)
+	      NUMBER_2extraL++;
+	      if (VERBOSE) std::cout << "# events: 2 extra Lepton " << NUMBER_2extraL << endl;
+	      for (int i = 0; i < ExtraLepPt->size() -1; i++)
 		{
-		  std::cout << "0 : " << ExtraLepLepId->at(i) << endl;
-		  std::cout << "1 : " << ExtraLepLepId->at(j) << endl;
-		  std::cout << "x : " << ExtraLepLepId->at(i) * ExtraLepLepId->at(j) << endl; 
-		  if ( ((ExtraLepLepId->at(i)) * (ExtraLepLepId->at(j)) < 0) && (YIELD == 0)) YIELD++;	    
-		  std::cout << "YIELD " << YIELD << endl; 
+		  for (int j = i+1; j < ExtraLepPt->size(); j++)
+		    {
+		      if (VERBOSE)
+			{
+			  std::cout << "i    : " << ExtraLepLepId->at(i) << endl;
+			  std::cout << "j    : " << ExtraLepLepId->at(j) << endl;
+			  std::cout << "sign : " << ExtraLepLepId->at(i) * ExtraLepLepId->at(j) << endl; 
+			}
+			  if ( ((ExtraLepLepId->at(i)) * (ExtraLepLepId->at(j)) < 0) && (NUMBER_2extraLOS == 0)) NUMBER_2extraLOS++;	    
+			  if ( (  fabs((ExtraLepLepId->at(i)) * (ExtraLepLepId->at(j))) == 143 ) && (NUMBER_2extraLemu == 0) ) NUMBER_2extraLemu++;	    
+			  if (VERBOSE) std::cout << "# events: 2 extra Leptons OS " << NUMBER_2extraLOS << "\n# events: 2 extra Leptons e mu " << NUMBER_2extraLemu << endl; 
+		    }
 		}
 	    }
 	}
-
-      if (nextraLep > 0) YIELD1++;
-      std::cout << "YIELD1 " << YIELD1 << endl;
     
+      std::cout << "\n**# events**\n1 extraL : " << NUMBER_1extraL << "\n2 extraL : " << NUMBER_2extraL <<  "\n2 extraL OS : " << NUMBER_2extraLOS << "\n2 extraL e mu : " << NUMBER_2extraLemu << endl;
+
             
       Float_t histo[nHisto];
       
@@ -253,8 +272,10 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 	  else if (histoString == "pt4L") histo[v] = ZZPt;
 	  else if (histoString == "eta4L") histo[v] = ZZEta;
 	  else if (histoString == "eta4L") histo[v] = ZZEta;
-	  else if (histoString == "yield") histo[v] = YIELD;
-	  else if (histoString == "yield1") histo[v] = YIELD1;
+	  else if (histoString == "yield_1extraL") histo[v] = NUMBER_1extraL;
+	  else if (histoString == "yield_2extraL") histo[v] = NUMBER_2extraL;
+	  else if (histoString == "yield_2extraLOS") histo[v] = NUMBER_2extraLOS;
+	  else if (histoString == "yield_2extraLemu") histo[v] = NUMBER_2extraLemu;
 	  else continue;
 		 
 	  h1[v][currentFinalState]->Fill(histo[v], eventWeight);
@@ -291,14 +312,6 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 } //end doHisto
 
 
-/*
-void doPlot(const std::string outputFile)
-{
-  
-
-}
-*/
-
 
 void ZZWW_analysis() 
 {
@@ -306,25 +319,26 @@ void ZZWW_analysis()
   double lumi = 140; // full Run2 Lumi
 
   string inputFilePath = "/eos/user/a/acappati/samples_4lX/190626/";
-  string inputFileName[] = {"ggH125",
-                             "VBFH125",
-                             "WplusH125",
-                             "WminusH125",
-                             "ZH125",
-                             "bbH125",
-                             "ttH125",
-                             "ggTo4e_Contin_MCFM701",
-                             "ggTo4mu_Contin_MCFM701",
-                             "ggTo4tau_Contin_MCFM701",
-                             "ggTo2e2mu_Contin_MCFM701",
-                             "ggTo2e2tau_Contin_MCFM701",
-                             "ggTo2mu2tau_Contin_MCFM701",
-                             "ZZTo4lext1",
-                             "TTZJets_M10_MLMext1",
-                             "TTZToLL_M1to1O_MLM",
-                             "TTWJetsToLNu",
-                             //"DYJetsToLL_M50",
-                             //"TTTo2L2Nu",
+  string inputFileName[] = {//"HH4LWW",       //signal
+                            "ggH125",
+			    "VBFH125",
+			    "WplusH125",
+			    "WminusH125",
+			    "ZH125",
+			    "bbH125",
+			    "ttH125",
+			    "ggTo4e_Contin_MCFM701",
+			    "ggTo4mu_Contin_MCFM701",
+			    "ggTo4tau_Contin_MCFM701",
+			    "ggTo2e2mu_Contin_MCFM701",
+			    "ggTo2e2tau_Contin_MCFM701",
+			    "ggTo2mu2tau_Contin_MCFM701",
+			    "ZZTo4lext1",
+			    "TTZJets_M10_MLMext1",
+			    "TTZToLL_M1to1O_MLM",
+			    "TTWJetsToLNu",
+                            //"DYJetsToLL_M50",
+                            //"TTTo2L2Nu",
                             };
 
   size_t nInputFiles = sizeof(inputFileName)/sizeof(inputFileName[0]);
