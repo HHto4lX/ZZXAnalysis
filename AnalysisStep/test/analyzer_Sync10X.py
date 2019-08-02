@@ -23,14 +23,18 @@ TAUDISCRIMINATOR = "byIsolationMVA3oldDMwoLTraw"
 PD = ""
 MCFILTER = ""
 
+## ****************************************
+## *** choose the xsec ( xsec = xsec*BR )
+## *** XSEC HH = 0.03105 pb  # https://twiki.cern.ch/twiki/bin/view/LHCPhysics/LHCHXSWGHH
 
-XSEC    = 0.03349 # pb 
+XSEC = 0.03105 * 0.00014     # HH->4lbb
+#XSEC = 0.03105 * 0.000015    # HH->4ltautau
+#XSEC = 0.03105 * 0.0000023   # HH->4lww         #FIXME
+#XSEC = 0.03105 * 0.00000054  # HH->4lgammagamma
+
 GENXSEC = XSEC
-GENBR   = 0.00014    # 4lbb
-#GENBR  = 0.000015   # 4ltautau
-#GENBR  = 0.0000023  # 6l2nu
-#GENBR  = 0.00000054 # 4lgammagamma
-
+GENBR   = 1
+## ****************************************
 
 
 #For DATA: 
@@ -74,8 +78,8 @@ if not IsMC:
 ### ----------------------------------------------------------------------
 
 # keep events even if they have same runNumber:lumiNumber:eventNumber
-# (useful if we are reading more than 1 file here)
-process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
+# NOT TO BE USED
+# process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
 
 
 # --- input files
