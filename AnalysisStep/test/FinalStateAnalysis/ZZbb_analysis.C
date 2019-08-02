@@ -30,7 +30,7 @@ using namespace std;
 
 #define MERGE2E2MU 1
 
-double DELTAR = 1.2;
+double DELTAR = .4;
 
 // Final State scan
 
@@ -97,7 +97,7 @@ Histo1D myHisto1D[nHisto] = {
 void doHisto(const std::string inputFileMC, const std::string outputFile, double lumi=1)
 {
 
-  bool VERBOSE = true;
+  bool VERBOSE = false;
 
   TFile* inputFile;
   TTree* inputTree;
@@ -291,7 +291,7 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
       Float_t kfactor = 1.;
       
       //genBR only if signal
-      //      Double_t eventWeight = partialSampleWeight * xsec * genBR * kfactor * overallEventWeight ;
+      //Double_t eventWeight = partialSampleWeight * xsec * genBR * kfactor * overallEventWeight ;
       Double_t eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight ;
     
       //Double_t eventWeight = 1;
@@ -332,6 +332,7 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 	}
       if(MERGE2E2MU && ( currentFinalState == fs_2mu2e )) currentFinalState = fs_2e2mu;
       
+      if (ZZMass < 115 || ZZMass > 135) continue;
 
       // H(bb) selection
       

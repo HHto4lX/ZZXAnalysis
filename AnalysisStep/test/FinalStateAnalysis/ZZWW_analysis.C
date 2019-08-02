@@ -176,8 +176,8 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
       Float_t kfactor = 1.;
       
       //USE genBR only for signal
-      //      Double_t eventWeight = partialSampleWeight * xsec * genBR * kfactor * overallEventWeight ; //signal
-      Double_t eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight ; //background
+      Double_t eventWeight = partialSampleWeight * xsec * genBR * kfactor * overallEventWeight ; //signal
+      //Double_t eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight ; //background
     
       if (VERBOSE)
 	{
@@ -214,6 +214,10 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 	  cerr << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; Z1Flav = " << Z1Flav << endl;
 	}
       if(MERGE2E2MU && ( currentFinalState == fs_2mu2e )) currentFinalState = fs_2e2mu;
+
+
+      if (ZZMass < 115 || ZZMass > 135 ) continue;
+
 
       NUMBER_1extraL = 0;  
       NUMBER_2extraL = 0;    
@@ -319,8 +323,8 @@ void ZZWW_analysis()
   double lumi = 140; // full Run2 Lumi
 
   string inputFilePath = "/eos/user/a/acappati/samples_4lX/190626/";
-  string inputFileName[] = {//"HH4LWW",       //signal
-                            "ggH125",
+  string inputFileName[] = {"HH4LWW",       //signal
+                            /*"ggH125",
 			    "VBFH125",
 			    "WplusH125",
 			    "WminusH125",
@@ -336,7 +340,7 @@ void ZZWW_analysis()
 			    "ZZTo4lext1",
 			    "TTZJets_M10_MLMext1",
 			    "TTZToLL_M1to1O_MLM",
-			    "TTWJetsToLNu",
+			    "TTWJetsToLNu",*/
                             //"DYJetsToLL_M50",
                             //"TTTo2L2Nu",
                             };
