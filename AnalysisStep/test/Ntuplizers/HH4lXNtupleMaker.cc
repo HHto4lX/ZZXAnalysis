@@ -82,6 +82,7 @@
 
 namespace {
   bool writePrunedGenParticles = true;
+  bool writePrunedGenPhotons = true;
   bool writeGenJets = true;  // Write GenJets in the tree.
   bool writeJets = true;     // Write jets in the tree. FIXME: make this configurable
   bool writePhotons = true;  // Write photons in the tree
@@ -264,6 +265,12 @@ namespace {
   std::vector<short> prunedGenPartID;  
   std::vector<short> prunedGenMotherID;
 
+  std::vector<float> prunedGenPhoPt;
+  std::vector<float> prunedGenPhoEta; 
+  std::vector<float> prunedGenPhoPhi; 
+  std::vector<float> prunedGenPhoMass;
+  std::vector<short> prunedGenPhoID;  
+  std::vector<short> prunedGenPhoMotherID;
 
   Float_t DiJetMass  = -99;
 //   Float_t DiJetMassPlus  = -99;
@@ -431,6 +438,7 @@ private:
   virtual void endJob() ;
 
   void FillPrunedGenParticlesInfo(const reco::Candidate& prunedGenPart);
+  void FillPrunedGenPhotonsInfo(const reco::Candidate& prunedGenPart);
   void FillJetGenInfo(const reco::GenJet& genjet);
 
   void FillHGenInfo(const math::XYZTLorentzVector Hp, float w);
@@ -1150,7 +1158,7 @@ void HH4lXNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
   event.getByToken(vtxToken,vertices);
   Nvtx=vertices->size();
 
-
+ 
   // --- GenParticles (prunedGenParticles)
   vector<const reco::Candidate*> genPrunedParticlesVector;
   for(edm::View<reco::Candidate>::const_iterator prunedPart_it = genParticles->begin(); prunedPart_it != genParticles->end(); ++prunedPart_it){
@@ -1161,6 +1169,7 @@ void HH4lXNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
       continue;
     }
     if (writePrunedGenParticles && isMC) FillPrunedGenParticlesInfo(*(genPrunedParticlesVector.at(i)));
+    if (writePrunedGenPhotons && isMC) FillPrunedGenPhotonsInfo(*(genPrunedParticlesVector.at(i)));
   }
 
 
@@ -1457,6 +1466,19 @@ void HH4lXNtupleMaker::FillPrunedGenParticlesInfo(const reco::Candidate& prunedG
     prunedGenPartMass.push_back( prunedGenPart.p4().M() );
     prunedGenPartID  .push_back( prunedGenPart.pdgId() );
     prunedGenMotherID.push_back( prunedGenPart.mother()->pdgId() );
+  }
+  
+}
+
+void HH4lXNtupleMaker::FillPrunedGenPhotonsInfo(const reco::Candidate& prunedGenPart)
+{
+  if(fabs(prunedGenPart.pdgId()) == 22 && prunedGenPart.status()== 1){
+    prunedGenPhoPt  .push_back( prunedGenPart.pt() );
+    prunedGenPhoEta .push_back( prunedGenPart.eta() );
+    prunedGenPhoPhi .push_back( prunedGenPart.phi() );
+    prunedGenPhoMass.push_back( prunedGenPart.p4().M() );
+    prunedGenPhoID  .push_back( prunedGenPart.pdgId() );
+    prunedGenPhoMotherID.push_back( prunedGenPart.mother()->pdgId() );
   }
 
 }
@@ -2757,6 +2779,12 @@ void HH4lXNtupleMaker::BookAllBranches(){
   myTree->Book("prunedGenPartID",   prunedGenPartID,   failedTreeLevel >= fullFailedTree);
   myTree->Book("prunedGenMotherID", prunedGenMotherID, failedTreeLevel >= fullFailedTree);
 
+  myTree->Book("prunedGenPhoPt",   prunedGenPhoPt,   failedTreeLevel >= fullFailedTree);
+  myTree->Book("prunedGenPhoEta",  prunedGenPhoEta,  failedTreeLevel >= fullFailedTree);
+  myTree->Book("prunedGenPhoPhi",  prunedGenPhoPhi,  failedTreeLevel >= fullFailedTree);
+  myTree->Book("prunedGenPhoMass", prunedGenPhoMass, failedTreeLevel >= fullFailedTree);
+  myTree->Book("prunedGenPhoID",   prunedGenPhoID,   failedTreeLevel >= fullFailedTree);
+  myTree->Book("prunedGenPhoMotherID", prunedGenPhoMotherID, failedTreeLevel >= fullFailedTree);
 
   myTree->Book("DiJetMass",DiJetMass, false);
 //   myTree->Book("DiJetMassPlus",DiJetMassPlus, false); // FIXME: add back once filled again
