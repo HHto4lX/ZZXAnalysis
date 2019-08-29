@@ -20,24 +20,25 @@ extern "C" int categoryHH( int nExtraLep,
                            int nCleanedJetsPt30BTagged_bTagSF,
                            float PFMET )  
 {
-   if( nExtraLep==0 && nCleanedJetsPt30BTagged_bTagSF==2){
+  if( nExtraLep==0 && nCleanedJetsPt30BTagged_bTagSF==2){
 
-    return ZZ4lPlusTwoBjets;
-
-
-  }else if( nExtraLep==0 && nCleanedJetsPt30==1 ){
-
-    return ZZ4lPlusTwoTau;
+    return HH4lbbTagged;
 
   }else if( nExtraLep==0 && nCleanedJetsPt30==1 ){
 
-    return ZZ4lPlusTwoGamma;
+    return HH4ltautauTagged;
 
- }else if( nExtraLep==1 && PFMET > 100 ){
-    return ZZ4lPlusleptonNeutrino;
+  }else if( nExtraLep==0 && nCleanedJetsPt30==1 ){
+
+    return HH4lgammagammaTagged;
+
+  }else if( nExtraLep==1 && PFMET > 100 ){
+
+    return HH4lWWTagged;
 
   }else{
-    return UntaggedHH;
+
+    return HHUntagged;
 
   }
 }

@@ -8,11 +8,11 @@
 //------- ZZX Categorization
 
 enum CategoryHH {
- UntaggedHH = 0,
- ZZ4lPlusTwoBjets = 1,
- ZZ4lPlusTwoTau = 2,
- ZZ4lPlusTwoGamma = 3,
- ZZ4lPlusleptonNeutrino = 4
+ HHUntagged           = 0,
+ HH4lbbTagged         = 1,
+ HH4ltautauTagged     = 2,
+ HH4lgammagammaTagged = 3,
+ HH4lWWTagged         = 4
 };
  
 extern "C" int categoryHH( int nExtraLep,
