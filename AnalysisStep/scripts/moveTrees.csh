@@ -5,10 +5,10 @@ if ( $1 == "" ) then
     exit 1
 endif
 
-if ( `uname -n` != "lxcms03.cern.ch" ) then
-    echo "\nThis script is designed to run on lxcms03. Aborting.\n"
-    exit 1
-endif
+# if ( `uname -n` != "lxcms03.cern.ch" ) then
+#     echo "\nThis script is designed to run on lxcms03. Aborting.\n"
+#     exit 1
+# endif
 
 if ( ! -d AAAOK) then
     echo "\nSource directory AAAOK not found. Aborting.\n"
@@ -19,7 +19,7 @@ eval `scram runtime -csh`
 
 set SETNAME=`basename $PWD`
 
-set STORAGEPATH=/data3/HH
+set STORAGEPATH=/eos/user/a/acappati/samples_4lX
 set TREEPATH=${STORAGEPATH}/$1
 
 
