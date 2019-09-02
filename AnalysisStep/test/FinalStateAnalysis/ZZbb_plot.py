@@ -141,7 +141,7 @@ for name in namelist :
 
     # TTW
     histos_TTWJetsToLNu[i].SetFillColor(kBlue+3)
-    histos_TTWJetsToLNu[i].SetLineColor(kBlack)
+    histos_TTWJetsToLNu[i].SetLineColor(kBlue+3)
     hs.Add(histos_TTWJetsToLNu[i])    
     
     # gg->ZZ
@@ -170,8 +170,8 @@ for name in namelist :
     hs.Add(histos_ggTo2mu2tau_Contin_MCFM701[i])
 
     # qq->ZZ
-    histos_ZZTo4lext1[i].SetFillColor(kAzure+8)
-    histos_ZZTo4lext1[i].SetLineColor(kAzure+8)
+    histos_ZZTo4lext1[i].SetFillColor(kAzure+6)
+    histos_ZZTo4lext1[i].SetLineColor(kAzure+6)
     hs.Add(histos_ZZTo4lext1[i])
 
     # TTZ
@@ -220,15 +220,15 @@ for name in namelist :
 
     hs.Draw('histo')
     
-    hs.GetXaxis().SetTitle(namelist_label[i])
     hs.GetXaxis().SetLabelFont(43)
     hs.GetXaxis().SetLabelSize(15)
+    hs.GetXaxis().SetTitle(histos_HH4lbb[i].GetXaxis().GetTitle())
     hs.GetYaxis().SetTitleSize(20)
     hs.GetYaxis().SetTitleFont(43)
     hs.GetYaxis().SetTitleOffset(1.4)
     hs.GetYaxis().SetLabelFont(43)
     hs.GetYaxis().SetLabelSize(15)
-    hs.GetYaxis().SetTitle("Events")
+    hs.GetYaxis().SetTitle(histos_HH4lbb[i].GetYaxis().GetTitle())
 
     # legend
     legend = TLegend(0.74,0.64,0.94,0.87)
