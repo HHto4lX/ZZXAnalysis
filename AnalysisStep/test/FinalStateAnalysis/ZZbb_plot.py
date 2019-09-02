@@ -1,7 +1,7 @@
 #!/usr/bin/en python
 
 import ROOT, math
-from ROOT import TFile, TH1F, TCanvas, gSystem, TAttFill, TLegend, TStyle, THStack, kViolet, kBlack, kAzure, kCyan, kGreen, kWhite, kOrange, kBlue
+from ROOT import TFile, TH1F, TCanvas, gSystem, TAttFill, TLegend, TStyle, THStack, kViolet, kBlack, kAzure, kCyan, kGreen, kWhite, kOrange, kBlue, kRed
 
 # create output directory
 OutputPath = 'ZZbb_plots'
@@ -10,14 +10,21 @@ print "Output directory created!"
 
 
 # inputh file phath
-inputFilePath = '/eos/user/a/acappati/analysis_4lX/190626prod_histos/histos_4lbb_no4LmassCUT/' 
+inputFilePath = 'histos_4lbb/' 
 
 
 # hist names
 namelist       = ['h1_M4L_4L','h1_MZ1_4L','h1_MZ2_4L']
 namelist_label = ['m4l','mZ1','mZ2']
 
+
 # read files
+inFile_HH4lbb = TFile.Open(inputFilePath + 'histos_HH4lbb.root')
+histos_HH4lbb = []
+histos_HH4lbb.append(inFile_HH4lbb.Get(namelist[0]))
+histos_HH4lbb.append(inFile_HH4lbb.Get(namelist[1]))
+histos_HH4lbb.append(inFile_HH4lbb.Get(namelist[2]))
+
 inFile_ggH125 = TFile.Open(inputFilePath + 'histos_ggH125.root')
 histos_ggH125 = []
 histos_ggH125.append(inFile_ggH125.Get(namelist[0]))
@@ -205,7 +212,10 @@ for name in namelist :
     histos_ttH125[i].SetLineColor(kViolet+1)
     hs.Add(histos_ttH125[i])
 
-
+    # HH->4lbb signal
+    histos_HH4lbb[i].SetFillColor(kRed)
+    histos_HH4lbb[i].SetLineColor(kRed)
+    hs.Add(histos_HH4lbb[i])
 
 
     hs.Draw('histo')
@@ -221,7 +231,8 @@ for name in namelist :
     hs.GetYaxis().SetTitle("Events")
 
     # legend
-    legend = TLegend(0.74,0.68,0.94,0.87)
+    legend = TLegend(0.74,0.64,0.94,0.87)
+    legend.AddEntry(histos_HH4lbb[i],                "HH->4lbb", "f")
     legend.AddEntry(histos_ggH125[i],                "SM Higgs", "f")
     legend.AddEntry(histos_ggTo4e_Contin_MCFM701[i], "gg->ZZ",   "f")
     legend.AddEntry(histos_ZZTo4lext1[i],            "qq->ZZ",   "f")
