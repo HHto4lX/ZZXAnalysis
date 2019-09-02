@@ -60,9 +60,9 @@ Histo1D myHisto1D[nHisto] = {
   {"NJets","# jets", "Events", "", 0, 20, 20, 0, 0}, 
   {"NJetsnoB","# jets not b-tagged", "Events", "", 0, 20, 20, 0, 0}, 
   {"NBJets","# b-jets", "Events", "", 0, 20, 20, 0, 0}, 
-  {"M4L", "m_{4L}", "Events/5 GeV", "", 70, 350, 56, 0, 0},  
-  {"MZ1", "m_{Z1}", "Events/2 GeV", "", 40, 120, 40, 0, 0},  
-  {"MZ2", "m_{Z2}", "Events/2 GeV", "", 12, 120, 54, 0, 0}, 
+  {"M4L", "m_{4l} (GeV)", "Events / 5 GeV", "", 70, 350, 56, 0, 0},  
+  {"MZ1", "m_{Z1} (GeV)", "Events / 2 GeV", "", 40, 120, 40, 0, 0},  
+  {"MZ2", "m_{Z2} (GeV)", "Events / 2 GeV", "", 12, 120, 54, 0, 0}, 
   {"pt4L", "p_{T}^{4L}", "Events", "", 0, 1000, 200, 0, 0}, 
   {"eta4L", "#eta^{4L}", "Events", "", -4, 4, 40, 0, 0}, 
   {"phi4L", "#phi^{4L}", "Events", "", -4, 4, 40, 0, 0}, 
@@ -290,9 +290,13 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 
       Float_t kfactor = 1.;
       
-      //genBR only if signal
-      //Double_t eventWeight = partialSampleWeight * xsec * genBR * kfactor * overallEventWeight ;
+
       Double_t eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight ;
+
+
+      // check negative weights
+      if(eventWeight < 0.) continue;
+
     
       //Double_t eventWeight = 1;
       if (VERBOSE) 
@@ -331,7 +335,8 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 	  cerr << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; Z1Flav = " << Z1Flav << endl;
 	}
       if(MERGE2E2MU && ( currentFinalState == fs_2mu2e )) currentFinalState = fs_2e2mu;
-      
+
+      // Mass Cut      
       if (ZZMass < 115 || ZZMass > 135) continue;
 
       // H(bb) selection
