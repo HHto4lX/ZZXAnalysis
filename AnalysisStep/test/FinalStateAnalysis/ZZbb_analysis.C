@@ -60,9 +60,9 @@ Histo1D myHisto1D[nHisto] = {
   {"NJets","# jets", "Events", "", 0, 20, 20, 0, 0}, 
   {"NJetsnoB","# jets not b-tagged", "Events", "", 0, 20, 20, 0, 0}, 
   {"NBJets","# b-jets", "Events", "", 0, 20, 20, 0, 0}, 
-  {"M4L", "m_{4L}", "Events", "", 0, 500, 100, 0, 0},  
-  {"MZ1", "m_{Z1}", "Events", "", 0, 200, 100, 0, 0},  
-  {"MZ2", "m_{Z2}", "Events", "", 0, 200, 100, 0, 0}, 
+  {"M4L", "m_{4L}", "Events", "", 70, 500, 100, 0, 0},  
+  {"MZ1", "m_{Z1}", "Events", "", 12, 120, 100, 0, 0},  
+  {"MZ2", "m_{Z2}", "Events", "", 40, 120, 100, 0, 0}, 
   {"pt4L", "p_{T}^{4L}", "Events", "", 0, 1000, 200, 0, 0}, 
   {"eta4L", "#eta^{4L}", "Events", "", -4, 4, 40, 0, 0}, 
   {"phi4L", "#phi^{4L}", "Events", "", -4, 4, 40, 0, 0}, 
@@ -768,8 +768,8 @@ void ZZbb_analysis()
 
   double lumi = 140; // full Run2 Lumi
 
-  string inputFilePath = "/eos/user/a/acappati/samples_4lX/190626/";
-  string inputFileName[] = {//"HH4Lbb",
+  string inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
+  string inputFileName[] = {"HH4lbb",
                             "ggH125",
 			    "VBFH125",
 			    "WplusH125",
@@ -777,12 +777,12 @@ void ZZbb_analysis()
 			    "ZH125",
 			    "bbH125",
 			    "ttH125",
-			    "ggTo4e_Contin_MCFM701",
-			    "ggTo4mu_Contin_MCFM701",
-			    "ggTo4tau_Contin_MCFM701",
-			    "ggTo2e2mu_Contin_MCFM701",
-			    "ggTo2e2tau_Contin_MCFM701",
-			    "ggTo2mu2tau_Contin_MCFM701",
+			    // "ggTo4e_Contin_MCFM701",
+			    // "ggTo4mu_Contin_MCFM701",
+			    // "ggTo4tau_Contin_MCFM701",
+			    // "ggTo2e2mu_Contin_MCFM701",
+			    // "ggTo2e2tau_Contin_MCFM701",
+			    // "ggTo2mu2tau_Contin_MCFM701",
 			    "ZZTo4lext1",
 			    "TTZJets_M10_MLMext1",
 			    "TTZToLL_M1to1O_MLM",
