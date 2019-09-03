@@ -212,6 +212,7 @@ namespace {
   std::vector<float> photon_chargedHadronIso_corr;
   std::vector<float> photon_neutralHadronIso_corr;
   std::vector<float> photon_photonIso_corr;
+  std::vector<float> photonPassElectronVeto;
 
   Short_t nTaus  =  0;
   std::vector<float> tauPt;
@@ -1506,6 +1507,7 @@ void HH4lXNtupleMaker::FillPhoton(const pat::Photon& photon)
    photonMass  .push_back( photon.p4().M());
    photon_5x5r9.push_back( photon.full5x5_r9());
    photon_5x5sigmaIetaIeta.push_back( photon.full5x5_sigmaIetaIeta());
+   photonPassElectronVeto    .push_back( photon.passElectronVeto());
 
    // --- Isolation (https://github.com/cms-sw/cmssw/blob/master/DataFormats/PatCandidates/interface/Photon.h#L127-L135)
    // isolation calculated with only the charged hadron PFCandidates
@@ -2728,7 +2730,7 @@ void HH4lXNtupleMaker::BookAllBranches(){
   myTree->Book("photon_chargedHadronIso_corr", photon_chargedHadronIso_corr, failedTreeLevel >= fullFailedTree);
   myTree->Book("photon_neutralHadronIso_corr", photon_neutralHadronIso_corr, failedTreeLevel >= fullFailedTree);
   myTree->Book("photon_photonIso_corr",        photon_photonIso_corr,        failedTreeLevel >= fullFailedTree); 
-
+  myTree->Book("photonPassElectronVeto",     photonPassElectronVeto,   failedTreeLevel >= fullFailedTree);
 
   //Tau variables
   myTree->Book("nTaus",  nTaus,   failedTreeLevel >= fullFailedTree);

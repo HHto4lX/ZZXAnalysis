@@ -25,6 +25,7 @@
 #include "TTree.h"
 #include <vector>
 #include "TLorentzVector.h"
+#include <fstream>
 
 using namespace std;
 
@@ -54,7 +55,7 @@ struct Histo1D
   bool isLogy;
 };
 
-const int nHisto = 9;
+const int nHisto = 11;
 
 Histo1D myHisto1D[nHisto] = {
   {"NPhotons","# photons", "Events", "", 0, 20, 20, 0, 0},
@@ -64,12 +65,25 @@ Histo1D myHisto1D[nHisto] = {
   {"MZ2", "m_{Z2}", "Events", "", 0, 200, 100, 0, 0},
   {"pt4L", "p_{T}^{4L}", "Events", "", 0, 1000, 200, 0, 0},
   {"eta4L", "#eta^{4L}", "Events", "", -8, 8, 80, 0, 0},
-  {"Mpairmgamma", "m_{pair#gamma}", "Events", "", 0, 500, 100, 0, 0},
+  {"Mpairmgamma", "m_{pair#gamma}", "Events", "", 0, 500, 250, 0, 0},
   {"Mpairptgamma", "p_{T}^{pair#gamma}", "Events", "", 0, 1000, 200, 0, 0},
+  {"NGenPhotons","# gen photons", "Events", "", 0, 20, 20, 0, 0},
+  {"NGenPhotonsInAcc","# gen photons", "Events", "", 0, 20, 20, 0, 0},
 };
   
+float deltaR(float  p1, float p2, float e1, float e2)
+{
+ float dp = std::abs(p1 - p2);
+ if (dp > M_PI) dp -= 2 * M_PI;
+ return (e1 - e2) * (e1 - e2) + dp * dp;
+}
+
 void doHisto(const std::string inputFileMC, const std::string outputFile, double lumi=1)
 {
+
+  ofstream myfile;
+  myfile.open ("HH4lgg.txt");
+
   TFile* inputFile;
   TTree* inputTree;
   TH1F* hCounters;
@@ -86,6 +100,9 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 
   Short_t ZZsel;
   vector<Float_t> *LepEta = 0;
+  vector<Float_t> *LepPhi = 0;
+  vector<Float_t> *LepPt = 0;
+  vector<Int_t> *LepLepId = 0;
   Float_t ZZMass;
   Float_t Z1Mass;
   Float_t Z2Mass;
@@ -99,6 +116,16 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
   vector<Float_t> *photonEta = 0;
   vector<Float_t> *photonPhi= 0;
   vector<Float_t> *photonMass = 0;
+  vector<Float_t> *photonPassElectronVeto = 0;
+
+  vector<Float_t> *prunedGenPhoPt = 0;
+  vector<Float_t> *prunedGenPhoEta = 0; 
+  vector<Float_t> *prunedGenPhoPhi = 0; 
+  vector<Float_t> *prunedGenPhoMass = 0;
+  vector<Short_t> *prunedGenPhoID = 0;  
+  vector<Short_t> *prunedGenPhoMotherID = 0;             
+               
+
 
   Float_t MASSPairMass;
   Float_t MASSPairPt;
@@ -140,6 +167,9 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
   inputTree->SetBranchAddress("xsec", &xsec);
   inputTree->SetBranchAddress("ZZsel", &ZZsel);
   inputTree->SetBranchAddress("LepEta", &LepEta);
+  inputTree->SetBranchAddress("LepPhi", &LepPhi);
+  inputTree->SetBranchAddress("LepPt", &LepPt);
+  inputTree->SetBranchAddress("LepLepId", &LepLepId);
   inputTree->SetBranchAddress("ZZMass", &ZZMass);  
   inputTree->SetBranchAddress("Z1Flav", &Z1Flav);
   inputTree->SetBranchAddress("Z2Flav", &Z2Flav);
@@ -149,12 +179,22 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
   inputTree->SetBranchAddress("ZZEta", &ZZEta);
   inputTree->SetBranchAddress("photonPt", &photonPt);
   inputTree->SetBranchAddress("photonEta", &photonEta);
+  inputTree->SetBranchAddress("photonPhi", &photonPhi);
   inputTree->SetBranchAddress("photonMass", &photonMass);
+  inputTree->SetBranchAddress("photonPassElectronVeto", &photonPassElectronVeto);
   inputTree->SetBranchAddress("photonPhi",  &photonPhi);
   inputTree->SetBranchAddress("photonIsID",  &photonIsID);
-
+  inputTree->SetBranchAddress("prunedGenPhoPt", &prunedGenPhoPt);
+  inputTree->SetBranchAddress("prunedGenPhoEta", &prunedGenPhoEta);
+  inputTree->SetBranchAddress("prunedGenPhoPhi", &prunedGenPhoPhi);
+  inputTree->SetBranchAddress("prunedGenPhoMass", &prunedGenPhoMass);
+  inputTree->SetBranchAddress("prunedGenPhoID", &prunedGenPhoID);
+  inputTree->SetBranchAddress("prunedGenPhoMotherID", &prunedGenPhoMotherID);
+ 
+  //inputTree->Draw("prunedGenPhoPt");
   int entries = inputTree->GetEntries();
-  std::cout<<"Processing file: "<< inputFileMC.c_str() << "\nNumber of entries: " << entries << endl;
+ 
+  myfile<<"Processing file: "<< inputFileMC.c_str() << "\nNumber of entries: " << entries << endl;
   
   //  entries = 100;
 
@@ -163,6 +203,8 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
     {  
       int nphoton = 0;
       int nphoton_ID = 0;
+      int ngenphoton = 0;
+      int ngenphoton_inacc = 0;
 
       if (DEBUG && (entry > 100)) break;
       
@@ -180,14 +222,13 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
       Double_t eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight ;
     
       //Double_t eventWeight = 1;
-      std::cout << "-----------------------------------------------------------------------\nevent: " << entry << " weight: " << eventWeight << endl;
-      
-      std::cout << "lumi " << lumi << endl;
-      std::cout << "xsec " << xsec << endl;
-      std::cout << "genBR " << genBR << endl;
-      std::cout << "genSumwweight " << gen_sumWeights << endl;
-      std::cout << "overallEventwweight " << overallEventWeight << endl;
-      std::cout << "Bin 0 " << NGenEvt << endl;
+      myfile << "-----------------------------------------------------------------------" << endl;
+      // myfile << "lumi " << lumi << endl;
+      // myfile << "xsec " << xsec << endl;
+      // myfile << "genBR " << genBR << endl;
+      // myfile << "genSumwweight " << gen_sumWeights << endl;
+      // myfile << "overallEventwweight " << overallEventWeight << endl;
+      // myfile << "Bin 0 " << NGenEvt << endl;
       
       currentFinalState = -1;
       if (Z1Flav == -121)
@@ -214,72 +255,108 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 	}
       if(MERGE2E2MU && ( currentFinalState == fs_2mu2e )) currentFinalState = fs_2e2mu;
       
+      myfile <<FinalState[currentFinalState].c_str() <<" final state "<< endl;
+    
 
-      // H(bb) selection
-      
+      // H(gg) selection
       vector<TLorentzVector> PhotonVec;
       vector<TLorentzVector> PhotonPair;
       
       int photonID = 0;      
+      float dR; 
+      float dRmin;
+      
+      //count how many gen photons are there
+      for (UInt_t k = 0; k < prunedGenPhoPt->size(); k++)
+	{
+	  ngenphoton++;
+	  //Acceptance cuts at gen level
+	  if(prunedGenPhoPt->at(k)>10 && fabs(prunedGenPhoEta->at(k))<2.5 && prunedGenPhoMotherID->at(k) == 25) ngenphoton_inacc++;
+	 
+	}
+      
 
-      std::cout <<"\nphoton size " << photonEta->size() << endl;
+      myfile <<"nphoton size " << photonEta->size() << endl;
 
       for (UInt_t j = 0; j < photonPt->size(); j++)
 	{
 	  nphoton++;
-	  std::cout << "ID " << photonIsID->at(j) << endl;
-	  if (photonIsID->at(j) >0) 
+	  //myfile << "Photon ID = " << photonIsID->at(j) << " pt = " << photonPt->at(j) << " eta = " << photonEta->at(j)<< " phi = " << photonPhi->at(j)<<endl;
+	  dR = 0;
+	  dRmin = 1000000;
+
+	  //Look for the smallest deltaR between the photon and the leptons
+	  for (UInt_t k = 0; k < LepPt->size(); k++)
 	    {
-	      photonID = 1;
-	      nphoton_ID ++;
+	      dR = deltaR(LepPhi->at(k),photonPhi->at(j),LepEta->at(k),photonEta->at(j)); 
+	      if(dR < dRmin) dRmin = dR;
+	      //myfile << "dR = " << dR << endl; 
+	    }
+	   myfile << "dRmin = " << dRmin << endl; 
 	      
-	      TLorentzVector temp;
-	      temp.SetPtEtaPhiM(photonPt->at(j), photonEta->at(j), photonPhi->at(j), photonMass->at(j));
-	      PhotonVec.push_back(temp);
-	    }
+	   //cuts for efficiency, at reco levels
+	   //if ( dRmin > 0.01 && photonIsID->ats(j) >0 && fabs(photonEta->at(j))<2.5 && photonPt->at(j)>10)
+	   if (photonPassElectronVeto->at(j)>0.5 && photonIsID->at(j) >0 && fabs(photonEta->at(j))<2.5 && photonPt->at(j)>10)
+	     
+	     {
+	       photonID = 1;
+	       nphoton_ID ++;
+	       TLorentzVector temp;
+	       temp.SetPtEtaPhiM(photonPt->at(j), photonEta->at(j), photonPhi->at(j), photonMass->at(j));
+	       PhotonVec.push_back(temp);
+	     }
 	}
+      myfile << PhotonVec.size()<<" photon passing ID" << endl;
+      // myfile << "photon n \t" << nphoton << endl;
+      // myfile << "ID n \t\t" << nphoton_ID << endl;
+      // myfile << "vec size \t" << PhotonVec.size() << endl;
       
-      std::cout << "photon n \t" << nphoton << endl;
-      std::cout << "ID n \t\t" << nphoton_ID << endl;
-      std::cout << "vec size \t" << PhotonVec.size() << endl;
 
+      
       // create gamma gamma pairs
-      
-      if (PhotonVec.size() < 2) continue;
-      
-      std::cout << "PASSED " << endl;
-
-      for (UInt_t i = 0; i < PhotonVec.size() -1; i++)
-	{
-	  TLorentzVector ph0 = PhotonVec[i];
-	  for (UInt_t j = i+1; j < PhotonVec.size(); j++)
-	    {
-	      TLorentzVector ph1 = PhotonVec[j];
-	      PhotonPair.push_back(ph0 + ph1);
-	    }
-	}
-
-      std::cout << "pair n \t\t" << PhotonPair.size() << endl;     
       double deltaM = 100000.;
       MASSPairMass = 0;
       MASSPairPt = 0;
       
-      if (PhotonPair.size() < 1) continue;
-      std::cout << "PASSED" << endl;
+      //if (PhotonVec.size() < 2) continue;
 
-      for (UInt_t i = 0; i< PhotonPair.size(); i++)
-	{
-	  std::cout << i <<  "  mass: " << PhotonPair[i].M() << " Delta M: " << deltaM << endl; 
-	  if ( fabs (PhotonPair[i].M() - 125.) < deltaM ) 
-	    {
-	      deltaM = fabs(PhotonPair[i].M() - 125.);
-	      MASSPairMass = PhotonPair[i].M();
-	      MASSPairPt = PhotonPair[i].Pt();
-	    }
-	}
-      
-      std::cout << "AFTER delta M " << deltaM << endl;
-      std::cout << "MASS " << MASSPairMass << endl;
+      //Needed for computing the acceptance
+      if (PhotonVec.size() < 2){ 
+	MASSPairMass = -1000;
+	MASSPairPt = -1000;
+	  }      
+
+      else{
+	for (UInt_t i = 0; i < PhotonVec.size() -1; i++)
+	  {
+	    TLorentzVector ph0 = PhotonVec[i];
+	    for (UInt_t j = i+1; j < PhotonVec.size(); j++)
+	      {
+		TLorentzVector ph1 = PhotonVec[j];
+		PhotonPair.push_back(ph0 + ph1);
+	      }
+	  }
+	
+	myfile << "pair n \t\t" << PhotonPair.size() << endl;     
+     
+	
+	if (PhotonPair.size() < 1) continue;
+	
+	for (UInt_t i = 0; i< PhotonPair.size(); i++)
+	  {
+	    myfile << i <<  "  mass: " << PhotonPair[i].M() << " Delta M: " << deltaM << endl; 
+	    if ( fabs (PhotonPair[i].M() - 125.) < deltaM ) 
+	      {
+		deltaM = fabs(PhotonPair[i].M() - 125.);
+		MASSPairMass = PhotonPair[i].M();
+		MASSPairPt = PhotonPair[i].Pt();
+	      }
+	  }
+      }
+      myfile << "AFTER delta M " << deltaM << endl;
+      myfile << "MASS " << MASSPairMass << endl;
+      myfile << "Z1 Mass " << Z1Mass << " Z2Mass "<< Z2Mass << endl;
+
       
       Float_t histo[nHisto];
       
@@ -297,9 +374,12 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 	  else if (histoString == "NPhotonsID") histo[v] = nphoton_ID;
 	  else if (histoString == "Mpairmgamma") histo[v] = MASSPairMass;
 	  else if (histoString == "Mpairptgamma") histo[v] = MASSPairPt;
+	  else if (histoString == "NGenPhotons") histo[v] = ngenphoton;
+	  else if (histoString == "NGenPhotonsInAcc") histo[v] = ngenphoton_inacc;
 	  else continue;
 		 
 	  h1[v][currentFinalState]->Fill(histo[v], eventWeight);
+	  
 	}
       
       PhotonVec.clear();
@@ -307,7 +387,7 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
       
     } //end loop entries
 
-  std::cout << "TOT YIELD " << yield << endl;
+  myfile << "TOT YIELD " << yield << endl;
   
   
   // fill inclusive histo (4L)
@@ -321,7 +401,8 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
     } 
   
   
-  std::cout << "Output file "<< outputFile << endl;
+  myfile << "Output file "<< outputFile << endl;
+  myfile.close();
   TFile* fOut = new TFile(outputFile.c_str(),"recreate");  
   fOut->cd();
   
@@ -336,7 +417,169 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
     
 } //end doHisto
 
+void doAccEff(const std::string inputFileMC)
+{
 
+ TFile* inputFile;
+ inputFile =  TFile::Open( inputFileMC.c_str() );
+ 
+ TH1F* h_4mu = (TH1F*)inputFile->Get("h1_NGenPhotons_4mu");
+ TH1F* h_4e = (TH1F*)inputFile->Get("h1_NGenPhotons_4e");
+ TH1F* h_2e2mu = (TH1F*)inputFile->Get("h1_NGenPhotons_2e2mu");
+ 
+ TH1F* h_4mu_inacc = (TH1F*)inputFile->Get("h1_NGenPhotonsInAcc_4mu");
+ TH1F* h_4e_inacc = (TH1F*)inputFile->Get("h1_NGenPhotonsInAcc_4e");
+ TH1F* h_2e2mu_inacc = (TH1F*)inputFile->Get("h1_NGenPhotonsInAcc_2e2mu");
+ 
+ TH1F* h_4mu_reco = (TH1F*)inputFile->Get("h1_NPhotonsID_4mu");
+ TH1F* h_4e_reco = (TH1F*)inputFile->Get("h1_NPhotonsID_4e");
+ TH1F* h_2e2mu_reco = (TH1F*)inputFile->Get("h1_NPhotonsID_2e2mu");
+
+ Double_t e[3];
+ Double_t e_inacc[3];
+ Double_t e_reco[3];
+ 
+ Double_t integral[3];
+ Double_t integral_inacc[3];
+ Double_t integral_reco[3];
+
+  
+ integral[0] = h_4mu->IntegralAndError(0, -1, e[0], "");
+ integral[1] = h_4e->IntegralAndError(0, -1, e[1], "");
+ integral[2] = h_2e2mu->IntegralAndError(0, -1, e[2], "");
+ 
+ integral_inacc[0] = h_4mu_inacc->IntegralAndError(3, 100, e_inacc[0], "");
+ integral_inacc[1] = h_4e_inacc->IntegralAndError(3, 100, e_inacc[1], "");
+ integral_inacc[2] = h_2e2mu_inacc->IntegralAndError(3, 100, e_inacc[2], "");
+ 
+ integral_reco[0] = h_4mu_reco->IntegralAndError(3, 100, e_reco[0], "");
+ integral_reco[1] = h_4e_reco->IntegralAndError(3, 100, e_reco[1], "");
+ integral_reco[2] = h_2e2mu_reco->IntegralAndError(3, 100, e_reco[2], "");
+
+ //for(int i =0; i<20; i++){
+ //cout << "4mu bin " << i << " " << h_4mu_reco->GetBinContent(i) << " " << h_4mu_inacc->GetBinContent(i) << " " << h_4mu->GetXaxis()->FindBin(i) << endl;
+   //cout << "4e bin " << i << " " << h_4e_reco->GetBinContent(i) << " " << h_4e_inacc->GetBinContent(i) << " " << h_4e->GetXaxis()->FindBin(i) << endl;
+   //cout << "2e2mu bin " << i << " " << h_2e2mu_reco->GetBinContent(i) << " " << h_2e2mu_inacc->GetBinContent(i) << endl;
+
+ //}
+
+ cout << "4mu " <<integral[0] << "+-" << e[0] << " " << integral_inacc[0] << "+-" << e_inacc[0] << " " << integral_reco[0] << "+-" << e_reco[0] <<" ==> acc = " << integral_inacc[0]/integral[0] << " eff = " << integral_reco[0]/integral_inacc[0] << endl;  
+ cout << "4e " << integral[1] << "+-" << e[1] << " " << integral_inacc[1] << "+-" << e_inacc[1] << " " << integral_reco[1] << "+-" << e_reco[1] <<" ==> acc = " << integral_inacc[1]/integral[1] << " eff = " << integral_reco[1]/integral_inacc[1] << endl;    
+ cout << "2e2mu " << integral[2] << "+-" << e[2] << " " << integral_inacc[2] << "+-" << e_inacc[2] << " " << integral_reco[2] << "+-" << e_reco[2] <<" ==> acc = " << integral_inacc[2]/integral[2] << " eff = " << integral_reco[2]/integral_inacc[2] << endl; 
+ cout << "number of events with more than 2 (reco) photons passng the analysis selection" << endl;
+ cout << "4mu " << h_4mu_reco->IntegralAndError(4, 100, e_reco[0], "")/h_4mu_reco->IntegralAndError(0, -1, e_reco[0], "")<<endl;
+ cout << "4e " << h_4e_reco->IntegralAndError(4, 100, e_reco[1], "")/h_4e_reco->IntegralAndError(0, -1, e_reco[0], "") << endl;
+   cout << "2e2mu " << h_2e2mu_reco->IntegralAndError(4, 100, e_reco[2], "")/h_2e2mu_reco->IntegralAndError(0, -1, e_reco[0], "") << endl;
+
+}
+void doComparisonPlots(const std::string inputFileMC1,const std::string inputFileMC2,const std::string inputFileMC3,const std::string inputFileMC4, const std::string variable, Double_t xmin = 0, Double_t xmax = -1)
+{
+  TFile* inputFile1;
+  TFile* inputFile2;
+  TFile* inputFile3;
+  TFile* inputFile4;
+      
+  inputFile1 =  TFile::Open( inputFileMC1.c_str() );
+  inputFile2 =  TFile::Open( inputFileMC2.c_str() );
+  inputFile3 =  TFile::Open( inputFileMC3.c_str() );
+  inputFile4 =  TFile::Open( inputFileMC4.c_str() );
+ 
+  TH1F* h1 = (TH1F*)inputFile1->Get(TString("h1_")+TString(variable));
+  TH1F* h2= (TH1F*)inputFile2->Get(TString("h1_")+TString(variable));
+  TH1F* h3= (TH1F*)inputFile3->Get(TString("h1_")+TString(variable));
+  TH1F* h4 = (TH1F*)inputFile4->Get(TString("h1_")+TString(variable));
+ 
+  Float_t max1 = h1->GetMaximum();
+  Float_t max2 = h2->GetMaximum();
+  Float_t max3 = h3->GetMaximum();
+  Float_t max4 = h4->GetMaximum();
+
+  std::vector<float> max_values = {max1,max2,max3,max4}; 
+  std::sort(max_values.begin(), max_values.end());
+
+  TCanvas *c = new TCanvas("c", "c");
+  //TH1*h = c->DrawFrame(xmin,ymin,xmax,ymax);
+  //c->cd();
+     
+  TLegend *legend = new TLegend(.45,.25,.75,.45);
+  legend->SetBorderSize(1);
+  legend->SetTextSize(0.03 );
+  h1->Draw("hist");
+  h1->SetLineColor(kBlack);
+  
+  h2->Draw("hist SAME");
+  h2->SetLineColor(kBlue);
+  h3->Draw("hist SAME");
+  h3->SetLineColor(kRed);
+  h4->Draw("hist SAME");
+  h4->SetLineColor(kMagenta);
+  h1->Draw("hist SAME");
+  h1->GetXaxis()->SetTitle(variable.c_str()); 
+  h1->GetYaxis()->SetTitle(TString("Events")); 
+  h1->GetYaxis()->SetTitleOffset(1.4);  
+  h1->SetTitle("");
+
+  Int_t bin_xmin = h1->GetXaxis()->FindBin(xmin);
+  Int_t bin_xmax =  h1->GetXaxis()->FindBin(xmax);
+  h1->GetXaxis()->SetRange(bin_xmin,bin_xmax);
+  h1->SetMaximum(max_values[3]*1.05);
+
+  cout << bin_xmin << " " << bin_xmax << " " << bin_xmax - bin_xmin << endl;
+  //c->Modified();
+  TString file1 = TString(inputFileMC1.c_str()).ReplaceAll(".root","");
+  TString file2 = TString(inputFileMC2.c_str()).ReplaceAll(".root","");
+  TString file3 = TString(inputFileMC3.c_str()).ReplaceAll(".root","");
+  TString file4 = TString(inputFileMC4.c_str()).ReplaceAll(".root","");
+
+  legend->AddEntry(h1,file1,"le");
+  legend->AddEntry(h2,file2,"le");
+  legend->AddEntry(h3,file3,"le");
+  legend->AddEntry(h4,file4,"le");
+  legend->Draw("SAME");
+
+  //c->Print(TString(file1+TString("_")+TString(variable)+TString(".png"))); 
+  //c->Print(TString(file1+TString("_")+TString(variable)+TString(".pdf"))); 
+  //c->Print(TString(file1+TString("_")+TString(variable)+TString(".root"))); 
+
+  // for(int k =0; k<50 ;k++){
+  //   cout << k << " " << h1->GetBinContent(k)<< endl;
+  // }
+
+
+
+  Double_t bins[5]= { 0.0001, 0.001, 0.01, 0.1 ,1.};
+  Int_t totBins = bin_xmax - bin_xmin;
+  TH2F *h_2D = new TH2F("h2","",totBins,xmin,xmax,3,bins);
+ 
+  Float_t entries;
+  
+  for (Int_t j = 1; j < 5; j++) {
+    for (Int_t i = 1; i < totBins+1; i++) {
+      
+      entries = 0;
+          
+      if(j == 1) entries = h1->GetBinContent(bin_xmin+i);
+      else if(j == 2) entries = h2->GetBinContent(bin_xmin+i);
+      else if(j == 3) entries = h3->GetBinContent(bin_xmin+i);
+      else if(j == 4) entries = h4->GetBinContent(bin_xmin+i);
+
+      h_2D->SetBinContent(i,j,entries);
+      //cout << "x = " << h_2D->GetXaxis()->GetBinCenter(i) <<" y = " << h_2D->GetYaxis()->GetBinCenter(j) << " entries = " << h_2D->GetBinContent(i,j) << " " << entries << endl;
+    }
+  }
+  TCanvas *c2 = new TCanvas("c2", "c2");
+  gStyle->SetOptStat(0);
+  gPad->SetLogy();
+  h_2D->GetXaxis()->SetRange(bin_xmin,bin_xmax);
+  h_2D->GetYaxis()->SetRange(0,5);
+  h_2D->Draw("colz2"); 
+  h_2D->GetXaxis()->SetTitle(variable.c_str()); 
+  h_2D->GetYaxis()->SetTitle(TString("Lep-pho #DeltaR cut")); 
+
+  c2->Print(TString(file1+TString("_")+TString(variable)+TString("_2D.png"))); 
+  c2->Print(TString(file1+TString("_")+TString(variable)+TString("_2D.pdf"))); 
+  c2->Print(TString(file1+TString("_")+TString(variable)+TString("_2D.root"))); 
+}
 /*
 void doPlot(const std::string outputFile)
 {
