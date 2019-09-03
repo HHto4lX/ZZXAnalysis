@@ -293,10 +293,6 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 
       Double_t eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight ;
 
-
-      // check negative weights
-      if(eventWeight < 0.) continue;
-
     
       //Double_t eventWeight = 1;
       if (VERBOSE) 
