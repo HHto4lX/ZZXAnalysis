@@ -14,8 +14,7 @@ inputFilePath = 'histos_4lbb/'
 
 
 # hist names
-namelist       = ['h1_M4L_4L','h1_MZ1_4L','h1_MZ2_4L']
-namelist_label = ['m4l','mZ1','mZ2']
+namelist = ['h1_M4L_4L','h1_MZ1_4L','h1_MZ2_4L']
 
 
 # read files
@@ -229,6 +228,7 @@ for name in namelist :
     hs.GetYaxis().SetLabelFont(43)
     hs.GetYaxis().SetLabelSize(15)
     hs.GetYaxis().SetTitle(histos_HH4lbb[i].GetYaxis().GetTitle())
+    hs.SetMinimum(0.)
 
     # legend
     legend = TLegend(0.74,0.64,0.94,0.87)
