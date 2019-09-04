@@ -10,16 +10,14 @@
 enum CategoryHH {
  HHUntagged           = 0,
  HH4lbbTagged         = 1,
- HH4ltautauTagged     = 2,
+ HH4lWWTagged         = 2,
  HH4lgammagammaTagged = 3,
- HH4lWWTagged         = 4
+ HH4ltautauTagged     = 4
 };
  
-extern "C" int categoryHH( int nExtraLep,
-                           int nExtraZ,
-                           int nCleanedJetsPt30,
-                           int nCleanedJetsPt30BTagged_bTagSF,
-                           float PFMET
+extern "C" int categoryHH( vector<Float_t>* JetPt,
+                           vector<Float_t>* JetEta,
+                           vector<Float_t>* JetIsBTagged
 			 );
 
 //--------- RunI canegorization 

@@ -14,34 +14,52 @@ using namespace std;
 
 
 
-extern "C" int categoryHH( int nExtraLep,
-                           int nExtraZ,
-                           int nCleanedJetsPt30,
-                           int nCleanedJetsPt30BTagged_bTagSF,
-                           float PFMET )  
-{
-  if( nExtraLep==0 && nCleanedJetsPt30BTagged_bTagSF==2){
+extern "C" int categoryHH( vector<Float_t>* JetPt,
+                           vector<Float_t>* JetEta,
+                           vector<Float_t>* JetIsBTagged
+                         )  
+{ 
+  // check on Jets Variables and btagging
+  Int_t nBtaggedJets = 0;
+  Int_t nGoodJets    = 0;
+  for(UInt_t i = 0; i < JetPt->size(); i++)
+  {
+    if(fabs(JetEta->at(i)) > 2.4 ) continue;
+    if(JetPt->at(i) < 20. ) continue;
 
+    nGoodJets++;
+    if(JetIsBTagged->at(i) > 0) { nBtaggedJets++; }
+  } 
+
+  // 4lbb
+  if( nGoodJets > 1 && nBtaggedJets > 0 )
+  {
     return HH4lbbTagged;
-
-  }else if( nExtraLep==0 && nCleanedJetsPt30==1 ){
-
-    return HH4ltautauTagged;
-
-  }else if( nExtraLep==0 && nCleanedJetsPt30==1 ){
-
-    return HH4lgammagammaTagged;
-
-  }else if( nExtraLep==1 && PFMET > 100 ){
-
+  }
+  // 4lww
+  else if( false )
+  {
     return HH4lWWTagged;
 
-  }else{
+  }
+  else if( false )
+  {
+    return HH4lgammagammaTagged;
 
+  }
+  else if( false )
+  {
+    return HH4ltautauTagged;
+
+  }
+  else
+  {
     return HHUntagged;
 
   }
 }
+
+
 
 extern "C" int categoryLegacy( int nCleanedJetsPt30 )
 {
