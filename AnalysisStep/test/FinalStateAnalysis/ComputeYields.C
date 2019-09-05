@@ -109,6 +109,15 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
   vector<Float_t> *prunedGenPartMass   = 0;
   vector<Float_t> *prunedGenMotherID   = 0;
 
+  Short_t nExtraLep;
+  vector<Float_t> *ExtraLepPt = 0;
+  vector<Float_t> *ExtraLepEta = 0;
+  vector<Int_t> *ExtraLepLepId = 0;
+
+  Short_t nPhotons = 0;
+
+  Short_t nTaus  =  0;
+
 
 
   TH1F* h1[nFinalState+1][nCat];
@@ -162,6 +171,13 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
   inputTree->SetBranchAddress("prunedGenPartMass", &prunedGenPartMass );
   inputTree->SetBranchAddress("prunedGenPartID", &prunedGenPartID );
   inputTree->SetBranchAddress("prunedGenMotherID", &prunedGenMotherID );
+  inputTree->SetBranchAddress("nExtraLep", &nExtraLep);
+  inputTree->SetBranchAddress("ExtraLepPt", &ExtraLepPt);
+  inputTree->SetBranchAddress("ExtraLepEta", &ExtraLepEta);
+  inputTree->SetBranchAddress("ExtraLepLepId", &ExtraLepLepId);
+  inputTree->SetBranchAddress("nPhotons", &nPhotons);
+  inputTree->SetBranchAddress("nTaus", &nTaus);
+
 
   int entries = inputTree->GetEntries();
   std::cout<<"Processing file: "<< inputFileMC.c_str() << "\nNumber of entries: " << entries << endl;
@@ -221,7 +237,13 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
       // --- choose category
       currentCategory = categoryHH(JetPt,
                                    JetEta,
-                                   JetIsBTagged
+                                   JetIsBTagged,
+                                   nExtraLep,
+                                   ExtraLepPt,
+                                   ExtraLepEta,
+                                   ExtraLepLepId
+				   //        nPhotons
+				   //         nTaus
       				  );
 
 
@@ -272,6 +294,9 @@ void ComputeYields()
 
   string inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
   string inputFileName[] = {"HH4lbb",
+                            // "HH4lww",
+                            // "HH4lgammagamma",
+                            // "HH4ltautau",
                             "ggH125",
 			    "VBFH125",
 			    "WplusH125",

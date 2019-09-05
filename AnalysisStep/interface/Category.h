@@ -17,7 +17,13 @@ enum CategoryHH {
  
 extern "C" int categoryHH( vector<Float_t>* JetPt,
                            vector<Float_t>* JetEta,
-                           vector<Float_t>* JetIsBTagged
+                           vector<Float_t>* JetIsBTagged,
+                           Short_t nExtraLep,
+                           vector<Float_t>* ExtraLepPt,
+                           vector<Float_t>* ExtraLepEta,
+                           vector<Int_t>* ExtraLepLepId
+			   //                           int nPhotons
+			   //                           int nTaus
 			 );
 
 //--------- RunI canegorization 

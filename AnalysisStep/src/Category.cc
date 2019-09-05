@@ -16,7 +16,13 @@ using namespace std;
 
 extern "C" int categoryHH( vector<Float_t>* JetPt,
                            vector<Float_t>* JetEta,
-                           vector<Float_t>* JetIsBTagged
+                           vector<Float_t>* JetIsBTagged,
+                           Short_t nExtraLep,
+                           vector<Float_t>* ExtraLepPt,
+                           vector<Float_t>* ExtraLepEta,
+                           vector<Int_t>* ExtraLepLepId 
+			   //                           int nPhotons
+			   //                           int nTaus
                          )  
 { 
   // check on Jets Variables and btagging
@@ -31,31 +37,56 @@ extern "C" int categoryHH( vector<Float_t>* JetPt,
     if(JetIsBTagged->at(i) > 0) { nBtaggedJets++; }
   } 
 
+  // check on extraLep variables
+  Int_t nExtraLepInAcceptance  = 0;
+  Int_t nExtraLepInAcceptaneOS = 0;
+  for(Int_t i = 0; i < nExtraLep; i++)
+  {
+    if(ExtraLepPt->at(i) < 10 || fabs(ExtraLepEta->at(i)) > 2.4) continue;
+    nExtraLepInAcceptance++; 
+  }
+  if(nExtraLepInAcceptance > 1) 
+  {
+    for(Int_t i = 0; i < nExtraLep; i++)
+    { 
+      if(ExtraLepPt->at(i) < 10 || fabs(ExtraLepEta->at(i)) > 2.4) continue;
+      for(Int_t j = 0; j < nExtraLep; j++)
+   	{
+        if(ExtraLepPt->at(j) < 10 || fabs(ExtraLepEta->at(j)) > 2.4) continue;
+        if(ExtraLepLepId->at(i) * ExtraLepLepId->at(j) < 0)
+   	  {
+          nExtraLepInAcceptaneOS++;   
+        }
+      }
+    }  
+  }
+
+  // --- select category
   // 4lbb
-  if( nGoodJets > 1 && nBtaggedJets > 0 )
+  if( nGoodJets > 1 && nBtaggedJets > 0 && nExtraLep < 2 )
   {
     return HH4lbbTagged;
   }
   // 4lww
-  else if( false )
+  //  else if( nExtraLepInAcceptaneOS > 0 ) // to be used!
+  else if( false ) // temporary: FIXME
   {
     return HH4lWWTagged;
-
   }
+  // 4lgammagamma
   else if( false )
   {
     return HH4lgammagammaTagged;
-
   }
+  // 4ltautau
   else if( false )
   {
     return HH4ltautauTagged;
-
   }
+  // untagged
   else
   {
     return HHUntagged;
-
   }
 }
 
