@@ -213,80 +213,51 @@ for name in namelist :
 
     # TTW
     histos_TTWJetsToLNu[i].SetFillColor(kBlue+3)
-    histos_TTWJetsToLNu[i].SetLineColor(kBlue+3)
+    histos_TTWJetsToLNu[i].SetLineColor(kBlack)
     hs.Add(histos_TTWJetsToLNu[i])    
     
     # gg->ZZ
-    histos_ggTo4e_Contin_MCFM701[i].SetFillColor(kAzure-3)
-    histos_ggTo4e_Contin_MCFM701[i].SetLineColor(kAzure-3)
-    hs.Add(histos_ggTo4e_Contin_MCFM701[i])
+    histo_ggZZ = histos_ggTo4e_Contin_MCFM701[i]
+    histo_ggZZ.Add(histos_ggTo4mu_Contin_MCFM701[i])
+    histo_ggZZ.Add(histos_ggTo4tau_Contin_MCFM701[i])
+    histo_ggZZ.Add(histos_ggTo2e2mu_Contin_MCFM701[i])
+    histo_ggZZ.Add(histos_ggTo2e2tau_Contin_MCFM701[i])
+    histo_ggZZ.Add(histos_ggTo2mu2tau_Contin_MCFM701[i])
 
-    histos_ggTo4mu_Contin_MCFM701[i].SetFillColor(kAzure-3)
-    histos_ggTo4mu_Contin_MCFM701[i].SetLineColor(kAzure-3)
-    hs.Add(histos_ggTo4mu_Contin_MCFM701[i])
+    histo_ggZZ.SetFillColor(kAzure-3)
+    histo_ggZZ.SetLineColor(kBlue+2)
+    hs.Add(histo_ggZZ)
 
-    histos_ggTo4tau_Contin_MCFM701[i].SetFillColor(kAzure-3)
-    histos_ggTo4tau_Contin_MCFM701[i].SetLineColor(kAzure-3)
-    hs.Add(histos_ggTo4tau_Contin_MCFM701[i])
+    # TTZ
+    histo_TTZ = histos_TTZJets_M10_MLMext1[i]
+    histo_TTZ.Add(histos_TTZToLL_M1to10_MLM[i])
+    histo_TTZ.SetFillColor(kGreen-2)
+    histo_TTZ.SetLineColor(kGreen+4)
+    hs.Add(histo_TTZ)
 
-    histos_ggTo2e2mu_Contin_MCFM701[i].SetFillColor(kAzure-3)
-    histos_ggTo2e2mu_Contin_MCFM701[i].SetLineColor(kAzure-3)
-    hs.Add(histos_ggTo2e2mu_Contin_MCFM701[i])
-
-    histos_ggTo2e2tau_Contin_MCFM701[i].SetFillColor(kAzure-3)
-    histos_ggTo2e2tau_Contin_MCFM701[i].SetLineColor(kAzure-3)
-    hs.Add(histos_ggTo2e2tau_Contin_MCFM701[i])
-
-    histos_ggTo2mu2tau_Contin_MCFM701[i].SetFillColor(kAzure-3)
-    histos_ggTo2mu2tau_Contin_MCFM701[i].SetLineColor(kAzure-3)
-    hs.Add(histos_ggTo2mu2tau_Contin_MCFM701[i])
 
     # qq->ZZ
     histos_ZZTo4lext1[i].SetFillColor(kAzure+6)
-    histos_ZZTo4lext1[i].SetLineColor(kAzure+6)
+    histos_ZZTo4lext1[i].SetLineColor(kAzure-6)
     hs.Add(histos_ZZTo4lext1[i])
 
-    # TTZ
-    histos_TTZJets_M10_MLMext1[i].SetFillColor(kGreen+2)
-    histos_TTZJets_M10_MLMext1[i].SetLineColor(kGreen+2)
-    hs.Add(histos_TTZJets_M10_MLMext1[i])
-
-    histos_TTZToLL_M1to10_MLM[i].SetFillColor(kGreen+2)
-    histos_TTZToLL_M1to10_MLM[i].SetLineColor(kGreen+2)
-    hs.Add(histos_TTZToLL_M1to10_MLM[i])
 
     # SM Higgs
-    histos_ggH125[i].SetFillColor(kViolet+1)
-    histos_ggH125[i].SetLineColor(kViolet+1)
-    hs.Add(histos_ggH125[i])
+    histo_SMHiggs = histos_ggH125[i]
+    histo_SMHiggs.Add(histos_VBFH125[i])
+    histo_SMHiggs.Add(histos_WplusH125[i])
+    histo_SMHiggs.Add(histos_WminusH125[i])
+    histo_SMHiggs.Add(histos_ZH125[i])
+    histo_SMHiggs.Add(histos_bbH125[i])
+    histo_SMHiggs.Add(histos_ttH125[i])
+    histo_SMHiggs.SetFillColor(kViolet+6)
+    histo_SMHiggs.SetLineColor(kViolet+7)
+    hs.Add(histo_SMHiggs)
 
-    histos_VBFH125[i].SetFillColor(kViolet+1)
-    histos_VBFH125[i].SetLineColor(kViolet+1)
-    hs.Add(histos_VBFH125[i])
-    
-    histos_WplusH125[i].SetFillColor(kViolet+1)
-    histos_WplusH125[i].SetLineColor(kViolet+1)
-    hs.Add(histos_WplusH125[i])
-
-    histos_WminusH125[i].SetFillColor(kViolet+1)
-    histos_WminusH125[i].SetLineColor(kViolet+1)
-    hs.Add(histos_WminusH125[i])
-
-    histos_ZH125[i].SetFillColor(kViolet+1)
-    histos_ZH125[i].SetLineColor(kViolet+1)
-    hs.Add(histos_ZH125[i])
-
-    histos_bbH125[i].SetFillColor(kViolet+1)
-    histos_bbH125[i].SetLineColor(kViolet+1)
-    hs.Add(histos_bbH125[i])
-
-    histos_ttH125[i].SetFillColor(kViolet+1)
-    histos_ttH125[i].SetLineColor(kViolet+1)
-    hs.Add(histos_ttH125[i])
 
     # HH->4lbb signal
-    histos_HH4lbb[i].SetFillColor(kRed)
-    histos_HH4lbb[i].SetLineColor(kRed)
+    histos_HH4lbb[i].SetFillColor(kRed+1)
+    histos_HH4lbb[i].SetLineColor(kRed+2)
     hs.Add(histos_HH4lbb[i])
 
 
@@ -306,10 +277,10 @@ for name in namelist :
     # legend
     legend = TLegend(0.74,0.64,0.94,0.87)
     legend.AddEntry(histos_HH4lbb[i],                "HH->4lbb", "f")
-    legend.AddEntry(histos_ggH125[i],                "SM Higgs", "f")
-    legend.AddEntry(histos_ggTo4e_Contin_MCFM701[i], "gg->ZZ",   "f")
+    legend.AddEntry(histo_SMHiggs,                   "SM Higgs", "f")
     legend.AddEntry(histos_ZZTo4lext1[i],            "qq->ZZ",   "f")
-    legend.AddEntry(histos_TTZJets_M10_MLMext1[i],   "TTZ",      "f")
+    legend.AddEntry(histo_TTZ,                       "TTZ",      "f")
+    legend.AddEntry(histo_ggZZ,                      "gg->ZZ",   "f")
     legend.AddEntry(histos_TTWJetsToLNu[i],          "TTW",      "f")
     legend.SetFillColor(kWhite)
     legend.SetLineColor(kBlack)
@@ -335,3 +306,5 @@ for name in namelist :
     canvas.SaveAs(OutputPath + "/" + namelist[i] + ".png")
     
     i = i+1
+
+    del canvas
