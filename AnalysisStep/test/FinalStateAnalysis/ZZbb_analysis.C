@@ -63,9 +63,9 @@ Histo1D myHisto1D[nHisto] = {
   {"M4L", "m_{4l} (GeV)", "Events / 5 GeV", "", 70, 350, 56, 0, 0},  
   {"MZ1", "m_{Z1} (GeV)", "Events / 2 GeV", "", 40, 120, 40, 0, 0},  
   {"MZ2", "m_{Z2} (GeV)", "Events / 2 GeV", "", 12, 120, 54, 0, 0}, 
-  {"pt4L", "p_{T}^{4L}", "Events", "", 0, 1000, 200, 0, 0}, 
-  {"eta4L", "#eta^{4L}", "Events", "", -4, 4, 40, 0, 0}, 
-  {"phi4L", "#phi^{4L}", "Events", "", -4, 4, 40, 0, 0}, 
+  {"pt4L", "p_{T}^{4l}", "Events / 7 GeV", "", 0, 700, 100, 0, 0}, 
+  {"eta4L", "#eta^{4l}", "Events", "", -4, 4, 40, 0, 0}, 
+  {"phi4L", "#phi^{4l}", "Events", "", -4, 4, 40, 0, 0}, 
   {"etabb_m", "#eta^{bb}", "Events", "", -4, 4, 40, 0, 0},
   {"phibb_m", "#phi^{bb}", "Events", "", -4, 4, 40, 0, 0},
   {"etabb_pt", "#eta^{bb}", "Events", "", -4, 4, 40, 0, 0},
@@ -82,8 +82,8 @@ Histo1D myHisto1D[nHisto] = {
   {"methodM_Binfo", "jet b-tag", "Events", "", -1, 4, 5, 0, 0},
   {"methodBM_M", "m_{pairJ}", "Events", "", 0, 500, 100, 0, 0},  
   {"methodBM_PT", "p_{T}^{pairJ}", "Events", "", 0, 1000, 200, 0, 0},
-  {"methodBPT_M", "m_{pairJ}", "Events", "", 0, 500, 100, 0, 0},  
-  {"methodBPT_PT", "p_{T}^{pairJ}", "Events", "", 0, 1000, 200, 0, 0},
+  {"methodBPT_M", "m^{jj}", "Events / 10 GeV", "", 0, 500, 50, 0, 0},  
+  {"methodBPT_PT", "p_{T}^{jj}", "Events / 7 GeV", "", 0, 700, 100, 0, 0},
   {"GENRECOeff_methodPTjet", "GEN-RECO efficiency ptjet method", "Events", "", 0, 3, 3, 0, 0},
   {"GENRECOeff_methodM", "GEN-RECO efficiency madd method", "Events", "", 0, 3, 3, 0, 0},
   {"methodM_Pruned1", "Pruned gen efficiency", "Events", "", 0, 5, 5, 0, 0},
@@ -93,6 +93,9 @@ Histo1D myHisto1D[nHisto] = {
   {"methodPTjet_Pruned2", "Pruned gen efficiency", "Events", "", 0, 5, 5, 0, 0},
   {"methodPTjet_PrunedTOT", "Pruned gen efficiency", "Events", "", 0, 5, 5, 0, 0},
 };
+
+
+
   
 void doHisto(const std::string inputFileMC, const std::string outputFile, double lumi=1)
 {
@@ -333,7 +336,7 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
       if(MERGE2E2MU && ( currentFinalState == fs_2mu2e )) currentFinalState = fs_2e2mu;
 
       // Mass Cut      
-      if (ZZMass < 115 || ZZMass > 135) continue;
+      //      if (ZZMass < 115 || ZZMass > 135) continue;
 
       // H(bb) selection
       
@@ -770,6 +773,7 @@ void ZZbb_analysis()
   double lumi = 140; // full Run2 Lumi
 
   string inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
+  //  string inputFilePath = "/eos/user/a/acappati/samples_4lX/190626/";
   string inputFileName[] = {"HH4lbb",
                             "ggH125",
 			    "VBFH125",
