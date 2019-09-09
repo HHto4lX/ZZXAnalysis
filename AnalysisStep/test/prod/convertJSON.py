@@ -26,7 +26,8 @@
 
 #filename = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/PromptReco/Cert_314472-317591_13TeV_PromptReco_Collisions18_JSON.txt' #June 22, 2018
 #filename = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/PromptReco/Cert_314472-324209_13TeV_PromptReco_Collisions18_JSON.txt' #Oct 19, 2018; 50.98/fb; https://hypernews.cern.ch/HyperNews/CMS/get/physics-validation/3226.html
-filename = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/PromptReco/Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt' #Nov 24, 2018; 58.83/fb; https://hypernews.cern.ch/HyperNews/CMS/get/physics-validation/3259.html
+#filename = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/PromptReco/Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt' #Nov 24, 2018; 58.83/fb; https://hypernews.cern.ch/HyperNews/CMS/get/physics-validation/3259.html
+filename = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt' #for 2018 taken from https://twiki.cern.ch/twiki/bin/view/CMS/PdmV2018Analysis#Early2018Re_reco_17Sep2018_datas
 
 json = eval( open(filename).read() )
 
