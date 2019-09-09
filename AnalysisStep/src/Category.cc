@@ -14,13 +14,14 @@ using namespace std;
 
 
 
-extern "C" int categoryHH( vector<Float_t>* JetPt,
-                           vector<Float_t>* JetEta,
-                           vector<Float_t>* JetIsBTagged,
-                           Short_t nExtraLep,
-                           vector<Float_t>* ExtraLepPt,
-                           vector<Float_t>* ExtraLepEta,
-                           vector<Int_t>* ExtraLepLepId 
+extern "C" int categoryHH( short  nJets20, //FIXME: change name
+                           float* JetPt,
+                           float* JetEta,
+                           float* JetIsBTagged,
+                           short  nExtraLep,
+                           float* ExtraLepPt,
+                           float* ExtraLepEta,
+                           int*   ExtraLepLepId 
 			   //                           int nPhotons
 			   //                           int nTaus
                          )  
@@ -28,13 +29,13 @@ extern "C" int categoryHH( vector<Float_t>* JetPt,
   // check on Jets Variables and btagging
   Int_t nBtaggedJets = 0;
   Int_t nGoodJets    = 0;
-  for(UInt_t i = 0; i < JetPt->size(); i++)
+  for(int i = 0; i < nJets20; i++)
   {
-    if(fabs(JetEta->at(i)) > 2.4 ) continue;
-    if(JetPt->at(i) < 20. ) continue;
+    if(fabs(JetEta[i]) > 2.4 ) continue;
+    if(JetPt[i] < 20. ) continue;
 
     nGoodJets++;
-    if(JetIsBTagged->at(i) > 0) { nBtaggedJets++; }
+    if(JetIsBTagged[i] > 0) { nBtaggedJets++; }
   } 
 
   // check on extraLep variables
@@ -42,18 +43,18 @@ extern "C" int categoryHH( vector<Float_t>* JetPt,
   Int_t nExtraLepInAcceptaneOS = 0;
   for(Int_t i = 0; i < nExtraLep; i++)
   {
-    if(ExtraLepPt->at(i) < 10 || fabs(ExtraLepEta->at(i)) > 2.4) continue;
+    if(ExtraLepPt[i] < 10 || fabs(ExtraLepEta[i]) > 2.4) continue;
     nExtraLepInAcceptance++; 
   }
   if(nExtraLepInAcceptance > 1) 
   {
     for(Int_t i = 0; i < nExtraLep; i++)
     { 
-      if(ExtraLepPt->at(i) < 10 || fabs(ExtraLepEta->at(i)) > 2.4) continue;
+      if(ExtraLepPt[i] < 10 || fabs(ExtraLepEta[i]) > 2.4) continue;
       for(Int_t j = 0; j < nExtraLep; j++)
    	{
-        if(ExtraLepPt->at(j) < 10 || fabs(ExtraLepEta->at(j)) > 2.4) continue;
-        if(ExtraLepLepId->at(i) * ExtraLepLepId->at(j) < 0)
+        if(ExtraLepPt[j] < 10 || fabs(ExtraLepEta[j]) > 2.4) continue;
+        if(ExtraLepLepId[j] * ExtraLepLepId[j] < 0)
    	  {
           nExtraLepInAcceptaneOS++;   
         }

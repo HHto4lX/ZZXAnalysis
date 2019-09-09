@@ -118,6 +118,13 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 
   Short_t nTaus  =  0;
 
+  // variables for categories
+  float JetPt[99];        
+  float JetEta[99];       
+  float JetIsBTagged[99];
+  float ExtraLepPt[99];   
+  float ExtraLepEta[99];  
+  float ExtraLepLepId[99];  
 
 
   TH1F* h1[nFinalState+1][nCat];
@@ -234,8 +241,22 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
       if (ZZMass < 115 || ZZMass > 135) continue;
 
 
-      // --- choose category
-      currentCategory = categoryHH(JetPt,
+      // --- find category
+      short nJets20 = 0.;
+      for(UInt_t i = 0; i < JetPt->size(); i++){
+        JetPt[i]        = JetPt->at(i);
+        JetEta[i]       = JetEta->at(i);
+        JetIsBTagged[i] = JetIsBTagged->at(i);
+        nJets20++;
+      }
+      for(int i = 0; i < nExtraLep; i++){
+        ExtraLepPt[i]    = ExtraLepPt->at(i);
+        ExtraLepEta[i]   = ExtraLepEta->at(i);
+        ExtraLepLepId[i] = ExtraLepLepId->at(i);
+      }
+
+      currentCategory = categoryHH(nJets20,
+                                   JetPt,
                                    JetEta,
                                    JetIsBTagged,
                                    nExtraLep,
@@ -290,7 +311,9 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 void ComputeYields() 
 {
 
-  double lumi = 140; // full Run2 Lumi
+  //  double lumi = 140; // full Run2 Lumi
+  //  double lumi = 35.92; // 2016 data
+  double lumi = 59.74; // 2018 data 
 
   string inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
   string inputFileName[] = {"HH4lbb",

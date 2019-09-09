@@ -4,7 +4,6 @@
 
 
 
-
 //------- ZZX Categorization
 
 enum CategoryHH {
@@ -15,13 +14,14 @@ enum CategoryHH {
  HH4ltautauTagged     = 4
 };
  
-extern "C" int categoryHH( vector<Float_t>* JetPt,
-                           vector<Float_t>* JetEta,
-                           vector<Float_t>* JetIsBTagged,
-                           Short_t nExtraLep,
-                           vector<Float_t>* ExtraLepPt,
-                           vector<Float_t>* ExtraLepEta,
-                           vector<Int_t>* ExtraLepLepId
+extern "C" int categoryHH( short  nJets20,
+                           float* JetPt,
+                           float* JetEta,
+                           float* JetIsBTagged,
+                           short  nExtraLep,
+                           float* ExtraLepPt,
+                           float* ExtraLepEta,
+                           int*   ExtraLepLepId
 			   //                           int nPhotons
 			   //                           int nTaus
 			 );
