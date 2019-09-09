@@ -61,7 +61,7 @@ string sCategory[nCat] = {
 
 
   
-void doHisto(const std::string inputFileMC, const std::string outputFile, double lumi=1)
+void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 {
 
   TFile* inputFile;
@@ -77,6 +77,12 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
   Int_t nLumi;
   Float_t overallEventWeight;
   Float_t xsec;
+
+  Float_t KFactor_QCD_ggZZ_Nominal;
+  Float_t KFactor_EW_qqZZ;
+  Float_t KFactor_QCD_qqZZ_dPhi;
+  Float_t KFactor_QCD_qqZZ_M;
+  Float_t KFactor_QCD_qqZZ_Pt;
 
   Short_t ZZsel;
   vector<Float_t> *LepEta = 0;
@@ -119,12 +125,12 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
   Short_t nTaus  =  0;
 
   // variables for categories
-  float JetPt[99];        
-  float JetEta[99];       
-  float JetIsBTagged[99];
-  float ExtraLepPt[99];   
-  float ExtraLepEta[99];  
-  float ExtraLepLepId[99];  
+  float jetPt[99];        
+  float jetEta[99];       
+  float jetIsBTagged[99];
+  float extraLepPt[99];   
+  float extraLepEta[99];  
+  int   extraLepLepId[99];  
 
 
   TH1F* h1[nFinalState+1][nCat];
@@ -141,7 +147,7 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
   int currentFinalState;
   int currentCategory;
 
-  inputFile =  TFile::Open( inputFileMC.c_str() );
+  inputFile =  TFile::Open( inputFileMC );
   
   hCounters = (TH1F*)inputFile->Get("ZZTree/Counters");
   NGenEvt = (Float_t)hCounters->GetBinContent(1);
@@ -184,10 +190,20 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
   inputTree->SetBranchAddress("ExtraLepLepId", &ExtraLepLepId);
   inputTree->SetBranchAddress("nPhotons", &nPhotons);
   inputTree->SetBranchAddress("nTaus", &nTaus);
-
+  if(inputFileMC.Contains("ggTo"))    //ggZZ samples
+  {
+    inputTree->SetBranchAddress("KFactor_QCD_ggZZ_Nominal", &KFactor_QCD_ggZZ_Nominal);
+  }
+  if(inputFileMC.Contains("ZZto4l"))   //qqZZ samples
+  {
+    inputTree->SetBranchAddress("KFactor_EW_qqZZ", &KFactor_EW_qqZZ);
+    inputTree->SetBranchAddress("KFactor_QCD_qqZZ_dPhi", &KFactor_QCD_qqZZ_dPhi);
+    inputTree->SetBranchAddress("KFactor_QCD_qqZZ_M", &KFactor_QCD_qqZZ_M);
+    inputTree->SetBranchAddress("KFactor_QCD_qqZZ_Pt", &KFactor_QCD_qqZZ_Pt);
+  }
 
   int entries = inputTree->GetEntries();
-  std::cout<<"Processing file: "<< inputFileMC.c_str() << "\nNumber of entries: " << entries << endl;
+  std::cout<<"Processing file: "<< inputFileMC << "\nNumber of entries: " << entries << endl;
   
   // --- loop over tree entries
   for (Long64_t entry = 0; entry < entries; entry++)
@@ -205,6 +221,8 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 
 
       Float_t kfactor = 1.;
+      if(inputFileMC.Contains("ggTo"))       { kfactor = KFactor_EW_qqZZ * KFactor_QCD_qqZZ_M; }   //ggZZ samples
+      else if(inputFileMC.Contains("ZZto4l")){ kfactor = KFactor_QCD_ggZZ_Nominal; }               //qqZZ samples
       
 
       Double_t eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight ;
@@ -244,25 +262,25 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
       // --- find category
       short nJets20 = 0.;
       for(UInt_t i = 0; i < JetPt->size(); i++){
-        JetPt[i]        = JetPt->at(i);
-        JetEta[i]       = JetEta->at(i);
-        JetIsBTagged[i] = JetIsBTagged->at(i);
+        jetPt[i]        = JetPt->at(i);
+        jetEta[i]       = JetEta->at(i);
+        jetIsBTagged[i] = JetIsBTagged->at(i);
         nJets20++;
       }
       for(int i = 0; i < nExtraLep; i++){
-        ExtraLepPt[i]    = ExtraLepPt->at(i);
-        ExtraLepEta[i]   = ExtraLepEta->at(i);
-        ExtraLepLepId[i] = ExtraLepLepId->at(i);
+        extraLepPt[i]    = ExtraLepPt->at(i);
+        extraLepEta[i]   = ExtraLepEta->at(i);
+        extraLepLepId[i] = ExtraLepLepId->at(i);
       }
 
       currentCategory = categoryHH(nJets20,
-                                   JetPt,
-                                   JetEta,
-                                   JetIsBTagged,
+                                   jetPt,
+                                   jetEta,
+                                   jetIsBTagged,
                                    nExtraLep,
-                                   ExtraLepPt,
-                                   ExtraLepEta,
-                                   ExtraLepLepId
+                                   extraLepPt,
+                                   extraLepEta,
+                                   extraLepLepId
 				   //        nPhotons
 				   //         nTaus
       				  );
@@ -287,7 +305,7 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
   
   
   std::cout << "Output file "<< outputFile << endl;
-  TFile* fOut = new TFile(outputFile.c_str(),"recreate");  
+  TFile* fOut = new TFile(outputFile ,"recreate");  
   fOut->cd();
   
   for (int nfs = 0; nfs < nFinalState+1; nfs ++)
@@ -311,12 +329,12 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
 void ComputeYields() 
 {
 
-  //  double lumi = 140; // full Run2 Lumi
+  double lumi = 140; // full Run2 Lumi
   //  double lumi = 35.92; // 2016 data
-  double lumi = 59.74; // 2018 data 
+  //  double lumi = 59.74; // 2018 data 
 
-  string inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
-  string inputFileName[] = {"HH4lbb",
+  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
+  TString inputFileName[] = {"HH4lbb",
                             // "HH4lww",
                             // "HH4lgammagamma",
                             // "HH4ltautau",
@@ -345,13 +363,14 @@ void ComputeYields()
   cout<<nInputFiles<<endl;
 
   string outputFilePath = "Yields_histos";
-  gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
+  gSystem->Exec(("mkdir -p "+ outputFilePath).c_str()); // create output dir
   
 
   //call function
   for(UInt_t i=0; i<nInputFiles; i++){
     cout<<"Processing sample "<<inputFileName[i]<<" ... "<<endl;
-    doHisto(Form("%s%s%s",inputFilePath.c_str(),inputFileName[i].c_str(),"/ZZXAnalysis.root"), Form("%s%s%s%s",outputFilePath.c_str(), "/histos_", (inputFileName[i]).c_str(), ".root"), lumi);
+    //doHisto(Form("%s%s%s",inputFilePath.c_str(),inputFileName[i].c_str(),"/ZZXAnalysis.root"), Form("%s%s%s%s",outputFilePath.c_str(), "/histos_", (inputFileName[i]).c_str(), ".root"), lumi);
+   doHisto(inputFilePath + inputFileName[i] + "/ZZXAnalysis.root" , outputFilePath + "/histos_" + inputFileName[i] + ".root", lumi);
   }
   
 }
