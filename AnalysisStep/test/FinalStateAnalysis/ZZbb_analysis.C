@@ -97,7 +97,7 @@ Histo1D myHisto1D[nHisto] = {
 
 
   
-void doHisto(const std::string inputFileMC, const std::string outputFile, double lumi=1)
+void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 {
 
   bool VERBOSE = false;
@@ -115,6 +115,12 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
   Int_t nLumi;
   Float_t overallEventWeight;
   Float_t xsec;
+
+  Float_t KFactor_QCD_ggZZ_Nominal;
+  Float_t KFactor_EW_qqZZ;
+  Float_t KFactor_QCD_qqZZ_dPhi;
+  Float_t KFactor_QCD_qqZZ_M;
+  Float_t KFactor_QCD_qqZZ_Pt;
 
   Short_t ZZsel;
   vector<Float_t> *LepEta = 0;
@@ -229,7 +235,7 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
   
   int currentFinalState;
 
-  inputFile =  TFile::Open( inputFileMC.c_str() );
+  inputFile =  TFile::Open( inputFileMC );
   
   hCounters = (TH1F*)inputFile->Get("ZZTree/Counters");
   NGenEvt = (Float_t)hCounters->GetBinContent(1);
@@ -266,9 +272,21 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
   inputTree->SetBranchAddress("prunedGenPartMass", &prunedGenPartMass );
   inputTree->SetBranchAddress("prunedGenPartID", &prunedGenPartID );
   inputTree->SetBranchAddress("prunedGenMotherID", &prunedGenMotherID );
+  if(inputFileMC.Contains("ggTo"))    //ggZZ samples
+    {
+      inputTree->SetBranchAddress("KFactor_QCD_ggZZ_Nominal", &KFactor_QCD_ggZZ_Nominal);
+    }
+  if(inputFileMC.Contains("ZZto4l"))   //qqZZ samples
+    {
+      inputTree->SetBranchAddress("KFactor_EW_qqZZ", &KFactor_EW_qqZZ);
+      inputTree->SetBranchAddress("KFactor_QCD_qqZZ_dPhi", &KFactor_QCD_qqZZ_dPhi);
+      inputTree->SetBranchAddress("KFactor_QCD_qqZZ_M", &KFactor_QCD_qqZZ_M);
+      inputTree->SetBranchAddress("KFactor_QCD_qqZZ_Pt", &KFactor_QCD_qqZZ_Pt);
+    }
+
 
   int entries = inputTree->GetEntries();
-  std::cout<<"Processing file: "<< inputFileMC.c_str() << "\nNumber of entries: " << entries << endl;
+  std::cout<<"Processing file: "<< inputFileMC << "\nNumber of entries: " << entries << endl;
   
   //  entries = 10;
 
@@ -292,6 +310,8 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
       if( !(ZZsel >= 90) ) continue;
 
       Float_t kfactor = 1.;
+      if(inputFileMC.Contains("ggTo"))       { kfactor = KFactor_EW_qqZZ * KFactor_QCD_qqZZ_M; }   //ggZZ samples
+      else if(inputFileMC.Contains("ZZto4l")){ kfactor = KFactor_QCD_ggZZ_Nominal; }               //qqZZ samples
       
 
       Double_t eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight ;
@@ -751,7 +771,7 @@ void doHisto(const std::string inputFileMC, const std::string outputFile, double
   
   
   std::cout << "Output file "<< outputFile << endl;
-  TFile* fOut = new TFile(outputFile.c_str(),"recreate");  
+  TFile* fOut = new TFile(outputFile,"recreate");  
   fOut->cd();
   
   for (int nfs = 0; nfs < nFinalState+1; nfs ++)
@@ -772,9 +792,9 @@ void ZZbb_analysis()
 
   double lumi = 140; // full Run2 Lumi
 
-  string inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
+  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
   //  string inputFilePath = "/eos/user/a/acappati/samples_4lX/190626/";
-  string inputFileName[] = {"HH4lbb",
+  TString inputFileName[] = {"HH4lbb",
                             "ggH125",
 			    "VBFH125",
 			    "WplusH125",
@@ -806,8 +826,7 @@ void ZZbb_analysis()
   //call function
   for(UInt_t i=0; i<nInputFiles; i++){
     cout<<"Processing sample "<<inputFileName[i]<<" ... "<<endl;
-    doHisto(Form("%s%s%s",inputFilePath.c_str(),inputFileName[i].c_str(),"/ZZXAnalysis.root"), Form("%s%s%s%s",outputFilePath.c_str(), "/histos_", (inputFileName[i]).c_str(), ".root"), lumi);
+    doHisto(inputFilePath + inputFileName[i] + "/ZZXAnalysis.root", outputFilePath + "/histos_" + inputFileName[i] + ".root", lumi);
   }
   
-  //  doPlot(ouputFile);
 }

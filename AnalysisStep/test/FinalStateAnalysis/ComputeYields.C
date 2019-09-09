@@ -369,8 +369,7 @@ void ComputeYields()
   //call function
   for(UInt_t i=0; i<nInputFiles; i++){
     cout<<"Processing sample "<<inputFileName[i]<<" ... "<<endl;
-    //doHisto(Form("%s%s%s",inputFilePath.c_str(),inputFileName[i].c_str(),"/ZZXAnalysis.root"), Form("%s%s%s%s",outputFilePath.c_str(), "/histos_", (inputFileName[i]).c_str(), ".root"), lumi);
-   doHisto(inputFilePath + inputFileName[i] + "/ZZXAnalysis.root" , outputFilePath + "/histos_" + inputFileName[i] + ".root", lumi);
+    doHisto(inputFilePath + inputFileName[i] + "/ZZXAnalysis.root" , outputFilePath + "/histos_" + inputFileName[i] + ".root", lumi);
   }
   
 }
