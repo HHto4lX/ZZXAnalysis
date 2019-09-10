@@ -83,7 +83,6 @@
 namespace {
   bool writePrunedGenParticles = true;
   bool writePrunedGenPhotons = true;
-  bool writeGenJets = true;  // Write GenJets in the tree.
   bool writeJets = true;     // Write jets in the tree. FIXME: make this configurable
   bool writePhotons = true;  // Write photons in the tree
   bool writeTaus = true;     // Write taus in the tree
@@ -251,13 +250,6 @@ namespace {
 
   std::vector<float> JetJERUp ;
   std::vector<float> JetJERDown ;
-
-
-  std::vector<float> GENjetPt;
-  std::vector<float> GENjetEta;
-  std::vector<float> GENjetPhi;
-  std::vector<float> GENjetMass;
-  std::vector<short> GENjetParentID;
 
   std::vector<float> prunedGenPartPt;
   std::vector<float> prunedGenPartEta; 
@@ -440,7 +432,6 @@ private:
 
   void FillPrunedGenParticlesInfo(const reco::Candidate& prunedGenPart);
   void FillPrunedGenPhotonsInfo(const reco::Candidate& prunedGenPart);
-  void FillJetGenInfo(const reco::GenJet& genjet);
 
   void FillHGenInfo(const math::XYZTLorentzVector Hp, float w);
   void FillZGenInfo(Short_t Z1Id, Short_t Z2Id,
@@ -525,7 +516,6 @@ private:
   edm::EDGetTokenT<edm::View<pat::CompositeCandidate> > lhecandToken;
   edm::EDGetTokenT<edm::TriggerResults> triggerResultToken;
   edm::EDGetTokenT<vector<reco::Vertex> > vtxToken;
-  edm::EDGetTokenT<edm::View<reco::GenJet> > jetGenToken; //GenJet
   edm::EDGetTokenT<edm::View<pat::Jet> > jetToken;
   edm::EDGetTokenT<edm::View<pat::Photon> > photonToken; //H->GammaGamma photons
   edm::EDGetTokenT<edm::View<pat::Tau> > tauToken; // H->TauTau
@@ -650,7 +640,6 @@ HH4lXNtupleMaker::HH4lXNtupleMaker(const edm::ParameterSet& pset) :
   }
   triggerResultToken = consumes<edm::TriggerResults>(edm::InputTag("TriggerResults"));
   vtxToken = consumes<vector<reco::Vertex> >(edm::InputTag("goodPrimaryVertices"));
-  jetGenToken = consumes<edm::View<reco::GenJet> >(edm::InputTag("slimmedGenJets")); //GenJet
   jetToken = consumes<edm::View<pat::Jet> >(edm::InputTag("cleanJets"));
   photonToken = consumes<edm::View<pat::Photon> >(edm::InputTag("pikaPhotons")); // H->GammaGamma photons
   tauToken = consumes<edm::View<pat::Tau> >(edm::InputTag("pikaTaus")); // H->TauTau 
@@ -1161,34 +1150,20 @@ void HH4lXNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
 
  
   // --- GenParticles (prunedGenParticles)
-  vector<const reco::Candidate*> genPrunedParticlesVector;
-  for(edm::View<reco::Candidate>::const_iterator prunedPart_it = genParticles->begin(); prunedPart_it != genParticles->end(); ++prunedPart_it){
-    genPrunedParticlesVector.push_back(&*prunedPart_it);
-  }
-  for(unsigned i=0; i<genPrunedParticlesVector.size(); ++i){
-    if (genPrunedParticlesVector[i]==0) {
-      continue;
+  if (isMC){
+    vector<const reco::Candidate*> genPrunedParticlesVector;
+    for(edm::View<reco::Candidate>::const_iterator prunedPart_it = genParticles->begin(); prunedPart_it != genParticles->end(); ++prunedPart_it){
+      genPrunedParticlesVector.push_back(&*prunedPart_it);
     }
-    if (writePrunedGenParticles && isMC) FillPrunedGenParticlesInfo(*(genPrunedParticlesVector.at(i)));
-    if (writePrunedGenPhotons && isMC) FillPrunedGenPhotonsInfo(*(genPrunedParticlesVector.at(i)));
-  }
-
-
-  // --- GenJets
-  Handle<edm::View<reco::GenJet> > genJetHandle;
-  event.getByToken(jetGenToken, genJetHandle);
-  vector<const reco::GenJet*> genJetVector;
-  for(edm::View<reco::GenJet>::const_iterator genjet = genJetHandle->begin(); genjet != genJetHandle->end(); ++genjet){
-    genJetVector.push_back(&*genjet);
-  }
-  for (unsigned i=0; i<genJetVector.size(); ++i) {
-    if (genJetVector[i]==0) {
-      continue;
+    for(unsigned i=0; i<genPrunedParticlesVector.size(); ++i){
+      if (genPrunedParticlesVector[i]==0) {
+        continue;
+      }
+      if (writePrunedGenParticles && isMC) FillPrunedGenParticlesInfo(*(genPrunedParticlesVector.at(i)));
+      if (writePrunedGenPhotons && isMC) FillPrunedGenPhotonsInfo(*(genPrunedParticlesVector.at(i)));
     }
-
-    if (writeGenJets && theChannel!=ZL) FillJetGenInfo(*(genJetVector.at(i)));
-
   }
+
 
 
   // Jets (cleaned wrt all tight isolated leptons)
@@ -1417,17 +1392,7 @@ void HH4lXNtupleMaker::FillJet(const pat::Jet& jet)
    JetPt  .push_back( jet.pt());
    JetEta .push_back( jet.eta());
    JetPhi .push_back( jet.phi());
-   JetMass .push_back( jet.p4().M());
-   if (isMC){
-     const reco::Candidate * parton=jet.genParton();
-     if (parton !=0){
-       const reco::Candidate  * mo = parton->mother();
-       GENjetParentID.push_back(mo->pdgId());
-     }
-     else{
-       GENjetParentID.push_back(-999.);
-     }
-   } 
+   JetMass .push_back( jet.p4().M()); 
    JetBTagger .push_back( jet.userFloat("bTagger"));
    JetIsBtagged .push_back( jet.userFloat("isBtagged"));
    JetIsBtaggedWithSF .push_back( jet.userFloat("isBtaggedWithSF"));
@@ -1484,17 +1449,6 @@ void HH4lXNtupleMaker::FillPrunedGenPhotonsInfo(const reco::Candidate& prunedGen
 
 }
 
-
-void HH4lXNtupleMaker::FillJetGenInfo(const reco::GenJet& genjet)
-{
-  GENjetPt  .push_back( genjet.pt() );
-  GENjetEta .push_back( genjet.eta() );
-  GENjetPhi .push_back( genjet.phi() );
-  GENjetMass.push_back( genjet.p4().M() );
-//  GENjetParentID.push_back( genjet.mother()->pdgId() );
-//  std::cout << "The Genjet mother: "<<  genjet.mother() << "The GenjetID: " << genjet.pdgId() << std::endl;
-
-}
 
 
 void HH4lXNtupleMaker::FillPhoton(const pat::Photon& photon)
@@ -2766,27 +2720,21 @@ void HH4lXNtupleMaker::BookAllBranches(){
   myTree->Book("JetPUID", JetPUID, failedTreeLevel >= fullFailedTree);
   myTree->Book("JetPUValue", JetPUValue, failedTreeLevel >= fullFailedTree);
 
-
-  myTree->Book("GENjetPt",   GENjetPt,   failedTreeLevel >= fullFailedTree);
-  myTree->Book("GENjetEta",  GENjetEta,  failedTreeLevel >= fullFailedTree);
-  myTree->Book("GENjetPhi",  GENjetPhi,  failedTreeLevel >= fullFailedTree);
-  myTree->Book("GENjetMass", GENjetMass, failedTreeLevel >= fullFailedTree);  
-  myTree->Book("GENjetParentID", GENjetParentID, failedTreeLevel >= fullFailedTree);
-
-
-  myTree->Book("prunedGenPartPt",   prunedGenPartPt,   failedTreeLevel >= fullFailedTree);
-  myTree->Book("prunedGenPartEta",  prunedGenPartEta,  failedTreeLevel >= fullFailedTree);
-  myTree->Book("prunedGenPartPhi",  prunedGenPartPhi,  failedTreeLevel >= fullFailedTree);
-  myTree->Book("prunedGenPartMass", prunedGenPartMass, failedTreeLevel >= fullFailedTree);
-  myTree->Book("prunedGenPartID",   prunedGenPartID,   failedTreeLevel >= fullFailedTree);
-  myTree->Book("prunedGenMotherID", prunedGenMotherID, failedTreeLevel >= fullFailedTree);
-
-  myTree->Book("prunedGenPhoPt",   prunedGenPhoPt,   failedTreeLevel >= fullFailedTree);
-  myTree->Book("prunedGenPhoEta",  prunedGenPhoEta,  failedTreeLevel >= fullFailedTree);
-  myTree->Book("prunedGenPhoPhi",  prunedGenPhoPhi,  failedTreeLevel >= fullFailedTree);
-  myTree->Book("prunedGenPhoMass", prunedGenPhoMass, failedTreeLevel >= fullFailedTree);
-  myTree->Book("prunedGenPhoID",   prunedGenPhoID,   failedTreeLevel >= fullFailedTree);
-  myTree->Book("prunedGenPhoMotherID", prunedGenPhoMotherID, failedTreeLevel >= fullFailedTree);
+  if(isMC){
+    myTree->Book("prunedGenPartPt",   prunedGenPartPt,   failedTreeLevel >= fullFailedTree);
+    myTree->Book("prunedGenPartEta",  prunedGenPartEta,  failedTreeLevel >= fullFailedTree);
+    myTree->Book("prunedGenPartPhi",  prunedGenPartPhi,  failedTreeLevel >= fullFailedTree);
+    myTree->Book("prunedGenPartMass", prunedGenPartMass, failedTreeLevel >= fullFailedTree);
+    myTree->Book("prunedGenPartID",   prunedGenPartID,   failedTreeLevel >= fullFailedTree);
+    myTree->Book("prunedGenMotherID", prunedGenMotherID, failedTreeLevel >= fullFailedTree);
+    
+    myTree->Book("prunedGenPhoPt",   prunedGenPhoPt,   failedTreeLevel >= fullFailedTree);
+    myTree->Book("prunedGenPhoEta",  prunedGenPhoEta,  failedTreeLevel >= fullFailedTree);
+    myTree->Book("prunedGenPhoPhi",  prunedGenPhoPhi,  failedTreeLevel >= fullFailedTree);
+    myTree->Book("prunedGenPhoMass", prunedGenPhoMass, failedTreeLevel >= fullFailedTree);
+    myTree->Book("prunedGenPhoID",   prunedGenPhoID,   failedTreeLevel >= fullFailedTree);
+    myTree->Book("prunedGenPhoMotherID", prunedGenPhoMotherID, failedTreeLevel >= fullFailedTree);
+  }
 
   myTree->Book("DiJetMass",DiJetMass, false);
 //   myTree->Book("DiJetMassPlus",DiJetMassPlus, false); // FIXME: add back once filled again
