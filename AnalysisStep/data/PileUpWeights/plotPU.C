@@ -1,33 +1,33 @@
 
 void plotPU(){
-  TFile* fMoriond17 = TFile::Open("puWeightsMoriond17_v2.root");  
-  //  TFile* fData2017 = TFile::Open("puWeight_Spring2016MC_to_2017Data_294927-301141.root");
-  //  TFile* fData2017 = TFile::Open("puWeight_Spring2016MC_to_2017Data_294927-301997.root");
-  TFile* fData2017 = TFile::Open("puWeight_Spring2016MC_to_2017Data_294927-305636.root");
-  
-  auto hMC = (TH1F*) fMoriond17->Get("MC out-of-the-box");
-  auto hData2016 = (TH1F*) fMoriond17->Get("Data");
-  auto hData2017 = (TH1F*) fData2017->Get("Data");
 
+  TFile* fIn2018 = TFile::Open("pu_weights_2018.root");
   
-  hMC->SetMaximum(0.065);
-  hMC->SetStats(false);
-  hMC->SetFillColor(kBlue-10);
-  hData2016->SetMarkerStyle(21);
-  hData2016->SetMarkerSize(0.8);
+  TH1F* hMC          = (TH1F*)fIn2018->Get("MC_out_of_the_box");
+  TH1F* hMC_reweight = (TH1F*)fIn2018->Get("MC_reweighted");
+  TH1F* hData2018    = (TH1F*)fIn2018->Get("Data");
 
-  hData2017->SetMarkerStyle(21);
-  hData2017->SetMarkerSize(0.8);
-  hData2017->SetMarkerColor(kRed);
+  gStyle->SetOptStat(false);  
+
+  hMC_reweight->SetMaximum(0.065);
+  hMC_reweight->SetLineColor(kBlue);
+  hMC_reweight->SetFillColor(kBlue-9);
+  hMC_reweight->SetFillStyle(3345);
+
+  hMC->SetLineColor(kBlack);
   
+  hData2018->SetMarkerStyle(21);
+  hData2018->SetMarkerSize(0.8);
+  hData2018->SetMarkerColor(kRed);
 
-  hMC->Draw("histo");
-  hData2016->Draw("sameP");
-  hData2017->Draw("sameP");
-  leg = new TLegend(0.56,0.71,0.88,0.88);
-  leg->AddEntry(hMC, "Spring2016 MC", "f");
-  leg->AddEntry(hData2016,"Data 2016", "p");
-  leg->AddEntry(hData2017,"Data 2017, 35.88/fb", "p");
+
+  hMC_reweight->Draw("histo");
+  hMC->Draw("samehisto");
+  hData2018->Draw("sameP");
+  TLegend* leg = new TLegend(0.56,0.71,0.88,0.88);
+  leg->AddEntry(hMC,          "MC out-of-the-box",   "f");
+  leg->AddEntry(hMC_reweight, "MC reweighed",        "f");
+  leg->AddEntry(hData2018,    "Data 2018, 59.74/fb", "p");
   leg->SetLineColor(kWhite);
   leg->Draw();
 
