@@ -506,10 +506,10 @@ elif LEPTON_SETUP == 2017:# (Rochester corrections, Moriond 2018)
                                          isMC = cms.bool(IsMC),
                                          isSynchronization = cms.bool(False),
                                          )
-elif LEPTON_SETUP == 2018:# FIXME: still 2017 version
+elif LEPTON_SETUP == 2018:# (Rochester corrections for 2018 data) 
      process.calibratedMuons = cms.EDProducer("RochesterPATMuonCorrector",
                                          src = cms.InputTag("slimmedMuons"),
-                                         identifier = cms.string("RoccoR2017v0"),
+                                         identifier = cms.string("RoccoR2018"),
                                          isMC = cms.bool(IsMC),
                                          isSynchronization = cms.bool(False),
                                          )
