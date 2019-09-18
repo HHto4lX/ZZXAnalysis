@@ -177,13 +177,6 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   inputTree->SetBranchAddress("JetMass", &JetMass);
   inputTree->SetBranchAddress("JetPhi",  &JetPhi);
   inputTree->SetBranchAddress("JetIsBtagged",  &JetIsBTagged);
-  inputTree->SetBranchAddress("GENjetParentID",  &GENjetParentID);
-  inputTree->SetBranchAddress("prunedGenPartEta", &prunedGenPartEta );
-  inputTree->SetBranchAddress("prunedGenPartPhi", &prunedGenPartPhi );
-  inputTree->SetBranchAddress("prunedGenPartPt", &prunedGenPartPt );
-  inputTree->SetBranchAddress("prunedGenPartMass", &prunedGenPartMass );
-  inputTree->SetBranchAddress("prunedGenPartID", &prunedGenPartID );
-  inputTree->SetBranchAddress("prunedGenMotherID", &prunedGenMotherID );
   inputTree->SetBranchAddress("nExtraLep", &nExtraLep);
   inputTree->SetBranchAddress("ExtraLepPt", &ExtraLepPt);
   inputTree->SetBranchAddress("ExtraLepEta", &ExtraLepEta);
@@ -329,9 +322,9 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 void ComputeYields() 
 {
 
-  double lumi = 140; // full Run2 Lumi
+  //double lumi = 140; // full Run2 Lumi
   //  double lumi = 35.92; // 2016 data
-  //  double lumi = 59.74; // 2018 data 
+  double lumi = 59.74; // 2018 data 
 
   TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
   TString inputFileName[] = {"HH4lbb",
@@ -357,6 +350,7 @@ void ComputeYields()
 			    "TTWJetsToLNu",
                             //"DYJetsToLL_M50",
                             //"TTTo2L2Nu",
+			    //"AllData"
                             };
 
   size_t nInputFiles = sizeof(inputFileName)/sizeof(inputFileName[0]);

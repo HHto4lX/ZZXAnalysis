@@ -19,6 +19,17 @@ namelist = ['h1_M4L_4L','h1_MZ1_4L','h1_MZ2_4L','h1_eta4L_4L','h1_pt4L_4L','h1_m
 
 
 # read files
+inFile_AllData = TFile.Open(inputFilePath + 'histos_AllData.root')
+histos_AllData = []
+histos_AllData.append(inFile_AllData.Get(namelist[0]))
+histos_AllData.append(inFile_AllData.Get(namelist[1]))
+histos_AllData.append(inFile_AllData.Get(namelist[2]))
+histos_AllData.append(inFile_AllData.Get(namelist[3]))
+histos_AllData.append(inFile_AllData.Get(namelist[4]))
+histos_AllData.append(inFile_AllData.Get(namelist[5]))
+histos_AllData.append(inFile_AllData.Get(namelist[6]))
+
+
 inFile_HH4lbb = TFile.Open(inputFilePath + 'histos_HH4lbb.root')
 histos_HH4lbb = []
 histos_HH4lbb.append(inFile_HH4lbb.Get(namelist[0]))
@@ -256,13 +267,24 @@ for name in namelist :
 
 
     # HH->4lbb signal
-    histos_HH4lbb[i].SetFillColor(kRed+1)
-    histos_HH4lbb[i].SetLineColor(kRed+2)
-    hs.Add(histos_HH4lbb[i])
+    histos_HH4lbb[i].SetLineColor(kRed)
+    histos_HH4lbb[i].SetLineWidth(3)
+    integral = histos_HH4lbb[i].Integral();
+    print 'integrale ' 
+    print integral
+    #hs.Add(histos_HH4lbb[i])
+    histos_HH4lbb[i].Scale(integral * 1000.) 
 
-
-    hs.Draw('histo')
     
+    # ALL DATA
+    histos_AllData[i].SetMarkerColor(kBlack)
+    histos_AllData[i].SetMarkerStyle(20)
+   
+    histos_AllData[i].Draw('p')  
+    hs.Draw('histosame')
+    histos_HH4lbb[i].Draw('histosame')
+
+
     hs.GetXaxis().SetLabelFont(43)
     hs.GetXaxis().SetLabelSize(15)
     hs.GetXaxis().SetTitle(histos_HH4lbb[i].GetXaxis().GetTitle())
@@ -291,7 +313,7 @@ for name in namelist :
     canvas.Update()
 
     #draw CMS and lumi text
-    lumiText = '140 fb^{-1}'
+    lumiText = '59.7 fb^{-1}'
     CMS_lumi.writeExtraText = True
     CMS_lumi.extraText      = "Preliminary"
     CMS_lumi.lumi_sqrtS     = lumiText + " (13 TeV)"

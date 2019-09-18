@@ -29,6 +29,8 @@
 using namespace std;
 
 #define MERGE2E2MU 1
+#define DOBLINDHISTO 1
+#define VERBOSE 0
 
 double DELTAR = .4;
 
@@ -96,11 +98,14 @@ Histo1D myHisto1D[nHisto] = {
 
 
 
-  
 void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 {
 
-  bool VERBOSE = false;
+  bool ISDATA = false;
+  if ( inputFileMC.Contains("AllData")) ISDATA = true ;
+
+  std::cout << "ISDATA: " << ISDATA << endl; 
+  std::cout << "DOBLINDHISTO: " << DOBLINDHISTO << endl;
 
   TFile* inputFile;
   TTree* inputTree;
@@ -244,12 +249,12 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   inputTree = (TTree*)inputFile->Get("ZZTree/candTree");
   
   // set address of all branches
-  inputTree->SetBranchAddress("genBR", &genBR);
+  if (!ISDATA) inputTree->SetBranchAddress("genBR", &genBR);
   inputTree->SetBranchAddress("RunNumber", &nRun);
   inputTree->SetBranchAddress("EventNumber", &nEvent);
   inputTree->SetBranchAddress("LumiNumber", &nLumi);
-  inputTree->SetBranchAddress("overallEventWeight", &overallEventWeight);
-  inputTree->SetBranchAddress("xsec", &xsec);
+  if (!ISDATA) inputTree->SetBranchAddress("overallEventWeight", &overallEventWeight);
+  if (!ISDATA) inputTree->SetBranchAddress("xsec", &xsec);
   inputTree->SetBranchAddress("ZZsel", &ZZsel);
   inputTree->SetBranchAddress("LepEta", &LepEta);
   inputTree->SetBranchAddress("ZZMass", &ZZMass);  
@@ -265,13 +270,13 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   inputTree->SetBranchAddress("JetMass", &JetMass);
   inputTree->SetBranchAddress("JetPhi",  &JetPhi);
   inputTree->SetBranchAddress("JetIsBtagged",  &JetIsBTagged);
-  inputTree->SetBranchAddress("GENjetParentID",  &GENjetParentID);
-  inputTree->SetBranchAddress("prunedGenPartEta", &prunedGenPartEta );
-  inputTree->SetBranchAddress("prunedGenPartPhi", &prunedGenPartPhi );
-  inputTree->SetBranchAddress("prunedGenPartPt", &prunedGenPartPt );
-  inputTree->SetBranchAddress("prunedGenPartMass", &prunedGenPartMass );
-  inputTree->SetBranchAddress("prunedGenPartID", &prunedGenPartID );
-  inputTree->SetBranchAddress("prunedGenMotherID", &prunedGenMotherID );
+  if (!ISDATA) inputTree->SetBranchAddress("GENjetParentID",  &GENjetParentID);
+  if (!ISDATA) inputTree->SetBranchAddress("prunedGenPartEta", &prunedGenPartEta );
+  if (!ISDATA) inputTree->SetBranchAddress("prunedGenPartPhi", &prunedGenPartPhi );
+  if (!ISDATA) inputTree->SetBranchAddress("prunedGenPartPt", &prunedGenPartPt );
+  if (!ISDATA) inputTree->SetBranchAddress("prunedGenPartMass", &prunedGenPartMass );
+  if (!ISDATA) inputTree->SetBranchAddress("prunedGenPartID", &prunedGenPartID );
+  if (!ISDATA) inputTree->SetBranchAddress("prunedGenMotherID", &prunedGenMotherID );
   if(inputFileMC.Contains("ggTo"))    //ggZZ samples
     {
       inputTree->SetBranchAddress("KFactor_QCD_ggZZ_Nominal", &KFactor_QCD_ggZZ_Nominal);
@@ -283,7 +288,6 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
       inputTree->SetBranchAddress("KFactor_QCD_qqZZ_M", &KFactor_QCD_qqZZ_M);
       inputTree->SetBranchAddress("KFactor_QCD_qqZZ_Pt", &KFactor_QCD_qqZZ_Pt);
     }
-
 
   int entries = inputTree->GetEntries();
   std::cout<<"Processing file: "<< inputFileMC << "\nNumber of entries: " << entries << endl;
@@ -313,11 +317,10 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
       if(inputFileMC.Contains("ggTo"))       { kfactor = KFactor_EW_qqZZ * KFactor_QCD_qqZZ_M; }   //ggZZ samples
       else if(inputFileMC.Contains("ZZto4l")){ kfactor = KFactor_QCD_ggZZ_Nominal; }               //qqZZ samples
       
+      Double_t eventWeight = 0.;
+      if (!ISDATA) eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight ;
+      else eventWeight = 1.;
 
-      Double_t eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight ;
-
-    
-      //Double_t eventWeight = 1;
       if (VERBOSE) 
 	{std::cout << "--------- event: " << entry << " weight: " << eventWeight << endl;
 	  /*
@@ -358,6 +361,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
       // Mass Cut      
       //      if (ZZMass < 115 || ZZMass > 135) continue;
 
+      //      std::cout << "ZZ Mass: " << ZZMass << endl;
       // H(bb) selection
       
       vector<TLorentzVector> JetVec; // TLorentz vector with all Jets per Event
@@ -369,7 +373,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
       vector<int> index_GEN;
      
       int btag;      
-      
+       
       for (UInt_t j = 0; j < JetPt->size(); j++)
 	{
 	  btag = 0;
@@ -649,52 +653,54 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 
 	}
 
-      
-      for (UInt_t pr = 0; pr < prunedGenPartEta->size(); pr ++)
+      if (!ISDATA)
 	{
-	  if (fabs(prunedGenPartID->at(pr)) == 5 && prunedGenMotherID->at(pr) == 25)
+	  for (UInt_t pr = 0; pr < prunedGenPartEta->size(); pr ++)
 	    {
-	      double M_deltaPhi1 = JetVec[BESTpair_methodBM_index1].Phi() - prunedGenPartPhi->at(pr);
-	      if (fabs (M_deltaPhi1) > 3.14) M_deltaPhi1 = 2 * 3.14 - fabs(M_deltaPhi1);
-	      double M_deltaEta1 = JetVec[BESTpair_methodBM_index1].Eta() - prunedGenPartEta->at(pr);
-	      
-	      double M_DeltaR1 = sqrt(M_deltaEta1 * M_deltaEta1 + M_deltaPhi1 * M_deltaPhi1);
-
-	      if (M_DeltaR1 < DELTAR) methodM_eff_pruned1++;
-
-	      double M_deltaPhi2 = JetVec[BESTpair_methodBM_index2].Phi() - prunedGenPartPhi->at(pr);
-	      if (fabs (M_deltaPhi2) > 3.14) M_deltaPhi2 = 2 * 3.14 - fabs(M_deltaPhi2);
-	      double M_deltaEta2 = JetVec[BESTpair_methodBM_index2].Eta() - prunedGenPartEta->at(pr);
-	      
-	      double M_DeltaR2 = sqrt(M_deltaEta2 * M_deltaEta2 + M_deltaPhi2 * M_deltaPhi2);
-
-	      if (M_DeltaR2 < DELTAR) methodM_eff_pruned2++;
-
-
-	      double PTjet_deltaPhi1 = JetVec[BESTpair_methodBPT_index1].Phi() - prunedGenPartPhi->at(pr);
-	      if (fabs (PTjet_deltaPhi1) > 3.14) PTjet_deltaPhi1 = 2 * 3.14 - fabs(PTjet_deltaPhi1);
-	      double PTjet_deltaEta1 = JetVec[BESTpair_methodBPT_index1].Eta() - prunedGenPartEta->at(pr);
-	      
-	      double PTjet_DeltaR1 = sqrt(PTjet_deltaEta1 * PTjet_deltaEta1 + PTjet_deltaPhi1 * PTjet_deltaPhi1);
-
-	      if (PTjet_DeltaR1 < DELTAR) methodPTjet_eff_pruned1++;
-
-	      double PTjet_deltaPhi2 = JetVec[BESTpair_methodBPT_index2].Phi() - prunedGenPartPhi->at(pr);
-	      if (fabs (PTjet_deltaPhi2) > 3.14) PTjet_deltaPhi2 = 2 * 3.14 - fabs(PTjet_deltaPhi2);
-	      double PTjet_deltaEta2 = JetVec[BESTpair_methodBPT_index2].Eta() - prunedGenPartEta->at(pr);
-	      
-	      double PTjet_DeltaR2 = sqrt(PTjet_deltaEta2 * PTjet_deltaEta2 + PTjet_deltaPhi2 * PTjet_deltaPhi2);
-
-	      if (PTjet_DeltaR2 < DELTAR) methodPTjet_eff_pruned2++;
-
+	      if (fabs(prunedGenPartID->at(pr)) == 5 && prunedGenMotherID->at(pr) == 25)
+		{
+		  double M_deltaPhi1 = JetVec[BESTpair_methodBM_index1].Phi() - prunedGenPartPhi->at(pr);
+		  if (fabs (M_deltaPhi1) > 3.14) M_deltaPhi1 = 2 * 3.14 - fabs(M_deltaPhi1);
+		  double M_deltaEta1 = JetVec[BESTpair_methodBM_index1].Eta() - prunedGenPartEta->at(pr);
+		  
+		  double M_DeltaR1 = sqrt(M_deltaEta1 * M_deltaEta1 + M_deltaPhi1 * M_deltaPhi1);
+		  
+		  if (M_DeltaR1 < DELTAR) methodM_eff_pruned1++;
+		  
+		  double M_deltaPhi2 = JetVec[BESTpair_methodBM_index2].Phi() - prunedGenPartPhi->at(pr);
+		  if (fabs (M_deltaPhi2) > 3.14) M_deltaPhi2 = 2 * 3.14 - fabs(M_deltaPhi2);
+		  double M_deltaEta2 = JetVec[BESTpair_methodBM_index2].Eta() - prunedGenPartEta->at(pr);
+		  
+		  double M_DeltaR2 = sqrt(M_deltaEta2 * M_deltaEta2 + M_deltaPhi2 * M_deltaPhi2);
+		  
+		  if (M_DeltaR2 < DELTAR) methodM_eff_pruned2++;
+		  
+		  
+		  double PTjet_deltaPhi1 = JetVec[BESTpair_methodBPT_index1].Phi() - prunedGenPartPhi->at(pr);
+		  if (fabs (PTjet_deltaPhi1) > 3.14) PTjet_deltaPhi1 = 2 * 3.14 - fabs(PTjet_deltaPhi1);
+		  double PTjet_deltaEta1 = JetVec[BESTpair_methodBPT_index1].Eta() - prunedGenPartEta->at(pr);
+		  
+		  double PTjet_DeltaR1 = sqrt(PTjet_deltaEta1 * PTjet_deltaEta1 + PTjet_deltaPhi1 * PTjet_deltaPhi1);
+		  
+		  if (PTjet_DeltaR1 < DELTAR) methodPTjet_eff_pruned1++;
+		  
+		  double PTjet_deltaPhi2 = JetVec[BESTpair_methodBPT_index2].Phi() - prunedGenPartPhi->at(pr);
+		  if (fabs (PTjet_deltaPhi2) > 3.14) PTjet_deltaPhi2 = 2 * 3.14 - fabs(PTjet_deltaPhi2);
+		  double PTjet_deltaEta2 = JetVec[BESTpair_methodBPT_index2].Eta() - prunedGenPartEta->at(pr);
+		  
+		  double PTjet_DeltaR2 = sqrt(PTjet_deltaEta2 * PTjet_deltaEta2 + PTjet_deltaPhi2 * PTjet_deltaPhi2);
+		  
+		  if (PTjet_DeltaR2 < DELTAR) methodPTjet_eff_pruned2++;
+		  
+		}
 	    }
+	  
+	  methodM_eff_prunedTOT = methodM_eff_pruned1 + methodM_eff_pruned2;
+	  methodPTjet_eff_prunedTOT = methodPTjet_eff_pruned1 + methodPTjet_eff_pruned2; 
+	  
 	}
-
-      methodM_eff_prunedTOT = methodM_eff_pruned1 + methodM_eff_pruned2;
-      methodPTjet_eff_prunedTOT = methodPTjet_eff_pruned1 + methodPTjet_eff_pruned2; 
-
+      
       // check efficiency for methodPT
-
      
       Deltabb_eta_m = ZZEta + BESTpair_methodM_ETA;    
       Deltabb_phi_m = ZZPhi - BESTpair_methodM_PHI;
@@ -702,11 +708,13 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
       Deltabb_phi_pt = ZZPhi - BESTpair_methodPTjet_PHI;
 
       Float_t histo[nHisto];
+
+      bool SHOW =  ( (ZZMass > 135) || (ZZMass < 115) ) || (!DOBLINDHISTO) ;
       
       for(int v = 0; v < nHisto; v++)
 	{
 	  string histoString = myHisto1D[v].Name.c_str();
-	  if      (histoString == "M4L") histo[v] = ZZMass;
+	  if      (histoString == "M4L" && ( !ISDATA || SHOW ) ) histo[v] = ZZMass;
 	  else if (histoString == "MZ1") histo[v] = Z1Mass;
 	  else if (histoString == "MZ2") histo[v] = Z2Mass;
 	  else if (histoString == "pt4L") histo[v] = ZZPt;
@@ -733,18 +741,18 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
  	  else if (histoString == "methodM_ETA") histo[v] = BESTpair_methodM_ETA;
  	  else if (histoString == "methodM_PHI") histo[v] = BESTpair_methodM_PHI;
 	  else if (histoString == "methodM_Binfo") histo[v] = BESTpair_methodM_Binfo;
-	  else if (histoString == "methodM_Pruned1") histo[v] = methodM_eff_pruned1;
-	  else if (histoString == "methodM_Pruned2") histo[v] = methodM_eff_pruned2;
-	  else if (histoString == "methodM_PrunedTOT") histo[v] = methodM_eff_prunedTOT;
-	  else if (histoString == "methodPTjet_Pruned1") histo[v] = methodPTjet_eff_pruned1;
-	  else if (histoString == "methodPTjet_Pruned2") histo[v] = methodPTjet_eff_pruned2;
-	  else if (histoString == "methodPTjet_PrunedTOT") histo[v] = methodPTjet_eff_prunedTOT;
+	  else if (histoString == "methodM_Pruned1" && !ISDATA ) histo[v] = methodM_eff_pruned1;
+	  else if (histoString == "methodM_Pruned2" && !ISDATA ) histo[v] = methodM_eff_pruned2;
+	  else if (histoString == "methodM_PrunedTOT" && !ISDATA ) histo[v] = methodM_eff_prunedTOT;
+	  else if (histoString == "methodPTjet_Pruned1" && !ISDATA ) histo[v] = methodPTjet_eff_pruned1;
+	  else if (histoString == "methodPTjet_Pruned2" && !ISDATA ) histo[v] = methodPTjet_eff_pruned2;
+	  else if (histoString == "methodPTjet_PrunedTOT" && !ISDATA ) histo[v] = methodPTjet_eff_prunedTOT;
 	  else if (histoString == "methodBM_M") histo[v] = BESTpair_methodBM_M;
           else if (histoString == "methodBM_PT") histo[v] = BESTpair_methodBM_PT;
           else if (histoString == "methodBM_ETA") histo[v] = BESTpair_methodBM_ETA;
           else if (histoString == "methodBM_PHI") histo[v] = BESTpair_methodBM_PHI;
           else if (histoString == "methodBM_Binfo") histo[v] = BESTpair_methodBM_Binfo;
-	  else if (histoString == "methodBPT_M") histo[v] = BESTpair_methodBPT_M;
+	  else if (histoString == "methodBPT_M" && SHOW ) histo[v] = BESTpair_methodBPT_M;
           else if (histoString == "methodBPT_PT") histo[v] = BESTpair_methodBPT_PT;
           else if (histoString == "methodBPT_ETA") histo[v] = BESTpair_methodBPT_ETA;
           else if (histoString == "methodBPT_PHI") histo[v] = BESTpair_methodBPT_PHI;
@@ -791,33 +799,36 @@ void ZZbb_analysis()
 {
 
   double lumi = 140; // full Run2 Lumi
+  if (DOBLINDHISTO) lumi = 59.74;
+  std::cout << "Lumi: " << lumi << endl;
 
-  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
-  //  string inputFilePath = "/eos/user/a/acappati/samples_4lX/190626/";
-  TString inputFileName[] = {"HH4lbb",
-                            "ggH125",
-			    "VBFH125",
-			    "WplusH125",
-			    "WminusH125",
-			    "ZH125",
-			    "bbH125",
-			    "ttH125",
-			    // "ggTo4e_Contin_MCFM701",
-			    // "ggTo4mu_Contin_MCFM701",
-			    // "ggTo4tau_Contin_MCFM701",
-			    // "ggTo2e2mu_Contin_MCFM701",
-			    // "ggTo2e2tau_Contin_MCFM701",
-			    // "ggTo2mu2tau_Contin_MCFM701",
-			    "ZZTo4lext1",
-			    "TTZJets_M10_MLMext1",
-			    "TTZToLL_M1to1O_MLM",
-			    "TTWJetsToLNu",
-                            //"DYJetsToLL_M50",
-                            //"TTTo2L2Nu",
+  //TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
+  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190626/";
+  TString inputFileName[] = {//"HH4lbb",
+			     //"ggH125",
+			     //"VBFH125",
+			     //"WplusH125",
+			     //"WminusH125",
+			     //"ZH125",
+			     //"bbH125",
+			     //"ttH125",
+                             "ggTo4e_Contin_MCFM701",
+			     "ggTo4mu_Contin_MCFM701",
+			     "ggTo4tau_Contin_MCFM701",
+			     "ggTo2e2mu_Contin_MCFM701",
+			     "ggTo2e2tau_Contin_MCFM701",
+			     "ggTo2mu2tau_Contin_MCFM701",
+			     //"ZZTo4lext1",
+			     //"TTZJets_M10_MLMext1",
+			     //"TTZToLL_M1to1O_MLM",
+			     //"TTWJetsToLNu",
+                             //"DYJetsToLL_M50",
+                             //"TTTo2L2Nu",
+			     //"AllData"
                             };
 
   size_t nInputFiles = sizeof(inputFileName)/sizeof(inputFileName[0]);
-  cout<<nInputFiles<<endl;
+  cout<< "number of input files: " << nInputFiles<<endl;
 
   string outputFilePath = "histos_4lbb";
   gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
