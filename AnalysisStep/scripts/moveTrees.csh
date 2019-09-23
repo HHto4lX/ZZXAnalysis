@@ -88,7 +88,7 @@ rmdir ${SETNAME} # If any of the above fails (eg because a sample was already pr
 if ($MERGEDATA16 || $MERGEDATA17 || $MERGEDATA18) then
     mkdir AllData
     echo "Merging data trees ..."
-    if ($MERGEDATA16) hadd AllData/ZZXAnalysis2016.root *2016*/ZZXAnalysis.root >&! haddlog_${SETNAME}_mergingData.txt
+    if ($MERGEDATA16) hadd AllData/ZZXAnalysis.root *2016*/ZZXAnalysis.root >&! haddlog_${SETNAME}_mergingData.txt
     if ($MERGEDATA17) hadd AllData/ZZXAnalysis.root *2017*/ZZXAnalysis.root >&! haddlog_${SETNAME}_mergingData.txt
     if ($MERGEDATA18) hadd AllData/ZZXAnalysis.root *2018*/ZZXAnalysis.root >&! haddlog_${SETNAME}_mergingData.txt
 endif

@@ -222,9 +222,13 @@ for name in namelist :
 
     hs = THStack('hs','')
 
+#    integral_fondi = 0.
+
     # TTW
     histos_TTWJetsToLNu[i].SetFillColor(kBlue+3)
     histos_TTWJetsToLNu[i].SetLineColor(kBlack)
+#    histos_TTWJetsToLNu[i].Rebin(6)
+#    integral_fondi += histos_TTWJetsToLNu[i].Integral()
     hs.Add(histos_TTWJetsToLNu[i])    
     
     # gg->ZZ
@@ -234,9 +238,10 @@ for name in namelist :
     histo_ggZZ.Add(histos_ggTo2e2mu_Contin_MCFM701[i])
     histo_ggZZ.Add(histos_ggTo2e2tau_Contin_MCFM701[i])
     histo_ggZZ.Add(histos_ggTo2mu2tau_Contin_MCFM701[i])
-
     histo_ggZZ.SetFillColor(kAzure-3)
     histo_ggZZ.SetLineColor(kBlue+2)
+#    histo_ggZZ.Rebin(6)
+#    integral_fondi += histo_ggZZ.Integral()
     hs.Add(histo_ggZZ)
 
     # TTZ
@@ -244,12 +249,16 @@ for name in namelist :
     histo_TTZ.Add(histos_TTZToLL_M1to10_MLM[i])
     histo_TTZ.SetFillColor(kGreen-2)
     histo_TTZ.SetLineColor(kGreen+4)
+#    histo_TTZ.Rebin(6)
+#    integral_fondi += histo_TTZ.Integral()
     hs.Add(histo_TTZ)
 
 
     # qq->ZZ
     histos_ZZTo4lext1[i].SetFillColor(kAzure+6)
     histos_ZZTo4lext1[i].SetLineColor(kAzure-6)
+#    histos_ZZTo4lext1[i].Rebin(6)
+#    integral_fondi += histos_ZZTo4lext1[i].Integral()
     hs.Add(histos_ZZTo4lext1[i])
 
 
@@ -263,26 +272,36 @@ for name in namelist :
     histo_SMHiggs.Add(histos_ttH125[i])
     histo_SMHiggs.SetFillColor(kViolet+6)
     histo_SMHiggs.SetLineColor(kViolet+7)
+#    histo_SMHiggs.Rebin(6)
+#    integral_fondi += histo_SMHiggs.Integral()
     hs.Add(histo_SMHiggs)
 
 
     # HH->4lbb signal
     histos_HH4lbb[i].SetLineColor(kRed)
-    histos_HH4lbb[i].SetLineWidth(3)
+    histos_HH4lbb[i].SetLineWidth(2)
+#    histos_HH4lbb[i].Rebin(6)
     integral = histos_HH4lbb[i].Integral();
     print 'integrale ' 
     print integral
-    #hs.Add(histos_HH4lbb[i])
     histos_HH4lbb[i].Scale(integral * 1000.) 
 
     
     # ALL DATA
     histos_AllData[i].SetMarkerColor(kBlack)
     histos_AllData[i].SetMarkerStyle(20)
+#    histos_AllData[i].Rebin(6)
    
-    histos_AllData[i].Draw('p')  
-    hs.Draw('histosame')
+
+    # Draw all
+    hs.SetMaximum(1.5 * max(hs.GetMaximum(),histos_AllData[i].GetMaximum()));
+    hs.Draw('histo')
     histos_HH4lbb[i].Draw('histosame')
+    histos_AllData[i].Draw('samep')  
+
+    # print "-----------------"
+    # print "fondi: " , integral_fondi
+    # print "dati: ", histos_AllData[i].Integral()
 
 
     hs.GetXaxis().SetLabelFont(43)
@@ -298,7 +317,7 @@ for name in namelist :
 
     # legend
     legend = TLegend(0.74,0.64,0.94,0.87)
-    legend.AddEntry(histos_HH4lbb[i],                "HH->4lbb", "f")
+    legend.AddEntry(histos_HH4lbb[i],                "HH->4lbb x1000", "f")
     legend.AddEntry(histo_SMHiggs,                   "SM Higgs", "f")
     legend.AddEntry(histos_ZZTo4lext1[i],            "qq->ZZ",   "f")
     legend.AddEntry(histo_TTZ,                       "TTZ",      "f")
@@ -307,7 +326,7 @@ for name in namelist :
     legend.SetFillColor(kWhite)
     legend.SetLineColor(kBlack)
     legend.SetTextFont(43)
-    legend.SetTextSize(20)
+    #legend.SetTextSize(20)
     legend.Draw()
 
     canvas.Update()
