@@ -56,18 +56,24 @@ struct Histo1D
   bool isLogy;
 };
 
-const int nHisto = 35;
+const int nHisto = 41;
 
 Histo1D myHisto1D[nHisto] = {
+  {"M4L_CR4Lonly", "m_{4l} (GeV)", "Events / 5 GeV", "", 70, 1070, 200, 1, 0},  
+  {"MZ1_CR4Lonly", "m_{Z1} (GeV)", "Events / 2 GeV", "", 40, 120, 40, 0, 0},  
+  {"MZ2_CR4Lonly", "m_{Z2} (GeV)", "Events / 2 GeV", "", 12, 120, 54, 0, 0}, 
+  {"pt4L_CR4Lonly", "p_{T}^{4l}", "Events / 7 GeV", "", 0, 700, 100, 0, 0}, 
+  {"eta4L_CR4Lonly", "#eta^{4l}", "Events", "", -4, 4, 40, 0, 0}, 
+  {"phi4L_CR4Lonly", "#phi^{4l}", "Events", "", -4, 4, 40, 0, 0},
   {"NJets","# jets", "Events", "", 0, 20, 20, 0, 0}, 
   {"NJetsnoB","# jets not b-tagged", "Events", "", 0, 20, 20, 0, 0}, 
   {"NBJets","# b-jets", "Events", "", 0, 20, 20, 0, 0}, 
-  {"M4L", "m_{4l} (GeV)", "Events / 5 GeV", "", 70, 350, 56, 0, 0},  
+  {"M4L", "m_{4l} (GeV)", "Events / 10 GeV", "", 70, 1070, 100, 1, 0},  
   {"MZ1", "m_{Z1} (GeV)", "Events / 2 GeV", "", 40, 120, 40, 0, 0},  
   {"MZ2", "m_{Z2} (GeV)", "Events / 2 GeV", "", 12, 120, 54, 0, 0}, 
-  {"pt4L", "p_{T}^{4l}", "Events / 7 GeV", "", 0, 700, 100, 0, 0}, 
-  {"eta4L", "#eta^{4l}", "Events", "", -4, 4, 40, 0, 0}, 
-  {"phi4L", "#phi^{4l}", "Events", "", -4, 4, 40, 0, 0}, 
+  {"pt4L", "p_{T}^{4l}", "Events / 28 GeV", "", 0, 700, 25, 0, 0}, 
+  {"eta4L", "#eta^{4l}", "Events", "", -4, 4, 20, 0, 0}, 
+  {"phi4L", "#phi^{4l}", "Events", "", -4, 4, 20, 0, 0}, 
   {"etabb_m", "#eta^{bb}", "Events", "", -4, 4, 40, 0, 0},
   {"phibb_m", "#phi^{bb}", "Events", "", -4, 4, 40, 0, 0},
   {"etabb_pt", "#eta^{bb}", "Events", "", -4, 4, 40, 0, 0},
@@ -84,8 +90,8 @@ Histo1D myHisto1D[nHisto] = {
   {"methodM_Binfo", "jet b-tag", "Events", "", -1, 4, 5, 0, 0},
   {"methodBM_M", "m_{pairJ}", "Events", "", 0, 500, 100, 0, 0},  
   {"methodBM_PT", "p_{T}^{pairJ}", "Events", "", 0, 1000, 200, 0, 0},
-  {"methodBPT_M", "m^{jj}", "Events / 10 GeV", "", 0, 500, 50, 0, 0},  
-  {"methodBPT_PT", "p_{T}^{jj}", "Events / 7 GeV", "", 0, 700, 100, 0, 0},
+  {"methodBPT_M", "m^{jj}", "Events / 20 GeV", "", 0, 500, 25, 0, 0},  
+  {"methodBPT_PT", "p_{T}^{jj}", "Events / 28 GeV", "", 0, 700, 25, 0, 0},
   {"GENRECOeff_methodPTjet", "GEN-RECO efficiency ptjet method", "Events", "", 0, 3, 3, 0, 0},
   {"GENRECOeff_methodM", "GEN-RECO efficiency madd method", "Events", "", 0, 3, 3, 0, 0},
   {"methodM_Pruned1", "Pruned gen efficiency", "Events", "", 0, 5, 5, 0, 0},
@@ -101,6 +107,7 @@ Histo1D myHisto1D[nHisto] = {
 void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 {
 
+  bool GEN = false;
   bool ISDATA = false;
   if ( inputFileMC.Contains("AllData")) ISDATA = true ;
 
@@ -270,18 +277,18 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   inputTree->SetBranchAddress("JetMass", &JetMass);
   inputTree->SetBranchAddress("JetPhi",  &JetPhi);
   inputTree->SetBranchAddress("JetIsBtagged",  &JetIsBTagged);
-  if (!ISDATA) inputTree->SetBranchAddress("GENjetParentID",  &GENjetParentID);
-  if (!ISDATA) inputTree->SetBranchAddress("prunedGenPartEta", &prunedGenPartEta );
-  if (!ISDATA) inputTree->SetBranchAddress("prunedGenPartPhi", &prunedGenPartPhi );
-  if (!ISDATA) inputTree->SetBranchAddress("prunedGenPartPt", &prunedGenPartPt );
-  if (!ISDATA) inputTree->SetBranchAddress("prunedGenPartMass", &prunedGenPartMass );
-  if (!ISDATA) inputTree->SetBranchAddress("prunedGenPartID", &prunedGenPartID );
-  if (!ISDATA) inputTree->SetBranchAddress("prunedGenMotherID", &prunedGenMotherID );
-  if(inputFileMC.Contains("ggTo"))    //ggZZ samples
+  if (GEN) inputTree->SetBranchAddress("GENjetParentID",  &GENjetParentID);
+  if (GEN) inputTree->SetBranchAddress("prunedGenPartEta", &prunedGenPartEta );
+  if (GEN) inputTree->SetBranchAddress("prunedGenPartPhi", &prunedGenPartPhi );
+  if (GEN) inputTree->SetBranchAddress("prunedGenPartPt", &prunedGenPartPt );
+  if (GEN) inputTree->SetBranchAddress("prunedGenPartMass", &prunedGenPartMass );
+  if (GEN) inputTree->SetBranchAddress("prunedGenPartID", &prunedGenPartID );
+  if (GEN) inputTree->SetBranchAddress("prunedGenMotherID", &prunedGenMotherID );
+  if(inputFileMC.Contains("ggTo"))    //ggZZ samples                                                                                                                                                        
     {
       inputTree->SetBranchAddress("KFactor_QCD_ggZZ_Nominal", &KFactor_QCD_ggZZ_Nominal);
     }
-  if(inputFileMC.Contains("ZZto4l"))   //qqZZ samples
+  if(inputFileMC.Contains("ZZTo4l"))   //qqZZ samples                                                                                                                                                       
     {
       inputTree->SetBranchAddress("KFactor_EW_qqZZ", &KFactor_EW_qqZZ);
       inputTree->SetBranchAddress("KFactor_QCD_qqZZ_dPhi", &KFactor_QCD_qqZZ_dPhi);
@@ -314,9 +321,11 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
       if( !(ZZsel >= 90) ) continue;
 
       Float_t kfactor = 1.;
-      if(inputFileMC.Contains("ggTo"))       { kfactor = KFactor_EW_qqZZ * KFactor_QCD_qqZZ_M; }   //ggZZ samples
-      else if(inputFileMC.Contains("ZZto4l")){ kfactor = KFactor_QCD_ggZZ_Nominal; }               //qqZZ samples
-      
+      // qqZZ sample                                                                                                                                                                                        
+      if(inputFileMC.Contains("ZZTo4l")) { kfactor = KFactor_EW_qqZZ * KFactor_QCD_qqZZ_M; }
+      //ggZZ samples                                                                                                                                                                                        
+      else if(inputFileMC.Contains("ggTo")) { kfactor = KFactor_QCD_ggZZ_Nominal; }
+
       Double_t eventWeight = 0.;
       if (!ISDATA) eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight ;
       else eventWeight = 1.;
@@ -362,6 +371,28 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
       //      if (ZZMass < 115 || ZZMass > 135) continue;
 
       //      std::cout << "ZZ Mass: " << ZZMass << endl;
+
+
+      Float_t histo[nHisto];
+
+      bool SHOW =  ( (ZZMass > 135) || (ZZMass < 115) ) || (!DOBLINDHISTO) ;
+
+      for(int v = 0; v < nHisto; v++)
+	{
+	  string histoString = myHisto1D[v].Name.c_str();
+	  if      (histoString == "M4L_CR4Lonly" && ( !ISDATA || SHOW ) ) histo[v] = ZZMass;
+	  else if (histoString == "MZ1_CR4Lonly") histo[v] = Z1Mass;
+	  else if (histoString == "MZ2_CR4Lonly") histo[v] = Z2Mass;
+	  else if (histoString == "pt4L_CR4Lonly") histo[v] = ZZPt;
+	  else if (histoString == "eta4L_CR4Lonly") histo[v] = ZZEta;
+	  else if (histoString == "phi4L_CR4Lonly") histo[v] = ZZPhi;
+	  else continue;
+	  	
+	  h1[v][currentFinalState]->Fill(histo[v], eventWeight);
+	}
+
+
+
       // H(bb) selection
       
       vector<TLorentzVector> JetVec; // TLorentz vector with all Jets per Event
@@ -653,7 +684,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 
 	}
 
-      if (!ISDATA)
+      if (GEN)
 	{
 	  for (UInt_t pr = 0; pr < prunedGenPartEta->size(); pr ++)
 	    {
@@ -706,11 +737,9 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
       Deltabb_phi_m = ZZPhi - BESTpair_methodM_PHI;
       Deltabb_eta_pt = ZZEta + BESTpair_methodPTjet_ETA;
       Deltabb_phi_pt = ZZPhi - BESTpair_methodPTjet_PHI;
+    
 
-      Float_t histo[nHisto];
 
-      bool SHOW =  ( (ZZMass > 135) || (ZZMass < 115) ) || (!DOBLINDHISTO) ;
-      
       for(int v = 0; v < nHisto; v++)
 	{
 	  string histoString = myHisto1D[v].Name.c_str();
@@ -741,12 +770,12 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
  	  else if (histoString == "methodM_ETA") histo[v] = BESTpair_methodM_ETA;
  	  else if (histoString == "methodM_PHI") histo[v] = BESTpair_methodM_PHI;
 	  else if (histoString == "methodM_Binfo") histo[v] = BESTpair_methodM_Binfo;
-	  else if (histoString == "methodM_Pruned1" && !ISDATA ) histo[v] = methodM_eff_pruned1;
-	  else if (histoString == "methodM_Pruned2" && !ISDATA ) histo[v] = methodM_eff_pruned2;
-	  else if (histoString == "methodM_PrunedTOT" && !ISDATA ) histo[v] = methodM_eff_prunedTOT;
-	  else if (histoString == "methodPTjet_Pruned1" && !ISDATA ) histo[v] = methodPTjet_eff_pruned1;
-	  else if (histoString == "methodPTjet_Pruned2" && !ISDATA ) histo[v] = methodPTjet_eff_pruned2;
-	  else if (histoString == "methodPTjet_PrunedTOT" && !ISDATA ) histo[v] = methodPTjet_eff_prunedTOT;
+	  else if (histoString == "methodM_Pruned1" && GEN ) histo[v] = methodM_eff_pruned1;
+	  else if (histoString == "methodM_Pruned2" && GEN ) histo[v] = methodM_eff_pruned2;
+	  else if (histoString == "methodM_PrunedTOT" && GEN ) histo[v] = methodM_eff_prunedTOT;
+	  else if (histoString == "methodPTjet_Pruned1" && GEN ) histo[v] = methodPTjet_eff_pruned1;
+	  else if (histoString == "methodPTjet_Pruned2" && GEN ) histo[v] = methodPTjet_eff_pruned2;
+	  else if (histoString == "methodPTjet_PrunedTOT" && GEN ) histo[v] = methodPTjet_eff_prunedTOT;
 	  else if (histoString == "methodBM_M") histo[v] = BESTpair_methodBM_M;
           else if (histoString == "methodBM_PT") histo[v] = BESTpair_methodBM_PT;
           else if (histoString == "methodBM_ETA") histo[v] = BESTpair_methodBM_ETA;
@@ -802,29 +831,29 @@ void ZZbb_analysis()
   if (DOBLINDHISTO) lumi = 59.74;
   std::cout << "Lumi: " << lumi << endl;
 
-  //TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
-  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190626/";
-  TString inputFileName[] = {//"HH4lbb",
-			     //"ggH125",
-			     //"VBFH125",
-			     //"WplusH125",
-			     //"WminusH125",
-			     //"ZH125",
-			     //"bbH125",
-			     //"ttH125",
-                             "ggTo4e_Contin_MCFM701",
-			     "ggTo4mu_Contin_MCFM701",
-			     "ggTo4tau_Contin_MCFM701",
-			     "ggTo2e2mu_Contin_MCFM701",
-			     "ggTo2e2tau_Contin_MCFM701",
-			     "ggTo2mu2tau_Contin_MCFM701",
-			     //"ZZTo4lext1",
-			     //"TTZJets_M10_MLMext1",
-			     //"TTZToLL_M1to1O_MLM",
-			     //"TTWJetsToLNu",
-                             //"DYJetsToLL_M50",
-                             //"TTTo2L2Nu",
-			     //"AllData"
+  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
+  //TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190924/";
+  //TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190626/";
+  TString inputFileName[] = {"HH4lbb",
+			     "ggH125",
+			     "VBFH125",
+			     "WplusH125",
+			     "WminusH125",
+			     "ZH125",
+			     "bbH125",
+			     "ttH125",
+                             //"ggTo4e_Contin_MCFM701",
+			     //"ggTo4mu_Contin_MCFM701",
+			     //"ggTo4tau_Contin_MCFM701",
+			     //"ggTo2e2mu_Contin_MCFM701",
+			     //"ggTo2e2tau_Contin_MCFM701",
+			     //"ggTo2mu2tau_Contin_MCFM701",
+			     "ZZTo4lext1",
+			     "TTZJets_M10_MLMext1",
+			     "TTZToLL_M1to1O_MLM",
+			     "TTWJetsToLNu",
+			     //"DY2JetsToLL_M50",
+			     "AllData"
                             };
 
   size_t nInputFiles = sizeof(inputFileName)/sizeof(inputFileName[0]);
