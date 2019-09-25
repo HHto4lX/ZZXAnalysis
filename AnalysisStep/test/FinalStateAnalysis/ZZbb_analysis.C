@@ -408,7 +408,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
       for (UInt_t j = 0; j < JetPt->size(); j++)
 	{
 	  btag = 0;
-  	  if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 30) ) continue; // pt cut 20GeV from ntuplizer reduced to 30
+  	  if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 30 ) ) continue; // pt cut 20GeV from ntuplizer reduced to 30
 	  
 	  njet++;
 	  if (JetIsBTaggedWithSF->at(j) >0) 
