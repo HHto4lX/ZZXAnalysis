@@ -152,7 +152,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   Float_t Deltabb_eta_pt = 0;
   Float_t Deltabb_phi_pt = 0;
  
-  vector<Float_t> *JetIsBTagged = 0;
+  vector<Float_t> *JetIsBTaggedWithSF = 0;
   vector<Float_t> *JetPt     = 0;
   vector<Float_t> *JetEta    = 0;
   vector<Float_t> *JetPhi    = 0;
@@ -276,7 +276,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   inputTree->SetBranchAddress("JetEta", &JetEta);
   inputTree->SetBranchAddress("JetMass", &JetMass);
   inputTree->SetBranchAddress("JetPhi",  &JetPhi);
-  inputTree->SetBranchAddress("JetIsBtagged",  &JetIsBTagged);
+  inputTree->SetBranchAddress("JetIsBtaggedWithSF",  &JetIsBTaggedWithSF);
   if (GEN) inputTree->SetBranchAddress("GENjetParentID",  &GENjetParentID);
   if (GEN) inputTree->SetBranchAddress("prunedGenPartEta", &prunedGenPartEta );
   if (GEN) inputTree->SetBranchAddress("prunedGenPartPhi", &prunedGenPartPhi );
@@ -408,10 +408,10 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
       for (UInt_t j = 0; j < JetPt->size(); j++)
 	{
 	  btag = 0;
-  	  if ( fabs ( JetEta->at(j) ) > 2.4 ) continue; // pt cut 20GeV from ntuplizer
+  	  if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 30) ) continue; // pt cut 20GeV from ntuplizer reduced to 30
 	  
 	  njet++;
-	  if (JetIsBTagged->at(j) >0) 
+	  if (JetIsBTaggedWithSF->at(j) >0) 
 	    {
 	      btag = 1;
 	      nbjet ++;
@@ -419,7 +419,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 	  else njet_noB++;
 	  if (VERBOSE)
 	    {
-	      std::cout << "Jet is: " << JetIsBTagged->at(j) << endl;
+	      std::cout << "Jet is: " << JetIsBTaggedWithSF->at(j) << endl;
 	      std::cout << "btag  : " << btag << endl;
 	    }
 	  TLorentzVector temp;
@@ -558,6 +558,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 	{
 
 	  if (VERBOSE) std::cout << "loop i : " << p << endl;
+
 
 	  if ( JetPairBinfo[p] > 0 )
 	    {
@@ -831,30 +832,29 @@ void ZZbb_analysis()
   if (DOBLINDHISTO) lumi = 59.74;
   std::cout << "Lumi: " << lumi << endl;
 
-  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
-  //TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190924/";
-  //TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190626/";
-  TString inputFileName[] = {"HH4lbb",
-			     "ggH125",
-			     "VBFH125",
-			     "WplusH125",
-			     "WminusH125",
-			     "ZH125",
-			     "bbH125",
-			     "ttH125",
-                             //"ggTo4e_Contin_MCFM701",
-			     //"ggTo4mu_Contin_MCFM701",
-			     //"ggTo4tau_Contin_MCFM701",
-			     //"ggTo2e2mu_Contin_MCFM701",
-			     //"ggTo2e2tau_Contin_MCFM701",
-			     //"ggTo2mu2tau_Contin_MCFM701",
-			     "ZZTo4lext1",
-			     "TTZJets_M10_MLMext1",
-			     "TTZToLL_M1to1O_MLM",
-			     "TTWJetsToLNu",
-			     //"DY2JetsToLL_M50",
-			     "AllData"
-                            };
+  //TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
+  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190626/";
+
+  TString inputFileName[] = {// "HH4lbb",
+			     // "ggH125",
+			     // "VBFH125",
+			     // "WplusH125",
+			     // "WminusH125",
+			     // "ZH125",
+			     // "bbH125",
+			     // "ttH125",
+ 			     // "ZZTo4lext1",
+			     // "TTZJets_M10_MLMext1",
+			     // "TTZToLL_M1to1O_MLM",
+			     // "TTWJetsToLNu",
+			     // "AllData",
+                             "ggTo4e_Contin_MCFM701",
+ 			     "ggTo4mu_Contin_MCFM701",
+			     "ggTo4tau_Contin_MCFM701",
+			     "ggTo2e2mu_Contin_MCFM701",
+			     "ggTo2e2tau_Contin_MCFM701",
+			     "ggTo2mu2tau_Contin_MCFM701",
+                           };
 
   size_t nInputFiles = sizeof(inputFileName)/sizeof(inputFileName[0]);
   cout<< "number of input files: " << nInputFiles<<endl;
