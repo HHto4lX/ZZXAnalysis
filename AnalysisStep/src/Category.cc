@@ -17,7 +17,7 @@ using namespace std;
 extern "C" int categoryHH( short  nJets20, //FIXME: change name
                            float* JetPt,
                            float* JetEta,
-                           float* JetIsBTagged,
+                           float* JetIsBTaggedWithSF,
                            short  nExtraLep,
                            float* ExtraLepPt,
                            float* ExtraLepEta,
@@ -32,10 +32,10 @@ extern "C" int categoryHH( short  nJets20, //FIXME: change name
   for(int i = 0; i < nJets20; i++)
   {
     if(fabs(JetEta[i]) > 2.4 ) continue;
-    if(JetPt[i] < 20. ) continue;
+    if(JetPt[i] < 30. ) continue;
 
     nGoodJets++;
-    if(JetIsBTagged[i] > 0) { nBtaggedJets++; }
+    if(JetIsBTaggedWithSF[i] > 0) { nBtaggedJets++; }
   } 
 
   // check on extraLep variables

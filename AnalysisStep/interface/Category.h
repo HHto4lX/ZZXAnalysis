@@ -14,10 +14,10 @@ enum CategoryHH {
  HH4ltautauTagged     = 4
 };
  
-extern "C" int categoryHH( short  nJets20,
+extern "C" int categoryHH( short  nJets20, //FIXME
                            float* JetPt,
                            float* JetEta,
-                           float* JetIsBTagged,
+                           float* JetIsBTaggedWithSF,
                            short  nExtraLep,
                            float* ExtraLepPt,
                            float* ExtraLepEta,

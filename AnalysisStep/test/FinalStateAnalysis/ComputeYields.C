@@ -31,6 +31,7 @@
 #include "TTree.h"
 #include <vector>
 #include "TLorentzVector.h"
+#include "map"
 
 #include "ZZXAnalysis/AnalysisStep/src/Category.cc"
 
@@ -58,7 +59,6 @@ string sCategory[nCat] = {
   "HH4lgammagammaTagged",
   "HH4ltautauTagged"
 };
-
 
   
 void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
@@ -315,9 +315,42 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   {
     std::cout << "YIELD "<< sCategory[c] << " " << h1[4][c]->GetBinContent(1) << endl; 
   }
+
+  fOut->Close(); 
     
 } //end doHisto
 
+
+void  doCount(TString inputfile, TString inputSample, std::map<TString,std::vector<double> > & map_chan, std::map<TString,std::vector<TString> > & map_names, double counter_WH[4], double counter_TTZ[4], double counter_ggZZ[4])
+{
+  TFile * inputFile =  TFile::Open( inputfile );
+  
+  enum FinalState {fs_4mu=0, fs_4e=1, fs_2e2mu=2, fs_4L=3};  // 4mu, 4e, 2e2mu, 2mu2e
+  const int nFinalState = 4;
+  string FinalState[nFinalState] = {"4mu", "4e","2e2mu", "4L"};
+
+  for (int nF = 0; nF < nFinalState; nF++ )
+    {
+      std::string histo_name = "h1_" + FinalState[nF] + "_HH4lbbTagged";
+      TH1F *h_temp = (TH1F*)inputFile->Get( histo_name.c_str() );
+      
+      double counter = h_temp->GetBinContent(1);
+      
+      if (inputfile.Contains("TTZToLL") || inputfile.Contains("TTZJets")) counter_TTZ[nF] += counter;
+      else if (inputfile.Contains("WplusH") || inputfile.Contains("WminusH")) counter_WH[nF] += counter;
+      else if (inputfile.Contains("ggTo") ) counter_ggZZ[nF] += counter;
+
+      else 
+	{
+	  map_chan[FinalState[nF]].push_back(counter);
+	  map_names[FinalState[nF]].push_back(inputSample);
+	}
+    }
+  
+  
+  inputFile->Close();
+  
+} //end doCount
 
 void ComputeYields() 
 {
@@ -326,6 +359,8 @@ void ComputeYields()
   //  double lumi = 35.92; // 2016 data
   double lumi = 59.74; // 2018 data 
 
+  //TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190626/";
+
   TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
   TString inputFileName[] = {"HH4lbb",
                             // "HH4lww",
@@ -333,25 +368,23 @@ void ComputeYields()
                             // "HH4ltautau",
                             "ggH125",
 			    "VBFH125",
-			    "WplusH125",
-			    "WminusH125",
 			    "ZH125",
 			    "bbH125",
 			    "ttH125",
-			    // "ggTo4e_Contin_MCFM701",
-			    // "ggTo4mu_Contin_MCFM701",
+			     "ZZTo4lext1",
+			     "TTWJetsToLNu",
+			    "WplusH125",
+			    "WminusH125",
+			     "TTZJets_M10_MLMext1",
+			     "TTZToLL_M1to1O_MLM",
+			     //"ggTo4e_Contin_MCFM701",
+			     //"ggTo4mu_Contin_MCFM701",
 			    // "ggTo4tau_Contin_MCFM701",
 			    // "ggTo2e2mu_Contin_MCFM701",
 			    // "ggTo2e2tau_Contin_MCFM701",
 			    // "ggTo2mu2tau_Contin_MCFM701",
-			    "ZZTo4lext1",
-			    "TTZJets_M10_MLMext1",
-			    "TTZToLL_M1to1O_MLM",
-			    "TTWJetsToLNu",
-                            //"DYJetsToLL_M50",
-                            //"TTTo2L2Nu",
-			    //"AllData"
                             };
+
 
   size_t nInputFiles = sizeof(inputFileName)/sizeof(inputFileName[0]);
   cout<<nInputFiles<<endl;
@@ -359,11 +392,60 @@ void ComputeYields()
   string outputFilePath = "Yields_histos";
   gSystem->Exec(("mkdir -p "+ outputFilePath).c_str()); // create output dir
   
+  std::ofstream outFile_4mubb("Yields_forCombine_4mubb.txt");
+  std::ofstream outFile_4ebb("Yields_forCombine_4ebb.txt");
+  std::ofstream outFile_2e2mubb("Yields_forCombine_2e2mubb.txt");
+  std::ofstream outFile_4Lbb("Yields_forCombine_4Lbb.txt");
 
-  //call function
-  for(UInt_t i=0; i<nInputFiles; i++){
-    cout<<"Processing sample "<<inputFileName[i]<<" ... "<<endl;
-    doHisto(inputFilePath + inputFileName[i] + "/ZZXAnalysis.root" , outputFilePath + "/histos_" + inputFileName[i] + ".root", lumi);
-  }
-  
+  double counter_WH[4] = {0,0,0,0};  
+  double counter_TTZ[4] = {0,0,0,0};
+  double counter_ggZZ[4] = {0,0,0,0};
+
+  // outFile_4mubb << "HH4Lbb\tggH\tVBFH\tZH\tbbH\tttH\tqqZ\tttW\tWH\tttZ\tggZZ\n"; 
+  // outFile_4ebb << "HH4Lbb\tggH\tVBFH\tZH\tbbH\tttH\tqqZ\tttW\tWH\tttZ\tggZZ\n"; 
+  // outFile_2e2mubb << "HH4Lbb\tggH\tVBFH\tZH\tbbH\tttH\tqqZ\tttW\tWH\tttZ\tggZZ\n"; 
+  // outFile_4Lbb << "HH4Lbb\tggH\tVBFH\tZH\tbbH\tttH\tqqZ\tttW\tWH\tttZ\tggZZ\n";
+
+
+  std::map<TString, std::vector<double> > map_chan;
+  std::map<TString, std::vector<TString> > map_names;
+   
+   //call function
+  for(UInt_t i=0; i<nInputFiles; i++)
+    {
+      cout<<"Processing sample "<<inputFileName[i]<<" ... "<<endl;
+      
+      doHisto(inputFilePath + inputFileName[i] + "/ZZXAnalysis.root" , outputFilePath + "/histos_" + inputFileName[i] + ".root", lumi);
+      //doCount(outputFilePath + "/histos_" + inputFileName[i] + ".root", outFile_4mubb, outFile_4ebb, outFile_2e2mubb, outFile_4Lbb, counter_WH, counter_TTZ, counter_ggZZ);
+      doCount(outputFilePath + "/histos_" + inputFileName[i] + ".root", inputFileName[i], map_chan, map_names, counter_WH, counter_TTZ, counter_ggZZ);
+    }
+
+  int sizes = map_names["4mu"].size();
+  for (int i=0; i< sizes; ++i )
+    {
+      outFile_4mubb   << map_names["4mu"][i]   << '\t';
+      outFile_4ebb    << map_names["4e"][i]   << '\t';
+      outFile_2e2mubb << map_names["2e2mu"][i]   << '\t';
+      outFile_4Lbb    << map_names["4L"][i]   << '\t';
+    } 
+  outFile_4mubb   <<  "WH\tTTZ\tggZZ\n";
+  outFile_4ebb    <<  "WH\tTTZ\tggZZ\n";
+  outFile_2e2mubb <<  "WH\tTTZ\tggZZ\n";
+  outFile_4Lbb    <<  "WH\tTTZ\tggZZ\n";
+
+  for (int i=0; i< sizes; ++i ) 
+    {
+      outFile_4mubb   << map_chan["4mu"][i]   << '\t'; 
+      outFile_4ebb    << map_chan["4e"][i]    << '\t';
+      outFile_2e2mubb << map_chan["2e2mu"][i] << '\t';
+      outFile_4Lbb    << map_chan["4L"][i]    << '\t';
+    }  
+  for (int nF = 0; nF < nFinalState; nF++ )
+    {
+      if (nF == 0)  outFile_4mubb << counter_WH[nF] << "\t" << counter_TTZ[nF] << "\t" << counter_ggZZ[nF] << "\n";
+      else if (nF == 1) outFile_4ebb << counter_WH[nF] << "\t" << counter_TTZ[nF] << "\t" << counter_ggZZ[nF] << "\n";
+      else if (nF == 2) outFile_2e2mubb << counter_WH[nF] << "\t" << counter_TTZ[nF] << "\t" << counter_ggZZ[nF] << "\n";
+      else if (nF == 3) outFile_4Lbb << counter_WH[nF] << "\t" << counter_TTZ[nF] << "\t" << counter_ggZZ[nF] << "\n";
+    }
+
 }
