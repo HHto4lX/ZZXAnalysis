@@ -93,7 +93,7 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
 
 
-elif (SAMPLE_TYPE == 2016):
+if (SAMPLE_TYPE == 2016):
     if IsMC:
         process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_TrancheIV_v8', '')
     else:
@@ -175,7 +175,7 @@ process.hltFilterSingleMu.throw  = cms.bool(False) #FIXME: beware of this!
 # MuEG
 
 ### 2016 triggers - final
-elif (LEPTON_SETUP == 2016):
+if (LEPTON_SETUP == 2016):
    process.hltFilterDiEle.HLTPaths = ["HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v*","HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v*","HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v*"]
    process.hltFilterDiMu.HLTPaths = ["HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v*","HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v*","HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v*","HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v*"]
    process.hltFilterMuEle.HLTPaths = ["HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v*","HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v*","HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v*","HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v*","HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v*","HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v*","HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v*","HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v*","HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v*"]
@@ -372,7 +372,7 @@ process.calibratedMuons = cms.EDProducer("KalmanPATMuonCorrector",
                                          )
 
 #--- Set correct identifier for muon corrections
-elif LEPTON_SETUP == 2016: # (KalmanMuonCalibrator, ICHEP 2016) FIXME: still using the version from ICHEP16
+if LEPTON_SETUP == 2016: # (KalmanMuonCalibrator, ICHEP 2016) FIXME: still using the version from ICHEP16
      if IsMC:
          process.calibratedMuons.identifier = cms.string("MC_80X_13TeV")
      else:
