@@ -77,6 +77,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   Int_t nLumi;
   Float_t overallEventWeight;
   Float_t xsec;
+  Float_t weight;
 
   Float_t KFactor_QCD_ggZZ_Nominal;
   Float_t KFactor_EW_qqZZ;
@@ -102,7 +103,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   Float_t Deltabb_eta_pt = 0;
   Float_t Deltabb_phi_pt = 0;
  
-  vector<Float_t> *JetIsBTagged = 0;
+  vector<Float_t> *JetIsBTaggedWithSF = 0;
   vector<Float_t> *JetPt     = 0;
   vector<Float_t> *JetEta    = 0;
   vector<Float_t> *JetPhi    = 0;
@@ -115,7 +116,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   vector<Float_t> *prunedGenPartMass   = 0;
   vector<Float_t> *prunedGenMotherID   = 0;
 
-  Short_t nExtraLep;
+  Short_t nExtraLep = 0;;
   vector<Float_t> *ExtraLepPt = 0;
   vector<Float_t> *ExtraLepEta = 0;
   vector<Int_t> *ExtraLepLepId = 0;
@@ -127,7 +128,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   // variables for categories
   float jetPt[99];        
   float jetEta[99];       
-  float jetIsBTagged[99];
+  float jetIsBTaggedWithSF[99];
   float extraLepPt[99];   
   float extraLepEta[99];  
   int   extraLepLepId[99];  
@@ -149,19 +150,36 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 
   inputFile =  TFile::Open( inputFileMC );
   
-  hCounters = (TH1F*)inputFile->Get("ZZTree/Counters");
-  NGenEvt = (Float_t)hCounters->GetBinContent(1);
-  gen_sumWeights = (Float_t)hCounters->GetBinContent(40);
-  partialSampleWeight = lumi * 1000 / gen_sumWeights;
-  inputTree = (TTree*)inputFile->Get("ZZTree/candTree");
+  if( !(inputFileMC.Contains("Z+X")) )
+    { 
+      //      std::cout << "NOT Z+X" << endl;
+      hCounters = (TH1F*)inputFile->Get("ZZTree/Counters");
+      NGenEvt = (Float_t)hCounters->GetBinContent(1);
+      gen_sumWeights = (Float_t)hCounters->GetBinContent(40);
+      partialSampleWeight = lumi * 1000 / gen_sumWeights;
+      inputTree = (TTree*)inputFile->Get("ZZTree/candTree");
+    }
   
+  else if (inputFileMC.Contains("Z+X"))
+    {
+      inputTree = (TTree*)inputFile->Get("candTree");
+    }
+
   // set address of all branches
-  inputTree->SetBranchAddress("genBR", &genBR);
-  inputTree->SetBranchAddress("RunNumber", &nRun);
-  inputTree->SetBranchAddress("EventNumber", &nEvent);
-  inputTree->SetBranchAddress("LumiNumber", &nLumi);
-  inputTree->SetBranchAddress("overallEventWeight", &overallEventWeight);
-  inputTree->SetBranchAddress("xsec", &xsec);
+  if( !(inputFileMC.Contains("Z+X")) )
+    {
+      //      std::cout << "NOT Z+X" << endl;
+      inputTree->SetBranchAddress("genBR", &genBR);
+      inputTree->SetBranchAddress("RunNumber", &nRun);
+      inputTree->SetBranchAddress("EventNumber", &nEvent);
+      inputTree->SetBranchAddress("LumiNumber", &nLumi);
+      inputTree->SetBranchAddress("overallEventWeight", &overallEventWeight);
+      inputTree->SetBranchAddress("xsec", &xsec);
+    }
+  if( inputFileMC.Contains("Z+X") )
+    {
+      inputTree->SetBranchAddress("weight", &weight);
+    }
   inputTree->SetBranchAddress("ZZsel", &ZZsel);
   inputTree->SetBranchAddress("LepEta", &LepEta);
   inputTree->SetBranchAddress("ZZMass", &ZZMass);  
@@ -176,18 +194,22 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   inputTree->SetBranchAddress("JetEta", &JetEta);
   inputTree->SetBranchAddress("JetMass", &JetMass);
   inputTree->SetBranchAddress("JetPhi",  &JetPhi);
-  inputTree->SetBranchAddress("JetIsBtagged",  &JetIsBTagged);
-  inputTree->SetBranchAddress("nExtraLep", &nExtraLep);
-  inputTree->SetBranchAddress("ExtraLepPt", &ExtraLepPt);
-  inputTree->SetBranchAddress("ExtraLepEta", &ExtraLepEta);
-  inputTree->SetBranchAddress("ExtraLepLepId", &ExtraLepLepId);
-  inputTree->SetBranchAddress("nPhotons", &nPhotons);
-  inputTree->SetBranchAddress("nTaus", &nTaus);
+  inputTree->SetBranchAddress("JetIsBtaggedWithSF",  &JetIsBTaggedWithSF);
+  if( !(inputFileMC.Contains("Z+X")) )
+    {
+      //      std::cout << "NOT Z+X" << endl;
+      inputTree->SetBranchAddress("nExtraLep", &nExtraLep);
+      inputTree->SetBranchAddress("ExtraLepPt", &ExtraLepPt);
+      inputTree->SetBranchAddress("ExtraLepEta", &ExtraLepEta);
+      inputTree->SetBranchAddress("ExtraLepLepId", &ExtraLepLepId);
+      inputTree->SetBranchAddress("nPhotons", &nPhotons);
+      inputTree->SetBranchAddress("nTaus", &nTaus);
+    }
   if(inputFileMC.Contains("ggTo"))    //ggZZ samples
   {
     inputTree->SetBranchAddress("KFactor_QCD_ggZZ_Nominal", &KFactor_QCD_ggZZ_Nominal);
   }
-  if(inputFileMC.Contains("ZZto4l"))   //qqZZ samples
+  if(inputFileMC.Contains("ZZTo4l"))   //qqZZ samples
   {
     inputTree->SetBranchAddress("KFactor_EW_qqZZ", &KFactor_EW_qqZZ);
     inputTree->SetBranchAddress("KFactor_QCD_qqZZ_dPhi", &KFactor_QCD_qqZZ_dPhi);
@@ -198,58 +220,95 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   int entries = inputTree->GetEntries();
   std::cout<<"Processing file: "<< inputFileMC << "\nNumber of entries: " << entries << endl;
   
+      std::cout << "entries: " << entries << endl;
   // --- loop over tree entries
   for (Long64_t entry = 0; entry < entries; entry++)
-    {  
- 
+    { 
       inputTree->GetEntry(entry);
       
-
       if(LepEta->size() != 4)
 	{
 	  cerr << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; stored leptons: "<< LepEta->size() << endl;
 	  continue;
 	}
-      if( !(ZZsel >= 90) ) continue;
-
-
-      Float_t kfactor = 1.;
-      if(inputFileMC.Contains("ggTo"))       { kfactor = KFactor_EW_qqZZ * KFactor_QCD_qqZZ_M; }   //ggZZ samples
-      else if(inputFileMC.Contains("ZZto4l")){ kfactor = KFactor_QCD_ggZZ_Nominal; }               //qqZZ samples
+      if( !(ZZsel >= 0) ) continue;
       
 
-      Double_t eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight ;
-
+      Float_t kfactor = 1.;
+      if(inputFileMC.Contains("ggTo"))       { kfactor = KFactor_QCD_ggZZ_Nominal; }   //ggZZ samples
+      else if(inputFileMC.Contains("ZZTo4l")){ kfactor = KFactor_EW_qqZZ * KFactor_QCD_qqZZ_M; }               //qqZZ samples
+      
+      Double_t eventWeight = 1.;
+      
+      if( !(inputFileMC.Contains("Z+X")) ) 
+      	{ 
+      	  eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight ;
+      	}
+      if( inputFileMC.Contains("Z+X") ) 
+      	{
+      	  eventWeight = weight ;
+      	}
+      
+      
  
       // 4l final state check    
       currentFinalState = -1;
-      if (Z1Flav == -121)
+      if( !(inputFileMC.Contains("Z+X")) )
 	{
-	  if (Z2Flav == -121)
-	    currentFinalState = fs_4e;
-	  else if ( Z2Flav == -169)
-	    currentFinalState = fs_2e2mu;
+	  if (Z1Flav == -121)
+	    {
+	      if (Z2Flav == -121)
+		currentFinalState = fs_4e;
+	      else if ( Z2Flav == -169)
+		currentFinalState = fs_2e2mu;
+	      else
+		cerr << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; Z2Flav = " << Z2Flav << endl;
+	    }
+	  else if (Z1Flav == -169)
+	    {
+	      if (Z2Flav == -121)
+		currentFinalState = fs_2mu2e;
+	      else if (Z2Flav == -169)
+		currentFinalState = fs_4mu;
+	      else
+		cerr << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; Z2Flav = " << Z2Flav << endl;
+	    }
 	  else
-	    cerr << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; Z2Flav = " << Z2Flav << endl;
+	    {
+	      cerr << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; Z1Flav = " << Z1Flav << endl;
+	    }
+	  if(MERGE2E2MU && ( currentFinalState == fs_2mu2e )) currentFinalState = fs_2e2mu;
 	}
-      else if (Z1Flav == -169)
-	{
-	  if (Z2Flav == -121)
-	    currentFinalState = fs_2mu2e;
-	  else if (Z2Flav == -169)
-	    currentFinalState = fs_4mu;
-	  else
-	    cerr << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; Z2Flav = " << Z2Flav << endl;
-	}
-      else
-	{
-	  cerr << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; Z1Flav = " << Z1Flav << endl;
-	}
-      if(MERGE2E2MU && ( currentFinalState == fs_2mu2e )) currentFinalState = fs_2e2mu;
 
-
+      else  if ( inputFileMC.Contains("Z+X") )
+	{
+          if (Z1Flav == -121)
+            {
+              if (Z2Flav == +121)
+                currentFinalState = fs_4e;
+              else if ( Z2Flav == +169)
+                currentFinalState = fs_2e2mu;
+              else
+                cerr << "error in event " <<  endl;
+            }
+          else if (Z1Flav == -169)
+            {
+              if (Z2Flav == +121)
+                currentFinalState = fs_2mu2e;
+              else if (Z2Flav == +169)
+                currentFinalState = fs_4mu;
+              else
+		cerr << "error in event " <<  endl;
+            }
+          else
+            {
+	      cerr << "error in event " <<  endl;
+            }
+          if(MERGE2E2MU && ( currentFinalState == fs_2mu2e )) currentFinalState = fs_2e2mu;
+        }
+      
       // --- Mass Cut      
-      if (ZZMass < 115 || ZZMass > 135) continue;
+      //      if (ZZMass < 115 || ZZMass > 135) continue;
 
 
       // --- find category
@@ -257,19 +316,22 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
       for(UInt_t i = 0; i < JetPt->size(); i++){
         jetPt[i]        = JetPt->at(i);
         jetEta[i]       = JetEta->at(i);
-        jetIsBTagged[i] = JetIsBTagged->at(i);
+        jetIsBTaggedWithSF[i] = JetIsBTaggedWithSF->at(i);
         nJets20++;
       }
-      for(int i = 0; i < nExtraLep; i++){
-        extraLepPt[i]    = ExtraLepPt->at(i);
-        extraLepEta[i]   = ExtraLepEta->at(i);
-        extraLepLepId[i] = ExtraLepLepId->at(i);
-      }
-
+      if( !(inputFileMC.Contains("Z+X")) )
+	{
+	  //	  std::cout << "NOT Z+X" << endl;
+	  for(int i = 0; i < nExtraLep; i++){
+	    extraLepPt[i]    = ExtraLepPt->at(i);
+	    extraLepEta[i]   = ExtraLepEta->at(i);
+	    extraLepLepId[i] = ExtraLepLepId->at(i);
+	  }
+	}
       currentCategory = categoryHH(nJets20,
                                    jetPt,
                                    jetEta,
-                                   jetIsBTagged,
+                                   jetIsBTaggedWithSF,
                                    nExtraLep,
                                    extraLepPt,
                                    extraLepEta,
@@ -321,7 +383,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 } //end doHisto
 
 
-void  doCount(TString inputfile, TString inputSample, std::map<TString,std::vector<double> > & map_chan, std::map<TString,std::vector<TString> > & map_names, double counter_WH[4], double counter_TTZ[4], double counter_ggZZ[4])
+void  doCount(TString inputfile, TString inputSample, std::map<TString,std::vector<double> > & map_chan, std::map<TString,std::vector<TString> > & map_names, double counter_VVV[4], double counter_WH[4], double counter_TTZ[4], double counter_ggZZ[4])
 {
   TFile * inputFile =  TFile::Open( inputfile );
   
@@ -336,9 +398,10 @@ void  doCount(TString inputfile, TString inputSample, std::map<TString,std::vect
       
       double counter = h_temp->GetBinContent(1);
       
-      if (inputfile.Contains("TTZToLL") || inputfile.Contains("TTZJets")) counter_TTZ[nF] += counter;
-      else if (inputfile.Contains("WplusH") || inputfile.Contains("WminusH")) counter_WH[nF] += counter;
-      else if (inputfile.Contains("ggTo") ) counter_ggZZ[nF] += counter;
+      if ( inputfile.Contains("ZZZ") || inputfile.Contains("WWZ") || inputfile.Contains("WZZ") ) counter_VVV[nF] += counter;
+      else if ( inputfile.Contains("TTZToLL") || inputfile.Contains("TTZJets") ) counter_TTZ[nF] += counter;
+      else if ( inputfile.Contains("WplusH") || inputfile.Contains("WminusH") ) counter_WH[nF] += counter;
+      else if ( inputfile.Contains("ggTo") ) counter_ggZZ[nF] += counter;
 
       else 
 	{
@@ -361,7 +424,8 @@ void ComputeYields()
 
   //TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190626/";
 
-  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
+  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/allsamples/";
+  //  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190924/";
   TString inputFileName[] = {"HH4lbb",
                             // "HH4lww",
                             // "HH4lgammagamma",
@@ -371,18 +435,22 @@ void ComputeYields()
 			    "ZH125",
 			    "bbH125",
 			    "ttH125",
-			     "ZZTo4lext1",
+                             "ZZTo4lext1",
 			     "TTWJetsToLNu",
-			    "WplusH125",
-			    "WminusH125",
+                             "Z+X",
+			     "WWZ",
+                             "WZZ",
+                             "ZZZ",
+			     "WplusH125",
+ 			     "WminusH125",
 			     "TTZJets_M10_MLMext1",
 			     "TTZToLL_M1to1O_MLM",
-			     //"ggTo4e_Contin_MCFM701",
-			     //"ggTo4mu_Contin_MCFM701",
-			    // "ggTo4tau_Contin_MCFM701",
-			    // "ggTo2e2mu_Contin_MCFM701",
-			    // "ggTo2e2tau_Contin_MCFM701",
-			    // "ggTo2mu2tau_Contin_MCFM701",
+			     "ggTo4e_Contin_MCFM701",
+			     "ggTo4mu_Contin_MCFM701",
+			     "ggTo4tau_Contin_MCFM701",
+			     "ggTo2e2mu_Contin_MCFM701",
+			     "ggTo2e2tau_Contin_MCFM701",
+			     "ggTo2mu2tau_Contin_MCFM701",
                             };
 
 
@@ -397,6 +465,7 @@ void ComputeYields()
   std::ofstream outFile_2e2mubb("Yields_forCombine_2e2mubb.txt");
   std::ofstream outFile_4Lbb("Yields_forCombine_4Lbb.txt");
 
+  double counter_VVV[4] = {0,0,0,0};
   double counter_WH[4] = {0,0,0,0};  
   double counter_TTZ[4] = {0,0,0,0};
   double counter_ggZZ[4] = {0,0,0,0};
@@ -414,10 +483,10 @@ void ComputeYields()
   for(UInt_t i=0; i<nInputFiles; i++)
     {
       cout<<"Processing sample "<<inputFileName[i]<<" ... "<<endl;
-      
+    
       doHisto(inputFilePath + inputFileName[i] + "/ZZXAnalysis.root" , outputFilePath + "/histos_" + inputFileName[i] + ".root", lumi);
       //doCount(outputFilePath + "/histos_" + inputFileName[i] + ".root", outFile_4mubb, outFile_4ebb, outFile_2e2mubb, outFile_4Lbb, counter_WH, counter_TTZ, counter_ggZZ);
-      doCount(outputFilePath + "/histos_" + inputFileName[i] + ".root", inputFileName[i], map_chan, map_names, counter_WH, counter_TTZ, counter_ggZZ);
+      doCount(outputFilePath + "/histos_" + inputFileName[i] + ".root", inputFileName[i], map_chan, map_names, counter_VVV, counter_WH, counter_TTZ, counter_ggZZ);
     }
 
   int sizes = map_names["4mu"].size();
@@ -428,10 +497,10 @@ void ComputeYields()
       outFile_2e2mubb << map_names["2e2mu"][i]   << '\t';
       outFile_4Lbb    << map_names["4L"][i]   << '\t';
     } 
-  outFile_4mubb   <<  "WH\tTTZ\tggZZ\n";
-  outFile_4ebb    <<  "WH\tTTZ\tggZZ\n";
-  outFile_2e2mubb <<  "WH\tTTZ\tggZZ\n";
-  outFile_4Lbb    <<  "WH\tTTZ\tggZZ\n";
+  outFile_4mubb   <<  "VVV\tWH\tTTZ\tggZZ\n";
+  outFile_4ebb    <<  "VVV\tWH\tTTZ\tggZZ\n";
+  outFile_2e2mubb <<  "VVV\tWH\tTTZ\tggZZ\n";
+  outFile_4Lbb    <<  "VVV\tWH\tTTZ\tggZZ\n";
 
   for (int i=0; i< sizes; ++i ) 
     {
@@ -442,10 +511,9 @@ void ComputeYields()
     }  
   for (int nF = 0; nF < nFinalState; nF++ )
     {
-      if (nF == 0)  outFile_4mubb << counter_WH[nF] << "\t" << counter_TTZ[nF] << "\t" << counter_ggZZ[nF] << "\n";
-      else if (nF == 1) outFile_4ebb << counter_WH[nF] << "\t" << counter_TTZ[nF] << "\t" << counter_ggZZ[nF] << "\n";
-      else if (nF == 2) outFile_2e2mubb << counter_WH[nF] << "\t" << counter_TTZ[nF] << "\t" << counter_ggZZ[nF] << "\n";
-      else if (nF == 3) outFile_4Lbb << counter_WH[nF] << "\t" << counter_TTZ[nF] << "\t" << counter_ggZZ[nF] << "\n";
+      if (nF == 0)  outFile_4mubb << counter_VVV[nF] << "\t" << counter_WH[nF] << "\t" << counter_TTZ[nF] << "\t" << counter_ggZZ[nF] << "\n";
+      else if (nF == 1) outFile_4ebb << counter_VVV[nF] << "\t" << counter_WH[nF] << "\t" << counter_TTZ[nF] << "\t" << counter_ggZZ[nF] << "\n";
+      else if (nF == 2) outFile_2e2mubb << counter_VVV[nF] << "\t" << counter_WH[nF] << "\t" << counter_TTZ[nF] << "\t" << counter_ggZZ[nF] << "\n";
+      else if (nF == 3) outFile_4Lbb << counter_VVV[nF] << "\t" << counter_WH[nF] << "\t" << counter_TTZ[nF] << "\t" << counter_ggZZ[nF] << "\n";
     }
-
 }

@@ -5,13 +5,13 @@ from ROOT import TFile, TH1F, TCanvas, gSystem, TAttFill, TLegend, TStyle, THSta
 import CMSGraphics, CMS_lumi
 
 # create output directory
-OutputPath = 'ZZbb_plots'
+OutputPath = 'ZZbb_plotsNEW'
 gSystem.Exec("mkdir -p " + OutputPath)
 print "Output directory created!"
 
 
 # inputh file phath
-inputFilePath = 'histos_4lbb/' 
+inputFilePath = 'histos_4lbbNOmasscut/' 
 
 
 # hist names
@@ -305,6 +305,69 @@ histos_TTWJetsToLNu.append(inFile_TTWJetsToLNu.Get(namelist[10]))
 histos_TTWJetsToLNu.append(inFile_TTWJetsToLNu.Get(namelist[11]))
 
 
+inFile_WWZ = TFile.Open(inputFilePath + 'histos_WWZ.root')
+histos_WWZ = []
+histos_WWZ.append(inFile_WWZ.Get(namelist[0]))
+histos_WWZ.append(inFile_WWZ.Get(namelist[1]))
+histos_WWZ.append(inFile_WWZ.Get(namelist[2]))
+histos_WWZ.append(inFile_WWZ.Get(namelist[3]))
+histos_WWZ.append(inFile_WWZ.Get(namelist[4]))
+histos_WWZ.append(inFile_WWZ.Get(namelist[5]))
+histos_WWZ.append(inFile_WWZ.Get(namelist[6]))
+histos_WWZ.append(inFile_WWZ.Get(namelist[7]))
+histos_WWZ.append(inFile_WWZ.Get(namelist[8]))
+histos_WWZ.append(inFile_WWZ.Get(namelist[9]))
+histos_WWZ.append(inFile_WWZ.Get(namelist[10]))
+histos_WWZ.append(inFile_WWZ.Get(namelist[11]))
+
+
+inFile_WZZ = TFile.Open(inputFilePath + 'histos_WZZ.root')
+histos_WZZ = []
+histos_WZZ.append(inFile_WZZ.Get(namelist[0]))
+histos_WZZ.append(inFile_WZZ.Get(namelist[1]))
+histos_WZZ.append(inFile_WZZ.Get(namelist[2]))
+histos_WZZ.append(inFile_WZZ.Get(namelist[3]))
+histos_WZZ.append(inFile_WZZ.Get(namelist[4]))
+histos_WZZ.append(inFile_WZZ.Get(namelist[5]))
+histos_WZZ.append(inFile_WZZ.Get(namelist[6]))
+histos_WZZ.append(inFile_WZZ.Get(namelist[7]))
+histos_WZZ.append(inFile_WZZ.Get(namelist[8]))
+histos_WZZ.append(inFile_WZZ.Get(namelist[9]))
+histos_WZZ.append(inFile_WZZ.Get(namelist[10]))
+histos_WZZ.append(inFile_WZZ.Get(namelist[11]))
+
+
+inFile_ZZZ = TFile.Open(inputFilePath + 'histos_ZZZ.root')
+histos_ZZZ = []
+histos_ZZZ.append(inFile_ZZZ.Get(namelist[0]))
+histos_ZZZ.append(inFile_ZZZ.Get(namelist[1]))
+histos_ZZZ.append(inFile_ZZZ.Get(namelist[2]))
+histos_ZZZ.append(inFile_ZZZ.Get(namelist[3]))
+histos_ZZZ.append(inFile_ZZZ.Get(namelist[4]))
+histos_ZZZ.append(inFile_ZZZ.Get(namelist[5]))
+histos_ZZZ.append(inFile_ZZZ.Get(namelist[6]))
+histos_ZZZ.append(inFile_ZZZ.Get(namelist[7]))
+histos_ZZZ.append(inFile_ZZZ.Get(namelist[8]))
+histos_ZZZ.append(inFile_ZZZ.Get(namelist[9]))
+histos_ZZZ.append(inFile_ZZZ.Get(namelist[10]))
+histos_ZZZ.append(inFile_ZZZ.Get(namelist[11]))
+
+inFile_ZX = TFile.Open(inputFilePath + 'histos_Z+Xnew.root')
+histos_ZX = []
+histos_ZX.append(inFile_ZX.Get(namelist[0]))
+histos_ZX.append(inFile_ZX.Get(namelist[1]))
+histos_ZX.append(inFile_ZX.Get(namelist[2]))
+histos_ZX.append(inFile_ZX.Get(namelist[3]))
+histos_ZX.append(inFile_ZX.Get(namelist[4]))
+histos_ZX.append(inFile_ZX.Get(namelist[5]))
+histos_ZX.append(inFile_ZX.Get(namelist[6]))
+histos_ZX.append(inFile_ZX.Get(namelist[7]))
+histos_ZX.append(inFile_ZX.Get(namelist[8]))
+histos_ZX.append(inFile_ZX.Get(namelist[9]))
+histos_ZX.append(inFile_ZX.Get(namelist[10]))
+histos_ZX.append(inFile_ZX.Get(namelist[11]))
+
+
 print 'files read'
 
 
@@ -317,6 +380,23 @@ for name in namelist :
     hs = THStack('hs','')
 
 #    integral_fondi = 0.
+
+
+
+
+#  tribosons
+    histo_tribosons = histos_WWZ[i]
+    histo_tribosons.Add(histos_WZZ[i])
+    histo_tribosons.Add(histos_ZZZ[i])
+    histo_tribosons.SetFillColor(kOrange)
+    histo_tribosons.SetLineColor(kOrange+1)
+    hs.Add(histo_tribosons)
+
+# ZX background
+    histo_ZX = histos_ZX[i]
+    histo_ZX.SetFillColor(kGreen+3)
+    histo_ZX.SetLineColor(kGreen+4)
+    hs.Add(histo_ZX)
 
     # TTW
     histos_TTWJetsToLNu[i].SetFillColor(kBlue+3)
@@ -341,8 +421,8 @@ for name in namelist :
     # TTZ
     histo_TTZ = histos_TTZJets_M10_MLMext1[i]
     histo_TTZ.Add(histos_TTZToLL_M1to10_MLM[i])
-    histo_TTZ.SetFillColor(kGreen-2)
-    histo_TTZ.SetLineColor(kGreen+4)
+    histo_TTZ.SetFillColor(kGreen-3)
+    histo_TTZ.SetLineColor(kGreen-1)
 #   histo_TTZ.Rebin(6)
 #   integral_fondi += histo_TTZ.Integral()
     hs.Add(histo_TTZ)
@@ -378,7 +458,7 @@ for name in namelist :
     integral = histos_HH4lbb[i].Integral();
     print 'integrale ' 
     print integral
-    histos_HH4lbb[i].Scale(integral * 1000.) 
+    histos_HH4lbb[i].Scale(100.) 
 
     
     # ALL DATA
@@ -411,12 +491,14 @@ for name in namelist :
 
     # legend
     legend = TLegend(0.74,0.64,0.94,0.87)
-    legend.AddEntry(histos_HH4lbb[i],                "HH->4lbb x1000", "f")
+    legend.AddEntry(histos_HH4lbb[i],                "HH->4lbb x100", "f")
     legend.AddEntry(histo_SMHiggs,                   "SM Higgs", "f")
     legend.AddEntry(histos_ZZTo4lext1[i],            "qq->ZZ",   "f")
     legend.AddEntry(histo_TTZ,                       "TTZ",      "f")
     legend.AddEntry(histo_ggZZ,                      "gg->ZZ",   "f")
     legend.AddEntry(histos_TTWJetsToLNu[i],          "TTW",      "f")
+    legend.AddEntry(histos_ZX[i],                    "Z+X", "f")
+    legend.AddEntry(histo_tribosons,                 "Tribosons", "f")
     legend.SetFillColor(kWhite)
     legend.SetLineColor(kBlack)
     legend.SetTextFont(43)
