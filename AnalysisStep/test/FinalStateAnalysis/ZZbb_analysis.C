@@ -366,6 +366,8 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 	  */
 	}
 
+
+      // select final state
       currentFinalState = -1;
       if (!ISZX)
 	{
@@ -421,31 +423,36 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
             }
           if(MERGE2E2MU && ( currentFinalState == fs_2mu2e )) currentFinalState = fs_2e2mu;
 	}
+
+
       // Mass Cut      
       //if (ZZMass < 115 || ZZMass > 135) continue;
 
       //      std::cout << "ZZ Mass: " << ZZMass << endl;
 
-      Float_t histo[nHisto];
+      Float_t histoContent[nHisto];
 
       bool SHOW =  ( (ZZMass > 135) || (ZZMass < 115) ) || (!DOBLINDHISTO) ;
 
       for(int v = 0; v < nHisto; v++)
 	{
 	  string histoString = myHisto1D[v].Name.c_str();
-	  if      (histoString == "M4L_CR4Lonly" && ( !ISDATA || SHOW ) ) histo[v] = ZZMass;
-	  else if (histoString == "MZ1_CR4Lonly") histo[v] = Z1Mass;
-	  else if (histoString == "MZ2_CR4Lonly") histo[v] = Z2Mass;
-	  else if (histoString == "pt4L_CR4Lonly") histo[v] = ZZPt;
-	  else if (histoString == "eta4L_CR4Lonly") histo[v] = ZZEta;
-	  else if (histoString == "phi4L_CR4Lonly") histo[v] = ZZPhi;
+	  if      (histoString == "M4L_CR4Lonly" && ( !ISDATA || SHOW ) ) histoContent[v] = ZZMass;
+	  else if (histoString == "MZ1_CR4Lonly") histoContent[v] = Z1Mass;
+	  else if (histoString == "MZ2_CR4Lonly") histoContent[v] = Z2Mass;
+	  else if (histoString == "pt4L_CR4Lonly") histoContent[v] = ZZPt;
+	  else if (histoString == "eta4L_CR4Lonly") histoContent[v] = ZZEta;
+	  else if (histoString == "phi4L_CR4Lonly") histoContent[v] = ZZPhi;
 	  else continue;
 	  	
-	  h1[v][currentFinalState]->Fill(histo[v], eventWeight);
+	  h1[v][currentFinalState]->Fill(histoContent[v], eventWeight);
 	}
 
+
+      // -----------------
       // H(bb) selection
-      
+      // -----------------      
+
       vector<TLorentzVector> JetVec; // TLorentz vector with all Jets per Event
       vector<TLorentzVector> JetPair; // TLorentz vector with all Jets Pairs
       vector<int> JetBinfo; // vector with b-tag info per each Jet of the Event
@@ -794,52 +801,52 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
       for(int v = 0; v < nHisto; v++)
 	{
 	  string histoString = myHisto1D[v].Name.c_str();
-	  if      (histoString == "M4L" && ( !ISDATA || SHOW ) ) histo[v] = ZZMass;
-	  else if (histoString == "MZ1") histo[v] = Z1Mass;
-	  else if (histoString == "MZ2") histo[v] = Z2Mass;
-	  else if (histoString == "pt4L") histo[v] = ZZPt;
-	  else if (histoString == "eta4L") histo[v] = ZZEta;
-	  else if (histoString == "phi4L") histo[v] = ZZPhi;
-	  else if (histoString == "etabb_m") histo[v] = BESTpair_methodM_ETA;
-	  else if (histoString == "phibb_m") histo[v] = BESTpair_methodM_PHI;
-	  else if (histoString == "etabb_pt") histo[v] = BESTpair_methodPTjet_ETA;
-	  else if (histoString == "phibb_pt") histo[v] = BESTpair_methodPTjet_PHI;
-	  else if (histoString == "Deltaetabb_m") histo[v] = Deltabb_eta_m;
-	  else if (histoString == "Deltaphibb_m") histo[v] = Deltabb_phi_m;
- 	  else if (histoString == "Deltaetabb_pt") histo[v] = Deltabb_eta_pt;
-	  else if (histoString == "Deltaphibb_pt") histo[v] = Deltabb_phi_pt;
-	  else if (histoString == "NJets") histo[v] = njet;
-	  else if (histoString == "NJets_noB") histo[v] = njet_noB;
-	  else if (histoString == "NBJets") histo[v] = nbjet;
-	  else if (histoString == "methodPTjet_M") histo[v] = BESTpair_methodPTjet_M; 
-	  else if (histoString == "methodPTjet_PT") histo[v] = BESTpair_methodPTjet_PT;
-	  else if (histoString == "methodPTjet_ETA") histo[v] = BESTpair_methodPTjet_ETA;
-	  else if (histoString == "methodPTjet_PHI") histo[v] = BESTpair_methodPTjet_PHI;
-	  else if (histoString == "methodPTjet_Binfo") histo[v] = BESTpair_methodPTjet_Binfo;
- 	  else if (histoString == "methodM_M") histo[v] = BESTpair_methodM_M;
-	  else if (histoString == "methodM_PT") histo[v] = BESTpair_methodM_PT;
- 	  else if (histoString == "methodM_ETA") histo[v] = BESTpair_methodM_ETA;
- 	  else if (histoString == "methodM_PHI") histo[v] = BESTpair_methodM_PHI;
-	  else if (histoString == "methodM_Binfo") histo[v] = BESTpair_methodM_Binfo;
-	  else if (histoString == "methodM_Pruned1" && ISGEN ) histo[v] = methodM_eff_pruned1;
-	  else if (histoString == "methodM_Pruned2" && ISGEN ) histo[v] = methodM_eff_pruned2;
-	  else if (histoString == "methodM_PrunedTOT" && ISGEN ) histo[v] = methodM_eff_prunedTOT;
-	  else if (histoString == "methodPTjet_Pruned1" && ISGEN ) histo[v] = methodPTjet_eff_pruned1;
-	  else if (histoString == "methodPTjet_Pruned2" && ISGEN ) histo[v] = methodPTjet_eff_pruned2;
-	  else if (histoString == "methodPTjet_PrunedTOT" && ISGEN ) histo[v] = methodPTjet_eff_prunedTOT;
-	  else if (histoString == "methodBM_M") histo[v] = BESTpair_methodBM_M;
-          else if (histoString == "methodBM_PT") histo[v] = BESTpair_methodBM_PT;
-          else if (histoString == "methodBM_ETA") histo[v] = BESTpair_methodBM_ETA;
-          else if (histoString == "methodBM_PHI") histo[v] = BESTpair_methodBM_PHI;
-          else if (histoString == "methodBM_Binfo") histo[v] = BESTpair_methodBM_Binfo;
-	  else if (histoString == "methodBPT_M" && SHOW ) histo[v] = BESTpair_methodBPT_M;
-          else if (histoString == "methodBPT_PT") histo[v] = BESTpair_methodBPT_PT;
-          else if (histoString == "methodBPT_ETA") histo[v] = BESTpair_methodBPT_ETA;
-          else if (histoString == "methodBPT_PHI") histo[v] = BESTpair_methodBPT_PHI;
-          else if (histoString == "methodBPT_Binfo") histo[v] = BESTpair_methodBPT_Binfo;
+	  if      (histoString == "M4L" && ( !ISDATA || SHOW ) ) histoContent[v] = ZZMass;
+	  else if (histoString == "MZ1") histoContent[v] = Z1Mass;
+	  else if (histoString == "MZ2") histoContent[v] = Z2Mass;
+	  else if (histoString == "pt4L") histoContent[v] = ZZPt;
+	  else if (histoString == "eta4L") histoContent[v] = ZZEta;
+	  else if (histoString == "phi4L") histoContent[v] = ZZPhi;
+	  else if (histoString == "etabb_m") histoContent[v] = BESTpair_methodM_ETA;
+	  else if (histoString == "phibb_m") histoContent[v] = BESTpair_methodM_PHI;
+	  else if (histoString == "etabb_pt") histoContent[v] = BESTpair_methodPTjet_ETA;
+	  else if (histoString == "phibb_pt") histoContent[v] = BESTpair_methodPTjet_PHI;
+	  else if (histoString == "Deltaetabb_m") histoContent[v] = Deltabb_eta_m;
+	  else if (histoString == "Deltaphibb_m") histoContent[v] = Deltabb_phi_m;
+ 	  else if (histoString == "Deltaetabb_pt") histoContent[v] = Deltabb_eta_pt;
+	  else if (histoString == "Deltaphibb_pt") histoContent[v] = Deltabb_phi_pt;
+	  else if (histoString == "NJets") histoContent[v] = njet;
+	  else if (histoString == "NJets_noB") histoContent[v] = njet_noB;
+	  else if (histoString == "NBJets") histoContent[v] = nbjet;
+	  else if (histoString == "methodPTjet_M") histoContent[v] = BESTpair_methodPTjet_M; 
+	  else if (histoString == "methodPTjet_PT") histoContent[v] = BESTpair_methodPTjet_PT;
+	  else if (histoString == "methodPTjet_ETA") histoContent[v] = BESTpair_methodPTjet_ETA;
+	  else if (histoString == "methodPTjet_PHI") histoContent[v] = BESTpair_methodPTjet_PHI;
+	  else if (histoString == "methodPTjet_Binfo") histoContent[v] = BESTpair_methodPTjet_Binfo;
+ 	  else if (histoString == "methodM_M") histoContent[v] = BESTpair_methodM_M;
+	  else if (histoString == "methodM_PT") histoContent[v] = BESTpair_methodM_PT;
+ 	  else if (histoString == "methodM_ETA") histoContent[v] = BESTpair_methodM_ETA;
+ 	  else if (histoString == "methodM_PHI") histoContent[v] = BESTpair_methodM_PHI;
+	  else if (histoString == "methodM_Binfo") histoContent[v] = BESTpair_methodM_Binfo;
+	  else if (histoString == "methodM_Pruned1" && ISGEN ) histoContent[v] = methodM_eff_pruned1;
+	  else if (histoString == "methodM_Pruned2" && ISGEN ) histoContent[v] = methodM_eff_pruned2;
+	  else if (histoString == "methodM_PrunedTOT" && ISGEN ) histoContent[v] = methodM_eff_prunedTOT;
+	  else if (histoString == "methodPTjet_Pruned1" && ISGEN ) histoContent[v] = methodPTjet_eff_pruned1;
+	  else if (histoString == "methodPTjet_Pruned2" && ISGEN ) histoContent[v] = methodPTjet_eff_pruned2;
+	  else if (histoString == "methodPTjet_PrunedTOT" && ISGEN ) histoContent[v] = methodPTjet_eff_prunedTOT;
+	  else if (histoString == "methodBM_M") histoContent[v] = BESTpair_methodBM_M;
+          else if (histoString == "methodBM_PT") histoContent[v] = BESTpair_methodBM_PT;
+          else if (histoString == "methodBM_ETA") histoContent[v] = BESTpair_methodBM_ETA;
+          else if (histoString == "methodBM_PHI") histoContent[v] = BESTpair_methodBM_PHI;
+          else if (histoString == "methodBM_Binfo") histoContent[v] = BESTpair_methodBM_Binfo;
+	  else if (histoString == "methodBPT_M" && SHOW ) histoContent[v] = BESTpair_methodBPT_M;
+          else if (histoString == "methodBPT_PT") histoContent[v] = BESTpair_methodBPT_PT;
+          else if (histoString == "methodBPT_ETA") histoContent[v] = BESTpair_methodBPT_ETA;
+          else if (histoString == "methodBPT_PHI") histoContent[v] = BESTpair_methodBPT_PHI;
+          else if (histoString == "methodBPT_Binfo") histoContent[v] = BESTpair_methodBPT_Binfo;
 	  else continue;
 	  	
-	  h1[v][currentFinalState]->Fill(histo[v], eventWeight);
+	  h1[v][currentFinalState]->Fill(histoContent[v], eventWeight);
 	}
       
       JetVec.clear();
