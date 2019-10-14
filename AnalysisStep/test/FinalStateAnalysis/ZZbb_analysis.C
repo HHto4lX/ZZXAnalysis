@@ -57,7 +57,7 @@ struct Histo1D
   bool isLogy;
 };
 
-const int nHisto = 41;
+const int nHisto = 45;
 
 Histo1D myHisto1D[nHisto] = {
   {"M4L_CR4Lonly", "m_{4l} (GeV)", "Events / 5 GeV", "", 70, 1070, 200, 1, 0},  
@@ -101,6 +101,11 @@ Histo1D myHisto1D[nHisto] = {
   {"methodPTjet_Pruned1", "Pruned gen efficiency", "Events", "", 0, 5, 5, 0, 0},
   {"methodPTjet_Pruned2", "Pruned gen efficiency", "Events", "", 0, 5, 5, 0, 0},
   {"methodPTjet_PrunedTOT", "Pruned gen efficiency", "Events", "", 0, 5, 5, 0, 0},
+  // --- control plots
+  {"leptonsPt_4lSelOnly"          , "pT", "Events/ 10 GeV", "", 0, 700, 70, 0, 0},
+  {"jetsPt_4lSelOnly"             , "pT", "Events/ 10 GeV", "", 0, 700, 70, 0, 0},
+  {"jetsPt_4lAnd2JetsSel"         , "pT", "Events/ 10 GeV", "", 0, 700, 70, 0, 0},
+  {"jetsPt_4lAnd2JetsSel_withBtag", "pT", "Events/ 10 GeV", "", 0, 700, 70, 0, 0},
 };
 
 
@@ -141,6 +146,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   Float_t KFactor_QCD_qqZZ_Pt;
 
   Short_t ZZsel;
+  vector<Float_t> *LepPt = 0;
   vector<Float_t> *LepEta = 0;
   Float_t ZZMass;
   Float_t Z1Mass;
@@ -277,6 +283,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
     }
   if (ISZX) inputTree->SetBranchAddress("weight", &weight);
   inputTree->SetBranchAddress("ZZsel", &ZZsel);
+  inputTree->SetBranchAddress("LepPt", &LepPt);
   inputTree->SetBranchAddress("LepEta", &LepEta);
   inputTree->SetBranchAddress("ZZMass", &ZZMass);  
   inputTree->SetBranchAddress("Z1Flav", &Z1Flav);
@@ -438,15 +445,37 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 	{
 	  string histoString = myHisto1D[v].Name.c_str();
 	  if      (histoString == "M4L_CR4Lonly" && ( !ISDATA || SHOW ) ) histoContent[v] = ZZMass;
-	  else if (histoString == "MZ1_CR4Lonly") histoContent[v] = Z1Mass;
-	  else if (histoString == "MZ2_CR4Lonly") histoContent[v] = Z2Mass;
-	  else if (histoString == "pt4L_CR4Lonly") histoContent[v] = ZZPt;
+	  else if (histoString == "MZ1_CR4Lonly")   histoContent[v] = Z1Mass;
+	  else if (histoString == "MZ2_CR4Lonly")   histoContent[v] = Z2Mass;
+	  else if (histoString == "pt4L_CR4Lonly")  histoContent[v] = ZZPt;
 	  else if (histoString == "eta4L_CR4Lonly") histoContent[v] = ZZEta;
 	  else if (histoString == "phi4L_CR4Lonly") histoContent[v] = ZZPhi;
 	  else continue;
 	  	
 	  h1[v][currentFinalState]->Fill(histoContent[v], eventWeight);
 	}
+
+
+      // --- control plot
+      for(int v = 0; v < nHisto; v++)
+	{
+	  string histoString = myHisto1D[v].Name.c_str();
+          if(histoString == "leptonsPt_4lSelOnly")
+          {
+            for(UInt_t i = 0; i<LepPt->size(); i++)
+	    {
+              h1[v][currentFinalState]->Fill(LepPt->at(i), eventWeight);
+            }
+          }
+          else if(histoString == "jetsPt_4lSelOnly")
+	  {
+            for(UInt_t j = 0; j<JetPt->size(); j++)
+	    {
+              h1[v][currentFinalState]->Fill(JetPt->at(j), eventWeight);
+	    }
+          }          
+        }
+
 
 
       // -----------------
@@ -499,11 +528,46 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 	  std::cout << endl;
 	}
       
-      // remove events with <2 jet OR no btagged jets
-      
+
+      // --- bb selection
+      // --- remove events with <2 jet      
       if (JetVec.size() < 2) continue;      
+
+
+      // --- control plot
+      for(int v = 0; v < nHisto; v++)
+	{
+	  string histoString = myHisto1D[v].Name.c_str();
+          if(histoString == "jetsPt_4lAnd2JetsSel")
+          {
+            for(UInt_t i = 0; i<JetPt->size(); i++)
+	    {
+              h1[v][currentFinalState]->Fill(JetPt->at(i), eventWeight);
+            }
+          }
+        }
+      
+
+      // --- bb selection
+      // --- remove events with no btagged jets
       if (nbjet < 1) continue;
       if (VERBOSE) std::cout << "passed: >= 2 jet, >= 1 b-jet" << endl;
+
+
+      // --- control plot
+      for(int v = 0; v < nHisto; v++)
+	{
+	  string histoString = myHisto1D[v].Name.c_str();
+          if(histoString == "jetsPt_4lAnd2JetsSel_withBtag")
+          {
+            for(UInt_t i = 0; i<JetPt->size(); i++)
+	    {
+              h1[v][currentFinalState]->Fill(JetPt->at(i), eventWeight);
+            }
+          }
+        }
+
+
       
       // build pairs of jets
       
@@ -890,30 +954,29 @@ void ZZbb_analysis()
   std::cout << "Lumi: " << lumi << endl;
 
   //TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
-  //  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/allsamples/";
-  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/";
-  TString inputFileName[] = {// "HH4lbb",
-			     // "ggH125",
-			     // "VBFH125",
-			     // "WplusH125",
-			     // "WminusH125",
-			     // "ZH125",
-			     // "bbH125",
-			     // "ttH125",
- 			     // "ZZTo4lext1",
-			     // "TTZJets_M10_MLMext1",
-			     // "TTZToLL_M1to1O_MLM",
-			     // "TTWJetsToLNu",
-                             // //"AllData",
-                             // "ggTo4e_Contin_MCFM701",
- 			     // "ggTo4mu_Contin_MCFM701",
-			     // "ggTo4tau_Contin_MCFM701",
-			     // "ggTo2e2mu_Contin_MCFM701",
-			     // "ggTo2e2tau_Contin_MCFM701",
-			     // "ggTo2mu2tau_Contin_MCFM701",
-                             // "WWZ",
-                             // "WZZ",
-			     // "ZZZ",
+  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/allsamples/";
+  TString inputFileName[] = {"HH4lbb",
+                             "ggH125",
+                             "VBFH125",
+                             "WplusH125",
+                             "WminusH125",
+                             "ZH125",
+                             "bbH125",
+                             "ttH125",
+                             "ZZTo4lext1",
+                             "TTZJets_M10_MLMext1",
+                             "TTZToLL_M1to1O_MLM",
+                             "TTWJetsToLNu",
+                             "AllData",
+                             "ggTo4e_Contin_MCFM701",
+                             "ggTo4mu_Contin_MCFM701",
+                             "ggTo4tau_Contin_MCFM701",
+                             "ggTo2e2mu_Contin_MCFM701",
+                             "ggTo2e2tau_Contin_MCFM701",
+                             "ggTo2mu2tau_Contin_MCFM701",
+                             "WWZ",
+                             "WZZ",
+                             "ZZZ",
                              "Z+X"
                            };
 
