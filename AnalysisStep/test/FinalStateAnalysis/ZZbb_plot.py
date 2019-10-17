@@ -11,11 +11,11 @@ print "Output directory created!"
 
 
 # inputh file phath
-inputFilePath = 'histos_4lbbNOmasscut/' 
+inputFilePath = 'histos_4lbb/' 
 
 
 # hist names
-namelist = ['h1_M4L_CR4Lonly_4L','h1_MZ1_CR4Lonly_4L','h1_MZ2_CR4Lonly_4L','h1_eta4L_CR4Lonly_4L','h1_pt4L_CR4Lonly_4L','h1_M4L_4L','h1_MZ1_4L','h1_MZ2_4L','h1_eta4L_4L','h1_pt4L_4L','h1_methodBPT_M_4L','h1_methodBPT_PT_4L']
+namelist = ['h1_M4L_CR4Lonly_4L','h1_MZ1_CR4Lonly_4L','h1_MZ2_CR4Lonly_4L','h1_eta4L_CR4Lonly_4L','h1_pt4L_CR4Lonly_4L','h1_M4L_4L','h1_MZ1_4L','h1_MZ2_4L','h1_eta4L_4L','h1_pt4L_4L','h1_methodBPT_M_4L','h1_methodBPT_PT_4L','h1_jetsPt_4lSelOnly_4L','h1_jetsPt_4lAnd2JetsSel_4L','h1_jetsPt_4lAnd2JetsSel_withBtag_4L']
 
 
 # read files
@@ -33,6 +33,9 @@ histos_AllData.append(inFile_AllData.Get(namelist[8]))
 histos_AllData.append(inFile_AllData.Get(namelist[9]))
 histos_AllData.append(inFile_AllData.Get(namelist[10]))
 histos_AllData.append(inFile_AllData.Get(namelist[11]))
+histos_AllData.append(inFile_AllData.Get(namelist[12]))
+histos_AllData.append(inFile_AllData.Get(namelist[13]))
+histos_AllData.append(inFile_AllData.Get(namelist[14]))
 
 inFile_HH4lbb = TFile.Open(inputFilePath + 'histos_HH4lbb.root')
 histos_HH4lbb = []
@@ -48,6 +51,9 @@ histos_HH4lbb.append(inFile_HH4lbb.Get(namelist[8]))
 histos_HH4lbb.append(inFile_HH4lbb.Get(namelist[9]))
 histos_HH4lbb.append(inFile_HH4lbb.Get(namelist[10]))
 histos_HH4lbb.append(inFile_HH4lbb.Get(namelist[11]))
+histos_HH4lbb.append(inFile_HH4lbb.Get(namelist[12]))
+histos_HH4lbb.append(inFile_HH4lbb.Get(namelist[13]))
+histos_HH4lbb.append(inFile_HH4lbb.Get(namelist[14]))
 
 inFile_ggH125 = TFile.Open(inputFilePath + 'histos_ggH125.root')
 histos_ggH125 = []
@@ -63,6 +69,9 @@ histos_ggH125.append(inFile_ggH125.Get(namelist[8]))
 histos_ggH125.append(inFile_ggH125.Get(namelist[9]))
 histos_ggH125.append(inFile_ggH125.Get(namelist[10]))
 histos_ggH125.append(inFile_ggH125.Get(namelist[11]))
+histos_ggH125.append(inFile_ggH125.Get(namelist[12]))
+histos_ggH125.append(inFile_ggH125.Get(namelist[13]))
+histos_ggH125.append(inFile_ggH125.Get(namelist[14]))
 
 inFile_VBFH125 = TFile.Open(inputFilePath + 'histos_VBFH125.root')
 histos_VBFH125 = []
@@ -78,6 +87,9 @@ histos_VBFH125.append(inFile_VBFH125.Get(namelist[8]))
 histos_VBFH125.append(inFile_VBFH125.Get(namelist[9]))
 histos_VBFH125.append(inFile_VBFH125.Get(namelist[10]))
 histos_VBFH125.append(inFile_VBFH125.Get(namelist[11]))
+histos_VBFH125.append(inFile_VBFH125.Get(namelist[12]))
+histos_VBFH125.append(inFile_VBFH125.Get(namelist[13]))
+histos_VBFH125.append(inFile_VBFH125.Get(namelist[14]))
 
 inFile_WplusH125 = TFile.Open(inputFilePath + 'histos_WplusH125.root')
 histos_WplusH125 = []
@@ -93,6 +105,9 @@ histos_WplusH125.append(inFile_WplusH125.Get(namelist[8]))
 histos_WplusH125.append(inFile_WplusH125.Get(namelist[9]))
 histos_WplusH125.append(inFile_WplusH125.Get(namelist[10]))
 histos_WplusH125.append(inFile_WplusH125.Get(namelist[11]))
+histos_WplusH125.append(inFile_WplusH125.Get(namelist[12]))
+histos_WplusH125.append(inFile_WplusH125.Get(namelist[13]))
+histos_WplusH125.append(inFile_WplusH125.Get(namelist[14]))
 
 inFile_WminusH125 = TFile.Open(inputFilePath + 'histos_WminusH125.root')
 histos_WminusH125 = []
@@ -108,6 +123,9 @@ histos_WminusH125.append(inFile_WminusH125.Get(namelist[8]))
 histos_WminusH125.append(inFile_WminusH125.Get(namelist[9]))
 histos_WminusH125.append(inFile_WminusH125.Get(namelist[10]))
 histos_WminusH125.append(inFile_WminusH125.Get(namelist[11]))
+histos_WminusH125.append(inFile_WminusH125.Get(namelist[12]))
+histos_WminusH125.append(inFile_WminusH125.Get(namelist[13]))
+histos_WminusH125.append(inFile_WminusH125.Get(namelist[14]))
 
 inFile_ZH125 = TFile.Open(inputFilePath + 'histos_ZH125.root')
 histos_ZH125 = []
@@ -123,6 +141,9 @@ histos_ZH125.append(inFile_ZH125.Get(namelist[8]))
 histos_ZH125.append(inFile_ZH125.Get(namelist[9]))
 histos_ZH125.append(inFile_ZH125.Get(namelist[10]))
 histos_ZH125.append(inFile_ZH125.Get(namelist[11]))
+histos_ZH125.append(inFile_ZH125.Get(namelist[12]))
+histos_ZH125.append(inFile_ZH125.Get(namelist[13]))
+histos_ZH125.append(inFile_ZH125.Get(namelist[14]))
 
 inFile_bbH125 = TFile.Open(inputFilePath + 'histos_bbH125.root')
 histos_bbH125 = []
@@ -138,6 +159,9 @@ histos_bbH125.append(inFile_bbH125.Get(namelist[8]))
 histos_bbH125.append(inFile_bbH125.Get(namelist[9]))
 histos_bbH125.append(inFile_bbH125.Get(namelist[10]))
 histos_bbH125.append(inFile_bbH125.Get(namelist[11]))
+histos_bbH125.append(inFile_bbH125.Get(namelist[12]))
+histos_bbH125.append(inFile_bbH125.Get(namelist[13]))
+histos_bbH125.append(inFile_bbH125.Get(namelist[14]))
 
 inFile_ttH125 = TFile.Open(inputFilePath + 'histos_ttH125.root')
 histos_ttH125 = []
@@ -153,6 +177,9 @@ histos_ttH125.append(inFile_ttH125.Get(namelist[8]))
 histos_ttH125.append(inFile_ttH125.Get(namelist[9]))
 histos_ttH125.append(inFile_ttH125.Get(namelist[10]))
 histos_ttH125.append(inFile_ttH125.Get(namelist[11]))
+histos_ttH125.append(inFile_ttH125.Get(namelist[12]))
+histos_ttH125.append(inFile_ttH125.Get(namelist[13]))
+histos_ttH125.append(inFile_ttH125.Get(namelist[14]))
 
 inFile_ggTo4e_Contin_MCFM701 = TFile.Open(inputFilePath + 'histos_ggTo4e_Contin_MCFM701.root')
 histos_ggTo4e_Contin_MCFM701 = []
@@ -168,6 +195,9 @@ histos_ggTo4e_Contin_MCFM701.append(inFile_ggTo4e_Contin_MCFM701.Get(namelist[8]
 histos_ggTo4e_Contin_MCFM701.append(inFile_ggTo4e_Contin_MCFM701.Get(namelist[9]))
 histos_ggTo4e_Contin_MCFM701.append(inFile_ggTo4e_Contin_MCFM701.Get(namelist[10]))
 histos_ggTo4e_Contin_MCFM701.append(inFile_ggTo4e_Contin_MCFM701.Get(namelist[11]))
+histos_ggTo4e_Contin_MCFM701.append(inFile_ggTo4e_Contin_MCFM701.Get(namelist[12]))
+histos_ggTo4e_Contin_MCFM701.append(inFile_ggTo4e_Contin_MCFM701.Get(namelist[13]))
+histos_ggTo4e_Contin_MCFM701.append(inFile_ggTo4e_Contin_MCFM701.Get(namelist[14]))
 
 inFile_ggTo4mu_Contin_MCFM701 = TFile.Open(inputFilePath + 'histos_ggTo4mu_Contin_MCFM701.root')
 histos_ggTo4mu_Contin_MCFM701 = []
@@ -183,6 +213,9 @@ histos_ggTo4mu_Contin_MCFM701.append(inFile_ggTo4mu_Contin_MCFM701.Get(namelist[
 histos_ggTo4mu_Contin_MCFM701.append(inFile_ggTo4mu_Contin_MCFM701.Get(namelist[9]))
 histos_ggTo4mu_Contin_MCFM701.append(inFile_ggTo4mu_Contin_MCFM701.Get(namelist[10]))
 histos_ggTo4mu_Contin_MCFM701.append(inFile_ggTo4mu_Contin_MCFM701.Get(namelist[11]))
+histos_ggTo4mu_Contin_MCFM701.append(inFile_ggTo4mu_Contin_MCFM701.Get(namelist[12]))
+histos_ggTo4mu_Contin_MCFM701.append(inFile_ggTo4mu_Contin_MCFM701.Get(namelist[13]))
+histos_ggTo4mu_Contin_MCFM701.append(inFile_ggTo4mu_Contin_MCFM701.Get(namelist[14]))
 
 inFile_ggTo4tau_Contin_MCFM701 = TFile.Open(inputFilePath + 'histos_ggTo4tau_Contin_MCFM701.root')
 histos_ggTo4tau_Contin_MCFM701 = []
@@ -198,6 +231,9 @@ histos_ggTo4tau_Contin_MCFM701.append(inFile_ggTo4tau_Contin_MCFM701.Get(namelis
 histos_ggTo4tau_Contin_MCFM701.append(inFile_ggTo4tau_Contin_MCFM701.Get(namelist[9]))
 histos_ggTo4tau_Contin_MCFM701.append(inFile_ggTo4tau_Contin_MCFM701.Get(namelist[10]))
 histos_ggTo4tau_Contin_MCFM701.append(inFile_ggTo4tau_Contin_MCFM701.Get(namelist[11]))
+histos_ggTo4tau_Contin_MCFM701.append(inFile_ggTo4tau_Contin_MCFM701.Get(namelist[12]))
+histos_ggTo4tau_Contin_MCFM701.append(inFile_ggTo4tau_Contin_MCFM701.Get(namelist[13]))
+histos_ggTo4tau_Contin_MCFM701.append(inFile_ggTo4tau_Contin_MCFM701.Get(namelist[14]))
 
 inFile_ggTo2e2mu_Contin_MCFM701 = TFile.Open(inputFilePath + 'histos_ggTo2e2mu_Contin_MCFM701.root')
 histos_ggTo2e2mu_Contin_MCFM701 = []
@@ -213,6 +249,9 @@ histos_ggTo2e2mu_Contin_MCFM701.append(inFile_ggTo2e2mu_Contin_MCFM701.Get(namel
 histos_ggTo2e2mu_Contin_MCFM701.append(inFile_ggTo2e2mu_Contin_MCFM701.Get(namelist[9]))
 histos_ggTo2e2mu_Contin_MCFM701.append(inFile_ggTo2e2mu_Contin_MCFM701.Get(namelist[10]))
 histos_ggTo2e2mu_Contin_MCFM701.append(inFile_ggTo2e2mu_Contin_MCFM701.Get(namelist[11]))
+histos_ggTo2e2mu_Contin_MCFM701.append(inFile_ggTo2e2mu_Contin_MCFM701.Get(namelist[12]))
+histos_ggTo2e2mu_Contin_MCFM701.append(inFile_ggTo2e2mu_Contin_MCFM701.Get(namelist[13]))
+histos_ggTo2e2mu_Contin_MCFM701.append(inFile_ggTo2e2mu_Contin_MCFM701.Get(namelist[14]))
 
 inFile_ggTo2e2tau_Contin_MCFM701 = TFile.Open(inputFilePath + 'histos_ggTo2e2tau_Contin_MCFM701.root')
 histos_ggTo2e2tau_Contin_MCFM701 = []
@@ -228,6 +267,9 @@ histos_ggTo2e2tau_Contin_MCFM701.append(inFile_ggTo2e2tau_Contin_MCFM701.Get(nam
 histos_ggTo2e2tau_Contin_MCFM701.append(inFile_ggTo2e2tau_Contin_MCFM701.Get(namelist[9]))
 histos_ggTo2e2tau_Contin_MCFM701.append(inFile_ggTo2e2tau_Contin_MCFM701.Get(namelist[10]))
 histos_ggTo2e2tau_Contin_MCFM701.append(inFile_ggTo2e2tau_Contin_MCFM701.Get(namelist[11]))
+histos_ggTo2e2tau_Contin_MCFM701.append(inFile_ggTo2e2tau_Contin_MCFM701.Get(namelist[12]))
+histos_ggTo2e2tau_Contin_MCFM701.append(inFile_ggTo2e2tau_Contin_MCFM701.Get(namelist[13]))
+histos_ggTo2e2tau_Contin_MCFM701.append(inFile_ggTo2e2tau_Contin_MCFM701.Get(namelist[14]))
 
 inFile_ggTo2mu2tau_Contin_MCFM701 = TFile.Open(inputFilePath + 'histos_ggTo2mu2tau_Contin_MCFM701.root')
 histos_ggTo2mu2tau_Contin_MCFM701 = []
@@ -243,8 +285,12 @@ histos_ggTo2mu2tau_Contin_MCFM701.append(inFile_ggTo2mu2tau_Contin_MCFM701.Get(n
 histos_ggTo2mu2tau_Contin_MCFM701.append(inFile_ggTo2mu2tau_Contin_MCFM701.Get(namelist[9]))
 histos_ggTo2mu2tau_Contin_MCFM701.append(inFile_ggTo2mu2tau_Contin_MCFM701.Get(namelist[10]))
 histos_ggTo2mu2tau_Contin_MCFM701.append(inFile_ggTo2mu2tau_Contin_MCFM701.Get(namelist[11]))
+histos_ggTo2mu2tau_Contin_MCFM701.append(inFile_ggTo2mu2tau_Contin_MCFM701.Get(namelist[12]))
+histos_ggTo2mu2tau_Contin_MCFM701.append(inFile_ggTo2mu2tau_Contin_MCFM701.Get(namelist[13]))
+histos_ggTo2mu2tau_Contin_MCFM701.append(inFile_ggTo2mu2tau_Contin_MCFM701.Get(namelist[14]))
 
-inFile_ZZTo4lext1 = TFile.Open(inputFilePath + 'histos_ZZTo4lext1.root')
+#inFile_ZZTo4lext1 = TFile.Open(inputFilePath + 'histos_ZZTo4lext1.root')
+inFile_ZZTo4lext1 = TFile.Open(inputFilePath + 'histos_ZZTo4lamcatnlo.root')
 histos_ZZTo4lext1 = []
 histos_ZZTo4lext1.append(inFile_ZZTo4lext1.Get(namelist[0]))
 histos_ZZTo4lext1.append(inFile_ZZTo4lext1.Get(namelist[1]))
@@ -258,6 +304,9 @@ histos_ZZTo4lext1.append(inFile_ZZTo4lext1.Get(namelist[8]))
 histos_ZZTo4lext1.append(inFile_ZZTo4lext1.Get(namelist[9]))
 histos_ZZTo4lext1.append(inFile_ZZTo4lext1.Get(namelist[10]))
 histos_ZZTo4lext1.append(inFile_ZZTo4lext1.Get(namelist[11]))
+histos_ZZTo4lext1.append(inFile_ZZTo4lext1.Get(namelist[12]))
+histos_ZZTo4lext1.append(inFile_ZZTo4lext1.Get(namelist[13]))
+histos_ZZTo4lext1.append(inFile_ZZTo4lext1.Get(namelist[14]))
 
 inFile_TTZJets_M10_MLMext1 = TFile.Open(inputFilePath + 'histos_TTZJets_M10_MLMext1.root')
 histos_TTZJets_M10_MLMext1 = []
@@ -273,6 +322,9 @@ histos_TTZJets_M10_MLMext1.append(inFile_TTZJets_M10_MLMext1.Get(namelist[8]))
 histos_TTZJets_M10_MLMext1.append(inFile_TTZJets_M10_MLMext1.Get(namelist[9]))
 histos_TTZJets_M10_MLMext1.append(inFile_TTZJets_M10_MLMext1.Get(namelist[10]))
 histos_TTZJets_M10_MLMext1.append(inFile_TTZJets_M10_MLMext1.Get(namelist[11]))
+histos_TTZJets_M10_MLMext1.append(inFile_TTZJets_M10_MLMext1.Get(namelist[12]))
+histos_TTZJets_M10_MLMext1.append(inFile_TTZJets_M10_MLMext1.Get(namelist[13]))
+histos_TTZJets_M10_MLMext1.append(inFile_TTZJets_M10_MLMext1.Get(namelist[14]))
 
 inFile_TTZToLL_M1to10_MLM = TFile.Open(inputFilePath + 'histos_TTZToLL_M1to1O_MLM.root')
 histos_TTZToLL_M1to10_MLM = []
@@ -288,6 +340,9 @@ histos_TTZToLL_M1to10_MLM.append(inFile_TTZToLL_M1to10_MLM.Get(namelist[8]))
 histos_TTZToLL_M1to10_MLM.append(inFile_TTZToLL_M1to10_MLM.Get(namelist[9]))
 histos_TTZToLL_M1to10_MLM.append(inFile_TTZToLL_M1to10_MLM.Get(namelist[10]))
 histos_TTZToLL_M1to10_MLM.append(inFile_TTZToLL_M1to10_MLM.Get(namelist[11]))
+histos_TTZToLL_M1to10_MLM.append(inFile_TTZToLL_M1to10_MLM.Get(namelist[12]))
+histos_TTZToLL_M1to10_MLM.append(inFile_TTZToLL_M1to10_MLM.Get(namelist[13]))
+histos_TTZToLL_M1to10_MLM.append(inFile_TTZToLL_M1to10_MLM.Get(namelist[14]))
 
 inFile_TTWJetsToLNu = TFile.Open(inputFilePath + 'histos_TTWJetsToLNu.root')
 histos_TTWJetsToLNu = []
@@ -303,7 +358,9 @@ histos_TTWJetsToLNu.append(inFile_TTWJetsToLNu.Get(namelist[8]))
 histos_TTWJetsToLNu.append(inFile_TTWJetsToLNu.Get(namelist[9]))
 histos_TTWJetsToLNu.append(inFile_TTWJetsToLNu.Get(namelist[10]))
 histos_TTWJetsToLNu.append(inFile_TTWJetsToLNu.Get(namelist[11]))
-
+histos_TTWJetsToLNu.append(inFile_TTWJetsToLNu.Get(namelist[12]))
+histos_TTWJetsToLNu.append(inFile_TTWJetsToLNu.Get(namelist[13]))
+histos_TTWJetsToLNu.append(inFile_TTWJetsToLNu.Get(namelist[14]))
 
 inFile_WWZ = TFile.Open(inputFilePath + 'histos_WWZ.root')
 histos_WWZ = []
@@ -319,7 +376,9 @@ histos_WWZ.append(inFile_WWZ.Get(namelist[8]))
 histos_WWZ.append(inFile_WWZ.Get(namelist[9]))
 histos_WWZ.append(inFile_WWZ.Get(namelist[10]))
 histos_WWZ.append(inFile_WWZ.Get(namelist[11]))
-
+histos_WWZ.append(inFile_WWZ.Get(namelist[12]))
+histos_WWZ.append(inFile_WWZ.Get(namelist[13]))
+histos_WWZ.append(inFile_WWZ.Get(namelist[14]))
 
 inFile_WZZ = TFile.Open(inputFilePath + 'histos_WZZ.root')
 histos_WZZ = []
@@ -335,7 +394,9 @@ histos_WZZ.append(inFile_WZZ.Get(namelist[8]))
 histos_WZZ.append(inFile_WZZ.Get(namelist[9]))
 histos_WZZ.append(inFile_WZZ.Get(namelist[10]))
 histos_WZZ.append(inFile_WZZ.Get(namelist[11]))
-
+histos_WZZ.append(inFile_WZZ.Get(namelist[12]))
+histos_WZZ.append(inFile_WZZ.Get(namelist[13]))
+histos_WZZ.append(inFile_WZZ.Get(namelist[14]))
 
 inFile_ZZZ = TFile.Open(inputFilePath + 'histos_ZZZ.root')
 histos_ZZZ = []
@@ -351,8 +412,11 @@ histos_ZZZ.append(inFile_ZZZ.Get(namelist[8]))
 histos_ZZZ.append(inFile_ZZZ.Get(namelist[9]))
 histos_ZZZ.append(inFile_ZZZ.Get(namelist[10]))
 histos_ZZZ.append(inFile_ZZZ.Get(namelist[11]))
+histos_ZZZ.append(inFile_ZZZ.Get(namelist[12]))
+histos_ZZZ.append(inFile_ZZZ.Get(namelist[13]))
+histos_ZZZ.append(inFile_ZZZ.Get(namelist[14]))
 
-inFile_ZX = TFile.Open(inputFilePath + 'histos_Z+Xnew.root')
+inFile_ZX = TFile.Open(inputFilePath + 'histos_Z+X.root')
 histos_ZX = []
 histos_ZX.append(inFile_ZX.Get(namelist[0]))
 histos_ZX.append(inFile_ZX.Get(namelist[1]))
@@ -366,6 +430,9 @@ histos_ZX.append(inFile_ZX.Get(namelist[8]))
 histos_ZX.append(inFile_ZX.Get(namelist[9]))
 histos_ZX.append(inFile_ZX.Get(namelist[10]))
 histos_ZX.append(inFile_ZX.Get(namelist[11]))
+histos_ZX.append(inFile_ZX.Get(namelist[12]))
+histos_ZX.append(inFile_ZX.Get(namelist[13]))
+histos_ZX.append(inFile_ZX.Get(namelist[14]))
 
 
 print 'files read'
@@ -381,16 +448,13 @@ for name in namelist :
 
 #    integral_fondi = 0.
 
-
-
-
 #  tribosons
-    histo_tribosons = histos_WWZ[i]
-    histo_tribosons.Add(histos_WZZ[i])
-    histo_tribosons.Add(histos_ZZZ[i])
-    histo_tribosons.SetFillColor(kOrange)
-    histo_tribosons.SetLineColor(kOrange+1)
-    hs.Add(histo_tribosons)
+    histos_tribosons = histos_WWZ[i]
+    histos_tribosons.Add(histos_WZZ[i])
+    histos_tribosons.Add(histos_ZZZ[i])
+    histos_tribosons.SetFillColor(kOrange)
+    histos_tribosons.SetLineColor(kOrange+1)
+    hs.Add(histos_tribosons)
 
 # ZX background
     histo_ZX = histos_ZX[i]
@@ -498,7 +562,7 @@ for name in namelist :
     legend.AddEntry(histo_ggZZ,                      "gg->ZZ",   "f")
     legend.AddEntry(histos_TTWJetsToLNu[i],          "TTW",      "f")
     legend.AddEntry(histos_ZX[i],                    "Z+X", "f")
-    legend.AddEntry(histo_tribosons,                 "Tribosons", "f")
+    legend.AddEntry(histos_tribosons,                 "Tribosons", "f")
     legend.SetFillColor(kWhite)
     legend.SetLineColor(kBlack)
     legend.SetTextFont(43)

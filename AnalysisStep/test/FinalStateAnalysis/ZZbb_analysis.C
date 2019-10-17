@@ -283,7 +283,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
     }
   if (ISZX) inputTree->SetBranchAddress("weight", &weight);
   inputTree->SetBranchAddress("ZZsel", &ZZsel);
-  inputTree->SetBranchAddress("LepPt", &LepPt);
+  //  inputTree->SetBranchAddress("LepPt", &LepPt);
   inputTree->SetBranchAddress("LepEta", &LepEta);
   inputTree->SetBranchAddress("ZZMass", &ZZMass);  
   inputTree->SetBranchAddress("Z1Flav", &Z1Flav);
@@ -349,9 +349,9 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 
       Float_t kfactor = 1.;
       // qqZZ sample                                                                                                                                                                                        
-      if(inputFileMC.Contains("ZZTo4l")) { kfactor = KFactor_EW_qqZZ * KFactor_QCD_qqZZ_M; }
+      //      if(inputFileMC.Contains("ZZTo4l")) { kfactor = KFactor_EW_qqZZ * KFactor_QCD_qqZZ_M; }
       //ggZZ samples                                                                                                                                                                                        
-      else if(inputFileMC.Contains("ggTo")) { kfactor = KFactor_QCD_ggZZ_Nominal; }
+      //      else if(inputFileMC.Contains("ggTo")) { kfactor = KFactor_QCD_ggZZ_Nominal; }
 
       Double_t eventWeight = 0.;
       if (!ISDATA && !ISZX) eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight ;
@@ -460,14 +460,16 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
       for(int v = 0; v < nHisto; v++)
 	{
 	  string histoString = myHisto1D[v].Name.c_str();
-          if(histoString == "leptonsPt_4lSelOnly")
+	  /*          if(histoString == "leptonsPt_4lSelOnly")
           {
+
             for(UInt_t i = 0; i<LepPt->size(); i++)
 	    {
               h1[v][currentFinalState]->Fill(LepPt->at(i), eventWeight);
             }
           }
-          else if(histoString == "jetsPt_4lSelOnly")
+          else if(histoString == "jetsPt_4lSelOnly")*/
+	  if(histoString == "jetsPt_4lSelOnly")
 	  {
             for(UInt_t j = 0; j<JetPt->size(); j++)
 	    {
@@ -955,29 +957,32 @@ void ZZbb_analysis()
 
   //TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
   TString inputFilePath = "/eos/user/a/acappati/samples_4lX/allsamples/";
-  TString inputFileName[] = {"HH4lbb",
-                             "ggH125",
-                             "VBFH125",
-                             "WplusH125",
-                             "WminusH125",
-                             "ZH125",
-                             "bbH125",
-                             "ttH125",
+  TString inputFileName[] = {// "HH4lbb",
+                             // "ggH125",
+                             // "VBFH125",
+                             // "WplusH125",
+                             // "WminusH125",
+                             // "ZH125",
+                             // "bbH125",
+                             // "ttH125",
                              "ZZTo4lext1",
-                             "TTZJets_M10_MLMext1",
-                             "TTZToLL_M1to1O_MLM",
-                             "TTWJetsToLNu",
-                             "AllData",
-                             "ggTo4e_Contin_MCFM701",
-                             "ggTo4mu_Contin_MCFM701",
-                             "ggTo4tau_Contin_MCFM701",
-                             "ggTo2e2mu_Contin_MCFM701",
-                             "ggTo2e2tau_Contin_MCFM701",
-                             "ggTo2mu2tau_Contin_MCFM701",
-                             "WWZ",
-                             "WZZ",
-                             "ZZZ",
-                             "Z+X"
+                             // "TTZJets_M10_MLMext1",
+                             // "TTZToLL_M1to1O_MLM",
+                             // "TTWJetsToLNu",
+                             // "AllData",
+                             // "ggTo4e_Contin_MCFM701",
+                             // "ggTo4mu_Contin_MCFM701",
+                             // "ggTo4tau_Contin_MCFM701",
+                             // "ggTo2e2mu_Contin_MCFM701",
+                             // "ggTo2e2tau_Contin_MCFM701",
+                             // "ggTo2mu2tau_Contin_MCFM701",
+                             // "WWZ",
+                             // "WZZ",
+                             // "ZZZ",
+                             // "Z+X",
+			     "ZZTo4lamcatnlo",
+			     // "DY3JetsToLL_M50",
+			     // "DY2JetsToLL_M50" 
                            };
 
   size_t nInputFiles = sizeof(inputFileName)/sizeof(inputFileName[0]);
