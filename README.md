@@ -3,13 +3,13 @@ ZZXAnalysis
 
 To install a complete CMSSW 10X area (including this package)
 ------------------------------
-2018 data analysis
+2016, 2017, and 2018 data analysis
 
-Please use CMSSW_10_2_5_patch1. 
+Please use **CMSSW_10_2_18**. 
 
 Download and execute the setup script with the following indications:
 ```
-cmsrel CMSSW_10_2_5_patch1
+cmsrel CMSSW_10_2_18
 wget -O ${TMPDIR}/checkout_10X.csh https://raw.githubusercontent.com/HHto4lX/ZZXAnalysis/master/checkout_10X.csh
 cd $CMSSW_BASE/src
 cmsenv
@@ -18,35 +18,7 @@ ${TMPDIR}/checkout_10X.csh
 scram b
 ```
 
-To install a complete CMSSW 9X area (including this package) - TO BE FIXED
-------------------------------
-2017 data analysis
 
-Please use CMSSW_9_4_9.
-
-Download and execute the setup script:
-```
-wget -O ${TMPDIR}/checkout_9X.csh https://raw.githubusercontent.com/HHto4lX/ZZXAnalysis/master/checkout_9X.csh
-cd $CMSSW_BASE/src
-cmsenv
-chmod u+x ${TMPDIR}/checkout_9X.csh
-${TMPDIR}/checkout_9X.csh
-```
-
-To install a complete CMSSW 8X area (including this package) - TO BE FIXED
-------------------------------
-2016 data analysis
-
-Please use CMSSW_8_0_29. 
-
-Download and execute the setup script:
-```
-wget -O ${TMPDIR}/checkout_80X.csh https://raw.githubusercontent.com/HHto4lX/ZZXAnalysis/master/checkout_80X.csh
-cd $CMSSW_BASE/src
-cmsenv
-chmod u+x ${TMPDIR}/checkout_80X.csh
-${TMPDIR}/checkout_80X.csh
-```
 
 To update this package from the release
 ------------------------------------------
