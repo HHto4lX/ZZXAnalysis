@@ -7,36 +7,50 @@
 # chmod u+x ${TMPDIR}/checkout_10X.csh
 # ${TMPDIR}/checkout_10X.csh
 
-############## For CMSSW_10_2_5_patch1
+############## For CMSSW_10_2_18
 git cms-init
 
-#Preliminary electron scale and smearing corrections according to https://twiki.cern.ch/twiki/bin/view/CMS/EGMSmearer
-# git cms-merge-topic cms-egamma:EGM_94X_v1
-# (cd EgammaAnalysis/ElectronTools/data ; git clone https://github.com/ECALELFS/ScalesSmearings.git ; cd ScalesSmearings ; git checkout Run2017_17Nov2017_v1)
+#Preliminary electron scale and smearing corrections according to https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPostRecoRecipes#2018_Preliminary_Energy_Correcti
+#We need the ElectronTools package to calculate smear and scale uncertainties so just download the ScaleAndSmearing files manualy 
+git cms-merge-topic cms-egamma:EgammaPostRecoTools
+git cms-merge-topic cms-egamma:PhotonIDValueMapSpeedup1029
+git cms-merge-topic cms-egamma:slava77-btvDictFix_10210
+git cms-addpkg EgammaAnalysis/ElectronTools
+(rm -rf EgammaAnalysis/ElectronTools/data;git clone https://github.com/cms-data/EgammaAnalysis-ElectronTools.git EgammaAnalysis/ElectronTools/data;)
+
+# 2016 and 2018 retraining for electron BDT
+git cms-merge-topic mkovac:Electron_XGBoost_MVA_2016_and_2018_CMSSW_10_2_15
 
 #MET corrections according to https://twiki.cern.ch/twiki/bin/view/CMS/MissingETUncertaintyPrescription#Instructions_for_9_4_X_X_0_for_M
-# git cms-merge-topic cms-met:METRecipe94x
+git cms-merge-topic cms-met:METFixEE2017_949_v2_backport_to_102X
 
 #Simplified template cross section
-# git cms-addpkg GeneratorInterface/RivetInterface
+git cms-addpkg GeneratorInterface/RivetInterface
+git cms-addpkg SimDataFormats/HTXS
+git remote add amarini https://github.com/amarini/cmssw.git
+git fetch amarini 
+git checkout amarini/htxs_stage1p1_cmssw949_v2 GeneratorInterface/RivetInterface
+git checkout amarini/htxs_stage1p1_cmssw949_v2 SimDataFormats/HTXS
 
 #### Please do not add any custom (non-CMSSW) package before this line ####
-
 #ZZXAnalysis
 git clone https://github.com/HHto4lX/ZZXAnalysis.git ZZXAnalysis
 (cd ZZXAnalysis; git checkout master)
 
+# Muon MVA
+git clone https://github.com/mkovac/MuonMVAReader.git MuonMVAReader
+
 #MELA Analytics
 git clone https://github.com/usarica/MelaAnalytics.git
-(cd MelaAnalytics; git checkout -b from-v11 v1.1)
+(cd MelaAnalytics; git checkout -b from-v19 v1.9)
 
 #Common LHE tools
 git clone https://github.com/usarica/CommonLHETools.git
-(cd CommonLHETools; git checkout -b from-v122 v1.2.2)
+(cd CommonLHETools; git checkout -b from-v131 v1.3.1)
 
 #MELA
 git clone https://github.com/cms-analysis/HiggsAnalysis-ZZMatrixElement.git ZZMatrixElement
-(cd ZZMatrixElement; git checkout -b from-v218 v2.1.8)
+(cd ZZMatrixElement; git checkout -b from-v222 v2.2.2)
 # replace ZZMatrixElement/MELA/setup.sh -j 8
 (                                                                 \
   cd ${CMSSW_BASE}/src/ZZMatrixElement/MELA/COLLIER/             ;\
@@ -65,7 +79,6 @@ git clone https://github.com/cms-analysis/HiggsAnalysis-ZZMatrixElement.git ZZMa
 git clone https://github.com/mhl0116/KinZfitter-1.git KinZfitter
 (cd KinZfitter ; git checkout -b from-27daebb 27daebb)
 
-#muon momentum scale corrections (76X)
-git clone https://github.com/bachtis/Analysis.git -b KaMuCa_V4 KaMuCa
+
 
 
