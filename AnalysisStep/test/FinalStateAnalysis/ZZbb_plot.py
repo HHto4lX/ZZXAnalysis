@@ -5,17 +5,17 @@ from ROOT import TFile, TH1F, TCanvas, gSystem, TAttFill, TLegend, TStyle, THSta
 import CMSGraphics, CMS_lumi
 
 # create output directory
-OutputPath = 'ZZbb_plotsNEW'
+OutputPath = 'ZZbb_plots'
 gSystem.Exec("mkdir -p " + OutputPath)
 print "Output directory created!"
 
 
 # inputh file phath
-inputFilePath = 'histos_4lbb/' 
+inputFilePath = '/eos/user/a/acappati/analysis_4lX/histos_4lbb_20191203/' 
 
 
 # hist names
-namelist = ['h1_M4L_CR4Lonly_4L','h1_MZ1_CR4Lonly_4L','h1_MZ2_CR4Lonly_4L','h1_eta4L_CR4Lonly_4L','h1_pt4L_CR4Lonly_4L','h1_M4L_4L','h1_MZ1_4L','h1_MZ2_4L','h1_eta4L_4L','h1_pt4L_4L','h1_methodBPT_M_4L','h1_methodBPT_PT_4L','h1_jetsPt_4lSelOnly_4L','h1_jetsPt_4lAnd2JetsSel_4L','h1_jetsPt_4lAnd2JetsSel_withBtag_4L']
+namelist = ['h1_M4L_CR4Lonly_4L','h1_MZ1_CR4Lonly_4L','h1_MZ2_CR4Lonly_4L','h1_eta4L_CR4Lonly_4L','h1_pt4L_CR4Lonly_4L','h1_M4L_4L','h1_MZ1_4L','h1_MZ2_4L','h1_eta4L_4L','h1_pt4L_4L','h1_methodBPT_M_4L','h1_methodBPT_PT_4L','h1_jetsPt_4lSelOnly_4L','h1_jetsPt_4lAnd2JetsSel_4L','h1_jetsPt_4lAnd2JetsSel_withBtag_4L','h1_JetBTaggertot_4L','h1_JetBTagger1_4L','h1_JetBTagger2_4L']
 
 
 # read files
@@ -303,6 +303,8 @@ for name in namelist :
 
     canvas.Update()
 
+
+#    pad1.SetLogy()
 
     if 'M4L' in name:
         pad1.SetLogx()
