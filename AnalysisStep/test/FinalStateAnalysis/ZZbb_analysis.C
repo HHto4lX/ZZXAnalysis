@@ -32,6 +32,7 @@ using namespace std;
 #define MERGE2E2MU 1
 #define DOBLINDHISTO 1
 #define VERBOSE 0
+#define CR 0
 
 double DELTAR = .4;
 
@@ -57,7 +58,7 @@ struct Histo1D
   bool isLogy;
 };
 
-const int nHisto = 45;
+const int nHisto = 48;
 
 Histo1D myHisto1D[nHisto] = {
   {"M4L_CR4Lonly", "m_{4l} (GeV)", "Events / 5 GeV", "", 70, 1070, 200, 1, 0},  
@@ -101,6 +102,9 @@ Histo1D myHisto1D[nHisto] = {
   {"methodPTjet_Pruned1", "Pruned gen efficiency", "Events", "", 0, 5, 5, 0, 0},
   {"methodPTjet_Pruned2", "Pruned gen efficiency", "Events", "", 0, 5, 5, 0, 0},
   {"methodPTjet_PrunedTOT", "Pruned gen efficiency", "Events", "", 0, 5, 5, 0, 0},
+  {"JetBTaggertot", "total jet b tagger", "Events", "", -3, 3, 600, 0, 0},
+  {"JetBTagger1", "first jet b tagger", "Events", "", -3, 3, 600, 0, 0},
+  {"JetBTagger2", "second jet b tagger", "Events", "", -3, 3, 600, 0, 0},
   // --- control plots
   {"leptonsPt_4lSelOnly"          , "pT", "Events/ 10 GeV", "", 0, 700, 70, 0, 0},
   {"jetsPt_4lSelOnly"             , "pT", "Events/ 10 GeV", "", 0, 700, 70, 0, 0},
@@ -123,6 +127,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   std::cout << "ISDATA: " << ISDATA << endl; 
   std::cout << "ISZX: " << ISZX << endl; 
   std::cout << "DOBLINDHISTO: " << DOBLINDHISTO << endl;
+  std::cout << "CONTROL REGION: " << CR << endl;
 
   TFile* inputFile;
   TTree* inputTree;
@@ -164,7 +169,8 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   Float_t Deltabb_eta_pt = 0;
   Float_t Deltabb_phi_pt = 0;
  
-  vector<Float_t> *JetIsBTaggedWithSF = 0;
+  //  vector<Float_t> *JetIsBTaggedWithSF = 0;
+  vector<Float_t> *JetIsBTagged = 0;
   vector<Float_t> *JetPt     = 0;
   vector<Float_t> *JetEta    = 0;
   vector<Float_t> *JetPhi    = 0;
@@ -240,6 +246,10 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   Int_t count_2H = 0;
   Float_t yield_2H = 0;
 
+  vector<Float_t> *JetBTagger = 0;
+    Float_t JetBTagger1 = 0;
+  Float_t JetBTagger2 = 0;
+
   double yield = 0;
 
   TH1F* h1[nHisto][nFinalState+1];
@@ -256,7 +266,8 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 	  h1[h][fs]->Sumw2(true);
 	}       
     }
-  
+
+
   int currentFinalState;
 
   inputFile =  TFile::Open( inputFileMC );
@@ -283,7 +294,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
     }
   if (ISZX) inputTree->SetBranchAddress("weight", &weight);
   inputTree->SetBranchAddress("ZZsel", &ZZsel);
-  //  inputTree->SetBranchAddress("LepPt", &LepPt);
+  inputTree->SetBranchAddress("LepPt", &LepPt);
   inputTree->SetBranchAddress("LepEta", &LepEta);
   inputTree->SetBranchAddress("ZZMass", &ZZMass);  
   inputTree->SetBranchAddress("Z1Flav", &Z1Flav);
@@ -297,7 +308,9 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   inputTree->SetBranchAddress("JetEta", &JetEta);
   inputTree->SetBranchAddress("JetMass", &JetMass);
   inputTree->SetBranchAddress("JetPhi",  &JetPhi);
-  inputTree->SetBranchAddress("JetIsBtaggedWithSF",  &JetIsBTaggedWithSF);
+  inputTree->SetBranchAddress("JetBTagger",  &JetBTagger);
+  //  inputTree->SetBranchAddress("JetIsBtaggedWithSF",  &JetIsBTaggedWithSF);
+  inputTree->SetBranchAddress("JetIsBtagged",  &JetIsBTagged);
   if (!ISZX)
     {
       if (ISGEN) inputTree->SetBranchAddress("GENjetParentID",  &GENjetParentID);
@@ -328,6 +341,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 
   for (Long64_t entry = 0; entry < entries; entry++)
     {  
+      //      std::cout << "evento " << entry << endl;
       int nbjet = 0;
       int njet = 0;
       int njet_noB = 0;
@@ -348,10 +362,12 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
       if( !(ZZsel >= 0) ) continue;  // to include CRZLL sample
 
       Float_t kfactor = 1.;
-      // qqZZ sample                                                                                                                                                                                        
-      //      if(inputFileMC.Contains("ZZTo4l")) { kfactor = KFactor_EW_qqZZ * KFactor_QCD_qqZZ_M; }
-      //ggZZ samples                                                                                                                                                                                        
-      //      else if(inputFileMC.Contains("ggTo")) { kfactor = KFactor_QCD_ggZZ_Nominal; }
+
+      // qqZZ sample                                                                                                                                                                                       
+      if(inputFileMC.Contains("ZZTo4l")) { kfactor = KFactor_EW_qqZZ * KFactor_QCD_qqZZ_M; }
+
+      //ggZZ samples                                                                                                                                                                                       
+      else if(inputFileMC.Contains("ggTo")) { kfactor = KFactor_QCD_ggZZ_Nominal; }
 
       Double_t eventWeight = 0.;
       if (!ISDATA && !ISZX) eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight ;
@@ -359,7 +375,6 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
       else eventWeight = 1.;
 
      
- 
       if (VERBOSE) 
 	{std::cout << "--------- event: " << entry << " weight: " << eventWeight << endl;
 	  /*
@@ -439,12 +454,14 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 
       Float_t histoContent[nHisto];
 
-      bool SHOW =  ( (ZZMass > 135) || (ZZMass < 115) ) || (!DOBLINDHISTO) ;
+      bool isInControlRegion = ( (ZZMass > 135) || (ZZMass < 115) ) ;
+      bool SHOW =  isInControlRegion || (!DOBLINDHISTO)  ;
 
       for(int v = 0; v < nHisto; v++)
 	{
 	  string histoString = myHisto1D[v].Name.c_str();
 	  if      (histoString == "M4L_CR4Lonly" && ( !ISDATA || SHOW ) ) histoContent[v] = ZZMass;
+	  //	  if      (histoString == "M4L_CR4Lonly")   histoContent[v] = ZZMass;
 	  else if (histoString == "MZ1_CR4Lonly")   histoContent[v] = Z1Mass;
 	  else if (histoString == "MZ2_CR4Lonly")   histoContent[v] = Z2Mass;
 	  else if (histoString == "pt4L_CR4Lonly")  histoContent[v] = ZZPt;
@@ -460,7 +477,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
       for(int v = 0; v < nHisto; v++)
 	{
 	  string histoString = myHisto1D[v].Name.c_str();
-	  /*          if(histoString == "leptonsPt_4lSelOnly")
+	  if(histoString == "leptonsPt_4lSelOnly")
           {
 
             for(UInt_t i = 0; i<LepPt->size(); i++)
@@ -468,16 +485,15 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
               h1[v][currentFinalState]->Fill(LepPt->at(i), eventWeight);
             }
           }
-          else if(histoString == "jetsPt_4lSelOnly")*/
-	  if(histoString == "jetsPt_4lSelOnly")
-	  {
-            for(UInt_t j = 0; j<JetPt->size(); j++)
+          else if(histoString == "jetsPt_4lSelOnly")
 	    {
-              h1[v][currentFinalState]->Fill(JetPt->at(j), eventWeight);
-	    }
-          }          
+	      for(UInt_t j = 0; j<JetPt->size(); j++)
+		{
+		  h1[v][currentFinalState]->Fill(JetPt->at(j), eventWeight);
+		}
+	    }          
         }
-
+      
 
 
       // -----------------
@@ -500,7 +516,8 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   	  if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 30 ) ) continue; // pt cut 20GeV from ntuplizer reduced to 30
 	  
 	  njet++;
-	  if (JetIsBTaggedWithSF->at(j) >0) 
+	  //	  if (JetIsBTaggedWithSF->at(j) >0) 
+	  if (JetIsBTagged->at(j) >0) 
 	    {
 	      btag = 1;
 	      nbjet ++;
@@ -508,7 +525,8 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 	  else njet_noB++;
 	  if (VERBOSE)
 	    {
-	      std::cout << "Jet is: " << JetIsBTaggedWithSF->at(j) << endl;
+	      //	      std::cout << "Jet is: " << JetIsBTaggedWithSF->at(j) << endl;
+	      std::cout << "Jet is: " << JetIsBTagged->at(j) << endl;
 	      std::cout << "btag  : " << btag << endl;
 	    }
 	  TLorentzVector temp;
@@ -531,32 +549,27 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 	}
       
 
+
+
       // --- bb selection
       // --- remove events with <2 jet      
-      if (JetVec.size() < 2) continue;      
-
 
       // --- control plot
+
+      if (JetVec.size() < 2) continue;      
+
       for(int v = 0; v < nHisto; v++)
 	{
 	  string histoString = myHisto1D[v].Name.c_str();
           if(histoString == "jetsPt_4lAnd2JetsSel")
           {
             for(UInt_t i = 0; i<JetPt->size(); i++)
-	    {
-              h1[v][currentFinalState]->Fill(JetPt->at(i), eventWeight);
+	    { 
+	      if (JetPt->at(i) >= 30) h1[v][currentFinalState]->Fill(JetPt->at(i), eventWeight);
             }
           }
         }
-      
-
-      // --- bb selection
-      // --- remove events with no btagged jets
       if (nbjet < 1) continue;
-      if (VERBOSE) std::cout << "passed: >= 2 jet, >= 1 b-jet" << endl;
-
-
-      // --- control plot
       for(int v = 0; v < nHisto; v++)
 	{
 	  string histoString = myHisto1D[v].Name.c_str();
@@ -564,10 +577,18 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
           {
             for(UInt_t i = 0; i<JetPt->size(); i++)
 	    {
-              h1[v][currentFinalState]->Fill(JetPt->at(i), eventWeight);
+	      if (JetPt->at(i) >= 30) h1[v][currentFinalState]->Fill(JetPt->at(i), eventWeight);
             }
           }
         }
+
+
+
+      // --- control plot
+      
+      if (VERBOSE) std::cout << "passed: >= 2 jet, >= 1 b-jet" << endl;
+
+
 
 
       
@@ -662,6 +683,9 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
       Deltabb_eta_pt = 0;
       Deltabb_phi_pt = 0;
 
+      JetBTagger1 = 4.;
+      JetBTagger2 = 5.;
+
       int size_binfo_2 = 0;
       int size_binfo_1 = 0;
 
@@ -671,7 +695,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 	{
 	  if (JetPairBinfo[s] > 1) size_binfo_2++;
 	  if (JetPairBinfo[s] == 1) size_binfo_1++;
-	}    
+ 	}    
 
       if (VERBOSE)
 	{
@@ -720,6 +744,8 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 	      BESTpair_methodBPT_Binfo = JetPairBinfo[p];
 	      BESTpair_methodBPT_index1 = JetPair_index1[p];
 	      BESTpair_methodBPT_index2 = JetPair_index2[p];
+	      JetBTagger1 = JetBTagger->at(BESTpair_methodBPT_index1);
+	      JetBTagger2 = JetBTagger->at(BESTpair_methodBPT_index2);
 	    }
 	  
 	  if (size_binfo_2 > 1 && JetPairBinfo[p] == 2 && (fabs (JetPair[p].M() - 125.) < deltaM_B) )
@@ -734,9 +760,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
               BESTpair_methodBM_PHI = JetPair[p].Phi();
               BESTpair_methodBM_PT = JetPair[p].Pt();
               BESTpair_methodBM_Binfo = JetPairBinfo[p];
-
-              BESTpair_methodBM_index1 = JetPair_index1[p];
-              BESTpair_methodBM_index2 = JetPair_index2[p];
+	      
 	    }
 
 	  if (size_binfo_2 > 1 && JetPairBinfo[p] == 2 && JetPair[p].Pt() > sumPT )
@@ -754,6 +778,9 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 
               BESTpair_methodBPT_index1 = JetPair_index1[p];
               BESTpair_methodBPT_index2 = JetPair_index2[p];
+	      JetBTagger1 = JetBTagger->at(BESTpair_methodBPT_index1);
+	      JetBTagger2 = JetBTagger->at(BESTpair_methodBPT_index2);
+
 	    }
 
 
@@ -788,6 +815,8 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
               BESTpair_methodBPT_Binfo = JetPairBinfo[p];
               BESTpair_methodBPT_index1 = JetPair_index1[p];
               BESTpair_methodBPT_index2 = JetPair_index2[p];
+	      JetBTagger1 = JetBTagger->at(BESTpair_methodBPT_index1);
+	      JetBTagger2 = JetBTagger->at(BESTpair_methodBPT_index2);
             }
 	  
 	  
@@ -867,6 +896,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
       for(int v = 0; v < nHisto; v++)
 	{
 	  string histoString = myHisto1D[v].Name.c_str();
+	  //if      (histoString == "M4L") histoContent[v] = ZZMass;
 	  if      (histoString == "M4L" && ( !ISDATA || SHOW ) ) histoContent[v] = ZZMass;
 	  else if (histoString == "MZ1") histoContent[v] = Z1Mass;
 	  else if (histoString == "MZ2") histoContent[v] = Z2Mass;
@@ -905,14 +935,21 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
           else if (histoString == "methodBM_ETA") histoContent[v] = BESTpair_methodBM_ETA;
           else if (histoString == "methodBM_PHI") histoContent[v] = BESTpair_methodBM_PHI;
           else if (histoString == "methodBM_Binfo") histoContent[v] = BESTpair_methodBM_Binfo;
+	  //else if (histoString == "methodBPT_M") histoContent[v] = BESTpair_methodBPT_M;
 	  else if (histoString == "methodBPT_M" && SHOW ) histoContent[v] = BESTpair_methodBPT_M;
-          else if (histoString == "methodBPT_PT") histoContent[v] = BESTpair_methodBPT_PT;
-          else if (histoString == "methodBPT_ETA") histoContent[v] = BESTpair_methodBPT_ETA;
+          else if (histoString == "methodBPT_PT" && SHOW) histoContent[v] = BESTpair_methodBPT_PT;
+          else if (histoString == "methodBPT_ETA") histoContent[v] = BESTpair_methodBPT_ETA; 
           else if (histoString == "methodBPT_PHI") histoContent[v] = BESTpair_methodBPT_PHI;
           else if (histoString == "methodBPT_Binfo") histoContent[v] = BESTpair_methodBPT_Binfo;
+	  else if (histoString == "JetBTaggertot") histoContent[v] = JetBTagger1;
+	  else if (histoString == "JetBTagger1") histoContent[v] = JetBTagger1;
+	  else if (histoString == "JetBTagger2") histoContent[v] = JetBTagger2;
+
+
 	  else continue;
 	  	
 	  h1[v][currentFinalState]->Fill(histoContent[v], eventWeight);
+	  if (histoString == "JetBTaggertot") h1[v][currentFinalState]->Fill(JetBTagger2, eventWeight); 
 	}
       
       JetVec.clear();
@@ -932,6 +969,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   
   
   std::cout << "Output file "<< outputFile << endl;
+    
   TFile* fOut = new TFile(outputFile,"recreate");  
   fOut->cd();
   
@@ -952,43 +990,46 @@ void ZZbb_analysis()
 {
 
   double lumi = 140; // full Run2 Lumi
-  if (DOBLINDHISTO) lumi = 59.74;
+  //if (DOBLINDHISTO)
+  lumi = 59.74;
   std::cout << "Lumi: " << lumi << endl;
 
   //TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
+  //TString pippo = "/eos/user/a/acappati/samples_4lX/allsamples/ggH125/ZZXAnalysis.root";
   TString inputFilePath = "/eos/user/a/acappati/samples_4lX/allsamples/";
-  TString inputFileName[] = {// "HH4lbb",
-                             // "ggH125",
-                             // "VBFH125",
-                             // "WplusH125",
-                             // "WminusH125",
-                             // "ZH125",
-                             // "bbH125",
-                             // "ttH125",
+  //  TString inputFileName[] = {"HH4lbb"};
+  TString inputFileName[] = {"HH4lbb",
+			     "ggH125",
+			     "VBFH125",
+                             "WplusH125",
+                             "WminusH125",
+                             "ZH125",
+                             "bbH125",
+                             "ttH125",
                              "ZZTo4lext1",
-                             // "TTZJets_M10_MLMext1",
-                             // "TTZToLL_M1to1O_MLM",
-                             // "TTWJetsToLNu",
-                             // "AllData",
-                             // "ggTo4e_Contin_MCFM701",
-                             // "ggTo4mu_Contin_MCFM701",
-                             // "ggTo4tau_Contin_MCFM701",
-                             // "ggTo2e2mu_Contin_MCFM701",
-                             // "ggTo2e2tau_Contin_MCFM701",
-                             // "ggTo2mu2tau_Contin_MCFM701",
-                             // "WWZ",
-                             // "WZZ",
-                             // "ZZZ",
-                             // "Z+X",
-			     "ZZTo4lamcatnlo",
+                             "TTZJets_M10_MLMext1",
+                             "TTZToLL_M1to1O_MLM",
+                             "TTWJetsToLNu",
+  			     "AllData",
+                             "ggTo4e_Contin_MCFM701",
+                             "ggTo4mu_Contin_MCFM701",
+                             "ggTo4tau_Contin_MCFM701",
+                             "ggTo2e2mu_Contin_MCFM701",
+                             "ggTo2e2tau_Contin_MCFM701",
+                             "ggTo2mu2tau_Contin_MCFM701",
+                             "WWZ",
+                             "WZZ",
+                             "ZZZ",
+                             //"Z+X", 
+			     //"Zzto4lamcatnlo",
 			     // "DY3JetsToLL_M50",
 			     // "DY2JetsToLL_M50" 
-                           };
+                         };
 
   size_t nInputFiles = sizeof(inputFileName)/sizeof(inputFileName[0]);
   cout<< "number of input files: " << nInputFiles<<endl;
 
-  string outputFilePath = "histos_4lbb";
+  string outputFilePath = "histos_4lbb_20191203";
   gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
   
 
