@@ -1,7 +1,7 @@
 #!/usr/bin/en python
    
 import ROOT, math
-from ROOT import TFile, TH1F, TCanvas, gSystem, TAttFill, TLegend, TStyle, THStack, kViolet, kBlack, kAzure, kCyan, kGreen, kWhite, kOrange, kBlue, kRed
+from ROOT import TFile, TH1F, TCanvas, gSystem, TAttFill, TLegend, TStyle, THStack, kViolet, kBlack, kAzure, kCyan, kGreen, kWhite, kOrange, kBlue, kRed, TPad
 import CMSGraphics, CMS_lumi
 
 # create output directory
@@ -165,7 +165,7 @@ print 'files read'
 i = 0 #counter for histos list
 for name in namelist :
 
-    canvas = TCanvas('canvas','canvas',800,600)
+    canvas = TCanvas('canvas','canvas',800,800)
 
     hs = THStack('hs','')
 
@@ -250,9 +250,17 @@ for name in namelist :
     
     # ALL DATA
     histos_AllData[i].SetMarkerColor(kBlack)
+    histos_AllData[i].SetLineColor(kBlack)
     histos_AllData[i].SetMarkerStyle(20)
  #   histos_AllData[i].Rebin(6)
    
+
+
+    # --- upper plot pad
+    pad1 = TPad("pad1","pad1", 0, 0.3, 1, 1.0)
+    pad1.Draw()
+    pad1.cd()
+
 
     # Draw all
     hs.SetMaximum(1.5 * max(hs.GetMaximum(),histos_AllData[i].GetMaximum()));
@@ -277,15 +285,16 @@ for name in namelist :
     hs.SetMinimum(0.)
 
     # legend
-    legend = TLegend(0.74,0.64,0.94,0.87)
+    legend = TLegend(0.78,0.61,0.94,0.87)
     legend.AddEntry(histos_HH4lbb[i],                "HH->4lbb x100", "f")
-    legend.AddEntry(histo_SMHiggs,                   "SM Higgs", "f")
-    legend.AddEntry(histos_ZZTo4lext1[i],            "qq->ZZ",   "f")
-    legend.AddEntry(histo_TTZ,                       "TTZ",      "f")
-    legend.AddEntry(histo_ggZZ,                      "gg->ZZ",   "f")
-    legend.AddEntry(histos_TTWJetsToLNu[i],          "TTW",      "f")
-    legend.AddEntry(histos_ZX[i],                    "Z+X", "f")
-    legend.AddEntry(histos_tribosons,                 "Tribosons", "f")
+    legend.AddEntry(histo_SMHiggs,                   "SM Higgs",      "f")
+    legend.AddEntry(histos_ZZTo4lext1[i],            "qq->ZZ",        "f")
+    legend.AddEntry(histo_TTZ,                       "TTZ",           "f")
+    legend.AddEntry(histo_ggZZ,                      "gg->ZZ",        "f")
+    legend.AddEntry(histos_TTWJetsToLNu[i],          "TTW",           "f")
+    legend.AddEntry(histos_ZX[i],                    "Z+X",           "f")
+    legend.AddEntry(histos_tribosons,                "Tribosons",     "f")
+    legend.AddEntry(histos_AllData[i],               "Data",          "lp")
     legend.SetFillColor(kWhite)
     legend.SetLineColor(kBlack)
     legend.SetTextFont(43)
@@ -293,6 +302,63 @@ for name in namelist :
     legend.Draw()
 
     canvas.Update()
+
+
+    if 'M4L' in name:
+        pad1.SetLogx()
+        hs.GetXaxis().SetMoreLogLabels();
+        hs.GetXaxis().SetNoExponent();
+
+    canvas.Update()
+
+
+
+
+
+    # --- lower plot pad: RATIO PLOT
+    canvas.cd()
+    pad2 = TPad("pad2","pad2", 0, 0.05, 1, 0.3)
+    pad2.SetGridy()
+    pad2.Draw()
+    pad2.cd()    #pad2 becomes the current pad
+
+    #define ratio plot
+    rp = TH1F(histos_AllData[i].Clone("rp"))
+    rp.SetLineColor(kBlack)
+    rp.SetMinimum(0.)
+    rp.SetMaximum(5.)
+    rp.SetStats(0)
+    rp.Divide(TH1F(histo_SMHiggs + histos_ZZTo4lext1[i] + histo_TTZ + histo_ggZZ + histos_TTWJetsToLNu[i] + histos_ZX[i] + histos_tribosons))   #divide histo rp/MC
+    rp.SetMarkerStyle(24)
+    rp.SetTitle("") 
+
+    rp.SetYTitle("Data/MC")
+    rp.GetYaxis().SetNdivisions(505)
+    rp.GetYaxis().SetTitleSize(20)
+    rp.GetYaxis().SetTitleFont(43)
+    rp.GetYaxis().SetTitleOffset(1.4)
+    rp.GetYaxis().SetLabelFont(43)
+    rp.GetYaxis().SetLabelSize(15)
+
+    rp.GetXaxis().SetTitleSize(20)
+    rp.GetXaxis().SetTitleFont(43)
+    rp.GetXaxis().SetTitleOffset(4.)
+    rp.GetXaxis().SetLabelFont(43)
+    rp.GetXaxis().SetLabelSize(15)
+
+    rp.Draw("ep")
+
+    canvas.Update()
+
+
+
+    if 'M4L' in name:
+        pad2.SetLogx()
+        rp.GetXaxis().SetMoreLogLabels();
+        rp.GetXaxis().SetNoExponent();
+
+    canvas.Update()
+
 
     #draw CMS and lumi text
     lumiText = '59.7 fb^{-1}'
@@ -303,17 +369,13 @@ for name in namelist :
     CMS_lumi.lumiTextSize   = 0.46
     CMS_lumi.extraOverCmsTextSize = 0.75
     CMS_lumi.relPosX = 0.12
-    CMS_lumi.CMS_lumi(canvas, 0, 0)
-
-    if 'M4L' in name:
-        canvas.SetLogx()
- #       canvas.SetTickx();
-        hs.GetXaxis().SetMoreLogLabels();
-        hs.GetXaxis().SetNoExponent();
+    CMS_lumi.CMS_lumi(pad1, 0, 0)
 
     canvas.Update()
 
     canvas.SaveAs(OutputPath + "/" + namelist[i] + ".png")
+    canvas.SaveAs(OutputPath + "/" + namelist[i] + ".pdf")
+    canvas.SaveAs(OutputPath + "/" + namelist[i] + ".root")
     
     i = i+1
 
