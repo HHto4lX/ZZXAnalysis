@@ -102,9 +102,9 @@ Histo1D myHisto1D[nHisto] = {
   {"methodPTjet_Pruned1", "Pruned gen efficiency", "Events", "", 0, 5, 5, 0, 0},
   {"methodPTjet_Pruned2", "Pruned gen efficiency", "Events", "", 0, 5, 5, 0, 0},
   {"methodPTjet_PrunedTOT", "Pruned gen efficiency", "Events", "", 0, 5, 5, 0, 0},
-  {"JetBTaggertot", "total jet b tagger", "Events", "", -3, 3, 600, 0, 0},
-  {"JetBTagger1", "first jet b tagger", "Events", "", -3, 3, 600, 0, 0},
-  {"JetBTagger2", "second jet b tagger", "Events", "", -3, 3, 600, 0, 0},
+  {"JetBTaggertot", "total jet b tagger",  "Events", "", 0, 1, 10, 0, 0},
+  {"JetBTagger1",   "first jet b tagger",  "Events", "", 0, 1, 10, 0, 0},
+  {"JetBTagger2",   "second jet b tagger", "Events", "", 0, 1, 10, 0, 0},
   // --- control plots
   {"leptonsPt_4lSelOnly"          , "pT", "Events/ 10 GeV", "", 0, 700, 70, 0, 0},
   {"jetsPt_4lSelOnly"             , "pT", "Events/ 10 GeV", "", 0, 700, 70, 0, 0},
@@ -247,7 +247,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
   Float_t yield_2H = 0;
 
   vector<Float_t> *JetBTagger = 0;
-    Float_t JetBTagger1 = 0;
+  Float_t JetBTagger1 = 0;
   Float_t JetBTagger2 = 0;
 
   double yield = 0;
@@ -535,6 +535,20 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 	  JetBinfo.push_back(btag);
 	}
 
+
+      // ******************************
+      // check JetBTagger 
+      JetBTagger1 = 4.;
+      JetBTagger2 = 5.;
+      if(JetVec.size() >= 2)
+      {
+        JetBTagger1 = JetBTagger->at(0);
+        JetBTagger2 = JetBTagger->at(1);
+      }
+      // ******************************
+   
+
+
       if (VERBOSE)
 	{
 	  std::cout << "Jet Vec size: " << JetVec.size() << endl;
@@ -683,9 +697,7 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
       Deltabb_eta_pt = 0;
       Deltabb_phi_pt = 0;
 
-      JetBTagger1 = 4.;
-      JetBTagger2 = 5.;
-
+      
       int size_binfo_2 = 0;
       int size_binfo_1 = 0;
 
@@ -744,8 +756,6 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 	      BESTpair_methodBPT_Binfo = JetPairBinfo[p];
 	      BESTpair_methodBPT_index1 = JetPair_index1[p];
 	      BESTpair_methodBPT_index2 = JetPair_index2[p];
-	      JetBTagger1 = JetBTagger->at(BESTpair_methodBPT_index1);
-	      JetBTagger2 = JetBTagger->at(BESTpair_methodBPT_index2);
 	    }
 	  
 	  if (size_binfo_2 > 1 && JetPairBinfo[p] == 2 && (fabs (JetPair[p].M() - 125.) < deltaM_B) )
@@ -778,9 +788,6 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
 
               BESTpair_methodBPT_index1 = JetPair_index1[p];
               BESTpair_methodBPT_index2 = JetPair_index2[p];
-	      JetBTagger1 = JetBTagger->at(BESTpair_methodBPT_index1);
-	      JetBTagger2 = JetBTagger->at(BESTpair_methodBPT_index2);
-
 	    }
 
 
@@ -815,8 +822,6 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
               BESTpair_methodBPT_Binfo = JetPairBinfo[p];
               BESTpair_methodBPT_index1 = JetPair_index1[p];
               BESTpair_methodBPT_index2 = JetPair_index2[p];
-	      JetBTagger1 = JetBTagger->at(BESTpair_methodBPT_index1);
-	      JetBTagger2 = JetBTagger->at(BESTpair_methodBPT_index2);
             }
 	  
 	  
@@ -994,10 +999,7 @@ void ZZbb_analysis()
   lumi = 59.74;
   std::cout << "Lumi: " << lumi << endl;
 
-  //TString inputFilePath = "/eos/user/a/acappati/samples_4lX/190829/";
-  //TString pippo = "/eos/user/a/acappati/samples_4lX/allsamples/ggH125/ZZXAnalysis.root";
   TString inputFilePath = "/eos/user/a/acappati/samples_4lX/allsamples/";
-  //  TString inputFileName[] = {"HH4lbb"};
   TString inputFileName[] = {"HH4lbb",
 			     "ggH125",
 			     "VBFH125",
@@ -1020,7 +1022,7 @@ void ZZbb_analysis()
                              "WWZ",
                              "WZZ",
                              "ZZZ",
-                             //"Z+X", 
+                             "Z+X", 
 			     //"Zzto4lamcatnlo",
 			     // "DY3JetsToLL_M50",
 			     // "DY2JetsToLL_M50" 
@@ -1029,7 +1031,7 @@ void ZZbb_analysis()
   size_t nInputFiles = sizeof(inputFileName)/sizeof(inputFileName[0]);
   cout<< "number of input files: " << nInputFiles<<endl;
 
-  string outputFilePath = "histos_4lbb_20191203";
+  string outputFilePath = "histos_4lbb_20191205";
   gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
   
 

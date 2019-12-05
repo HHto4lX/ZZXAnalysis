@@ -11,7 +11,7 @@ print "Output directory created!"
 
 
 # inputh file phath
-inputFilePath = '/eos/user/a/acappati/analysis_4lX/histos_4lbb_20191203/' 
+inputFilePath = '/eos/user/a/acappati/analysis_4lX/histos_4lbb_20191205/' 
 
 
 # hist names
