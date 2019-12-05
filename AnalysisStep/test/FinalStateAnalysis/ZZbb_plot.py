@@ -15,7 +15,7 @@ inputFilePath = '/eos/user/a/acappati/analysis_4lX/histos_4lbb_20191203/'
 
 
 # hist names
-namelist = ['h1_M4L_CR4Lonly_4L','h1_MZ1_CR4Lonly_4L','h1_MZ2_CR4Lonly_4L','h1_eta4L_CR4Lonly_4L','h1_pt4L_CR4Lonly_4L','h1_M4L_4L','h1_MZ1_4L','h1_MZ2_4L','h1_eta4L_4L','h1_pt4L_4L','h1_methodBPT_M_4L','h1_methodBPT_PT_4L','h1_jetsPt_4lSelOnly_4L','h1_jetsPt_4lAnd2JetsSel_4L','h1_jetsPt_4lAnd2JetsSel_withBtag_4L','h1_JetBTaggertot_4L','h1_JetBTagger1_4L','h1_JetBTagger2_4L']
+namelist = ['h1_M4L_CR4Lonly_4L','h1_MZ1_CR4Lonly_4L','h1_MZ2_CR4Lonly_4L','h1_eta4L_CR4Lonly_4L','h1_pt4L_CR4Lonly_4L','h1_M4L_4L','h1_MZ1_4L','h1_MZ2_4L','h1_eta4L_4L','h1_pt4L_4L','h1_methodBPT_M_4L','h1_methodBPT_PT_4L','h1_jetsPt_4lSelOnly_4L','h1_jetsPt_4lAnd2JetsSel_4L','h1_jetsPt_4lAnd2JetsSel_withBtag_4L','h1_JetBTaggertot_4L','h1_JetBTagger1_4L','h1_JetBTagger2_4L','h1_leptonsPt_4lSelOnly_4L']
 
 
 # read files
