@@ -58,7 +58,7 @@ struct Histo1D
   bool isLogy;
 };
 
-const int nHisto = 48;
+const int nHisto = 47;
 
 Histo1D myHisto1D[nHisto] = {
   {"M4L_CR4Lonly", "m_{4l} (GeV)", "Events / 5 GeV", "", 70, 1070, 200, 1, 0},  
@@ -102,7 +102,6 @@ Histo1D myHisto1D[nHisto] = {
   {"methodPTjet_Pruned1", "Pruned gen efficiency", "Events", "", 0, 5, 5, 0, 0},
   {"methodPTjet_Pruned2", "Pruned gen efficiency", "Events", "", 0, 5, 5, 0, 0},
   {"methodPTjet_PrunedTOT", "Pruned gen efficiency", "Events", "", 0, 5, 5, 0, 0},
-  {"JetBTaggertot", "total jet b tagger",  "Events", "", 0, 1, 10, 0, 0},
   {"JetBTagger1",   "first jet b tagger",  "Events", "", 0, 1, 10, 0, 0},
   {"JetBTagger2",   "second jet b tagger", "Events", "", 0, 1, 10, 0, 0},
   // --- control plots
@@ -545,6 +544,13 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
         JetBTagger1 = JetBTagger->at(0);
         JetBTagger2 = JetBTagger->at(1);
       }
+      // fill BTagger histos
+      for(int v = 0; v < nHisto; v++)
+	{
+	  string histoString = myHisto1D[v].Name.c_str();
+	  if(histoString == "JetBTagger1") h1[v][currentFinalState]->Fill(JetBTagger1, eventWeight);
+	  if(histoString == "JetBTagger2") h1[v][currentFinalState]->Fill(JetBTagger2, eventWeight);
+        }
       // ******************************
    
 
@@ -946,15 +952,12 @@ void doHisto(TString inputFileMC, TString outputFile, double lumi=1)
           else if (histoString == "methodBPT_ETA") histoContent[v] = BESTpair_methodBPT_ETA; 
           else if (histoString == "methodBPT_PHI") histoContent[v] = BESTpair_methodBPT_PHI;
           else if (histoString == "methodBPT_Binfo") histoContent[v] = BESTpair_methodBPT_Binfo;
-	  else if (histoString == "JetBTaggertot") histoContent[v] = JetBTagger1;
-	  else if (histoString == "JetBTagger1") histoContent[v] = JetBTagger1;
-	  else if (histoString == "JetBTagger2") histoContent[v] = JetBTagger2;
 
 
 	  else continue;
 	  	
 	  h1[v][currentFinalState]->Fill(histoContent[v], eventWeight);
-	  if (histoString == "JetBTaggertot") h1[v][currentFinalState]->Fill(JetBTagger2, eventWeight); 
+
 	}
       
       JetVec.clear();
@@ -1031,7 +1034,7 @@ void ZZbb_analysis()
   size_t nInputFiles = sizeof(inputFileName)/sizeof(inputFileName[0]);
   cout<< "number of input files: " << nInputFiles<<endl;
 
-  string outputFilePath = "histos_4lbb_20191205";
+  string outputFilePath = "histos_4lbb_20191206";
   gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
   
 
