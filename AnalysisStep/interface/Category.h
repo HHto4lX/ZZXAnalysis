@@ -3,7 +3,6 @@
 
 
 
-
 //------- ZZX Categorization
 
 enum CategoryHH {
@@ -24,9 +23,11 @@ extern "C" int categoryHH( short  nJets20, //FIXME
                            int*   ExtraLepLepId
 			   //                           int nPhotons
 			   //                           int nTaus
-			 );
+                         );
 
-//--------- RunI canegorization 
+
+
+//---------- RunI categorization 
 
 enum CategoryLegacy {
   ZeroOneJet = 0,
@@ -63,7 +64,6 @@ enum CategoryIchep16 {
   ttHTaggedIchep16    = 5
 };
 
-//int category(
 extern "C" int categoryIchep16(
 			       int nExtraLep,
 			       int nExtraZ,
@@ -100,7 +100,6 @@ enum CategoryMor17 {
   VHMETTaggedMor17  = 6
 };
 
-//int category(
 extern "C" int categoryMor17(
 			     int nExtraLep,
 			     int nExtraZ,
@@ -138,7 +137,6 @@ enum CategoryMor18 {
   VHMETTaggedMor18   = 7
 };
 
-//int category(
 extern "C" int categoryMor18(
 			     int nExtraLep,
 			     int nExtraZ,
@@ -163,6 +161,84 @@ extern "C" int categoryMor18(
 			     bool useQGTagging = false
 			     );
 
+
+//---------- Run II Legacy categorization
+
+enum CategoryLegacyRunII {
+  ggH_0J_PTH_0_10     = 0,
+  ggH_0J_PTH_10_200   = 1,
+  ggH_1J_PTH_0_60     = 2,
+  ggH_1J_PTH_60_120   = 3,
+  ggH_1J_PTH_120_200  = 4,
+  ggH_2J_PTH_0_60     = 5,
+  ggH_2J_PTH_60_120   = 6,
+  ggH_2J_PTH_120_200  = 7,
+  ggH_PTH_200         = 8,
+  ggH_VBF             = 9,
+  VBF_1j              = 10,
+  VBF_2j              = 11,
+  VBF_2j_mjj_350_700_2j = 12,
+  VBF_2j_mjj_GT700_2j   = 13,
+  VBF_2j_mjj_GT350_3j   = 14,
+  VBF_GT200_2J          = 15,
+  VH_Had                = 16,
+  VBF_rest_VH           = 17,
+  VH_lep_0_150          = 18,
+  VH_Lep_GT150          = 19,
+  ttH_Lep               = 20,
+  ttH_Had               = 21
+};
+
+
+extern "C" int stage1_reco_1p1(
+                     int Njets,
+                     float mjj,
+                     float H_pt,
+                     int category,
+                     float pt_hjj
+                     );
+
+
+//---------- Anomalous couplings 2019 categorization
+//VBF1j, VH Lep and MET and ttH are merged into untagged or boosted,
+//but keep the numbers for compatibility with Mor18
+
+enum CategoryAC19 {
+  UntaggedAC19      = UntaggedMor18,
+  VBF1jTaggedAC19   = VBF1jTaggedMor18,
+  VBF2jTaggedAC19   = VBF2jTaggedMor18,
+  VHLeptTaggedAC19  = VHLeptTaggedMor18,
+  VHHadrTaggedAC19  = VHHadrTaggedMor18,
+  ttHLeptTaggedAC19 = ttHLeptTaggedMor18,
+  ttHHadrTaggedAC19 = ttHHadrTaggedMor18,
+  VHMETTaggedAC19   = VHMETTaggedMor18,
+  BoostedAC19       = 8
+};
+
+extern "C" int categoryAC19(
+			     int nExtraLep,
+			     int nExtraZ,
+			     int nCleanedJetsPt30,
+			     int nCleanedJetsPt30BTagged_bTagSF,
+			     float* jetQGLikelihood,
+			     float p_JJQCD_SIG_ghg2_1_JHUGen_JECNominal,
+			     float p_JQCD_SIG_ghg2_1_JHUGen_JECNominal,
+			     float p_JJVBF_SIG_ghv1_1_JHUGen_JECNominal,
+			     float p_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
+			     float pAux_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
+			     float p_HadWH_SIG_ghw1_1_JHUGen_JECNominal,
+			     float p_HadZH_SIG_ghz1_1_JHUGen_JECNominal,
+				  float p_HadWH_mavjj_JECNominal,
+				  float p_HadWH_mavjj_true_JECNominal,
+				  float p_HadZH_mavjj_JECNominal,
+				  float p_HadZH_mavjj_true_JECNominal,
+			     float* jetPhi,
+			     float ZZMass,
+			     float ZZPt,
+			     float PFMET,
+			     bool useVHMETTagged = true,
+			     bool useQGTagging = false
+			     );
 
 
 #endif
