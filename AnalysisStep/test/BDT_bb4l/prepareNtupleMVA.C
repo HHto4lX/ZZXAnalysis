@@ -32,14 +32,19 @@
 
 using namespace std;
 
+#define JETSELECTION 1
+
 
 
 void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 {
 
-  bool isMC = true;
-  if ( inFile.Contains("AllData")) isMC = false ;
-
+  bool isDATA = false;
+  bool isZX   = false;
+  if ( inFile.Contains("AllData") ) isDATA = true;
+  if ( inFile.Contains("Z+X") ) isZX   = true;
+  cout<<"isDATA "<<isDATA<<endl;
+  cout<<"isZX "<<isZX<<endl;
 
   // input file branches
   TFile* inputFile;
@@ -47,13 +52,15 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
   TH1F* hCounters;
   int NGenEvt;
   Float_t gen_sumWeights;
-  Float_t partialSampleWeight;
+  Float_t partialSampleWeight = 1.;
+  Float_t weight; //ZX weight
   
   Int_t nRun;
   Long64_t nEvent;
   Int_t nLumi;
   Float_t overallEventWeight;
   Float_t xsec;
+
   Float_t KFactor_QCD_ggZZ_Nominal;
   Float_t KFactor_EW_qqZZ;
   Float_t KFactor_QCD_qqZZ_dPhi;
@@ -79,18 +86,29 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
   vector<Float_t> *JetBTagger = 0;
   Float_t PFMET;
 
-  inputFile =  TFile::Open( inFile );
-  hCounters = (TH1F*)inputFile->Get("ZZTree/Counters");
-  NGenEvt = (Float_t)hCounters->GetBinContent(1);
-  gen_sumWeights = (Float_t)hCounters->GetBinContent(40);
-  partialSampleWeight = lumi * 1000 / gen_sumWeights;
-  inputTree = (TTree*)inputFile->Get("ZZTree/candTree");
+  Float_t yield = 0.;
 
-  inputTree->SetBranchAddress("RunNumber", &nRun);
-  inputTree->SetBranchAddress("EventNumber", &nEvent);
-  inputTree->SetBranchAddress("LumiNumber", &nLumi);
-  if (isMC) inputTree->SetBranchAddress("overallEventWeight", &overallEventWeight);
-  if (isMC) inputTree->SetBranchAddress("xsec", &xsec);
+
+  inputFile =  TFile::Open( inFile );
+
+  if(!isZX){
+    hCounters = (TH1F*)inputFile->Get("ZZTree/Counters");
+    NGenEvt = (Float_t)hCounters->GetBinContent(1);
+    gen_sumWeights = (Float_t)hCounters->GetBinContent(40);
+    partialSampleWeight = lumi * 1000 / gen_sumWeights;
+    inputTree = (TTree*)inputFile->Get("ZZTree/candTree");
+  }
+  else inputTree = (TTree*)inputFile->Get("candTree");
+
+  // set branch addresses
+  if(!isZX){
+    inputTree->SetBranchAddress("RunNumber", &nRun);
+    inputTree->SetBranchAddress("EventNumber", &nEvent);
+    inputTree->SetBranchAddress("LumiNumber", &nLumi);
+    if (!isDATA) inputTree->SetBranchAddress("overallEventWeight", &overallEventWeight);
+    if (!isDATA) inputTree->SetBranchAddress("xsec", &xsec);
+  }
+  if(isZX){ inputTree->SetBranchAddress("weight", &weight); }
   inputTree->SetBranchAddress("ZZsel", &ZZsel);
   inputTree->SetBranchAddress("LepPt", &LepPt);
   inputTree->SetBranchAddress("LepEta", &LepEta);
@@ -166,7 +184,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     inputTree->GetEntry(entry);
     
 
-    if( !(ZZsel>=90) ) continue;
+    if( !(ZZsel>=0) ) continue;
 
     // 4l selection
     if(LepEta->size() != 4)
@@ -189,63 +207,85 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     else if(inFile.Contains("ggTo")) { kfactor = KFactor_QCD_ggZZ_Nominal; }
 
     Double_t eventWeight = 1.;
-    if (isMC) eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight;
+    if(!isDATA && !isZX) eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight;
+    if(isZX) eventWeight = weight; //ZX weight
+ 
 
 
-
-    // jet quantities
-    vector<TLorentzVector> JetVec; // TLorentz vector with all Jets per Event
-    vector<TLorentzVector> JetPair; // TLorentz vector with all Jets Pairs
-    vector<float> JetBinfo; // vector with b-tag info per each Jet of the Event
-    
-
-    for (UInt_t j = 0; j < JetPt->size(); j++)
-      {
-	if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 30 ) ) continue; // pt cut 20GeV from ntuplizer reduced to 30
-	  
-	TLorentzVector temp;
-	temp.SetPtEtaPhiM(JetPt->at(j), JetEta->at(j), JetPhi->at(j), JetMass->at(j));
-	JetVec.push_back(temp);
-	JetBinfo.push_back(JetBTagger->at(j));
+    if(JETSELECTION){
+      // jet quantities
+      vector<TLorentzVector> JetVec; // TLorentz vector with all Jets per Event
+      vector<TLorentzVector> JetPair; // TLorentz vector with all Jets Pairs
+      vector<float> JetBinfo; // vector with b-tag info per each Jet of the Event
+      
+  
+      for (UInt_t j = 0; j < JetPt->size(); j++)
+        {
+  	if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 30 ) ) continue; // pt cut 20GeV from ntuplizer reduced to 30
+  	  
+  	TLorentzVector temp;
+  	temp.SetPtEtaPhiM(JetPt->at(j), JetEta->at(j), JetPhi->at(j), JetMass->at(j));
+  	JetVec.push_back(temp);
+  	JetBinfo.push_back(JetBTagger->at(j));
+        }
+  
+  
+  
+      // at least 2 jets in the acceptance
+      if (JetVec.size() < 2) continue;   
+          
+      
+  
+      // get and save vector with max btagger value
+      f_bdiscjet1signal_4mu = *max_element(JetBinfo.begin(), JetBinfo.end());
+  
+      // get and save btagger value of the second jet (the one with max pt)
+      int d1_maxbtag = distance( JetBinfo.begin(), max_element(JetBinfo.begin(), JetBinfo.end()));
+  
+      float maxJetPt = -9999.;
+      int d2_maxJetPt = -9999;
+      for(UInt_t i=0; i<JetVec.size(); i++){
+  
+        if(i == d1_maxbtag) continue;
+        float temp = JetVec.at(i).Pt();
+        if (temp > maxJetPt){
+          maxJetPt = temp;
+          d2_maxJetPt = i;
+        }
       }
-
-
-
-    // at least 2 jets in the acceptance
-    if (JetVec.size() < 2) continue;   
-        
+      // save btagger value of the second jet (the one with max pt)
+      f_bdiscjet2signal_4mu = JetBinfo.at(d2_maxJetPt);
+  
+  
+      // build H->bb tlorentzvector
+      TLorentzVector Hbb_Vec = JetVec.at(d1_maxbtag) + JetVec.at(d2_maxJetPt);
+  
+      // build H-H DeltaR
+      float DeltaR = sqrt( (( ZZPhi - Hbb_Vec.Phi() )*( ZZPhi - Hbb_Vec.Phi() )) + (( ZZEta - Hbb_Vec.Eta() )*( ZZEta - Hbb_Vec.Eta() )) );
+  
+      // save DeltaR
+      f_deltarsignal_4mu = DeltaR;
     
 
-    // get and save vector with max btagger value
-    f_bdiscjet1signal_4mu = *max_element(JetBinfo.begin(), JetBinfo.end());
 
-    // get and save btagger value of the second jet (the one with max pt)
-    int d1_maxbtag = distance( JetBinfo.begin(), max_element(JetBinfo.begin(), JetBinfo.end()));
-
-    float maxJetPt = -9999.;
-    int d2_maxJetPt = -9999;
-    for(UInt_t i=0; i<JetVec.size(); i++){
-
-      if(i == d1_maxbtag) continue;
-      float temp = JetVec.at(i).Pt();
-      if (temp > maxJetPt){
-        maxJetPt = temp;
-        d2_maxJetPt = i;
-      }
-    }
-    // save btagger value of the second jet (the one with max pt)
-    f_bdiscjet2signal_4mu = JetBinfo.at(d2_maxJetPt);
-
-
-    // build H->bb tlorentzvector
-    TLorentzVector Hbb_Vec = JetVec.at(d1_maxbtag) + JetVec.at(d2_maxJetPt);
-
-    // build H-H DeltaR
-    float DeltaR = sqrt( (( ZZPhi - Hbb_Vec.Phi() )*( ZZPhi - Hbb_Vec.Phi() )) + (( ZZEta - Hbb_Vec.Eta() )*( ZZEta - Hbb_Vec.Eta() )) );
-
-    // save DeltaR
-    f_deltarsignal_4mu = DeltaR;
+      // build HZZ tlorentzvector
+      TLorentzVector HZZ_Vec;
+      HZZ_Vec.SetPtEtaPhiM(ZZPt, ZZEta, ZZPhi, ZZMass);
     
+      // build HH tlorentzvector
+      TLorentzVector HH_Vec = HZZ_Vec + Hbb_Vec;
+
+
+      // save bb and HH masses
+      f_bbmass = Hbb_Vec.M();
+      f_HHmass = HH_Vec.M();
+
+    } // end if JETSELECTION
+
+
+
+    // save ZZ mass
+    f_ZZmass = ZZMass;
 
     // save lepton pt
     f_lept1_ptsignal_4mu = LepPt->at(0);
@@ -260,22 +300,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     // save event weight
     f_weightsignal_4mu = eventWeight; 
 
-
-
-
-
-    // build HZZ tlorentzvector
-    TLorentzVector HZZ_Vec;
-    HZZ_Vec.SetPtEtaPhiM(ZZPt, ZZEta, ZZPhi, ZZMass);
-    
-    // build HH tlorentzvector
-    TLorentzVector HH_Vec = HZZ_Vec + Hbb_Vec;
-
-    // save masses
-    f_ZZmass = ZZMass;
-    f_bbmass = Hbb_Vec.M();
-    f_HHmass = HH_Vec.M();
-
+    yield += eventWeight; 
 
 
     
@@ -283,6 +308,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     tnew->Fill();
   }
 
+  cout<<"yield "<<yield<<endl;
   
   f->cd();
   tnew->Write();
@@ -318,7 +344,7 @@ void prepareNtupleMVA()
                              "WWZ",
                              "WZZ",
                              "ZZZ",
-                             //"Z+X",
+                             "Z+X",
                              "AllData", 
                              //"Zzto4lamcatnlo",
                              // "DY3JetsToLL_M50",
