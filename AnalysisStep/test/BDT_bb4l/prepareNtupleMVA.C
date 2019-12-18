@@ -197,18 +197,6 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     // mass cut
     if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
 
-
-
-    // fill k factors and event weights
-    Float_t kfactor = 1.;
-    // qqZZ sample
-    if(inFile.Contains("ZZTo4l")) { kfactor = KFactor_EW_qqZZ * KFactor_QCD_qqZZ_M; }
-    //ggZZ samples                       
-    else if(inFile.Contains("ggTo")) { kfactor = KFactor_QCD_ggZZ_Nominal; }
-
-    Double_t eventWeight = 1.;
-    if(!isDATA && !isZX) eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight;
-    if(isZX) eventWeight = weight; //ZX weight
  
 
 
@@ -281,6 +269,22 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
       f_HHmass = HH_Vec.M();
 
     } // end if JETSELECTION
+
+
+
+
+
+    // fill k factors and event weights
+    Float_t kfactor = 1.;
+    // qqZZ sample
+    if(inFile.Contains("ZZTo4l")) { kfactor = KFactor_EW_qqZZ * KFactor_QCD_qqZZ_M; }
+    //ggZZ samples                       
+    else if(inFile.Contains("ggTo")) { kfactor = KFactor_QCD_ggZZ_Nominal; }
+
+    Double_t eventWeight = 1.;
+    if(!isDATA && !isZX) eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight;
+    if(isZX) eventWeight = weight; //ZX weight
+
 
 
 
