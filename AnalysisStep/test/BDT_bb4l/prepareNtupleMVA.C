@@ -33,6 +33,11 @@
 using namespace std;
 
 #define JETSELECTION 1
+#define MERGE2E2MU 1
+
+enum FinalState {fs_4mu=0, fs_4e=1, fs_2e2mu=2, fs_2mu2e=3};  // 4mu, 4e, 2e2mu, 2mu2e
+const int nFinalState = 4;
+string FinalState[nFinalState+1] = {"4mu", "4e","2e2mu","2mu2e", "4L"};
 
 
 
@@ -86,7 +91,10 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
   vector<Float_t> *JetBTagger = 0;
   Float_t PFMET;
 
-  Float_t yield = 0.;
+  Float_t yield_4e = 0.;
+  Float_t yield_4mu = 0.;
+  Float_t yield_2e2mu = 0.;
+  Float_t yield_4l = 0.;
 
 
   inputFile =  TFile::Open( inFile );
@@ -153,6 +161,8 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
   float f_METsignal_4mu;
   float f_weightsignal_4mu;
 
+  float f_Z1Mass;
+  float f_Z2Mass;
   float f_ZZmass;
   float f_bbmass;
   float f_HHmass;
@@ -170,9 +180,15 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
   tnew->Branch("f_deltar_norm", &f_deltarsignal_4mu); 
   tnew->Branch("f_MET_norm",    &f_METsignal_4mu); 
   tnew->Branch("f_weight",      &f_weightsignal_4mu); 
+  tnew->Branch("f_Z1Mass",      &f_Z1Mass); 
+  tnew->Branch("f_Z2Mass",      &f_Z2Mass); 
   tnew->Branch("f_ZZmass",      &f_ZZmass); 
   tnew->Branch("f_bbmass",      &f_bbmass); 
   tnew->Branch("f_HHmass",      &f_HHmass); 
+
+
+
+  int currentFinalState;
 
 
   // loop over input tree
@@ -192,6 +208,45 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 	cerr << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; stored leptons: "<< LepEta->size() << endl;
 	continue;
       }
+
+
+
+    // select final state
+    currentFinalState = -1;
+    if (!isZX){
+	if (Z1Flav == -121){
+	  if (Z2Flav == -121) {currentFinalState = fs_4e;}
+          else if ( Z2Flav == -169) {currentFinalState = fs_2e2mu;}
+          else { cerr << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; Z2Flav = " << Z2Flav << endl;}
+        }
+	else if (Z1Flav == -169){
+	  if (Z2Flav == -121) { currentFinalState = fs_2mu2e; }
+	  else if (Z2Flav == -169) { currentFinalState = fs_4mu; }
+          else { cerr << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; Z2Flav = " << Z2Flav << endl; }
+	}
+	else{ cerr << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; Z1Flav = " << Z1Flav << endl; }
+
+	if(MERGE2E2MU && ( currentFinalState == fs_2mu2e )) { currentFinalState = fs_2e2mu; }
+    }
+
+    else if (isZX){
+	if (Z1Flav == -121){
+	  if (Z2Flav == +121) { currentFinalState = fs_4e; }
+          else if (Z2Flav == +169) { currentFinalState = fs_2e2mu; }
+          else { cerr << "error, Z2Flav: " << endl; }
+        }
+	else if (Z1Flav == -169){
+	  if (Z2Flav == +121) { currentFinalState = fs_2mu2e; }
+	  else if (Z2Flav == +169) { currentFinalState = fs_4mu; }
+	  else { cerr << "error, Z2Flav: " << endl; }
+	}
+	else{ cerr << "error, Z2Flav: " << endl; }
+
+	if(MERGE2E2MU && ( currentFinalState == fs_2mu2e )) currentFinalState = fs_2e2mu;
+      }
+
+
+
 
 
     // mass cut
@@ -287,6 +342,9 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 
 
 
+    // save Z1 and Z2 mass
+    f_Z1Mass = Z1Mass;
+    f_Z2Mass = Z2Mass;
 
     // save ZZ mass
     f_ZZmass = ZZMass;
@@ -304,7 +362,13 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     // save event weight
     f_weightsignal_4mu = eventWeight; 
 
-    yield += eventWeight; 
+
+
+    // yields
+    if(currentFinalState == fs_4e)    { yield_4e += eventWeight; }
+    if(currentFinalState == fs_4mu)   { yield_4mu += eventWeight; }
+    if(currentFinalState == fs_2e2mu) { yield_2e2mu += eventWeight; }
+    yield_4l += eventWeight; 
 
 
     
@@ -312,7 +376,13 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     tnew->Fill();
   }
 
-  cout<<"yield "<<yield<<endl;
+
+  cout<<"yields "<<endl;
+  cout<<"4e    :"<<yield_4e<<endl;
+  cout<<"4mu   :"<<yield_4mu<<endl;
+  cout<<"2e2mu :"<<yield_2e2mu<<endl;
+  cout<<"4l    :"<<yield_4l<<endl;
+  cout<<"***************"<<endl;
   
   f->cd();
   tnew->Write();
@@ -360,7 +430,7 @@ void prepareNtupleMVA()
   cout<< "number of input files: " << nInputFiles<<endl;
 
 
-  string outputFilePath = "191214_mvaNtuples";
+  string outputFilePath = "191219_mvaNtuples_FULLsel";
   gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
 
 
