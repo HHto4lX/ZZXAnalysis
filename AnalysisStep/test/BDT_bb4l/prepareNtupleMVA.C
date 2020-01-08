@@ -264,7 +264,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
   
       for (UInt_t j = 0; j < JetPt->size(); j++)
         {
-  	if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 30 ) ) continue; // pt cut 20GeV from ntuplizer reduced to 30
+  	if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 20 ) ) continue; // pt cut 20GeV from ntuplizer 
   	  
   	TLorentzVector temp;
   	temp.SetPtEtaPhiM(JetPt->at(j), JetEta->at(j), JetPhi->at(j), JetMass->at(j));
