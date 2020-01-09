@@ -249,11 +249,8 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 
 
 
-    // // mass cut: signal region
+    // mass cut: signal region
     // if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
-
-    // mass cut: sideband
-    if(ZZMass > 115 && ZZMass < 135) continue; // ZZMass < 115  or  ZZMass > 135 GeV
 
  
 
@@ -433,7 +430,7 @@ void prepareNtupleMVA()
   cout<< "number of input files: " << nInputFiles<<endl;
 
 
-  string outputFilePath = "200108_mvaNtuples_4lsel_SIDEBANDS";
+  string outputFilePath = "200109_mvaNtuples_4lsel_full4lmass";
   gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
 
 
