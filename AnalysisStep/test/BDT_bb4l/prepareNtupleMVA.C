@@ -32,7 +32,7 @@
 
 using namespace std;
 
-#define JETSELECTION 1
+#define JETSELECTION 0
 #define MERGE2E2MU 1
 
 enum FinalState {fs_4mu=0, fs_4e=1, fs_2e2mu=2, fs_2mu2e=3};  // 4mu, 4e, 2e2mu, 2mu2e
@@ -249,8 +249,11 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 
 
 
-    // mass cut
-    if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
+    // // mass cut: signal region
+    // if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
+
+    // mass cut: sideband
+    if(ZZMass > 115 && ZZMass < 135) continue; // ZZMass < 115  or  ZZMass > 135 GeV
 
  
 
@@ -430,7 +433,7 @@ void prepareNtupleMVA()
   cout<< "number of input files: " << nInputFiles<<endl;
 
 
-  string outputFilePath = "191219_mvaNtuples_FULLsel";
+  string outputFilePath = "200108_mvaNtuples_4lsel_SIDEBANDS";
   gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
 
 
