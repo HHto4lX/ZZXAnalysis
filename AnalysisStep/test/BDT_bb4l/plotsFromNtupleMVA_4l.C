@@ -59,9 +59,9 @@ void doHisto(TString inputFileName, TString outputFileName){
 
 
 
-  TH1F* h_4leptonsPt = new TH1F("h_4leptonsPt", "; 4 leptons pT (GeV); Events / 2 GeV",  50,   0., 100.);
-  TH1F* h_MET        = new TH1F("h_MET",        "; MET (GeV); Events / 4 GeV",           50,   0., 200.);
-  TH1F* h_M4l        = new TH1F("h_M4l",        "; m_{4l} (GeV); Events / 2 GeV",        65,  70., 200.);
+  TH1F* h_4leptonsPt = new TH1F("h_4leptonsPt", "; 4 leptons pT (GeV); Events / 2 GeV",  50,   0., 100.);  h_4leptonsPt->Sumw2(true);
+  TH1F* h_MET        = new TH1F("h_MET",        "; MET (GeV); Events / 4 GeV",           50,   0., 200.);  h_MET->Sumw2(true);
+  TH1F* h_M4l        = new TH1F("h_M4l",        "; m_{4l} (GeV); Events / 2 GeV",        65,  70., 200.);  h_M4l->Sumw2(true);
 
 
   inFile = TFile::Open( inputFileName );
