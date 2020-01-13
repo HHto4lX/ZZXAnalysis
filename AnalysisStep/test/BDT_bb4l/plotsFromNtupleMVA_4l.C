@@ -45,6 +45,9 @@ void doHisto(TString inputFileName, TString outputFileName){
   cout<<"isDATA "<<isDATA<<endl;
   cout<<"isZX "<<isZX<<endl;
 
+
+  TH1::SetDefaultSumw2(true);
+
   
   TFile* inFile;
   TTree* inTree;

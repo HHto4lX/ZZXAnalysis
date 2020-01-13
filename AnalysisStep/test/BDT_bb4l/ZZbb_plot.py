@@ -1,7 +1,7 @@
 #!/usr/bin/en python
    
 import ROOT, math
-from ROOT import TFile, TH1F, TCanvas, gSystem, TAttFill, TLegend, TStyle, THStack, kViolet, kBlack, kAzure, kCyan, kGreen, kWhite, kOrange, kBlue, kRed, TPad, kCyan
+from ROOT import TFile, TH1F, TCanvas, gSystem, TAttFill, TLegend, TStyle, THStack, kViolet, kBlack, kAzure, kCyan, kGreen, kWhite, kOrange, kBlue, kRed, TPad, kCyan, TGraphErrors, kGray
 import CMSGraphics, CMS_lumi
 
 # create output directory
@@ -169,10 +169,9 @@ for name in namelist :
 
     hs = THStack('hs','')
 
-#    integral_fondi = 0.
 
-#  tribosons
-    histos_tribosons = histos_WWZ[i]
+    #  tribosons
+    histos_tribosons = histos_WWZ[i].Clone('histos_tribosons')
     histos_tribosons.Add(histos_WZZ[i])
     histos_tribosons.Add(histos_ZZZ[i])
     histos_tribosons.SetFillColor(kGreen-3)
@@ -185,7 +184,7 @@ for name in namelist :
     hs.Add(histos_ZX[i])
 
     # TTZ
-    histos_TTV = histos_TTZJets_M10_MLMext1[i]
+    histos_TTV = histos_TTZJets_M10_MLMext1[i].Clone('histos_TTV')
     histos_TTV.Add(histos_TTZToLL_M1to10_MLM[i])
     histos_TTV.Add(histos_TTWJetsToLNu[i])
     histos_TTV.SetFillColor(kBlue+3)
@@ -194,7 +193,7 @@ for name in namelist :
 
     
     # gg->ZZ
-    histos_ggZZ = histos_ggTo4e_Contin_MCFM701[i]
+    histos_ggZZ = histos_ggTo4e_Contin_MCFM701[i].Clone('histos_ggZZ')
     histos_ggZZ.Add(histos_ggTo4mu_Contin_MCFM701[i])
     histos_ggZZ.Add(histos_ggTo4tau_Contin_MCFM701[i])
     histos_ggZZ.Add(histos_ggTo2e2mu_Contin_MCFM701[i])
@@ -216,7 +215,7 @@ for name in namelist :
 
 
     # SM Higgs
-    histos_SMHiggs = histos_ggH125[i]
+    histos_SMHiggs = histos_ggH125[i].Clone('histos_SMHiggs')
     histos_SMHiggs.Add(histos_VBFH125[i])
     histos_SMHiggs.Add(histos_WplusH125[i])
     histos_SMHiggs.Add(histos_WminusH125[i])
@@ -294,9 +293,9 @@ for name in namelist :
     legend.AddEntry(histos_SMHiggs,                  "SM Higgs",      "f")
     legend.AddEntry(histos_ZZTo4lext1[i],            "qq->ZZ",        "f")
     legend.AddEntry(histos_ggZZ,                     "gg->ZZ",        "f")
-    legend.AddEntry(histos_TTV,                      "TTV",           "f")
+    legend.AddEntry(histos_TTV,                      "TTV; V=Z,W",    "f")
     legend.AddEntry(histos_ZX[i],                    "Z+X",           "f")
-    legend.AddEntry(histos_tribosons,                "Tribosons",     "f")
+    legend.AddEntry(histos_tribosons,                "VVV; V=Z,W",    "f")
     legend.AddEntry(histos_AllData[i],               "Data",          "lp")
     legend.SetFillColor(kWhite)
     legend.SetLineColor(kBlack)
@@ -321,6 +320,14 @@ for name in namelist :
 
 
 
+    # -----------------------------------------
+    # tot hist for all mc
+    mc_tot = histos_SMHiggs.Clone('mc_tot') 
+    mc_tot.Add(histos_ZZTo4lext1[i])
+    mc_tot.Add(histos_TTV)
+    mc_tot.Add(histos_ggZZ)
+    mc_tot.Add(histos_ZX[i])
+    mc_tot.Add(histos_tribosons)
 
 
     # --- lower plot pad: RATIO PLOT
@@ -329,6 +336,8 @@ for name in namelist :
     pad2.SetGridy()
     pad2.Draw()
     pad2.cd()    #pad2 becomes the current pad
+      
+
 
     #define ratio plot
     rp = TH1F(histos_AllData[i].Clone("rp"))
@@ -336,7 +345,7 @@ for name in namelist :
     rp.SetMinimum(0.)
     rp.SetMaximum(2.)
     rp.SetStats(0)
-    rp.Divide(TH1F(histos_SMHiggs + histos_ZZTo4lext1[i] + histos_TTV + histos_ggZZ + histos_ZX[i] + histos_tribosons))   #divide histo rp/MC
+    rp.Divide(mc_tot) #divide histo rp/MC
     rp.SetMarkerStyle(20)
     rp.SetMarkerColor(kBlack)
     rp.SetTitle("") 
@@ -355,7 +364,31 @@ for name in namelist :
     rp.GetXaxis().SetLabelFont(43)
     rp.GetXaxis().SetLabelSize(15)
 
+    
+
+    #define mc shadow unc plot
+    mc_unc_h = TH1F(mc_tot.Clone('mc_unc_h'))
+    gpoint = 0
+    for xbin in range(1 , mc_unc_h.GetXaxis().GetNbins() + 1) :   #estremo e' sempre escluso, quindi +1
+        err = 0.
+        if(mc_unc_h.GetBinContent(xbin) == 0 ) : 
+            continue
+        err = mc_unc_h.GetBinError(xbin) / mc_unc_h.GetBinContent(xbin)
+        mc_unc_h.SetBinContent(xbin, 1)
+        mc_unc_h.SetBinError(xbin, err)
+
+    mc_unc_h.SetLineColor(1)
+    mc_unc_h.SetFillStyle(3005)
+    mc_unc_h.SetFillColor(kGray+3)
+    mc_unc_h.SetMarkerColor(1)
+    mc_unc_h.SetMarkerStyle(1)
+    mc_unc_h.SetTitle('')
+    mc_unc_h.SetStats(0)
+
+
+    #draw
     rp.Draw("ep")
+    mc_unc_h.Draw('e2 same')
 
     canvas.Update()
 
