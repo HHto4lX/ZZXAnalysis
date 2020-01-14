@@ -36,6 +36,7 @@
 #include <DataFormats/PatCandidates/interface/MET.h>
 #include <DataFormats/METReco/interface/PFMET.h>
 #include <DataFormats/METReco/interface/PFMETCollection.h>
+#include <ZZXAnalysis/AnalysisStep/interface/METCorrectionHandler.h>
 #include <ZZXAnalysis/AnalysisStep/interface/Fisher.h>
 #include <ZZXAnalysis/AnalysisStep/interface/Comparators.h>
 #include <ZZXAnalysis/AnalysisStep/interface/utils.h>
@@ -112,6 +113,8 @@ private:
   edm::EDGetTokenT<pat::METCollection> metToken;
   edm::EDGetTokenT<edm::View<reco::Candidate> > softLeptonToken;
   edm::EDGetTokenT<edm::View<reco::CompositeCandidate> > ZCandToken;
+
+  int _num_of_JEC_variations;
 };
 
 
@@ -144,7 +147,7 @@ ZZCandidateFiller::ZZCandidateFiller(const edm::ParameterSet& iConfig) :
   rolesZ1Z2 = {"Z1", "Z2"};
   rolesZ2Z1 = {"Z2", "Z1"};
 
-
+  _num_of_JEC_variations = 5; // Define number of total JEC variations 4 (JESUp, JESDn, JERUp, JERDn) + 1 for Nominal
 
   if (setup < 2015) {// FIXME:  EbE corrections to be updated for Run II
     // Run I ebe corrections; obsolete
@@ -210,6 +213,7 @@ void ZZCandidateFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     PFMET = metHandle->front().pt();
     PFMETPhi = metHandle->front().phi();
   }
+  // FIXME: May need to correct MET in the MC and use the corrected MET to calculate the VH MEs
 
   // Get leptons (in order to store extra leptons)
   Handle<View<reco::Candidate> > softleptoncoll;
@@ -582,23 +586,56 @@ void ZZCandidateFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     float DiJetMass  = -99;
     float DiJetDEta  = -99;
     float DiJetFisher  = -99;
+    float ZZjjPt     = -99;
 
-    unsigned int nCandidates=0; // Should equal 3 after the loop below
-    for (int jecnum = 0; jecnum < 3; jecnum++){
+    unsigned int nCandidates=0; // Should equal jecnum after the loop below
+
+    // Loop over following JEC variations:
+    // JES
+    // JER
+    for (int jecnum = 0; jecnum < _num_of_JEC_variations; jecnum++){
       SimpleParticleCollection_t associated;
-
-      // multiplier: +1 means JEC up, -1 means JEC down
-      double jecnum_multiplier = 0;
-      if (jecnum==1) jecnum_multiplier = 1.;
-      else if (jecnum==2) jecnum_multiplier = -1.;
 
       vector<const pat::Jet*> cleanedJetsPt30Jec;
       vector<float> jec_ratio;
       for (edm::View<pat::Jet>::const_iterator jet = CleanJets->begin(); jet != CleanJets->end(); ++jet){
+
+        // Nominal jet
+        float ratio = 1.;
+        float newPt = jet->pt();
+
         // calculate JEC uncertainty up/down
-        float jec_unc = jet->userFloat("jec_unc");
-        float ratio = 1. + jecnum_multiplier * jec_unc;
-        float newPt = jet->pt() * ratio;
+
+        //JES Up uncertainty
+        if (jecnum == 1 )      {
+	  ratio = 1. + jet->userFloat("jes_unc");
+	  newPt = jet->pt() * ratio;
+        }        
+
+        //JES Down uncertainty
+        else if (jecnum == 2 ) {
+	  ratio = 1. - jet->userFloat("jes_unc");
+	  newPt = jet->pt() * ratio;
+        }
+
+        //JER Up uncertainty
+        else if (jecnum == 3 ) {
+	  ratio = jet->userFloat("pt_jerup") / jet->pt();
+	  newPt = jet->userFloat("pt_jerup");
+        }
+
+        //JER Down uncertainty
+        else if (jecnum == 4 ) {
+	  ratio = jet->userFloat("pt_jerdn") / jet->pt();
+	  newPt = jet->userFloat("pt_jerdn");
+        }
+
+        // To add new uncertainties you have to:
+        // 1) Update _num_of_JEC_variations
+        // 2) Add their ration calculation here
+        // 3) Update updateMELAClusters_J1JEC and updateMELAClusters_J2JEC functions with names for new variations
+        // 4) Update RecoProbabilities.py and RecoProbabilities_minimal.py with those same names
+
         // apply pt>30GeV cut
         if (newPt<=30.) continue;
         // additional jets cleaning for loose leptons belonging to this candidate (for CRs only;
@@ -615,6 +652,19 @@ void ZZCandidateFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
         DiJetMass = (jet1.p4()+jet2.p4()).M();
         DiJetFisher = fisher(DiJetMass, DiJetDEta);
       }
+
+      vector<const pat::Jet*> cleanedJetsPt30;
+      for (edm::View<pat::Jet>::const_iterator jet = CleanJets->begin(); jet != CleanJets->end(); ++jet){
+        if (jet->pt() > 30.) cleanedJetsPt30.push_back(&*jet);
+      }
+
+      if(cleanedJetsPt30.size() > 1)
+	{
+	  const pat::Jet& jet1 = *(cleanedJetsPt30.at(0));
+	  const pat::Jet& jet2 = *(cleanedJetsPt30.at(1));
+	  ZZjjPt = (Z1Lm->p4()+Z1Lp->p4()+Z2Lm->p4()+Z2Lp->p4()+jet1.p4()+jet2.p4()).pt();
+	}
+
       for (unsigned int ijet = 0; ijet<cleanedJetsPt30Jec.size(); ijet++){
         TLorentzVector jet(
           cleanedJetsPt30Jec[ijet]->p4().x()*jec_ratio.at(ijet),
@@ -809,6 +859,8 @@ void ZZCandidateFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     myCand.addUserFloat("DiJetMass", DiJetMass);
     myCand.addUserFloat("DiJetDEta", DiJetDEta);
     myCand.addUserFloat("DiJetFisher", DiJetFisher);
+
+    myCand.addUserFloat("ZZjjPt", ZZjjPt);
 
     // MELA branches
     pushMELABranches(myCand);
@@ -1094,7 +1146,7 @@ void ZZCandidateFiller::updateMELAClusters_LepZH(){
 }
 // Common ME computations for JECNominal, Up and Down variations, case where ME requires 2 jets
 void ZZCandidateFiller::updateMELAClusters_J2JEC(){
-  for (int jecnum=0; jecnum<3; jecnum++){
+  for (int jecnum=0; jecnum < _num_of_JEC_variations; jecnum++){
     mela->setCurrentCandidateFromIndex(jecnum);
     MELACandidate* melaCand = mela->getCurrentCandidate();
     if (melaCand==0) continue;
@@ -1107,7 +1159,7 @@ void ZZCandidateFiller::updateMELAClusters_J2JEC(){
         for (unsigned int disableJet=0; disableJet<nGoodJets; disableJet++) melaCand->getAssociatedJet(disableJet)->setSelected((disableJet==firstjet || disableJet==secondjet)); // Disable the other jets
         unsigned int nDisabledStableTops=0;
         for (int itop=0; itop<melaCand->getNAssociatedTops(); itop++){
-          MELATopCandidate* einTop = melaCand->getAssociatedTop(itop);
+          MELATopCandidate_t* einTop = melaCand->getAssociatedTop(itop);
           if (einTop->getNDaughters()==3) einTop->setSelected(false); // All unstable tops are disabled in the loop for jets (where "jet"=="stable top") since we are looping over jecnum
           else{
             einTop->setSelected((nDisabledStableTops==firstjet || nDisabledStableTops==secondjet)); // Disable the other stable tops
@@ -1119,8 +1171,10 @@ void ZZCandidateFiller::updateMELAClusters_J2JEC(){
           MELACluster* theCluster = me_clusters.at(icl);
           if (
             (theCluster->getName()=="J2JECNominal" && jecnum==0) ||
-            (theCluster->getName()=="J2JECUp" && jecnum==1) ||
-            (theCluster->getName()=="J2JECDn" && jecnum==2)
+	    (theCluster->getName()=="J2JESUp" && jecnum==1) ||
+            (theCluster->getName()=="J2JESDn" && jecnum==2) ||
+            (theCluster->getName()=="J2JERUp" && jecnum==3) ||
+            (theCluster->getName()=="J2JERDn" && jecnum==4)
             ){
             // Re-compute all related hypotheses first...
             theCluster->computeAll();
@@ -1140,7 +1194,7 @@ void ZZCandidateFiller::updateMELAClusters_J2JEC(){
 void ZZCandidateFiller::updateMELAClusters_J1JEC(){
   // First determine if any of the candidates has only one jet
   bool doSkip=true;
-  for (int jecnum=0; jecnum<3; jecnum++){
+  for (int jecnum=0; jecnum < _num_of_JEC_variations; jecnum++){
     mela->setCurrentCandidateFromIndex(jecnum);
     MELACandidate* melaCand = mela->getCurrentCandidate();
     if (melaCand==0) continue;
@@ -1149,7 +1203,7 @@ void ZZCandidateFiller::updateMELAClusters_J1JEC(){
     doSkip = doSkip && (nGoodJets!=1);
   }
   if (doSkip) return; // If none of the candidates have exactly 1 jet, skip the computations
-  for (int jecnum=0; jecnum<3; jecnum++){
+  for (int jecnum=0; jecnum < _num_of_JEC_variations; jecnum++){
     mela->setCurrentCandidateFromIndex(jecnum);
     MELACandidate* melaCand = mela->getCurrentCandidate();
     if (melaCand==0) continue;
@@ -1164,8 +1218,10 @@ void ZZCandidateFiller::updateMELAClusters_J1JEC(){
         MELACluster* theCluster = me_clusters.at(icl);
         if (
           (theCluster->getName()=="J1JECNominal" && jecnum==0) ||
-          (theCluster->getName()=="J1JECUp" && jecnum==1) ||
-          (theCluster->getName()=="J1JECDn" && jecnum==2)
+	  (theCluster->getName()=="J1JESUp" && jecnum==1) ||
+          (theCluster->getName()=="J1JESDn" && jecnum==2) ||
+          (theCluster->getName()=="J1JERUp" && jecnum==3) ||
+          (theCluster->getName()=="J1JERDn" && jecnum==4)
           ){
           // Re-compute all related hypotheses first...
           theCluster->computeAll();
