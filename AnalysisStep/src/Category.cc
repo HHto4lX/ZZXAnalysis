@@ -2,11 +2,13 @@
 #include <ZZXAnalysis/AnalysisStep/interface/Discriminants.h>
 #include <ZZXAnalysis/AnalysisStep/interface/cConstants.h>
 
+#include <cassert>
 #include <cmath>
 #include <iostream>
 
 #include "TMath.h"
 #include "TRandom3.h"
+#include "TH1F.h"
 
 using namespace std;
 
@@ -24,74 +26,79 @@ extern "C" int categoryHH( short  nJets20, //FIXME: change name
                            int*   ExtraLepLepId 
 			   //                           int nPhotons
 			   //                           int nTaus
-                         )  
+			   )  
 { 
   // check on Jets Variables and btagging
   Int_t nBtaggedJets = 0;
   Int_t nGoodJets    = 0;
   for(int i = 0; i < nJets20; i++)
-  {
-    if(fabs(JetEta[i]) > 2.4 ) continue;
-    if(JetPt[i] < 30. ) continue;
+    {
+      if(fabs(JetEta[i]) > 2.4 ) continue;
+      if(JetPt[i] < 30. ) continue;
 
-    nGoodJets++;
-    if(JetIsBTaggedWithSF[i] > 0) { nBtaggedJets++; }
-  } 
-
+      nGoodJets++;
+      if(JetIsBTaggedWithSF[i] > 0) { nBtaggedJets++; }
+    } 
   // check on extraLep variables
   Int_t nExtraLepInAcceptance  = 0;
   Int_t nExtraLepInAcceptaneOS = 0;
   for(Int_t i = 0; i < nExtraLep; i++)
-  {
-    if(ExtraLepPt[i] < 10 || fabs(ExtraLepEta[i]) > 2.4) continue;
-    nExtraLepInAcceptance++; 
-  }
-  if(nExtraLepInAcceptance > 1) 
-  {
-    for(Int_t i = 0; i < nExtraLep; i++)
-    { 
+    {
       if(ExtraLepPt[i] < 10 || fabs(ExtraLepEta[i]) > 2.4) continue;
-      for(Int_t j = 0; j < nExtraLep; j++)
-   	{
-        if(ExtraLepPt[j] < 10 || fabs(ExtraLepEta[j]) > 2.4) continue;
-        if(ExtraLepLepId[j] * ExtraLepLepId[j] < 0)
-   	  {
-          nExtraLepInAcceptaneOS++;   
-        }
-      }
-    }  
-  }
+      nExtraLepInAcceptance++; 
+    }
+  if(nExtraLepInAcceptance > 1) 
+    {
+      for(Int_t i = 0; i < nExtraLep; i++)
+	{ 
+	  if(ExtraLepPt[i] < 10 || fabs(ExtraLepEta[i]) > 2.4) continue;
+	  for(Int_t j = 0; j < nExtraLep; j++)
+	    {
+	      if(ExtraLepPt[j] < 10 || fabs(ExtraLepEta[j]) > 2.4) continue;
+	      if(ExtraLepLepId[j] * ExtraLepLepId[j] < 0)
+		{
+		  nExtraLepInAcceptaneOS++;   
+		}
+	    }
+	}  
+    }
 
   // --- select category
   // 4lbb
   if( nGoodJets > 1 && nBtaggedJets > 0 && nExtraLep < 2 )
-  {
-    return HH4lbbTagged;
-  }
+    {
+      return HH4lbbTagged;
+    }
   // 4lww
   //  else if( nExtraLepInAcceptaneOS > 0 ) // to be used!
   else if( false ) // temporary: FIXME
-  {
-    return HH4lWWTagged;
-  }
+    {
+      return HH4lWWTagged;
+    }
   // 4lgammagamma
   else if( false )
-  {
-    return HH4lgammagammaTagged;
-  }
+    {
+      return HH4lgammagammaTagged;
+    }
   // 4ltautau
   else if( false )
-  {
-    return HH4ltautauTagged;
-  }
+    {
+      return HH4ltautauTagged;
+    }
   // untagged
   else
-  {
-    return HHUntagged;
-  }
+    {
+      return HHUntagged;
+    }
 }
 
 
+
+
+
+
+float bins_hpt4[]={0,60,120,200};
+TH1F *hpt_bin=new TH1F("hpt_bin","",3, bins_hpt4);
 
 extern "C" int categoryLegacy( int nCleanedJetsPt30 )
 {
@@ -379,4 +386,126 @@ extern "C" int categoryMor18(
 
   }
 
+}
+
+extern "C" int stage1_reco_1p1(
+                           int Njets,
+                           float mjj,
+                           float H_pt,
+                           int categoryMor18,
+                           float pt_hjj
+                           )
+{
+	int vbfTopo=0;
+	if (Njets<2) vbfTopo=0; 
+	vbfTopo = mjj > 350.0; 
+	if(categoryMor18 == 5 ){ return ttH_Lep;}
+	else if(categoryMor18 == 6 ){ return ttH_Had;}
+	else if(categoryMor18==3){
+		if(H_pt<150 ){return VH_lep_0_150;}
+		else {return VH_Lep_GT150;}
+	}
+	else if (categoryMor18 ==1){return VBF_1j;}
+	else if(categoryMor18==2)
+   {
+		if(vbfTopo)
+      {
+			if (H_pt>200 )   {return VBF_GT200_2J;}
+			else{
+				if (pt_hjj>25)
+				{return VBF_2j_mjj_GT350_3j;}
+				else{
+					if (mjj > 350 && mjj < 700 ){return VBF_2j_mjj_350_700_2j;}
+					else if (mjj > 700 ){return VBF_2j_mjj_GT700_2j;}
+				    }
+			    }
+      }
+		else {return VBF_2j;}
+	}
+   
+	else if (categoryMor18 == 4)
+   {
+		if ( 60 < mjj && mjj < 120){return VH_Had;}
+		else{return VBF_rest_VH;}
+	}
+	else
+   {
+		if (H_pt>200 ){return ggH_PTH_200;}
+		else
+      {
+			if (Njets==0)
+         {
+				if(H_pt<10){return ggH_0J_PTH_0_10;}
+				else{return ggH_0J_PTH_10_200;}
+			}
+			else if (Njets==1)   {
+				int binpt = hpt_bin->FindBin(H_pt);
+				if (binpt == 1){return ggH_1J_PTH_0_60; }
+				else if (binpt == 2){return ggH_1J_PTH_60_120; }
+				else if (binpt == 3){return ggH_1J_PTH_120_200; }
+
+			} 
+			else if ( Njets>=2) {
+				if(vbfTopo) {return ggH_VBF;}
+            int binpt = hpt_bin->FindBin(H_pt);
+            if (binpt == 1){return ggH_2J_PTH_0_60; }
+            else if (binpt == 2){return ggH_2J_PTH_60_120; }
+            else if (binpt == 3){return ggH_2J_PTH_120_200; }
+			}
+		}
+	}
+	return -1;
+}
+
+extern "C" int categoryAC19(
+                             int nExtraLep,
+                             int nExtraZ,
+                             int nCleanedJetsPt30,
+                             int nCleanedJetsPt30BTagged_bTagSF,
+                             float* jetQGLikelihood,
+                             float p_JJQCD_SIG_ghg2_1_JHUGen_JECNominal,
+                             float p_JQCD_SIG_ghg2_1_JHUGen_JECNominal,
+                             float p_JJVBF_SIG_ghv1_1_JHUGen_JECNominal,
+                             float p_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
+                             float pAux_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
+                             float p_HadWH_SIG_ghw1_1_JHUGen_JECNominal,
+                             float p_HadZH_SIG_ghz1_1_JHUGen_JECNominal,
+                             float p_HadWH_mavjj_JECNominal,
+                             float p_HadWH_mavjj_true_JECNominal,
+                             float p_HadZH_mavjj_JECNominal,
+                             float p_HadZH_mavjj_true_JECNominal,
+                             float* jetPhi,
+                             float ZZMass,
+                             float ZZPt,
+                             float PFMET,
+                             bool useVHMETTagged,
+                             bool useQGTagging
+                             ) {
+  int c = categoryMor18(
+    nExtraLep,
+    nExtraZ,
+    nCleanedJetsPt30,
+    nCleanedJetsPt30BTagged_bTagSF,
+    jetQGLikelihood,
+    p_JJQCD_SIG_ghg2_1_JHUGen_JECNominal,
+    p_JQCD_SIG_ghg2_1_JHUGen_JECNominal,
+    p_JJVBF_SIG_ghv1_1_JHUGen_JECNominal,
+    p_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
+    pAux_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
+    p_HadWH_SIG_ghw1_1_JHUGen_JECNominal,
+    p_HadZH_SIG_ghz1_1_JHUGen_JECNominal,
+    p_HadWH_mavjj_JECNominal,
+    p_HadWH_mavjj_true_JECNominal,
+    p_HadZH_mavjj_JECNominal,
+    p_HadZH_mavjj_true_JECNominal,
+    jetPhi,
+    ZZMass,
+    PFMET,
+    useVHMETTagged,
+    useQGTagging
+  );
+  if (c==VBF2jTaggedMor18 || c==VHHadrTaggedMor18 || c==VBF1jTaggedMor18 || c==VHLeptTaggedMor18 || c==ttHLeptTaggedMor18 || c==ttHHadrTaggedMor18) return c; //ttH categories are not actually used (they are put into untagged), but their selection is excluded from boosted
+  assert(c==UntaggedMor18 || c==VHMETTaggedMor18);
+  if (ZZPt > 120) return BoostedAC19;
+  return c;
 }
