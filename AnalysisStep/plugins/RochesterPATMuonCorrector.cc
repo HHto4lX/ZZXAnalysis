@@ -102,12 +102,9 @@ RochesterPATMuonCorrector::produce(edm::Event& iEvent, const edm::EventSetup& iS
     double scale_factor;
     double scale_error = 0.;
     double smear_error = 0.;
-    double u1 = rgen_->Rndm();
-    double u2 = rgen_->Rndm();
-	
-	 if(isSync_) {u1 = 1.; u2 = 1.;}
-	 
-	  
+    double u = rgen_->Rndm();
+      
+    if(isSync_) u = 0.5;
 
     if (calibrator != 0  && mu.muonBestTrackType() == 1 && oldpt <= 200.)
     {
@@ -116,21 +113,22 @@ RochesterPATMuonCorrector::produce(edm::Event& iEvent, const edm::EventSetup& iS
       if(isMC_ && nl > 5)//Protection against muons with low number of layers, they are not used in the analysis anyway as we apply thight muon ID
       {
 			
+            //cout << "pt = " << mu.pt() << " eta = " << mu.eta() << " phi = " << mu.phi() << "u = " << u << endl;
 			/// ====== ON MC (correction plus smearing) =====
 			if ( gen_particle != 0)
 			{
-				scale_factor = calibrator->kScaleFromGenMC(mu.charge(), oldpt, mu.eta(), mu.phi(), nl, gen_particle->pt(), u1);
-				smear_error = calibrator->kScaleFromGenMCerror(mu.charge(), oldpt, mu.eta(), mu.phi(), nl, gen_particle->pt(), u1);
+				scale_factor = calibrator->kSpreadMC(mu.charge(), oldpt, mu.eta(), mu.phi(), gen_particle->pt());
+				smear_error = calibrator->kSpreadMCerror(mu.charge(), oldpt, mu.eta(), mu.phi(), gen_particle->pt());
 				
 			}
 			else
 			{
-				scale_factor = calibrator->kScaleAndSmearMC(mu.charge(), oldpt, mu.eta(), mu.phi(), nl, u1, u2);
-				smear_error = calibrator->kScaleAndSmearMCerror(mu.charge(), oldpt, mu.eta(), mu.phi(), nl, u1, u2);
+				scale_factor = calibrator->kSmearMC(mu.charge(), oldpt, mu.eta(), mu.phi(), nl, u);
+				smear_error = calibrator->kSmearMCerror(mu.charge(), oldpt, mu.eta(), mu.phi(), nl, u);
 				
 			}
 			
-			scale_error = calibrator->kScaleDTerror(mu.charge(), oldpt, mu.eta(), mu.phi());
+			scale_error = calibrator->kScaleDTerror(mu.charge(), oldpt, mu.eta(), mu.phi());//there is no scale for MC so calculate it pretending it is data
 			
 			newpt = oldpt*scale_factor;
 			newpterr = oldpterr*scale_factor;
@@ -139,11 +137,11 @@ RochesterPATMuonCorrector::produce(edm::Event& iEvent, const edm::EventSetup& iS
       else if(!isMC_ && nl > 5)
       {
 			/// ====== ON DATA (correction only) =====
-			if(mu.pt()>2.0 && fabs(mu.eta())<2.4)
+			if(mu.pt()>2.0 && fabs(mu.eta())<2.4)//protection, we don't use these muons anyway
 			{
 			  scale_factor = calibrator->kScaleDT(mu.charge(), oldpt, mu.eta(), mu.phi());
 			  scale_error = calibrator->kScaleDTerror(mu.charge(), oldpt, mu.eta(), mu.phi());
-			  smear_error = calibrator->kScaleAndSmearMCerror(mu.charge(), oldpt, mu.eta(), mu.phi(), nl, u1, u2);
+			  smear_error = calibrator->kSmearMCerror(mu.charge(), oldpt, mu.eta(), mu.phi(), nl, u);//there is no smear in data so calculate it pretending it is mc
 			}
 			else
 			{
@@ -161,8 +159,10 @@ RochesterPATMuonCorrector::produce(edm::Event& iEvent, const edm::EventSetup& iS
     p4.SetPtEtaPhiM(newpt, mu.eta(), mu.phi(), mu.mass());
     mu.setP4(reco::Particle::PolarLorentzVector(p4.Pt(), p4.Eta(), p4.Phi(), mu.mass()));
     mu.addUserFloat("correctedPtError",newpterr);
-	 mu.addUserFloat("scale_unc", 1. + scale_error);
-    mu.addUserFloat("smear_unc", 1. + smear_error);
+	 mu.addUserFloat("scale_total_up", 1. + scale_error);
+    mu.addUserFloat("scale_total_dn", 1. - scale_error);
+    mu.addUserFloat("sigma_total_up", 1. + smear_error);
+    mu.addUserFloat("sigma_total_dn", 1. - smear_error);
 	  
     outputMuons->push_back(mu);
   }
