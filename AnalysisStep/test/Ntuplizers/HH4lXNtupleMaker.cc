@@ -1,10 +1,12 @@
 // -*- C++ -*-
 //
+//
 // Fill a tree for selected candidates.
 //
 
 
 // system include files
+#include <cassert>
 #include <memory>
 #include <cmath>
 #include <algorithm>
@@ -30,11 +32,12 @@
 #include <DataFormats/PatCandidates/interface/Muon.h>
 #include <DataFormats/PatCandidates/interface/Electron.h>
 #include "DataFormats/EgammaCandidates/interface/Photon.h"
-#include "DataFormats/PatCandidates/interface/Photon.h"
+#include <DataFormats/PatCandidates/interface/Photon.h>
 #include <DataFormats/PatCandidates/interface/Jet.h>
 #include <DataFormats/PatCandidates/interface/MET.h>
 #include <DataFormats/METReco/interface/PFMET.h>
 #include <DataFormats/METReco/interface/PFMETCollection.h>
+#include <ZZXAnalysis/AnalysisStep/interface/METCorrectionHandler.h>
 #include <DataFormats/JetReco/interface/PFJet.h>
 #include <DataFormats/JetReco/interface/PFJetCollection.h>
 #include <DataFormats/Math/interface/LorentzVector.h>
@@ -59,10 +62,12 @@
 #include <ZZXAnalysis/AnalysisStep/interface/bitops.h>
 #include <ZZXAnalysis/AnalysisStep/interface/Fisher.h>
 #include <ZZXAnalysis/AnalysisStep/interface/LeptonIsoHelper.h>
+#include <ZZXAnalysis/AnalysisStep/interface/PhotonIDHelper.h>
 #include <ZZXAnalysis/AnalysisStep/interface/JetCleaner.h>
 #include <ZZXAnalysis/AnalysisStep/interface/utils.h>
 #include <ZZXAnalysis/AnalysisStep/interface/miscenums.h>
 #include <ZZXAnalysis/AnalysisStep/interface/ggF_qcd_uncertainty_2017.h>
+#include <ZZXAnalysis/AnalysisStep/interface/LeptonSFHelper.h>
 
 #include <MelaAnalytics/CandidateLOCaster/interface/MELACandidateRecaster.h>
 #include <CommonLHETools/LHEHandler/interface/LHEHandler.h>
@@ -82,7 +87,7 @@
 
 namespace {
   bool writePrunedGenParticles = true;
-  bool writePrunedGenPhotons = true;
+  bool writePrunedGenPhotons = false;
   bool writeJets = true;     // Write jets in the tree. FIXME: make this configurable
   bool writePhotons = true;  // Write photons in the tree
   bool writeTaus = true;     // Write taus in the tree
@@ -122,20 +127,26 @@ namespace {
   Float_t KFactor_QCD_qqZZ_dPhi = 0;
   Float_t KFactor_QCD_qqZZ_M = 0;
   Float_t KFactor_QCD_qqZZ_Pt = 0;
-  Float_t PFMET  =  -99;
-  Float_t PFMET_jesUp  =  -99;
-  Float_t PFMET_jesDn  =  -99;
-  Float_t PFMETPhi  =  -99;
+  // Generic MET object
+  METObject metobj;
+  METObject metobj_corrected;
+  Float_t GenMET = -99;
+  Float_t GenMETPhi = -99;
+  // MET with no HF
   //Float_t PFMETNoHF  =  -99;
   //Float_t PFMETNoHFPhi  =  -99;
   Short_t nCleanedJets  =  0;
   Short_t nCleanedJetsPt30  = 0;
-  Short_t nCleanedJetsPt30_jecUp  = 0;
-  Short_t nCleanedJetsPt30_jecDn  = 0;
+  Short_t nCleanedJetsPt30_jesUp  = 0;
+  Short_t nCleanedJetsPt30_jesDn  = 0;
+  Short_t nCleanedJetsPt30_jerUp  = 0;
+  Short_t nCleanedJetsPt30_jerDn  = 0;
   Short_t nCleanedJetsPt30BTagged  = 0;
   Short_t nCleanedJetsPt30BTagged_bTagSF  = 0;
-  Short_t nCleanedJetsPt30BTagged_bTagSF_jecUp  = 0;
-  Short_t nCleanedJetsPt30BTagged_bTagSF_jecDn  = 0;
+  Short_t nCleanedJetsPt30BTagged_bTagSF_jesUp  = 0;
+  Short_t nCleanedJetsPt30BTagged_bTagSF_jesDn  = 0;
+  Short_t nCleanedJetsPt30BTagged_bTagSF_jerUp  = 0;
+  Short_t nCleanedJetsPt30BTagged_bTagSF_jerDn  = 0;
   Short_t nCleanedJetsPt30BTagged_bTagSFUp  = 0;
   Short_t nCleanedJetsPt30BTagged_bTagSFDn  = 0;
   Short_t trigWord  = 0;
@@ -147,6 +158,7 @@ namespace {
   Float_t ZZPt  = 0;
   Float_t ZZEta  = 0;
   Float_t ZZPhi  = 0;
+  Float_t ZZjjPt = 0;
   Int_t CRflag  = 0;
   Float_t Z1Mass  = 0;
   Float_t Z1Pt  = 0;
@@ -174,11 +186,15 @@ namespace {
   std::vector<float> LepPt;
   std::vector<float> LepEta;
   std::vector<float> LepPhi;
+  std::vector<float> LepSCEta;
   std::vector<short> LepLepId;
   std::vector<float> LepSIP;
+  std::vector<float> Lepdxy;
+  std::vector<float> Lepdz;
   std::vector<float> LepTime;
   std::vector<bool>  LepisID;
   std::vector<float> LepBDT;
+  std::vector<bool>  LepisCrack;
   std::vector<char>  LepMissingHit;
   std::vector<float> LepChargedHadIso;
   std::vector<float> LepNeutralHadIso;
@@ -186,32 +202,22 @@ namespace {
   std::vector<float> LepPUIsoComponent;
   std::vector<float> LepCombRelIsoPF;
   std::vector<short> LepisLoose;
-  std::vector<float> LepRecoSF;
-  std::vector<float> LepRecoSF_Unc;
-  std::vector<float> LepSelSF;
-  std::vector<float> LepSelSF_Unc;
-  std::vector<float> LepScale_Unc;
-  std::vector<float> LepSmear_Unc;
-
-  Short_t nPhotons  =  0;
-  std::vector<float> photonPt;
-  std::vector<float> photonEta;
-  std::vector<float> photonPhi;
-  std::vector<float> photonEtaSC;
-  std::vector<float> photonPhiSC;
-  std::vector<float> photonMass;
-  std::vector<float> photon_5x5r9;
-  std::vector<float> photon_5x5sigmaIetaIeta;
-  std::vector<float> photon_chargedHadronIso;
-  std::vector<float> photon_neutralHadronIso;
-  std::vector<float> photon_photonIso;
-  std::vector<float> photon_hadronicOverEm;
-  std::vector<float> photon_rho;
-  std::vector<float> photonIsID;
-  std::vector<float> photon_chargedHadronIso_corr;
-  std::vector<float> photon_neutralHadronIso_corr;
-  std::vector<float> photon_photonIso_corr;
-  std::vector<float> photonPassElectronVeto;
+  std::vector<float> LepSF;
+  std::vector<float> LepSF_Unc;
+  std::vector<float> LepScale_Total_Up;
+  std::vector<float> LepScale_Total_Dn;
+  std::vector<float> LepScale_Stat_Up;
+  std::vector<float> LepScale_Stat_Dn;
+  std::vector<float> LepScale_Syst_Up;
+  std::vector<float> LepScale_Syst_Dn;
+  std::vector<float> LepScale_Gain_Up;
+  std::vector<float> LepScale_Gain_Dn;
+  std::vector<float> LepSigma_Total_Up;
+  std::vector<float> LepSigma_Total_Dn;
+  std::vector<float> LepSigma_Rho_Up;
+  std::vector<float> LepSigma_Rho_Dn;
+  std::vector<float> LepSigma_Phi_Up;
+  std::vector<float> LepSigma_Phi_Dn;
 
   Short_t nTaus  =  0;
   std::vector<float> tauPt;
@@ -245,8 +251,16 @@ namespace {
   std::vector<short> JetHadronFlavour;
   std::vector<short> JetPartonFlavour;
 
+  std::vector<float> JetPtJEC_noJER;
+  std::vector<float> JetRawPt;
+
   std::vector<float> JetPUValue;
   std::vector<short> JetPUID;
+
+  std::vector<short> JetID;
+
+  std::vector<float> JetJESUp ;
+  std::vector<float> JetJESDown ;
 
   std::vector<float> JetJERUp ;
   std::vector<float> JetJERDown ;
@@ -277,6 +291,29 @@ namespace {
   std::vector<float> ExtraLepPhi ;
   std::vector<float> ExtraLepMass;
   std::vector<short> ExtraLepLepId;
+
+  //  Short_t nPhotons  =  0;
+  std::vector<float> photonPt;
+  std::vector<float> photonEta;
+  std::vector<float> photonPhi;
+  std::vector<bool>  photonIsCutBasedLooseID;
+  // std::vector<float> photonEtaSC;
+  // std::vector<float> photonPhiSC;
+  // std::vector<float> photonMass;
+  // std::vector<float> photon_5x5r9;
+  // std::vector<float> photon_5x5sigmaIetaIeta;
+  // std::vector<float> photon_chargedHadronIso;
+  // std::vector<float> photon_neutralHadronIso;
+  // std::vector<float> photon_photonIso;
+  // std::vector<float> photon_hadronicOverEm;
+  // std::vector<float> photon_rho;
+  // std::vector<float> photonIsID;
+  // std::vector<float> photon_chargedHadronIso_corr;
+  // std::vector<float> photon_neutralHadronIso_corr;
+  // std::vector<float> photon_photonIso_corr;
+  // std::vector<float> photonPassElectronVeto;
+
+
   Short_t genFinalState  = 0;
   Int_t genProcessId  = 0;
   Float_t genHEPMCweight  = 0;
@@ -332,12 +369,13 @@ namespace {
   Float_t genxsection = 0;
   Float_t genbranchingratio = 0;
   Float_t dataMCWeight  = 0;
-  Float_t muonSF_Unc = 0;
-  Float_t eleSF_Unc = 0;
   Float_t trigEffWeight  = 0;
   Float_t HqTMCweight  = 0;
   Float_t ZXFakeweight  = 0;
   Float_t overallEventWeight  = 0;
+  Float_t L1prefiringWeight = 0;
+  Float_t L1prefiringWeightUp = 0;
+  Float_t L1prefiringWeightDn = 0;
   Float_t GenHMass  = 0;
   Float_t GenHPt  = 0;
   Float_t GenHRapidity  = 0;
@@ -381,7 +419,9 @@ namespace {
   Int_t   htxs_errorCode=-1;
   Int_t   htxs_prodMode=-1;
   Int_t   htxs_stage0_cat = -1;
-  Int_t   htxs_stage1_cat = -1;
+  Int_t   htxs_stage1p1_cat = -1;
+  Int_t   htxs_stage1p0_cat = -1;
+  Int_t   htxs_stage1p2_cat = -1;
   Float_t ggH_NNLOPS_weight = 0;
   Float_t ggH_NNLOPS_weight_unc = 0;
   std::vector<float> qcd_ggF_uncertSF;
@@ -426,7 +466,7 @@ private:
   virtual void FillLHECandidate();
   virtual void FillCandidate(const pat::CompositeCandidate& higgs, bool evtPass, const edm::Event&, const Int_t CRflag);
   virtual void FillJet(const pat::Jet& jet);
-  virtual void FillPhoton(const pat::Photon& photon);
+  virtual void FillPhoton(int year, const pat::Photon& photon);
   virtual void FillTau(const pat::Tau& tau);
   virtual void endJob() ;
 
@@ -441,7 +481,7 @@ private:
   void FillAssocLepGenInfo(std::vector<const reco::Candidate *>& AssocLeps);
 
   
-  Float_t getAllWeight(const vector<const reco::Candidate*>& leptons, Float_t& muonSFUncert, Float_t& eleSFUncert) const;
+  Float_t getAllWeight(const vector<const reco::Candidate*>& leptons);
   Float_t getHqTWeight(double mH, double genPt) const;
   Float_t getFakeWeight(Float_t LepPt, Float_t LepEta, Int_t LepID, Int_t LepZ1ID);
   Int_t FindBinValue(TGraphErrors *tgraph, double value);
@@ -504,6 +544,7 @@ private:
 
   bool addLHEKinematics;
   LHEHandler* lheHandler;
+  METCorrectionHandler* metCorrHandler;
   int apply_K_NNLOQCD_ZZGG; // 0: Do not; 1: NNLO/LO; 2: NNLO/NLO; 3: NLO/LO
   bool apply_K_NNLOQCD_ZZQQB;
   bool apply_K_NLOEW_ZZQQB;
@@ -517,7 +558,7 @@ private:
   edm::EDGetTokenT<edm::TriggerResults> triggerResultToken;
   edm::EDGetTokenT<vector<reco::Vertex> > vtxToken;
   edm::EDGetTokenT<edm::View<pat::Jet> > jetToken;
-  edm::EDGetTokenT<edm::View<pat::Photon> > photonToken; //H->GammaGamma photons
+  edm::EDGetTokenT<pat::PhotonCollection> photonToken;
   edm::EDGetTokenT<edm::View<pat::Tau> > tauToken; // H->TauTau
   edm::EDGetTokenT<pat::METCollection> metToken;
   //edm::EDGetTokenT<pat::METCollection> metNoHFToken;
@@ -526,6 +567,10 @@ private:
   edm::EDGetTokenT<HTXS::HiggsClassification> htxsToken;
   edm::EDGetTokenT<edm::MergeableCounter> preSkimToken;
   edm::EDGetTokenT<LHERunInfoProduct> lheRunInfoToken;
+
+  edm::EDGetTokenT< double > prefweight_token;
+  edm::EDGetTokenT< double > prefweightup_token;
+  edm::EDGetTokenT< double > prefweightdown_token;
 
   PileUpWeight* pileUpReweight;
 
@@ -560,15 +605,7 @@ private:
   TSpline3* spkfactor_ggzz_nnlo[9]; // Nominal, PDFScaleDn, PDFScaleUp, QCDScaleDn, QCDScaleUp, AsDn, AsUp, PDFReplicaDn, PDFReplicaUp
   TSpline3* spkfactor_ggzz_nlo[9]; // Nominal, PDFScaleDn, PDFScaleUp, QCDScaleDn, QCDScaleUp, AsDn, AsUp, PDFReplicaDn, PDFReplicaUp
 
-  TH2D *hTH2D_Mu_All;
-  TH2D *hTH2D_Mu_Unc;
-
-  TH2F *hTH2F_El_Reco;
-  TH2F *hTH2F_El_Reco_lowPT;
-  TH2F *hTH2F_El_Reco_highPT;
-  TH1 *hTH2D_El_IdIsoSip_notCracks;
-  TH1 *hTH2D_El_IdIsoSip_Cracks;
-  TH1 *hTH2F_El_RSE;
+  LeptonSFHelper *lepSFHelper;
 
   TH2D* h_weight; //HqT weights
   //TH2F *h_ZXWeightMuo;
@@ -609,6 +646,7 @@ HH4lXNtupleMaker::HH4lXNtupleMaker(const edm::ParameterSet& pset) :
   lheMElist(pset.getParameter<std::vector<std::string>>("lheProbabilities")),
   addLHEKinematics(pset.getParameter<bool>("AddLHEKinematics")),
   lheHandler(nullptr),
+  metCorrHandler(nullptr),
   apply_K_NNLOQCD_ZZGG(pset.getParameter<int>("Apply_K_NNLOQCD_ZZGG")),
   apply_K_NNLOQCD_ZZQQB(pset.getParameter<bool>("Apply_K_NNLOQCD_ZZQQB")),
   apply_K_NLOEW_ZZQQB(pset.getParameter<bool>("Apply_K_NLOEW_ZZQQB")),
@@ -616,13 +654,6 @@ HH4lXNtupleMaker::HH4lXNtupleMaker(const edm::ParameterSet& pset) :
 
   pileUpReweight(nullptr),
   sampleName(pset.getParameter<string>("sampleName")),
-  hTH2D_Mu_All(0),
-  hTH2D_Mu_Unc(0),
-
-  hTH2F_El_Reco(0),
-  hTH2D_El_IdIsoSip_notCracks(0),
-  hTH2D_El_IdIsoSip_Cracks(0),
-  hTH2F_El_RSE(0),
   h_weight(0),
 
   printedLHEweightwarning(false)
@@ -641,7 +672,7 @@ HH4lXNtupleMaker::HH4lXNtupleMaker(const edm::ParameterSet& pset) :
   triggerResultToken = consumes<edm::TriggerResults>(edm::InputTag("TriggerResults"));
   vtxToken = consumes<vector<reco::Vertex> >(edm::InputTag("goodPrimaryVertices"));
   jetToken = consumes<edm::View<pat::Jet> >(edm::InputTag("cleanJets"));
-  photonToken = consumes<edm::View<pat::Photon> >(edm::InputTag("pikaPhotons")); // H->GammaGamma photons
+  photonToken = consumes<pat::PhotonCollection>(edm::InputTag("slimmedPhotons"));
   tauToken = consumes<edm::View<pat::Tau> >(edm::InputTag("pikaTaus")); // H->TauTau 
   metToken = consumes<pat::METCollection>(metTag);
   //metNoHFToken = consumes<pat::METCollection>(edm::InputTag("slimmedMETsNoHF"));
@@ -663,14 +694,24 @@ HH4lXNtupleMaker::HH4lXNtupleMaker(const edm::ParameterSet& pset) :
   }
 
   isMC = myHelper.isMC();
+
+  if( isMC && (year == 2016 || year == 2017))
+  {
+     prefweight_token = consumes< double >(edm::InputTag("prefiringweight:nonPrefiringProb"));
+     prefweightup_token = consumes< double >(edm::InputTag("prefiringweight:nonPrefiringProbUp"));
+     prefweightdown_token = consumes< double >(edm::InputTag("prefiringweight:nonPrefiringProbDown"));
+  }
+
+
   addLHEKinematics = addLHEKinematics || !lheMElist.empty();
   if (isMC){
     lheHandler = new LHEHandler(
-      pset.getParameter<int>("VVMode"),
+      ((MELAEvent::CandidateVVMode)(pset.getParameter<int>("VVMode")+1)), // FIXME: Need to pass strings and interpret them instead!
       pset.getParameter<int>("VVDecayMode"),
       (addLHEKinematics ? LHEHandler::doHiggsKinematics : LHEHandler::noKinematics),
       year, LHEHandler::tryNNPDF30, LHEHandler::tryNLO
     );
+    metCorrHandler = new METCorrectionHandler(Form("%i", year));
     htxsToken = consumes<HTXS::HiggsClassification>(edm::InputTag("rivetProducerHTXS","HiggsClassification"));
     pileUpReweight = new PileUpWeight(myHelper.sampleType(), myHelper.setup());
   }
@@ -729,135 +770,8 @@ HH4lXNtupleMaker::HH4lXNtupleMaker(const edm::ParameterSet& pset) :
   gr_NNLOPSratio_pt_powheg_3jet = (TGraphErrors*)NNLOPS_weight_file->Get("gr_NNLOPSratio_pt_powheg_3jet");
 
   //Scale factors for data/MC efficiency
-  if (!skipEleDataMCWeight && isMC) {
+  if (!skipEleDataMCWeight && isMC) { lepSFHelper = new LeptonSFHelper(); }
 
-    if(year == 2016)
-    {
-        edm::FileInPath fipEleNotCracks("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/ScaleFactors_non_gap_ele_Moriond2017_v2.root");
-        TFile *root_file = TFile::Open(fipEleNotCracks.fullPath().data(),"READ");
-        hTH2D_El_IdIsoSip_notCracks = (TH1*) root_file->Get("EGamma_SF2D")->Clone();
-        root_file->Close();
-       
-        edm::FileInPath fipEleCracks("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/ScaleFactors_gap_ele_Moriond2017_v2.root");
-        root_file = TFile::Open(fipEleCracks.fullPath().data(),"READ");
-        hTH2D_El_IdIsoSip_Cracks = (TH1*) root_file->Get("EGamma_SF2D")->Clone();
-        root_file->Close();
- 
-        edm::FileInPath fipEleReco_highPt("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/Ele_Reco_2016.root");
-        TFile *root_file_reco_highPT = TFile::Open(fipEleReco_highPt.fullPath().data(),"READ");
-        hTH2F_El_Reco_highPT = (TH2F*) root_file_reco_highPT->Get("EGamma_SF2D")->Clone();
-        root_file_reco_highPT->Close();
-		 
-        edm::FileInPath fipEleReco_lowPt("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/Ele_Reco_LowEt_2016.root");
-        TFile *root_file_reco_lowPT = TFile::Open(fipEleReco_lowPt.fullPath().data(),"READ");
-        hTH2F_El_Reco_lowPT = (TH2F*) root_file_reco_lowPT->Get("EGamma_SF2D")->Clone();
-        root_file_reco_lowPT->Close();
-
-        edm::FileInPath fipEleRSE("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/ScaleFactors_RSE_ele_Moriond2017_v1.root");
-        root_file = TFile::Open(fipEleRSE.fullPath().data(),"READ");
-        hTH2F_El_RSE = (TH2F*) root_file->Get("EGamma_SF2D")->Clone();
-        root_file->Close();
-
-    }
-    else if (year == 2017)
-      {
-
-        edm::FileInPath fipEleNotCracks("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/egammaEffi.txt_EGM2D_Moriond2018v1.root");
-        TFile *root_file = TFile::Open(fipEleNotCracks.fullPath().data(),"READ");
-        hTH2D_El_IdIsoSip_notCracks = (TH2F*) root_file->Get("EGamma_SF2D")->Clone();
-        root_file->Close();
-		 
-        edm::FileInPath fipEleCracks("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/egammaEffi.txt_EGM2D_Moriond2018v1_gap.root");
-        root_file = TFile::Open(fipEleCracks.fullPath().data(),"READ");
-        hTH2D_El_IdIsoSip_Cracks = (TH2F*) root_file->Get("EGamma_SF2D")->Clone();
-        root_file->Close();
- 
-        edm::FileInPath fipEleReco_highPt("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/Ele_Reco_2017.root");
-        TFile *root_file_reco_highPT = TFile::Open(fipEleReco_highPt.fullPath().data(),"READ");
-        hTH2F_El_Reco_highPT = (TH2F*) root_file_reco_highPT->Get("EGamma_SF2D")->Clone();
-        root_file_reco_highPT->Close();
-			
-        edm::FileInPath fipEleReco_lowPt("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/Ele_Reco_LowEt_2017.root");
-        TFile *root_file_reco_lowPT = TFile::Open(fipEleReco_lowPt.fullPath().data(),"READ");
-        hTH2F_El_Reco_lowPT = (TH2F*) root_file_reco_lowPT->Get("EGamma_SF2D")->Clone();
-        root_file_reco_lowPT->Close();
-
-        edm::FileInPath fipEleRSE("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/ScaleFactors_RSE_ele_Moriond2017_v1.root");// FIXME UPDATE TO Moriond2018
-        root_file = TFile::Open(fipEleRSE.fullPath().data(),"READ");
-        hTH2F_El_RSE = (TH2F*) root_file->Get("EGamma_SF2D")->Clone();
-        root_file->Close();
-
-    }
-    else if (year == 2018)//[FIXME] Use 2017 SFs for now
-      {
-
-        edm::FileInPath fipEleNotCracks("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/egammaEffi.txt_EGM2D_Moriond2018v1.root");
-        TFile *root_file = TFile::Open(fipEleNotCracks.fullPath().data(),"READ");
-        hTH2D_El_IdIsoSip_notCracks = (TH2F*) root_file->Get("EGamma_SF2D")->Clone();
-        root_file->Close();
-			
-        edm::FileInPath fipEleCracks("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/egammaEffi.txt_EGM2D_Moriond2018v1_gap.root");
-        root_file = TFile::Open(fipEleCracks.fullPath().data(),"READ");
-        hTH2D_El_IdIsoSip_Cracks = (TH2F*) root_file->Get("EGamma_SF2D")->Clone();
-        root_file->Close();
- 
-        edm::FileInPath fipEleReco_highPt("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/Ele_Reco_2018.root");
-        TFile *root_file_reco_highPT = TFile::Open(fipEleReco_highPt.fullPath().data(),"READ");
-        hTH2F_El_Reco_highPT = (TH2F*) root_file_reco_highPT->Get("EGamma_SF2D")->Clone();
-        root_file_reco_highPT->Close();
-			
-        edm::FileInPath fipEleReco_lowPt("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/Ele_Reco_LowEt_2018.root");
-        TFile *root_file_reco_lowPT = TFile::Open(fipEleReco_lowPt.fullPath().data(),"READ");
-        hTH2F_El_Reco_lowPT = (TH2F*) root_file_reco_lowPT->Get("EGamma_SF2D")->Clone();
-        root_file_reco_lowPT->Close();
-
-        edm::FileInPath fipEleRSE("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/ScaleFactors_RSE_ele_Moriond2017_v1.root");
-        root_file = TFile::Open(fipEleRSE.fullPath().data(),"READ");
-        hTH2F_El_RSE = (TH2F*) root_file->Get("EGamma_SF2D")->Clone();
-        root_file->Close();
-
-    }
-    else
-    {
-    	 cout<<"[ERROR] HH4lXNtupleMaker: Electron SFs not supported for " << year << " year!!!" << endl;
-    	 abort();
-	 }
- }
-	 if (!skipMuDataMCWeight && isMC) {
-
-    if(year == 2016)
-    {
-		  edm::FileInPath fipMu("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/ScaleFactors_mu_Moriond2017_v2.root");
-        TFile *fMuWeight = TFile::Open(fipMu.fullPath().data(),"READ");
-        hTH2D_Mu_All = (TH2D*)fMuWeight->Get("FINAL")->Clone();
-        hTH2D_Mu_Unc = (TH2D*)fMuWeight->Get("ERROR")->Clone();
-		  fMuWeight->Close();
-
-    }
-    else if (year == 2017)
-      {
-	edm::FileInPath fipMu("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/ScaleFactors_mu_Moriond2018_final.root");
-        TFile *fMuWeight = TFile::Open(fipMu.fullPath().data(),"READ");
-        hTH2D_Mu_All = (TH2D*)fMuWeight->Get("FINAL")->Clone();
-        hTH2D_Mu_Unc = (TH2D*)fMuWeight->Get("ERROR")->Clone();
-		  fMuWeight->Close();
-
-    }
-	else if (year == 2018)//[FIXME] Use 2017 SFs for now!
-      {
-	edm::FileInPath fipMu("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/ScaleFactors_mu_Moriond2018_final.root");
-        TFile *fMuWeight = TFile::Open(fipMu.fullPath().data(),"READ");
-        hTH2D_Mu_All = (TH2D*)fMuWeight->Get("FINAL")->Clone();
-        hTH2D_Mu_Unc = (TH2D*)fMuWeight->Get("ERROR")->Clone();
-		  fMuWeight->Close();
-
-    }
-    else
-    {
-    	 cout<<"[ERROR] HH4lXNtupleMaker: Muon SFs not supported for " << year << " year!!!" << endl;
-    	 abort();
-	 }
-  }
 
   if (!skipHqTWeight) {
     //HqT weights
@@ -897,6 +811,7 @@ HH4lXNtupleMaker::~HH4lXNtupleMaker()
   clearMELABranches(); // Cleans LHE branches
   delete lheHandler;
   delete pileUpReweight;
+  delete metCorrHandler;
 }
 
 
@@ -945,6 +860,28 @@ void HH4lXNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
     PUWeight_Up = pileUpReweight->weight(NTrueInt, PileUpWeight::PUvar::VARUP);
     PUWeight_Dn = pileUpReweight->weight(NTrueInt, PileUpWeight::PUvar::VARDOWN);
 
+    // L1 prefiring weights
+    if( year == 2016 || year == 2017 )
+    {
+       edm::Handle< double > theprefweight;
+       event.getByToken(prefweight_token, theprefweight ) ;
+       L1prefiringWeight =(*theprefweight);
+  
+       edm::Handle< double > theprefweightup;
+       event.getByToken(prefweightup_token, theprefweightup ) ;
+       L1prefiringWeightUp =(*theprefweightup);
+ 
+       edm::Handle< double > theprefweightdown;
+       event.getByToken(prefweightdown_token, theprefweightdown ) ;
+       L1prefiringWeightDn =(*theprefweightdown);
+    }
+    else if ( year == 2018 )
+    {
+       L1prefiringWeight   = 1.;
+       L1prefiringWeightUp = 1.;
+       L1prefiringWeightDn = 1.;
+    }
+
     event.getByToken(genParticleToken, genParticles);
     event.getByToken(genInfoToken, genInfo);
 
@@ -990,17 +927,19 @@ void HH4lXNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
    htxsNJets = htxs->jets30.size();
    htxsHPt = htxs->higgs.Pt();
    htxs_stage0_cat = htxs->stage0_cat;
-   htxs_stage1_cat = htxs->stage1_cat_pTjet30GeV;
+   htxs_stage1p0_cat = htxs->stage1_cat_pTjet30GeV;
+   htxs_stage1p1_cat = htxs->stage1_1_cat_pTjet30GeV;
+   htxs_stage1p2_cat = htxs->stage1_2_cat_pTjet30GeV;
    htxs_errorCode=htxs->errorCode;
    htxs_prodMode= htxs->prodMode;
 
-    genExtInfo = mch.genAssociatedFS();
+   genExtInfo = mch.genAssociatedFS();
 
-    //Information on generated candidates, will be used later
-    genH = mch.genH();
-    genZLeps     = mch.sortedGenZZLeps();
-    genAssocLeps = mch.genAssociatedLeps();
-    genFSR       = mch.genFSR();
+   //Information on generated candidates, will be used later
+   genH = mch.genH();
+   genZLeps     = mch.sortedGenZZLeps();
+   genAssocLeps = mch.genAssociatedLeps();
+   genFSR       = mch.genFSR();
 
 
 
@@ -1174,15 +1113,113 @@ void HH4lXNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
     cleanedJets.push_back(&*jet);
   }
 
+
+
+  // Photons
+  Handle<pat::PhotonCollection> photonCands;
+  event.getByToken(photonToken, photonCands);
+  vector<const pat::Photon*> photons;
+   
+  for(unsigned int i = 0; i< photonCands->size(); ++i){
+    const pat::Photon* photon = &((*photonCands)[i]);
+    photons.push_back(&*photon);
+  }
+
+  if (writePhotons){
+    for (unsigned i=0; i<photons.size(); ++i) {
+      FillPhoton(year, *(photons.at(i)));
+    }
+  }
+
+  // uncomment for filling photons
+  // for (unsigned i=0; i<photons.size(); ++i) {
+  //   if (photons[i]==0) {
+  //     continue;
+  //   }
+
+  //   ++nPhotons;   // count number of photons
+
+  //   if (writePhotons) FillPhoton(year, *(photons.at(i)));
+
+  // }
+  // ---
+
+
   // MET
   Handle<pat::METCollection> metHandle;
   event.getByToken(metToken, metHandle);
+
+  GenMET=GenMETPhi=-99;
   if(metHandle.isValid()){
     const pat::MET &met = metHandle->front();
-    PFMET = met.pt();
-    PFMET_jesUp = met.shiftedPt(pat::MET::JetEnUp);
-    PFMET_jesDn = met.shiftedPt(pat::MET::JetEnDown);
-    PFMETPhi = met.phi();
+
+    metobj.extras.met = metobj.extras.met_original = metobj.extras.met_raw
+      = metobj.extras.met_METup = metobj.extras.met_METdn
+      = metobj.extras.met_JERup = metobj.extras.met_JERdn
+      = metobj.extras.met_PUup = metobj.extras.met_PUdn
+
+      = metobj_corrected.extras.met = metobj_corrected.extras.met_original = metobj_corrected.extras.met_raw
+      = metobj_corrected.extras.met_METup = metobj_corrected.extras.met_METdn
+      = metobj_corrected.extras.met_JERup = metobj_corrected.extras.met_JERdn
+      = metobj_corrected.extras.met_PUup = metobj_corrected.extras.met_PUdn
+
+      = met.pt();
+    metobj.extras.phi = metobj.extras.phi_original = metobj.extras.phi_raw
+      = metobj.extras.phi_METup = metobj.extras.phi_METdn
+      = metobj.extras.phi_JECup = metobj.extras.phi_JECdn
+      = metobj.extras.phi_JERup = metobj.extras.phi_JERdn
+      = metobj.extras.phi_PUup = metobj.extras.phi_PUdn
+
+      = metobj_corrected.extras.phi = metobj_corrected.extras.phi_original = metobj_corrected.extras.phi_raw
+      = metobj_corrected.extras.phi_METup = metobj_corrected.extras.phi_METdn
+      = metobj_corrected.extras.phi_JECup = metobj_corrected.extras.phi_JECdn
+      = metobj_corrected.extras.phi_JERup = metobj_corrected.extras.phi_JERdn
+      = metobj_corrected.extras.phi_PUup = metobj_corrected.extras.phi_PUdn
+
+      = met.phi();
+
+    metobj.extras.met_JECup = metobj_corrected.extras.met_JECup = met.shiftedPt(pat::MET::JetEnUp);
+    metobj.extras.met_JECdn = metobj_corrected.extras.met_JECdn = met.shiftedPt(pat::MET::JetEnDown);
+    metobj.extras.phi_JECup = metobj_corrected.extras.phi_JECup = met.shiftedPhi(pat::MET::JetEnUp);
+    metobj.extras.phi_JECdn = metobj_corrected.extras.phi_JECdn = met.shiftedPhi(pat::MET::JetEnDown);
+
+    if (isMC && metCorrHandler && met.genMET()){
+      GenMET = met.genMET()->pt();
+      GenMETPhi = met.genMET()->phi();
+      metCorrHandler->correctMET(GenMET, GenMETPhi, &metobj_corrected, false); // FIXME: Last argument should be for isFastSim, but we don't have it yet
+    }
+    else if (isMC){
+      cms::Exception e("METCorrectionHandler");
+      e << "Either no met.genMET or metCorrHandler!";
+      throw e;
+    }
+  }
+  else{
+    metobj.extras.met = metobj.extras.met_original = metobj.extras.met_raw
+      = metobj.extras.met_METup = metobj.extras.met_METdn
+      = metobj.extras.met_JECup = metobj.extras.met_JECdn
+      = metobj.extras.met_JERup = metobj.extras.met_JERdn
+      = metobj.extras.met_PUup = metobj.extras.met_PUdn
+
+      = metobj_corrected.extras.met = metobj_corrected.extras.met_original = metobj_corrected.extras.met_raw
+      = metobj_corrected.extras.met_METup = metobj_corrected.extras.met_METdn
+      = metobj_corrected.extras.met_JECup = metobj_corrected.extras.met_JECdn
+      = metobj_corrected.extras.met_JERup = metobj_corrected.extras.met_JERdn
+      = metobj_corrected.extras.met_PUup = metobj_corrected.extras.met_PUdn
+
+      = metobj.extras.phi = metobj.extras.phi_original = metobj.extras.phi_raw
+      = metobj.extras.phi_METup = metobj.extras.phi_METdn
+      = metobj.extras.phi_JECup = metobj.extras.phi_JECdn
+      = metobj.extras.phi_JERup = metobj.extras.phi_JERdn
+      = metobj.extras.phi_PUup = metobj.extras.phi_PUdn
+
+      = metobj_corrected.extras.phi = metobj_corrected.extras.phi_original = metobj_corrected.extras.phi_raw
+      = metobj_corrected.extras.phi_METup = metobj_corrected.extras.phi_METdn
+      = metobj_corrected.extras.phi_JECup = metobj_corrected.extras.phi_JECdn
+      = metobj_corrected.extras.phi_JERup = metobj_corrected.extras.phi_JERdn
+      = metobj_corrected.extras.phi_PUup = metobj_corrected.extras.phi_PUdn
+
+      = -99;
   }
   //Handle<pat::METCollection> metNoHFHandle;
   //event.getByToken(metNoHFToken, metNoHFHandle);
@@ -1192,25 +1229,6 @@ void HH4lXNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
   //}
 
 
-  // --- photon variables (H->GammaGamma photons)
-  Handle<edm::View<pat::Photon> > photonHandle;
-  event.getByToken(photonToken,photonHandle);
-  vector<const pat::Photon*> photons;
-  for(edm::View<pat::Photon>::const_iterator pht = photonHandle->begin(); pht != photonHandle->end(); ++pht){
-    photons.push_back(&*pht);
-  } 
-
-  for (unsigned i=0; i<photons.size(); ++i) {
-    if (photons[i]==0) {
-      continue;
-    }
-
-    ++nPhotons;   // count number of photons
-
-    if (writePhotons && theChannel!=ZL) FillPhoton(*(photons.at(i)));
-
-  }
-  // ---
 
   // --- tau variables (H->TauTau  << jet.mother() << endl; )
   
@@ -1284,7 +1302,14 @@ void HH4lXNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
 
 	  std::vector<double> qcd_ggF_uncertSF_tmp;
 	  qcd_ggF_uncertSF.clear();
-	  qcd_ggF_uncertSF_tmp = qcd_ggF_uncertSF_2017(htxsNJets, htxsHPt, htxs_stage1_cat);
+          
+    ////////////////////////////////////////////////////////////
+    //////////////////     CHECK THIS!!!!!    //////////////////
+    // Why is this done with the STXS 1.0 bins uncertainties? //
+    //////////////////     CHECK THIS!!!!!    //////////////////
+    ////////////////////////////////////////////////////////////
+
+	  qcd_ggF_uncertSF_tmp = qcd_ggF_uncertSF_2017(htxsNJets, htxsHPt, htxs_stage1p0_cat);
 	  qcd_ggF_uncertSF = std::vector<float>(qcd_ggF_uncertSF_tmp.begin(),qcd_ggF_uncertSF_tmp.end());
 
 
@@ -1330,12 +1355,12 @@ void HH4lXNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
 
     ++nCleanedJets;
 
-    // count jec up/down njets pt30
-    float jec_unc = cleanedJets[i]->userFloat("jec_unc");
+    // count jes up/down njets pt30
+    float jes_unc = cleanedJets[i]->userFloat("jes_unc");
 
     float pt_nominal = cleanedJets[i]->pt();
-    float pt_up = pt_nominal * (1.0 + jec_unc);
-    float pt_dn = pt_nominal * (1.0 - jec_unc);
+    float pt_jes_up = pt_nominal * (1.0 + jes_unc);
+    float pt_jes_dn = pt_nominal * (1.0 - jes_unc);
 
     if(pt_nominal>30){
       ++nCleanedJetsPt30;
@@ -1344,16 +1369,29 @@ void HH4lXNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& e
       if(cleanedJets[i]->userFloat("isBtaggedWithSF_Up")) ++nCleanedJetsPt30BTagged_bTagSFUp;
       if(cleanedJets[i]->userFloat("isBtaggedWithSF_Dn")) ++nCleanedJetsPt30BTagged_bTagSFDn;
     }
-    if(pt_up>30){
-      ++nCleanedJetsPt30_jecUp;
-      if(cleanedJets[i]->userFloat("isBtaggedWithSF")) ++nCleanedJetsPt30BTagged_bTagSF_jecUp;
+    if(pt_jes_up>30){
+      ++nCleanedJetsPt30_jesUp;
+      if(cleanedJets[i]->userFloat("isBtaggedWithSF")) ++nCleanedJetsPt30BTagged_bTagSF_jesUp;
     }
-    if(pt_dn>30){
-      ++nCleanedJetsPt30_jecDn;
-      if(cleanedJets[i]->userFloat("isBtaggedWithSF")) ++nCleanedJetsPt30BTagged_bTagSF_jecDn;
+    if(pt_jes_dn>30){
+      ++nCleanedJetsPt30_jesDn;
+      if(cleanedJets[i]->userFloat("isBtaggedWithSF")) ++nCleanedJetsPt30BTagged_bTagSF_jesDn;
     }
 
-    if (writeJets && theChannel!=ZL) FillJet(*(cleanedJets.at(i))); // No additional pT cut (for JEC studies)
+    // count jer up/down njets pt30
+    float pt_jer_up = cleanedJets[i]->userFloat("pt_jerup");
+    float pt_jer_dn = cleanedJets[i]->userFloat("pt_jerdn");
+     
+    if(pt_jer_up>30){
+      ++nCleanedJetsPt30_jerUp;
+      if(cleanedJets[i]->userFloat("isBtaggedWithSF")) ++nCleanedJetsPt30BTagged_bTagSF_jerUp;
+    }
+    if(pt_jer_dn>30){
+      ++nCleanedJetsPt30_jerDn;
+      if(cleanedJets[i]->userFloat("isBtaggedWithSF")) ++nCleanedJetsPt30BTagged_bTagSF_jerDn;
+    }
+
+    if (writeJets) FillJet(*(cleanedJets.at(i))); // No additional pT cut (for JEC studies)
   }
 
   // Now we can write the variables for candidates
@@ -1404,17 +1442,24 @@ void HH4lXNtupleMaker::FillJet(const pat::Jet& jet)
      JetMult .push_back( jet.userFloat("mult"));
      JetPtD .push_back( jet.userFloat("ptD"));
    }
-   JetSigma .push_back(jet.userFloat("jec_unc"));
+   JetSigma .push_back(jet.userFloat("jes_unc"));
+
+   JetRawPt  .push_back( jet.userFloat("RawPt"));
+   JetPtJEC_noJER .push_back( jet.userFloat("pt_JEC_noJER"));
+   
+   JetJESUp .push_back(jet.userFloat("pt_jesup"));
+   JetJESDown .push_back(jet.userFloat("pt_jesdn"));
 
    JetJERUp .push_back(jet.userFloat("pt_jerup"));
    JetJERDown .push_back(jet.userFloat("pt_jerdn"));
 
+   JetID.push_back(jet.userFloat("JetID"));
+   JetPUID.push_back(jet.userFloat("PUjetID"));
+
    if (jet.hasUserFloat("pileupJetIdUpdated:fullDiscriminant")) { // if JEC is reapplied, we set this
      JetPUValue.push_back(jet.userFloat("pileupJetIdUpdated:fullDiscriminant"));
-     JetPUID.push_back(jet.userInt("pileupJetIdUpdated:fullId"));
    } else {
      JetPUValue.push_back(jet.userFloat("pileupJetId:fullDiscriminant"));
-     JetPUID.push_back(jet.userInt("pileupJetId:fullId"));
    }
    
 
@@ -1436,58 +1481,70 @@ void HH4lXNtupleMaker::FillPrunedGenParticlesInfo(const reco::Candidate& prunedG
   
 }
 
-void HH4lXNtupleMaker::FillPrunedGenPhotonsInfo(const reco::Candidate& prunedGenPart)
-{
-  if(fabs(prunedGenPart.pdgId()) == 22 && prunedGenPart.status()== 1){
-    prunedGenPhoPt  .push_back( prunedGenPart.pt() );
-    prunedGenPhoEta .push_back( prunedGenPart.eta() );
-    prunedGenPhoPhi .push_back( prunedGenPart.phi() );
-    prunedGenPhoMass.push_back( prunedGenPart.p4().M() );
-    prunedGenPhoID  .push_back( prunedGenPart.pdgId() );
-    prunedGenPhoMotherID.push_back( prunedGenPart.mother()->pdgId() );
-  }
+// uncomment if you want to study H->gammagamma 
+// void HH4lXNtupleMaker::FillPrunedGenPhotonsInfo(const reco::Candidate& prunedGenPart)
+// {
+//   if(fabs(prunedGenPart.pdgId()) == 22 && prunedGenPart.status()== 1){
+//     prunedGenPhoPt  .push_back( prunedGenPart.pt() );
+//     prunedGenPhoEta .push_back( prunedGenPart.eta() );
+//     prunedGenPhoPhi .push_back( prunedGenPart.phi() );
+//     prunedGenPhoMass.push_back( prunedGenPart.p4().M() );
+//     prunedGenPhoID  .push_back( prunedGenPart.pdgId() );
+//     prunedGenPhoMotherID.push_back( prunedGenPart.mother()->pdgId() );
+//   }
 
+// }
+
+
+// photons from H->4l framework, comment if you use the other FillPhoton function
+void HH4lXNtupleMaker::FillPhoton(int year, const pat::Photon& photon)
+{
+  photonPt  .push_back( photon.pt());
+  photonEta .push_back( photon.eta());
+  photonPhi .push_back( photon.phi());
+
+  photonIsCutBasedLooseID .push_back( PhotonIDHelper::isCutBasedID_Loose(year, photon) );
 }
 
+// uncomment when we will use photons for H->gammagamma
+// void HH4lXNtupleMaker::FillPhoton(const pat::Photon& photon)
+// {
+//    photonPt    .push_back( photon.pt());
+//    photonEta   .push_back( photon.eta());
+//    photonPhi   .push_back( photon.phi());
 
+//    photonEtaSC .push_back( photon.superCluster()->eta());
+//    photonPhiSC .push_back( photon.superCluster()->phi());
+//    photonMass  .push_back( photon.p4().M());
+//    photon_5x5r9.push_back( photon.full5x5_r9());
+//    photon_5x5sigmaIetaIeta.push_back( photon.full5x5_sigmaIetaIeta());
+//    photonPassElectronVeto    .push_back( photon.passElectronVeto());
 
-void HH4lXNtupleMaker::FillPhoton(const pat::Photon& photon)
-{
-   photonPt    .push_back( photon.pt());
-   photonEta   .push_back( photon.eta());
-   photonPhi   .push_back( photon.phi());
-   photonEtaSC .push_back( photon.superCluster()->eta());
-   photonPhiSC .push_back( photon.superCluster()->phi());
-   photonMass  .push_back( photon.p4().M());
-   photon_5x5r9.push_back( photon.full5x5_r9());
-   photon_5x5sigmaIetaIeta.push_back( photon.full5x5_sigmaIetaIeta());
-   photonPassElectronVeto    .push_back( photon.passElectronVeto());
+//    // --- Isolation (https://github.com/cms-sw/cmssw/blob/master/DataFormats/PatCandidates/interface/Photon.h#L127-L135)
+//    // isolation calculated with only the charged hadron PFCandidates
+//    photon_chargedHadronIso.push_back( photon.chargedHadronIso());
+//    // isolation calculated with only the neutral hadron PFCandidates
+//    photon_neutralHadronIso.push_back( photon.neutralHadronIso());
+//    // isolation calculated with only the gamma PFCandidates
+//    photon_photonIso.push_back( photon.photonIso());
 
-   // --- Isolation (https://github.com/cms-sw/cmssw/blob/master/DataFormats/PatCandidates/interface/Photon.h#L127-L135)
-   // isolation calculated with only the charged hadron PFCandidates
-   photon_chargedHadronIso.push_back( photon.chargedHadronIso());
-   // isolation calculated with only the neutral hadron PFCandidates
-   photon_neutralHadronIso.push_back( photon.neutralHadronIso());
-   // isolation calculated with only the gamma PFCandidates
-   photon_photonIso.push_back( photon.photonIso());
+//    // hadronic response over EM response
+//    photon_hadronicOverEm.push_back( photon.hadronicOverEm());
 
-   // hadronic response over EM response
-   photon_hadronicOverEm.push_back( photon.hadronicOverEm());
+//    // photon rho
+//    photon_rho.push_back( photon.userFloat("photon_rho"));
 
-   // photon rho
-   photon_rho.push_back( photon.userFloat("photon_rho"));
+//    // photon ID
+//    // https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedPhotonIdentificationRun2#Offline_selection_criteria_AN1
+//    photonIsID.push_back( photon.userFloat("photonID_loose"));
 
-   // photon ID
-   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedPhotonIdentificationRun2#Offline_selection_criteria_AN1
-   photonIsID.push_back( photon.userFloat("photonID_loose"));
-
-   // isolation rho corrected
-   photon_chargedHadronIso_corr.push_back( photon.userFloat("photon_chargedHadronIso_corr"));
-   photon_neutralHadronIso_corr.push_back( photon.userFloat("photon_neutralHadronIso_corr"));
-   photon_photonIso_corr       .push_back( photon.userFloat("photon_photonIso_corr"));
+//    // isolation rho corrected
+//    photon_chargedHadronIso_corr.push_back( photon.userFloat("photon_chargedHadronIso_corr"));
+//    photon_neutralHadronIso_corr.push_back( photon.userFloat("photon_neutralHadronIso_corr"));
+//    photon_photonIso_corr       .push_back( photon.userFloat("photon_photonIso_corr"));
    
 
-}
+// }
 
 
 void HH4lXNtupleMaker::FillTau(const pat::Tau& tau)
@@ -1764,11 +1821,15 @@ void HH4lXNtupleMaker::FillCandidate(const pat::CompositeCandidate& cand, bool e
   LepPt.clear();
   LepEta.clear();
   LepPhi.clear();
+  LepSCEta.clear();
   LepLepId.clear();
   LepSIP.clear();
+  Lepdxy.clear();
+  Lepdz.clear();
   LepTime.clear();
   LepisID.clear();
   LepBDT.clear();
+  LepisCrack.clear();
   LepMissingHit.clear();
   LepChargedHadIso.clear();
   LepNeutralHadIso.clear();
@@ -1776,13 +1837,23 @@ void HH4lXNtupleMaker::FillCandidate(const pat::CompositeCandidate& cand, bool e
   LepPUIsoComponent.clear();
   LepCombRelIsoPF.clear();
 
-  LepRecoSF.clear();
-  LepRecoSF_Unc.clear();
-  LepSelSF.clear();
-  LepSelSF_Unc.clear();
-	
-  LepScale_Unc.clear();
-  LepSmear_Unc.clear();
+  LepSF.clear();
+  LepSF_Unc.clear();
+
+  LepScale_Total_Up.clear();
+  LepScale_Total_Dn.clear();
+  LepScale_Stat_Up.clear();
+  LepScale_Stat_Dn.clear();
+  LepScale_Syst_Up.clear();
+  LepScale_Syst_Dn.clear();
+  LepScale_Gain_Up.clear();
+  LepScale_Gain_Dn.clear();
+  LepSigma_Total_Up.clear();
+  LepSigma_Total_Dn.clear();
+  LepSigma_Rho_Up.clear();
+  LepSigma_Rho_Dn.clear();
+  LepSigma_Phi_Up.clear();
+  LepSigma_Phi_Dn.clear();	
 
   TLE_dR_Z = -1;
   fsrPt.clear();
@@ -1810,6 +1881,8 @@ void HH4lXNtupleMaker::FillCandidate(const pat::CompositeCandidate& cand, bool e
     ZZPt  = cand.p4().pt();
     ZZEta = cand.p4().eta();
     ZZPhi = cand.p4().phi();
+
+    ZZjjPt = cand.userFloat("ZZjjPt");
 
     if(addKinRefit){
       if (cand.hasUserFloat("ZZMassRefit")) {
@@ -1941,16 +2014,32 @@ void HH4lXNtupleMaker::FillCandidate(const pat::CompositeCandidate& cand, bool e
     LepPt .push_back( leptons[i]->pt() );
     LepEta.push_back( leptons[i]->eta() );
     LepPhi.push_back( leptons[i]->phi() );
+    LepSCEta.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"SCeta") : -99. );
     int id =  leptons[i]->pdgId();
     if(id == 22 && (i == 1 || i == 3)) id=-22; //FIXME this assumes a standard ordering of leptons.
     LepLepId.push_back( id );
     LepSIP  .push_back( SIP[i] );
+    Lepdxy  .push_back( userdatahelpers::getUserFloat(leptons[i],"dxy") );
+    Lepdz   .push_back( userdatahelpers::getUserFloat(leptons[i],"dz") );
     LepTime .push_back( lepFlav==13 ? userdatahelpers::getUserFloat(leptons[i],"time") : 0. );
     LepisID .push_back( userdatahelpers::getUserFloat(leptons[i],"ID") );
     LepBDT  .push_back( lepFlav==11 ||lepFlav==22 ? userdatahelpers::getUserFloat(leptons[i],"BDT") : 0. );
+    LepisCrack.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"isCrack") : 0 );
     LepMissingHit.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"missingHit") : 0 );
-    LepScale_Unc.push_back( lepFlav==13 && year==2018 ? 0. : userdatahelpers::getUserFloat(leptons[i],"scale_unc") );//[FIXME] Temporary hack so it does not crash in 2018 without MUON CORRECTIONS turned on
-    LepSmear_Unc.push_back( lepFlav==13 && year==2018 ? 0. : userdatahelpers::getUserFloat(leptons[i],"smear_unc") );//[FIXME] Temporary hack so it does not crash in 2018 without MUON CORRECTIONS turned on
+    LepScale_Total_Up.push_back( userdatahelpers::getUserFloat(leptons[i],"scale_total_up") );
+    LepScale_Total_Dn.push_back( userdatahelpers::getUserFloat(leptons[i],"scale_total_dn") );
+    LepScale_Stat_Up.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"scale_stat_up") : -99. );
+    LepScale_Stat_Dn.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"scale_stat_dn") : -99. );
+    LepScale_Syst_Up.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"scale_syst_up") : -99. );
+    LepScale_Syst_Dn.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"scale_syst_dn") : -99. );
+    LepScale_Gain_Up.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"scale_gain_up") : -99. );
+    LepScale_Gain_Dn.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"scale_gain_dn") : -99. );
+    LepSigma_Total_Up.push_back( userdatahelpers::getUserFloat(leptons[i],"sigma_total_up") );
+    LepSigma_Total_Dn.push_back( userdatahelpers::getUserFloat(leptons[i],"sigma_total_dn") );
+    LepSigma_Rho_Up.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"sigma_rho_up") : -99. );
+    LepSigma_Rho_Dn.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"sigma_rho_dn") : -99. );
+    LepSigma_Phi_Up.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"sigma_phi_up") : -99. );
+    LepSigma_Phi_Dn.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"sigma_phi_dn") : -99. );
     LepChargedHadIso.push_back( userdatahelpers::getUserFloat(leptons[i],"PFChargedHadIso") );
     LepNeutralHadIso.push_back( userdatahelpers::getUserFloat(leptons[i],"PFNeutralHadIso") );
     LepPhotonIso.push_back( userdatahelpers::getUserFloat(leptons[i],"PFPhotonIso") );
@@ -2024,7 +2113,7 @@ void HH4lXNtupleMaker::FillCandidate(const pat::CompositeCandidate& cand, bool e
   trigEffWeight = 1.;
   if(isMC) {
     
-    dataMCWeight = getAllWeight(leptons,muonSF_Unc,eleSF_Unc);
+    dataMCWeight = getAllWeight(leptons);
     
     if (applyTrigEffWeight){
       Int_t ZZFlav = abs(Z1Flav*Z2Flav);
@@ -2178,237 +2267,46 @@ void HH4lXNtupleMaker::fillDescriptions(edm::ConfigurationDescriptions& descript
 }
 
 
-Float_t HH4lXNtupleMaker::getAllWeight(const vector<const reco::Candidate*>& leptons, Float_t& muonSFUncert, Float_t& eleSFUncert) const
+Float_t HH4lXNtupleMaker::getAllWeight(const vector<const reco::Candidate*>& leptons)
 {
   Float_t totWeight = 1.;
-  Float_t ele_Unc_rel = 0.; //relative uncertainty for product of electron weights
-  Float_t muon_Unc_rel = 0.; // same for mu
-  Float_t muonSF = 1.; // just used to get the absolute uncertainty on muon SF
-  Float_t eleSF = 1.;  // same for ele
 	
   for(unsigned int i=0; i<leptons.size(); ++i){ 
     Int_t   myLepID = abs(leptons[i]->pdgId());
     if (skipMuDataMCWeight&& myLepID==13) return 1.;
     if (skipEleDataMCWeight&& myLepID==11) return 1.;
-    if (myLepID==22) return 1.; // FIXME - what SFs should be used for TLEs?
-    Float_t weight  = 1.;
+
+    float SF = 1.0;
+    float SF_Unc = 0.0;
   
     Float_t myLepPt = leptons[i]->pt();
     Float_t myLepEta = leptons[i]->eta();
-    Float_t mySIP = userdatahelpers::getUserFloat(leptons[i], "SIP"); 
 
-    Float_t RecoSF = 0.;
-    Float_t RecoSF_Unc = 0.;
+    Float_t SCeta;
+    if (myLepID == 11) SCeta = userdatahelpers::getUserFloat(leptons[i],"SCeta");
+    else SCeta = myLepEta;
 
-    Float_t SelSF = 0.;
-    Float_t SelSF_Unc = 0.;
+    Float_t mySCeta;
+     
+    // Deal with very rare cases when SCeta is out of 2.5 bonds
+    if ( myLepEta <= 2.5 && SCeta >= 2.5) mySCeta = 2.49;
+    else if ( myLepEta >= -2.5 && SCeta <= -2.5) mySCeta = -2.49;
+    else mySCeta = SCeta;
+     
+    bool isCrack;
+    if (myLepID == 11) isCrack = userdatahelpers::getUserFloat(leptons[i],"isCrack");
+    else isCrack = false;
+     
+ 
+    SF = lepSFHelper->getSF(year,myLepID,myLepPt,myLepEta, mySCeta, isCrack);
+    SF_Unc = lepSFHelper->getSFError(year,myLepID,myLepPt,myLepEta, mySCeta, isCrack);
 
+    LepSF.push_back(SF);
+    LepSF_Unc.push_back(SF_Unc);
 
-   //MUONS
-    if(myLepID == 13 )
-	 {
-		if(year == 2016)
-		{
-		  RecoSF = 1.; // The scale factor combines all afficiecnies
-		  RecoSF_Unc = 0.;
-		  SelSF = hTH2D_Mu_All->GetBinContent(hTH2D_Mu_All->GetXaxis()->FindBin(myLepEta),hTH2D_Mu_All->GetYaxis()->FindBin(std::min(myLepPt,199.f))); //last bin contains the overflow
-		  SelSF_Unc = hTH2D_Mu_Unc->GetBinContent(hTH2D_Mu_Unc->GetXaxis()->FindBin(myLepEta),hTH2D_Mu_Unc->GetYaxis()->FindBin(std::min(myLepPt,199.f))); //last bin contains the overflow
-
-		  muonSF *= RecoSF*SelSF;
-		  muon_Unc_rel += sqrt( RecoSF_Unc*RecoSF_Unc/(RecoSF*RecoSF) + SelSF_Unc*SelSF_Unc/(SelSF*SelSF) ); // assume full correlation between different muons (and uncorrelated reco and sel uncertainties)
-		}
-		else if(year == 2017)
-		{
-		  RecoSF = 1.; // The scale factor combines all afficiecnies
-		  RecoSF_Unc = 0.;
-		  SelSF = hTH2D_Mu_All->GetBinContent(hTH2D_Mu_All->GetXaxis()->FindBin(myLepEta),hTH2D_Mu_All->GetYaxis()->FindBin(std::min(myLepPt,199.f))); //last bin contains the overflow
-		  SelSF_Unc = hTH2D_Mu_Unc->GetBinContent(hTH2D_Mu_Unc->GetXaxis()->FindBin(myLepEta),hTH2D_Mu_Unc->GetYaxis()->FindBin(std::min(myLepPt,199.f))); //last bin contains the overflow
-
-		  muonSF *= RecoSF*SelSF;
-		  muon_Unc_rel += sqrt( RecoSF_Unc*RecoSF_Unc/(RecoSF*RecoSF) + SelSF_Unc*SelSF_Unc/(SelSF*SelSF) ); // assume full correlation between different muons (and uncorrelated reco and sel uncertainties)
-		}
-		else if(year == 2018) //[FIXME] Update when 2018 available
-		{
-		  RecoSF = 1.; // The scale factor combines all afficiecnies
-		  RecoSF_Unc = 0.;
-		  SelSF = 1.; //last bin contains the overflow
-		  SelSF_Unc = 1.; //last bin contains the overflow
-
-		  muonSF *= RecoSF*SelSF;
-		  muon_Unc_rel += sqrt( RecoSF_Unc*RecoSF_Unc/(RecoSF*RecoSF) + SelSF_Unc*SelSF_Unc/(SelSF*SelSF) ); // assume full correlation between different muons (and uncorrelated reco and sel uncertainties)
-		}
-    }
-	  
-	 else if(myLepID == 11) {
-
-      // electron reconstruction scale factor, as a function of supercluster eta
-      Float_t SCeta = userdatahelpers::getUserFloat(leptons[i],"SCeta");
-      Float_t mySCeta;
-		 
-      // Deal with very rare cases when SCeta is out of 2.5 bonds
-      if ( myLepEta <= 2.5 && SCeta >= 2.5) mySCeta = 2.49;
-		else if ( myLepEta >= -2.5 && SCeta <= -2.5) mySCeta = -2.49;
-		else mySCeta = SCeta;
-		 
-      if(year == 2016)
-      {
-			if(myLepPt < 20.)
-			{
-				RecoSF = hTH2F_El_Reco_lowPT->GetBinContent(hTH2F_El_Reco_lowPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_lowPT->GetYaxis()->FindBin(15.));// FIXME: the histogram contains 1 pt bin only
-				RecoSF_Unc = hTH2F_El_Reco_lowPT->GetBinError(hTH2F_El_Reco_lowPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_lowPT->GetYaxis()->FindBin(15.));// FIXME: the histogram contains 1 pt bin only
-			}
-			else
-			{
-				RecoSF = hTH2F_El_Reco_highPT->GetBinContent(hTH2F_El_Reco_highPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_highPT->GetYaxis()->FindBin(std::min(myLepPt,499.f)));
-				RecoSF_Unc = hTH2F_El_Reco_highPT->GetBinError(hTH2F_El_Reco_highPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_highPT->GetYaxis()->FindBin(std::min(myLepPt,499.f)));
-			}
-		}
-		 else if(year == 2017)
-      {
-			if(myLepPt < 20.)
-			{
-				RecoSF = hTH2F_El_Reco_lowPT->GetBinContent(hTH2F_El_Reco_lowPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_lowPT->GetYaxis()->FindBin(15.));// FIXME: the histogram contains 1 pt bin only
-				RecoSF_Unc = hTH2F_El_Reco_lowPT->GetBinError(hTH2F_El_Reco_lowPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_lowPT->GetYaxis()->FindBin(15.));// FIXME: the histogram contains 1 pt bin only
-			}
-			else
-			{
-				RecoSF = hTH2F_El_Reco_highPT->GetBinContent(hTH2F_El_Reco_highPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_highPT->GetYaxis()->FindBin(std::min(myLepPt,499.f)));
-				RecoSF_Unc = hTH2F_El_Reco_highPT->GetBinError(hTH2F_El_Reco_highPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_highPT->GetYaxis()->FindBin(std::min(myLepPt,499.f)));
-			}
-		}
-		else if(year == 2018) 
-      {
-				if(myLepPt < 20.)
-			{
-				RecoSF = hTH2F_El_Reco_lowPT->GetBinContent(hTH2F_El_Reco_lowPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_lowPT->GetYaxis()->FindBin(15.));// FIXME: the histogram contains 1 pt bin only
-				RecoSF_Unc = hTH2F_El_Reco_lowPT->GetBinError(hTH2F_El_Reco_lowPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_lowPT->GetYaxis()->FindBin(15.));// FIXME: the histogram contains 1 pt bin only
-			}
-			else
-			{
-				RecoSF = hTH2F_El_Reco_highPT->GetBinContent(hTH2F_El_Reco_highPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_highPT->GetYaxis()->FindBin(std::min(myLepPt,499.f)));
-				RecoSF_Unc = hTH2F_El_Reco_highPT->GetBinError(hTH2F_El_Reco_highPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_highPT->GetYaxis()->FindBin(std::min(myLepPt,499.f)));
-			}
-		}
-		else {
-            edm::LogError("MC scale factor") << "ele SFs for < 2016 no longer supported";
-            abort();
-          }
-		 
-
-		if(year == 2016)
-		{
-			if(mySIP >= 4.0 )
-			{ // FIXME: use a better way to find RSE electrons!
-				 // This is also the case for the loose lepton in Z+l
-				SelSF = hTH2F_El_RSE->GetBinContent(hTH2F_El_RSE->FindFixBin(mySCeta, std::min(myLepPt,199.f)));
-				SelSF_Unc = hTH2F_El_RSE->GetBinError(hTH2F_El_RSE->FindFixBin(mySCeta, std::min(myLepPt,199.f)));
-			}
-			
-			else
-			{
-				if((bool)userdatahelpers::getUserFloat(leptons[i],"isCrack"))
-				{
-				 SelSF = hTH2D_El_IdIsoSip_Cracks->GetBinContent(hTH2D_El_IdIsoSip_Cracks->FindFixBin(mySCeta, std::min(myLepPt,199.f)));
-				 SelSF_Unc = hTH2D_El_IdIsoSip_Cracks->GetBinError(hTH2D_El_IdIsoSip_Cracks->FindFixBin(mySCeta, std::min(myLepPt,199.f)));
-				}
-				else
-				{
-				 SelSF = hTH2D_El_IdIsoSip_notCracks->GetBinContent(hTH2D_El_IdIsoSip_notCracks->FindFixBin(mySCeta, std::min(myLepPt,199.f)));
-				 SelSF_Unc = hTH2D_El_IdIsoSip_notCracks->GetBinError(hTH2D_El_IdIsoSip_notCracks->FindFixBin(mySCeta, std::min(myLepPt,199.f)));
-				}
-			}
-		
-		}
-	 
-	 else if(year == 2017)
-		{
-			if(mySIP >= 4.0 )
-			{ // FIXME: use a better way to find RSE electrons!
-				 // This is also the case for the loose lepton in Z+l
-				SelSF = hTH2F_El_RSE->GetBinContent(hTH2F_El_RSE->FindFixBin(mySCeta, std::min(myLepPt,199.f)));
-				SelSF_Unc = hTH2F_El_RSE->GetBinError(hTH2F_El_RSE->FindFixBin(mySCeta, std::min(myLepPt,199.f)));
-			}
-			
-			else
-			{
-				if((bool)userdatahelpers::getUserFloat(leptons[i],"isCrack"))
-				{
-				 SelSF = hTH2D_El_IdIsoSip_Cracks->GetBinContent(hTH2D_El_IdIsoSip_Cracks->FindFixBin(mySCeta, std::min(myLepPt,499.f)));
-				 SelSF_Unc = hTH2D_El_IdIsoSip_Cracks->GetBinError(hTH2D_El_IdIsoSip_Cracks->FindFixBin(mySCeta, std::min(myLepPt,499.f)));
-				}
-				else
-				{
-				 SelSF = hTH2D_El_IdIsoSip_notCracks->GetBinContent(hTH2D_El_IdIsoSip_notCracks->FindFixBin(mySCeta, std::min(myLepPt,499.f)));
-				 SelSF_Unc = hTH2D_El_IdIsoSip_notCracks->GetBinError(hTH2D_El_IdIsoSip_notCracks->FindFixBin(mySCeta, std::min(myLepPt,499.f)));
-				}
-			}
-		
-		}
-		
-	else if(year == 2018) //[FIXME] Update when 2018 available
-		{
-			if(mySIP >= 4.0 )
-			{ // FIXME: use a better way to find RSE electrons!
-				 // This is also the case for the loose lepton in Z+l
-				SelSF = 1.;
-				SelSF_Unc = 1.;
-			}
-			
-			else
-			{
-				if((bool)userdatahelpers::getUserFloat(leptons[i],"isCrack"))
-				{
-				 SelSF = 1.;
-				 SelSF_Unc = 1.;
-				}
-				else
-				{
-				 SelSF = 1.;
-				 SelSF_Unc = 1.;
-				}
-			}
-		
-		}
-		 
-	   else {
-            edm::LogError("MC scale factor") << "ele SFs for < 2016 no longer supported";
-            abort();
-          }
-		 
-      eleSF *= RecoSF*SelSF;  
-      ele_Unc_rel += sqrt( RecoSF_Unc*RecoSF_Unc/(RecoSF*RecoSF) + SelSF_Unc*SelSF_Unc/(SelSF*SelSF) ); // assume full correlation between different electrons (and uncorrelated reco and sel uncertainties)
-    }
-	  
-    else {
-      edm::LogError("MC scale factor") << "ERROR! wrong lepton ID "<<myLepID;
-      weight = 0.;
-    }
-
-    LepRecoSF.push_back(RecoSF);
-    LepRecoSF_Unc.push_back(RecoSF_Unc);
-
-    weight *= RecoSF;
-
-    LepSelSF.push_back(SelSF);
-    LepSelSF_Unc.push_back(SelSF_Unc);
-
-    weight *= SelSF;
-
-
-   if(weight < 0.001 || weight > 10.){
-      edm::LogError("MC scale factor") << "ERROR! LEP out of range! myLepPt = " << myLepPt << " myLepEta = " << myLepEta <<" myLepID "<<myLepID<< " weight = " << weight;
-      edm::LogWarning("MC scale factor") << "Overall weight: " << weight << " RECO " << RecoSF << " +-" << RecoSF_Unc << " selection " << SelSF << " +-" << SelSF_Unc;      
-      //abort();  //no correction should be zero, if you find one, stop
-    }
-
-
-    totWeight *= weight;
+    totWeight *= SF;
   } 
- 
-  // get absolute uncertainty from relative one
-  muonSFUncert =  muonSF* muon_Unc_rel;
-  eleSFUncert = eleSF* ele_Unc_rel;
- 
+  
   return totWeight;
 }
 
@@ -2572,20 +2470,47 @@ void HH4lXNtupleMaker::BookAllBranches(){
   myTree->Book("NObsInt",NObsInt, failedTreeLevel >= fullFailedTree);
   myTree->Book("NTrueInt",NTrueInt, failedTreeLevel >= fullFailedTree);
 
-  myTree->Book("PFMET",PFMET, failedTreeLevel >= fullFailedTree);
-  myTree->Book("PFMET_jesUp",PFMET_jesUp, failedTreeLevel >= fullFailedTree);
-  myTree->Book("PFMET_jesDn",PFMET_jesDn, failedTreeLevel >= fullFailedTree);
-  myTree->Book("PFMETPhi",PFMETPhi, failedTreeLevel >= fullFailedTree);
+  myTree->Book("GenMET", GenMET, failedTreeLevel >= minimalFailedTree);
+  myTree->Book("GenMETPhi", GenMETPhi, failedTreeLevel >= minimalFailedTree);
+  myTree->Book("PFMET", metobj.extras.met, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMET_jesUp", metobj.extras.met_JECup, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMET_jesDn", metobj.extras.met_JECdn, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMETPhi", metobj.extras.phi, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMETPhi_jesUp", metobj.extras.phi_JECup, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMETPhi_jesDn", metobj.extras.phi_JECdn, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMET_corrected", metobj_corrected.extras.met, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMET_corrected_jesUp", metobj_corrected.extras.met_JECup, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMET_corrected_jesDn", metobj_corrected.extras.met_JECdn, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMET_corrected_jerUp", metobj_corrected.extras.met_JERup, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMET_corrected_jerDn", metobj_corrected.extras.met_JERdn, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMET_corrected_puUp", metobj_corrected.extras.met_PUup, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMET_corrected_puDn", metobj_corrected.extras.met_PUdn, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMET_corrected_metUp", metobj_corrected.extras.met_METup, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMET_corrected_metDn", metobj_corrected.extras.met_METdn, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMETPhi_corrected", metobj_corrected.extras.phi, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMETPhi_corrected_jesUp", metobj_corrected.extras.phi_JECup, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMETPhi_corrected_jesDn", metobj_corrected.extras.phi_JECdn, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMETPhi_corrected_jerUp", metobj_corrected.extras.phi_JERup, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMETPhi_corrected_jerDn", metobj_corrected.extras.phi_JERdn, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMETPhi_corrected_puUp", metobj_corrected.extras.phi_PUup, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMETPhi_corrected_puDn", metobj_corrected.extras.phi_PUdn, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMETPhi_corrected_metUp", metobj_corrected.extras.phi_METup, failedTreeLevel >= fullFailedTree);
+  myTree->Book("PFMETPhi_corrected_metDn", metobj_corrected.extras.phi_METdn, failedTreeLevel >= fullFailedTree);
   //myTree->Book("PFMETNoHF",PFMETNoHF, failedTreeLevel >= fullFailedTree);
   //myTree->Book("PFMETNoHFPhi",PFMETNoHFPhi, failedTreeLevel >= fullFailedTree);
+
   myTree->Book("nCleanedJets",nCleanedJets, failedTreeLevel >= fullFailedTree);
   myTree->Book("nCleanedJetsPt30",nCleanedJetsPt30, failedTreeLevel >= fullFailedTree);
-  myTree->Book("nCleanedJetsPt30_jecUp",nCleanedJetsPt30_jecUp, failedTreeLevel >= fullFailedTree);
-  myTree->Book("nCleanedJetsPt30_jecDn",nCleanedJetsPt30_jecDn, failedTreeLevel >= fullFailedTree);
+  myTree->Book("nCleanedJetsPt30_jesUp",nCleanedJetsPt30_jesUp, failedTreeLevel >= fullFailedTree);
+  myTree->Book("nCleanedJetsPt30_jesDn",nCleanedJetsPt30_jesDn, failedTreeLevel >= fullFailedTree);
+  myTree->Book("nCleanedJetsPt30_jerUp",nCleanedJetsPt30_jerUp, failedTreeLevel >= fullFailedTree);
+  myTree->Book("nCleanedJetsPt30_jerDn",nCleanedJetsPt30_jerDn, failedTreeLevel >= fullFailedTree);
   myTree->Book("nCleanedJetsPt30BTagged",nCleanedJetsPt30BTagged, failedTreeLevel >= fullFailedTree);
   myTree->Book("nCleanedJetsPt30BTagged_bTagSF",nCleanedJetsPt30BTagged_bTagSF, failedTreeLevel >= fullFailedTree);
-  myTree->Book("nCleanedJetsPt30BTagged_bTagSF_jecUp",nCleanedJetsPt30BTagged_bTagSF_jecUp, failedTreeLevel >= fullFailedTree);
-  myTree->Book("nCleanedJetsPt30BTagged_bTagSF_jecDn",nCleanedJetsPt30BTagged_bTagSF_jecDn, failedTreeLevel >= fullFailedTree);
+  myTree->Book("nCleanedJetsPt30BTagged_bTagSF_jesUp",nCleanedJetsPt30BTagged_bTagSF_jesUp, failedTreeLevel >= fullFailedTree);
+  myTree->Book("nCleanedJetsPt30BTagged_bTagSF_jesDn",nCleanedJetsPt30BTagged_bTagSF_jesDn, failedTreeLevel >= fullFailedTree);
+  myTree->Book("nCleanedJetsPt30BTagged_bTagSF_jerUp",nCleanedJetsPt30BTagged_bTagSF_jerUp, failedTreeLevel >= fullFailedTree);
+  myTree->Book("nCleanedJetsPt30BTagged_bTagSF_jerDn",nCleanedJetsPt30BTagged_bTagSF_jerDn, failedTreeLevel >= fullFailedTree);
   myTree->Book("nCleanedJetsPt30BTagged_bTagSFUp",nCleanedJetsPt30BTagged_bTagSFUp, failedTreeLevel >= fullFailedTree);
   myTree->Book("nCleanedJetsPt30BTagged_bTagSFDn",nCleanedJetsPt30BTagged_bTagSFDn, failedTreeLevel >= fullFailedTree);
   myTree->Book("trigWord",trigWord, failedTreeLevel >= minimalFailedTree);
@@ -2598,6 +2523,7 @@ void HH4lXNtupleMaker::BookAllBranches(){
   myTree->Book("ZZPt",ZZPt, false);
   myTree->Book("ZZEta",ZZEta, false);
   myTree->Book("ZZPhi",ZZPhi, false);
+  myTree->Book("ZZjjPt",ZZjjPt, false);
   myTree->Book("CRflag",CRflag, false);
   myTree->Book("Z1Mass",Z1Mass, false);
   myTree->Book("Z1Pt",Z1Pt, false);
@@ -2635,24 +2561,38 @@ void HH4lXNtupleMaker::BookAllBranches(){
   myTree->Book("LepPt",LepPt, false);
   myTree->Book("LepEta",LepEta, false);
   myTree->Book("LepPhi",LepPhi, false);
+  myTree->Book("LepSCEta",LepSCEta, false);
   myTree->Book("LepLepId",LepLepId, false);
   myTree->Book("LepSIP",LepSIP, false);
+  myTree->Book("Lepdxy",Lepdxy, false);
+  myTree->Book("Lepdz",Lepdz, false);
   myTree->Book("LepTime",LepTime, false);
   myTree->Book("LepisID",LepisID, false);
   myTree->Book("LepisLoose",LepisLoose, false);
   myTree->Book("LepBDT",LepBDT, false);
+  myTree->Book("LepisCrack",LepisCrack, false);
   myTree->Book("LepMissingHit",LepMissingHit, false);
   myTree->Book("LepChargedHadIso",LepChargedHadIso, false);
   myTree->Book("LepNeutralHadIso",LepNeutralHadIso, false);
   myTree->Book("LepPhotonIso",LepPhotonIso, false);
   myTree->Book("LepPUIsoComponent",LepPUIsoComponent, false);
   myTree->Book("LepCombRelIsoPF",LepCombRelIsoPF, false);
-  myTree->Book("LepRecoSF",LepRecoSF, false);
-  myTree->Book("LepRecoSF_Unc",LepRecoSF_Unc, false);
-  myTree->Book("LepSelSF",LepSelSF, false);
-  myTree->Book("LepSelSF_Unc",LepSelSF_Unc, false);
-  myTree->Book("LepScale_Unc",LepScale_Unc, false);
-  myTree->Book("LepSmear_Unc",LepSmear_Unc, false);
+  myTree->Book("LepSF",LepSF, false);
+  myTree->Book("LepSF_Unc",LepSF_Unc, false);
+  myTree->Book("LepScale_Total_Up",LepScale_Total_Up, false);
+  myTree->Book("LepScale_Total_Dn",LepScale_Total_Dn, false);
+  myTree->Book("LepScale_Stat_Up",LepScale_Stat_Up, false);
+  myTree->Book("LepScale_Stat_Dn",LepScale_Stat_Dn, false);
+  myTree->Book("LepScale_Syst_Up",LepScale_Syst_Up, false);
+  myTree->Book("LepScale_Syst_Dn",LepScale_Syst_Dn, false);
+  myTree->Book("LepScale_Gain_Up",LepScale_Gain_Up, false);
+  myTree->Book("LepScale_Gain_Dn",LepScale_Gain_Dn, false);
+  myTree->Book("LepSigma_Total_Up",LepSigma_Total_Up, false);
+  myTree->Book("LepSigma_Total_Dn",LepSigma_Total_Dn, false);
+  myTree->Book("LepSigma_Rho_Up",LepSigma_Rho_Up, false);
+  myTree->Book("LepSigma_Rho_Dn",LepSigma_Rho_Dn, false);
+  myTree->Book("LepSigma_Phi_Up",LepSigma_Phi_Up, false);
+  myTree->Book("LepSigma_Phi_Dn",LepSigma_Phi_Up, false);
 
   myTree->Book("fsrPt",fsrPt, false);
   myTree->Book("fsrEta",fsrEta, false);
@@ -2666,25 +2606,26 @@ void HH4lXNtupleMaker::BookAllBranches(){
   }
 
   //Photon variables
-  myTree->Book("nPhotons",     nPhotons,   failedTreeLevel >= fullFailedTree);
+  //  myTree->Book("nPhotons",     nPhotons,   failedTreeLevel >= fullFailedTree);
   myTree->Book("photonPt",     photonPt,   failedTreeLevel >= fullFailedTree);
   myTree->Book("photonEta",    photonEta,  failedTreeLevel >= fullFailedTree);
   myTree->Book("photonPhi",    photonPhi,  failedTreeLevel >= fullFailedTree);
-  myTree->Book("photonEtaSC",  photonEtaSC,failedTreeLevel >= fullFailedTree);
-  myTree->Book("photonPhiSC",  photonPhiSC,failedTreeLevel >= fullFailedTree);
-  myTree->Book("photonMass",   photonMass, failedTreeLevel >= fullFailedTree);
-  myTree->Book("photon_5x5r9", photon_5x5r9,  failedTreeLevel >= fullFailedTree);
-  myTree->Book("photon_5x5sigmaIetaIeta", photon_5x5sigmaIetaIeta, failedTreeLevel >= fullFailedTree); 
-  myTree->Book("photon_chargedHadronIso", photon_chargedHadronIso, failedTreeLevel >= fullFailedTree);
-  myTree->Book("photon_neutralHadronIso", photon_neutralHadronIso, failedTreeLevel >= fullFailedTree);
-  myTree->Book("photon_photonIso",        photon_photonIso,        failedTreeLevel >= fullFailedTree);
-  myTree->Book("photon_hadronicOverEm",   photon_hadronicOverEm,   failedTreeLevel >= fullFailedTree);
-  myTree->Book("photon_rho",              photon_rho,              failedTreeLevel >= fullFailedTree);
-  myTree->Book("photonIsID",              photonIsID,              failedTreeLevel >= fullFailedTree);
-  myTree->Book("photon_chargedHadronIso_corr", photon_chargedHadronIso_corr, failedTreeLevel >= fullFailedTree);
-  myTree->Book("photon_neutralHadronIso_corr", photon_neutralHadronIso_corr, failedTreeLevel >= fullFailedTree);
-  myTree->Book("photon_photonIso_corr",        photon_photonIso_corr,        failedTreeLevel >= fullFailedTree); 
-  myTree->Book("photonPassElectronVeto",     photonPassElectronVeto,   failedTreeLevel >= fullFailedTree);
+  myTree->Book("photonIsCutBasedLooseID",photonIsCutBasedLooseID, failedTreeLevel >= fullFailedTree);
+  // myTree->Book("photonEtaSC",  photonEtaSC,failedTreeLevel >= fullFailedTree);
+  // myTree->Book("photonPhiSC",  photonPhiSC,failedTreeLevel >= fullFailedTree);
+  // myTree->Book("photonMass",   photonMass, failedTreeLevel >= fullFailedTree);
+  // myTree->Book("photon_5x5r9", photon_5x5r9,  failedTreeLevel >= fullFailedTree);
+  // myTree->Book("photon_5x5sigmaIetaIeta", photon_5x5sigmaIetaIeta, failedTreeLevel >= fullFailedTree); 
+  // myTree->Book("photon_chargedHadronIso", photon_chargedHadronIso, failedTreeLevel >= fullFailedTree);
+  // myTree->Book("photon_neutralHadronIso", photon_neutralHadronIso, failedTreeLevel >= fullFailedTree);
+  // myTree->Book("photon_photonIso",        photon_photonIso,        failedTreeLevel >= fullFailedTree);
+  // myTree->Book("photon_hadronicOverEm",   photon_hadronicOverEm,   failedTreeLevel >= fullFailedTree);
+  // myTree->Book("photon_rho",              photon_rho,              failedTreeLevel >= fullFailedTree);
+  // myTree->Book("photonIsID",              photonIsID,              failedTreeLevel >= fullFailedTree);
+  // myTree->Book("photon_chargedHadronIso_corr", photon_chargedHadronIso_corr, failedTreeLevel >= fullFailedTree);
+  // myTree->Book("photon_neutralHadronIso_corr", photon_neutralHadronIso_corr, failedTreeLevel >= fullFailedTree);
+  // myTree->Book("photon_photonIso_corr",        photon_photonIso_corr,        failedTreeLevel >= fullFailedTree); 
+  // myTree->Book("photonPassElectronVeto",     photonPassElectronVeto,   failedTreeLevel >= fullFailedTree);
 
   //Tau variables
   myTree->Book("nTaus",  nTaus,   failedTreeLevel >= fullFailedTree);
@@ -2714,9 +2655,16 @@ void HH4lXNtupleMaker::BookAllBranches(){
   myTree->Book("JetHadronFlavour",JetHadronFlavour, failedTreeLevel >= fullFailedTree);
   myTree->Book("JetPartonFlavour",JetPartonFlavour, failedTreeLevel >= fullFailedTree);
 
-  myTree->Book("JetJERUp",JetJERUp, failedTreeLevel >= fullFailedTree);
-  myTree->Book("JetJERDown",JetJERDown, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetRawPt",JetRawPt, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPtJEC_noJER",JetPtJEC_noJER, failedTreeLevel >= fullFailedTree);
+  
+  myTree->Book("JetPt_JESUp",JetJESUp, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESDown",JetJESDown, failedTreeLevel >= fullFailedTree);
+   
+  myTree->Book("JetPt_JERUp",JetJERUp, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JERDown",JetJERDown, failedTreeLevel >= fullFailedTree);
 
+  myTree->Book("JetID", JetID, failedTreeLevel >= fullFailedTree);
   myTree->Book("JetPUID", JetPUID, failedTreeLevel >= fullFailedTree);
   myTree->Book("JetPUValue", JetPUValue, failedTreeLevel >= fullFailedTree);
 
@@ -2782,10 +2730,11 @@ void HH4lXNtupleMaker::BookAllBranches(){
     myTree->Book("PUWeight_Dn", PUWeight_Dn, failedTreeLevel >= minimalFailedTree);
     myTree->Book("PUWeight_Up", PUWeight_Up, failedTreeLevel >= minimalFailedTree);
     myTree->Book("dataMCWeight", dataMCWeight, false);
-    myTree->Book("muonSF_Unc", muonSF_Unc, false);
-    myTree->Book("eleSF_Unc", eleSF_Unc, false);
     myTree->Book("trigEffWeight", trigEffWeight, false);
     myTree->Book("overallEventWeight", overallEventWeight, false);
+    myTree->Book("L1prefiringWeight", L1prefiringWeight, false);
+    myTree->Book("L1prefiringWeightUp", L1prefiringWeightUp, false);
+    myTree->Book("L1prefiringWeightDn", L1prefiringWeightDn, false);
     myTree->Book("HqTMCweight", HqTMCweight, failedTreeLevel >= minimalFailedTree);
     myTree->Book("xsec", xsection, failedTreeLevel >= minimalFailedTree);
     myTree->Book("genxsec", genxsection, failedTreeLevel >= minimalFailedTree);
@@ -2828,15 +2777,15 @@ void HH4lXNtupleMaker::BookAllBranches(){
     myTree->Book("GenAssocLep2Id", GenAssocLep2Id, failedTreeLevel >= fullFailedTree);
     myTree->Book("htxs_errorCode", htxs_errorCode, failedTreeLevel >= minimalFailedTree);
     myTree->Book("htxs_prodMode", htxs_prodMode, failedTreeLevel >= minimalFailedTree);
-myTree->Book("htxsNJets", htxsNJets, failedTreeLevel >= fullFailedTree);
-myTree->Book("htxsHPt", htxsHPt, failedTreeLevel >= fullFailedTree);
-myTree->Book("htxs_stage0_cat", htxs_stage0_cat, failedTreeLevel >= fullFailedTree);
-myTree->Book("htxs_stage1_cat", htxs_stage1_cat, failedTreeLevel >= fullFailedTree);
+    myTree->Book("htxsHPt", htxsHPt, failedTreeLevel >= minimalFailedTree);
+    myTree->Book("htxs_stage0_cat", htxs_stage0_cat, failedTreeLevel >= minimalFailedTree);
+    myTree->Book("htxs_stage1p1_cat", htxs_stage1p1_cat, failedTreeLevel >= minimalFailedTree);
+    myTree->Book("htxs_stage1p2_cat", htxs_stage1p2_cat, failedTreeLevel >= minimalFailedTree);
     if(apply_QCD_GGF_UNCERT)
       {
-	myTree->Book("ggH_NNLOPS_weight", ggH_NNLOPS_weight, failedTreeLevel >= fullFailedTree);
-	myTree->Book("ggH_NNLOPS_weight_unc", ggH_NNLOPS_weight_unc, failedTreeLevel >= fullFailedTree);
-	myTree->Book("qcd_ggF_uncertSF", qcd_ggF_uncertSF, failedTreeLevel >= fullFailedTree);
+	myTree->Book("ggH_NNLOPS_weight", ggH_NNLOPS_weight, failedTreeLevel >= minimalFailedTree);
+	myTree->Book("ggH_NNLOPS_weight_unc", ggH_NNLOPS_weight_unc, failedTreeLevel >= minimalFailedTree);
+	myTree->Book("qcd_ggF_uncertSF", qcd_ggF_uncertSF, failedTreeLevel >= minimalFailedTree);
       }
 	  
 

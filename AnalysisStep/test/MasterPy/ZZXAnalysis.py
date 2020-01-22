@@ -1004,13 +1004,13 @@ process.ZLLCand = cms.EDProducer("ZZCandidateFiller",
 ### Search for additional Photon candidates
 ### ----------------------------------------------------------------------
 
-# Create a photon collection
-# photon from H->GammaGamma
-process.pikaPhotons = cms.EDProducer("PhotonFiller",    # https://www.youtube.com/watch?v=wDT3xJV3_28
-    pikaphotonSrc = cms.InputTag("slimmedPhotons"),
-    sampleType = cms.int32(SAMPLE_TYPE),
-    setup = cms.int32(LEPTON_SETUP), # define the set of effective areas, rho corrections, etc.
-)
+# # Create a photon collection
+# # photon from H->GammaGamma
+# process.pikaPhotons = cms.EDProducer("PhotonFiller",    # https://www.youtube.com/watch?v=wDT3xJV3_28
+#     pikaphotonSrc = cms.InputTag("slimmedPhotons"),
+#     sampleType = cms.int32(SAMPLE_TYPE),
+#     setup = cms.int32(LEPTON_SETUP), # define the set of effective areas, rho corrections, etc.
+# )
 
 
 
@@ -1604,7 +1604,7 @@ process.Candidates = cms.Path(
        process.appendPhotons     +
        process.softLeptons       +
        process.cleanJets         +
-       process.pikaPhotons       +
+#       process.pikaPhotons       +   #uncomment for H->gammagamma photons
        process.tauSequence       +
 # Build 4-lepton candidates
        process.bareZCand         + process.ZCand     +

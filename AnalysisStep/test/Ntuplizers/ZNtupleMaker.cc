@@ -2,6 +2,7 @@
 #include <memory>
 #include <cmath>
 #include <string>
+#include <cassert>
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -26,6 +27,8 @@
 #include <DataFormats/PatCandidates/interface/MET.h>
 #include <DataFormats/METReco/interface/PFMET.h>
 #include <DataFormats/METReco/interface/PFMETCollection.h>
+#include <ZZXAnalysis/AnalysisStep/interface/METCorrectionHandler.h>
+#include <ZZXAnalysis/AnalysisStep/interface/PhotonIDHelper.h>
 #include <DataFormats/Math/interface/LorentzVector.h>
 #include <CommonTools/UtilAlgos/interface/TFileService.h>
 #include <DataFormats/Common/interface/MergeableCounter.h>
@@ -39,6 +42,7 @@
 #include <ZZXAnalysis/AnalysisStep/interface/PileUpWeight.h>
 #include <ZZXAnalysis/AnalysisStep/interface/bitops.h>
 #include <ZZXAnalysis/AnalysisStep/interface/LeptonIsoHelper.h>
+#include <ZZXAnalysis/AnalysisStep/interface/LeptonSFHelper.h>
 #include "ZZXConfigHelper.h"
 #include "HH4lXNtupleFactory.h"
 
@@ -52,6 +56,7 @@ namespace {
   bool skipMuDataMCWeight = false; // skip computation of data/MC weight for mu
   bool skipEleDataMCWeight = false; // skip computation of data/MC weight for ele
   bool addJets = true;
+  bool addPhotons = true;
   bool addQGLInputs = false;
   bool addAddLept = false;
 
@@ -75,19 +80,35 @@ namespace {
   std::vector<float> LepPt;
   std::vector<float> LepEta;
   std::vector<float> LepPhi;
+  std::vector<float> LepSCEta;
   std::vector<short> LepLepId;
   std::vector<float> LepSIP;
+  std::vector<float> Lepdxy;
+  std::vector<float> Lepdz;
   std::vector<float> LepTime;
   std::vector<bool> LepisID;
   std::vector<float> LepBDT;
+  std::vector<bool> LepisCrack;
   std::vector<char> LepMissingHit;
   std::vector<float> LepChargedHadIso;
   std::vector<float> LepNeutralHadIso;
   std::vector<float> LepPhotonIso;
   std::vector<float> LepCombRelIsoPF;
   std::vector<float> LepCombRelIsoPFPreFSR;
-  std::vector<float> LepScale_Unc;
-  std::vector<float> LepSmear_Unc;
+  std::vector<float> LepScale_Total_Up;
+  std::vector<float> LepScale_Total_Dn;
+  std::vector<float> LepScale_Stat_Up;
+  std::vector<float> LepScale_Stat_Dn;
+  std::vector<float> LepScale_Syst_Up;
+  std::vector<float> LepScale_Syst_Dn;
+  std::vector<float> LepScale_Gain_Up;
+  std::vector<float> LepScale_Gain_Dn;
+  std::vector<float> LepSigma_Total_Up;
+  std::vector<float> LepSigma_Total_Dn;
+  std::vector<float> LepSigma_Rho_Up;
+  std::vector<float> LepSigma_Rho_Dn;
+  std::vector<float> LepSigma_Phi_Up;
+  std::vector<float> LepSigma_Phi_Dn;
   std::vector<float> fsrPt;
   std::vector<float> fsrEta;
   std::vector<float> fsrPhi;
@@ -120,6 +141,18 @@ namespace {
   std::vector<float> AddMuPhotonIso;
   std::vector<float> AddMuCombRelIsoPF;
   Short_t nCleanedJetsPt30 = 0;
+  Short_t nCleanedJetsPt30_jesUp = 0;
+  Short_t nCleanedJetsPt30_jesDn = 0;
+  Short_t nCleanedJetsPt30_jerUp = 0;
+  Short_t nCleanedJetsPt30_jerDn = 0;
+  Short_t nCleanedJetsPt30BTagged  = 0;
+  Short_t nCleanedJetsPt30BTagged_bTagSF  = 0;
+  Short_t nCleanedJetsPt30BTagged_bTagSF_jesUp  = 0;
+  Short_t nCleanedJetsPt30BTagged_bTagSF_jesDn  = 0;
+  Short_t nCleanedJetsPt30BTagged_bTagSF_jerUp  = 0;
+  Short_t nCleanedJetsPt30BTagged_bTagSF_jerDn  = 0;
+  Short_t nCleanedJetsPt30BTagged_bTagSFUp  = 0;
+  Short_t nCleanedJetsPt30BTagged_bTagSFDn  = 0;
   std::vector<float> JetPt;
   std::vector<float> JetEta;
   std::vector<float> JetPhi;
@@ -138,17 +171,34 @@ namespace {
   std::vector<short> JetPartonFlavour;
   std::vector<float> JetPUValue;
   std::vector<short> JetPUID;
-  std::vector<float> JetJERUp;
-  std::vector<float> JetJERDown;
+  std::vector<short> JetID;
+  std::vector<float> JetPt_JESUp;
+  std::vector<float> JetPt_JESDown;
+  std::vector<float> JetPt_JERUp;
+  std::vector<float> JetPt_JERDown;
+  std::vector<float> JetPtJEC_noJER;
+  std::vector<float> JetRawPt;
+   
+  std::vector<float> PhotonPt;
+  std::vector<float> PhotonEta;
+  std::vector<float> PhotonPhi;
+  std::vector<bool> PhotonIsCutBasedLooseID;
+
 	
-  Float_t PFMET  =  -99;
-  Float_t PFMET_jesUp  =  -99;
-  Float_t PFMET_jesDn  =  -99;
-  Float_t PFMETPhi  =  -99;
+  // Generic MET object
+  METObject metobj;
+  METObject metobj_corrected;
+  Float_t GenMET = -99;
+  Float_t GenMETPhi = -99;
+
   Float_t genHEPMCweight = 0;
   Float_t xsection = 0;
   Float_t dataMCWeight = 0;
   Float_t overallEventWeight = 0;
+   
+  Float_t L1prefiringWeight = 0;
+  Float_t L1prefiringWeightUp = 0;
+  Float_t L1prefiringWeightDn = 0;
 }
 
 //
@@ -172,9 +222,10 @@ private:
   void BookAllBranches();
   virtual void FillCandidate(const pat::CompositeCandidate& higgs, bool evtPass, const edm::Event&);
   virtual void FillJet(const pat::Jet& jet);
+  virtual void FillPhoton(int year, const pat::Photon& photon);
   virtual void endJob();
 
-  Float_t getAllWeight(const reco::Candidate* Lep) const;
+  Float_t getAllWeight(const reco::Candidate* Lep);
 
   // ----------member data ---------------------------
   ZZXConfigHelper myHelper;
@@ -192,6 +243,8 @@ private:
   Float_t xsec;
   int year;
   edm::InputTag metTag;
+   
+  METCorrectionHandler* metCorrHandler;
 
   edm::EDGetTokenT<GenEventInfoProduct> genInfoToken;
   edm::EDGetTokenT<edm::View<pat::CompositeCandidate> > candToken;
@@ -199,6 +252,7 @@ private:
   edm::EDGetTokenT<vector<reco::Vertex> > vtxToken;
   edm::EDGetTokenT<edm::View<pat::Jet> > jetToken;
   edm::EDGetTokenT<pat::METCollection> metToken;
+  edm::EDGetTokenT<pat::PhotonCollection> photonToken;
 
   edm::EDGetTokenT<edm::MergeableCounter> preSkimToken;
 
@@ -206,6 +260,10 @@ private:
   const vector<pat::Electron>* softElectrons;
   edm::EDGetTokenT<vector<pat::Muon> > muonToken;
   const vector<pat::Muon>* softMuons;
+   
+  edm::EDGetTokenT< double > prefweight_token;
+  edm::EDGetTokenT< double > prefweightup_token;
+  edm::EDGetTokenT< double > prefweightdown_token;
 
   PileUpWeight pileUpReweight;
 
@@ -219,14 +277,7 @@ private:
 
   string sampleName;
 
-  TH2D *hTH2D_Mu_All;
-  TH2D *hTH2D_Mu_Unc;
-  TH2F *hTH2F_El_Reco;
-  TH2F *hTH2F_El_Reco_lowPT;
-  TH2F *hTH2F_El_Reco_highPT;
-  TH1 *hTH2D_El_IdIsoSip_notCracks;
-  TH1 *hTH2D_El_IdIsoSip_Cracks;
-  TH1 *hTH2F_El_RSE;
+  LeptonSFHelper *lepSFHelper;
 
 };
 
@@ -235,15 +286,7 @@ private:
 //
 ZNtupleMaker::ZNtupleMaker(const edm::ParameterSet& pset) :
   myHelper(pset),
-  pileUpReweight(myHelper.sampleType(), myHelper.setup()),
-  hTH2D_Mu_All(0),
-  hTH2D_Mu_Unc(0),
-  hTH2F_El_Reco(0),
-  hTH2F_El_Reco_lowPT(0),
-  hTH2F_El_Reco_highPT(0),
-  hTH2D_El_IdIsoSip_notCracks(0),
-  hTH2D_El_IdIsoSip_Cracks(0),
-  hTH2F_El_RSE(0)
+  pileUpReweight(myHelper.sampleType(), myHelper.setup())
 {
   theCandLabel = pset.getUntrackedParameter<string>("CandCollection"); // Name of input Z collection
   theFileName = pset.getUntrackedParameter<string>("fileName");
@@ -259,7 +302,10 @@ ZNtupleMaker::ZNtupleMaker(const edm::ParameterSet& pset) :
   triggerResultToken = consumes<edm::TriggerResults>(edm::InputTag("TriggerResults"));
   vtxToken = consumes<vector<reco::Vertex> >(edm::InputTag("goodPrimaryVertices"));
   jetToken = consumes<edm::View<pat::Jet> >(edm::InputTag("cleanJets"));
+  
   metToken = consumes<pat::METCollection>(metTag);
+  metCorrHandler = new METCorrectionHandler(Form("%i", year));
+  photonToken = consumes<pat::PhotonCollection>(edm::InputTag("slimmedPhotons"));
 
   electronToken = consumes<vector<pat::Electron> >(edm::InputTag("softElectrons"));
   //softElectrons->clear();
@@ -277,6 +323,13 @@ ZNtupleMaker::ZNtupleMaker(const edm::ParameterSet& pset) :
   }
 
   isMC = myHelper.isMC();
+   
+  if( isMC && (year == 2016 || year == 2017))
+  {
+     prefweight_token = consumes< double >(edm::InputTag("prefiringweight:nonPrefiringProb"));
+     prefweightup_token = consumes< double >(edm::InputTag("prefiringweight:nonPrefiringProbUp"));
+     prefweightdown_token = consumes< double >(edm::InputTag("prefiringweight:nonPrefiringProbDown"));
+  }
 
   Nevt_Gen = 0;
   Nevt_Gen_lumiBlock = 0;
@@ -286,141 +339,14 @@ ZNtupleMaker::ZNtupleMaker(const edm::ParameterSet& pset) :
   gen_sumWeights =0.f;
 
    //Scale factors for data/MC efficiency
-  if (!skipEleDataMCWeight && isMC) {
-
-    if(year == 2016)
-    {
-        edm::FileInPath fipEleNotCracks("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/ScaleFactors_non_gap_ele_Moriond2017_v2.root");
-        TFile *root_file = TFile::Open(fipEleNotCracks.fullPath().data(),"READ");
-        hTH2D_El_IdIsoSip_notCracks = (TH1*) root_file->Get("EGamma_SF2D")->Clone();
-        root_file->Close();
-		 
-        edm::FileInPath fipEleCracks("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/ScaleFactors_gap_ele_Moriond2017_v2.root");
-        root_file = TFile::Open(fipEleCracks.fullPath().data(),"READ");
-        hTH2D_El_IdIsoSip_Cracks = (TH1*) root_file->Get("EGamma_SF2D")->Clone();
-        root_file->Close();
- 
-        edm::FileInPath fipEleReco_highPt("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/Ele_Reco_2016.root");
-        TFile *root_file_reco_highPT = TFile::Open(fipEleReco_highPt.fullPath().data(),"READ");
-        hTH2F_El_Reco_highPT = (TH2F*) root_file_reco_highPT->Get("EGamma_SF2D")->Clone();
-        root_file_reco_highPT->Close();
-		 
-		  edm::FileInPath fipEleReco_lowPt("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/Ele_Reco_LowEt_2016.root");
-        TFile *root_file_reco_lowPT = TFile::Open(fipEleReco_lowPt.fullPath().data(),"READ");
-        hTH2F_El_Reco_lowPT = (TH2F*) root_file_reco_lowPT->Get("EGamma_SF2D")->Clone();
-        root_file_reco_lowPT->Close();
-
-        edm::FileInPath fipEleRSE("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/ScaleFactors_RSE_ele_Moriond2017_v1.root");
-        root_file = TFile::Open(fipEleRSE.fullPath().data(),"READ");
-        hTH2F_El_RSE = (TH2F*) root_file->Get("EGamma_SF2D")->Clone();
-        root_file->Close();
-
-    }
-	 else if (year == 2017)
-	 {
-	 
-		  edm::FileInPath fipEleNotCracks("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/egammaEffi.txt_EGM2D_Moriond2018v1.root");
-        TFile *root_file = TFile::Open(fipEleNotCracks.fullPath().data(),"READ");
-        hTH2D_El_IdIsoSip_notCracks = (TH2F*) root_file->Get("EGamma_SF2D")->Clone();
-        root_file->Close();
-		 
-        edm::FileInPath fipEleCracks("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/egammaEffi.txt_EGM2D_Moriond2018v1_gap.root");
-        root_file = TFile::Open(fipEleCracks.fullPath().data(),"READ");
-        hTH2D_El_IdIsoSip_Cracks = (TH2F*) root_file->Get("EGamma_SF2D")->Clone();
-        root_file->Close();
- 
-        edm::FileInPath fipEleReco_highPt("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/Ele_Reco_2017.root");
-        TFile *root_file_reco_highPT = TFile::Open(fipEleReco_highPt.fullPath().data(),"READ");
-        hTH2F_El_Reco_highPT = (TH2F*) root_file_reco_highPT->Get("EGamma_SF2D")->Clone();
-        root_file_reco_highPT->Close();
-		 
-		  edm::FileInPath fipEleReco_lowPt("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/Ele_Reco_LowEt_2017.root");
-        TFile *root_file_reco_lowPT = TFile::Open(fipEleReco_lowPt.fullPath().data(),"READ");
-        hTH2F_El_Reco_lowPT = (TH2F*) root_file_reco_lowPT->Get("EGamma_SF2D")->Clone();
-        root_file_reco_lowPT->Close();
-
-        edm::FileInPath fipEleRSE("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/ScaleFactors_RSE_ele_Moriond2017_v1.root");// FIXME UPDATE TO Moriond2018
-        root_file = TFile::Open(fipEleRSE.fullPath().data(),"READ");
-        hTH2F_El_RSE = (TH2F*) root_file->Get("EGamma_SF2D")->Clone();
-        root_file->Close();
-
-    }
-	 else if (year == 2018)//[FIXME] Use 2017 SFs for now
-	 {
-	 
-		  edm::FileInPath fipEleNotCracks("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/egammaEffi.txt_EGM2D_Moriond2018v1.root");
-        TFile *root_file = TFile::Open(fipEleNotCracks.fullPath().data(),"READ");
-        hTH2D_El_IdIsoSip_notCracks = (TH2F*) root_file->Get("EGamma_SF2D")->Clone();
-        root_file->Close();
-		 
-        edm::FileInPath fipEleCracks("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/egammaEffi.txt_EGM2D_Moriond2018v1_gap.root");
-        root_file = TFile::Open(fipEleCracks.fullPath().data(),"READ");
-        hTH2D_El_IdIsoSip_Cracks = (TH2F*) root_file->Get("EGamma_SF2D")->Clone();
-        root_file->Close();
- 
-        edm::FileInPath fipEleReco_highPt("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/Ele_Reco_2018.root");
-        TFile *root_file_reco_highPT = TFile::Open(fipEleReco_highPt.fullPath().data(),"READ");
-        hTH2F_El_Reco_highPT = (TH2F*) root_file_reco_highPT->Get("EGamma_SF2D")->Clone();
-        root_file_reco_highPT->Close();
-		 
-		  edm::FileInPath fipEleReco_lowPt("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/Ele_Reco_LowEt_2018.root");
-        TFile *root_file_reco_lowPT = TFile::Open(fipEleReco_lowPt.fullPath().data(),"READ");
-        hTH2F_El_Reco_lowPT = (TH2F*) root_file_reco_lowPT->Get("EGamma_SF2D")->Clone();
-        root_file_reco_lowPT->Close();
-
-        edm::FileInPath fipEleRSE("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/ScaleFactors_RSE_ele_Moriond2017_v1.root");// FIXME UPDATE TO Moriond2018
-        root_file = TFile::Open(fipEleRSE.fullPath().data(),"READ");
-        hTH2F_El_RSE = (TH2F*) root_file->Get("EGamma_SF2D")->Clone();
-        root_file->Close();
-
-    }
-    else
-    {
-    	 cout<<"[ERROR] ZNtupleMaker: Electron SFs not supported for " << year << " year!!!" << endl;
-    	 abort();
-	 }
- }
-	 if (!skipMuDataMCWeight && isMC) {
-
-    if(year == 2016)
-    {
-		  edm::FileInPath fipMu("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/ScaleFactors_mu_Moriond2017_v2.root");
-        TFile *fMuWeight = TFile::Open(fipMu.fullPath().data(),"READ");
-        hTH2D_Mu_All = (TH2D*)fMuWeight->Get("FINAL")->Clone();
-        hTH2D_Mu_Unc = (TH2D*)fMuWeight->Get("ERROR")->Clone();
-		  fMuWeight->Close();
-
-    }
-	 else if (year == 2017)
-	 {
-		  edm::FileInPath fipMu("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/ScaleFactors_mu_Moriond2018_final.root");
-        TFile *fMuWeight = TFile::Open(fipMu.fullPath().data(),"READ");
-        hTH2D_Mu_All = (TH2D*)fMuWeight->Get("FINAL")->Clone();
-        hTH2D_Mu_Unc = (TH2D*)fMuWeight->Get("ERROR")->Clone();
-		  fMuWeight->Close();
-
-    }
-	 else if (year == 2018)//[FIXME] Use 2017 SFs for now
-	 {
-		  edm::FileInPath fipMu("ZZXAnalysis/AnalysisStep/data/LeptonEffScaleFactors/ScaleFactors_mu_Moriond2018_final.root");
-        TFile *fMuWeight = TFile::Open(fipMu.fullPath().data(),"READ");
-        hTH2D_Mu_All = (TH2D*)fMuWeight->Get("FINAL")->Clone();
-        hTH2D_Mu_Unc = (TH2D*)fMuWeight->Get("ERROR")->Clone();
-		  fMuWeight->Close();
-
-    }
-    else
-    {
-    	 cout<<"[ERROR] ZNtupleMaker: Muon SFs not supported for " << year << " year!!!" << endl;
-    	 abort();
-	 }
-  }
+   if (!skipEleDataMCWeight && isMC) { lepSFHelper = new LeptonSFHelper(); }
 	
 }
 
 
 ZNtupleMaker::~ZNtupleMaker()
 {
+   delete metCorrHandler;
 }
 
 
@@ -457,6 +383,28 @@ void ZNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& eSetu
     gen_sumPUWeight    += PUWeight;
     gen_sumGenMCWeight += genHEPMCweight;
     gen_sumWeights     += PUWeight*genHEPMCweight;
+     
+    // L1 prefiring weights
+    if( year == 2016 || year == 2017 )
+    {
+       edm::Handle< double > theprefweight;
+       event.getByToken(prefweight_token, theprefweight ) ;
+       L1prefiringWeight =(*theprefweight);
+        
+       edm::Handle< double > theprefweightup;
+       event.getByToken(prefweightup_token, theprefweightup ) ;
+       L1prefiringWeightUp =(*theprefweightup);
+        
+       edm::Handle< double > theprefweightdown;
+       event.getByToken(prefweightdown_token, theprefweightdown ) ;
+       L1prefiringWeightDn =(*theprefweightdown);
+    }
+    else if ( year == 2018 )
+    {
+       L1prefiringWeight   = 1.;
+       L1prefiringWeightUp = 1.;
+       L1prefiringWeightDn = 1.;
+    }
 
   }
 
@@ -496,24 +444,146 @@ void ZNtupleMaker::analyze(const edm::Event& event, const edm::EventSetup& eSetu
   event.getByToken(vtxToken,vertices);
   Nvtx = vertices->size();
 
-  // Jets
-  Handle<edm::View<pat::Jet> > CleanedJets;
-  event.getByToken(jetToken, CleanedJets);
-  for(edm::View<pat::Jet>::const_iterator jet = CleanedJets->begin(); jet != CleanedJets->end(); ++jet)
-    {
-      if(jet->pt()>30) nCleanedJetsPt30++;
-      if (addJets) FillJet(*jet);
+   // Jets (cleaned wrt all tight isolated leptons)
+   Handle<edm::View<pat::Jet> > CleanedJets;
+   event.getByToken(jetToken, CleanedJets);
+   vector<const pat::Jet*> cleanedJets;
+   for(edm::View<pat::Jet>::const_iterator jet = CleanedJets->begin(); jet != CleanedJets->end(); ++jet){
+      cleanedJets.push_back(&*jet);
+   }
+   
+   // Count and store jets, after additional cleaning for CRs...
+   for (unsigned i=0; i<cleanedJets.size(); ++i) {
+       
+       // count jes up/down njets pt30
+       float jes_unc = cleanedJets[i]->userFloat("jes_unc");
+       
+       float pt_nominal = cleanedJets[i]->pt();
+       float pt_jes_up = pt_nominal * (1.0 + jes_unc);
+       float pt_jes_dn = pt_nominal * (1.0 - jes_unc);
+       
+       if(pt_nominal>30){
+          ++nCleanedJetsPt30;
+          if(cleanedJets[i]->userFloat("isBtagged")) ++nCleanedJetsPt30BTagged;
+          if(cleanedJets[i]->userFloat("isBtaggedWithSF")) ++nCleanedJetsPt30BTagged_bTagSF;
+          if(cleanedJets[i]->userFloat("isBtaggedWithSF_Up")) ++nCleanedJetsPt30BTagged_bTagSFUp;
+          if(cleanedJets[i]->userFloat("isBtaggedWithSF_Dn")) ++nCleanedJetsPt30BTagged_bTagSFDn;
+       }
+       if(pt_jes_up>30){
+          ++nCleanedJetsPt30_jesUp;
+          if(cleanedJets[i]->userFloat("isBtaggedWithSF")) ++nCleanedJetsPt30BTagged_bTagSF_jesUp;
+       }
+       if(pt_jes_dn>30){
+          ++nCleanedJetsPt30_jesDn;
+          if(cleanedJets[i]->userFloat("isBtaggedWithSF")) ++nCleanedJetsPt30BTagged_bTagSF_jesDn;
+       }
+       
+       // count jer up/down njets pt30
+       float pt_jer_up = cleanedJets[i]->userFloat("pt_jerup");
+       float pt_jer_dn = cleanedJets[i]->userFloat("pt_jerdn");
+       
+       if(pt_jer_up>30){
+          ++nCleanedJetsPt30_jerUp;
+          if(cleanedJets[i]->userFloat("isBtaggedWithSF")) ++nCleanedJetsPt30BTagged_bTagSF_jerUp;
+       }
+       if(pt_jer_dn>30){
+          ++nCleanedJetsPt30_jerDn;
+          if(cleanedJets[i]->userFloat("isBtaggedWithSF")) ++nCleanedJetsPt30BTagged_bTagSF_jerDn;
+       }
+      if (addJets) FillJet(*(cleanedJets.at(i)));
     }
 
   // MET
   Handle<pat::METCollection> metHandle;
   event.getByToken(metToken, metHandle);
-  if(metHandle.isValid()){
-    const pat::MET &met = metHandle->front();
-    PFMET = met.pt();
-    PFMET_jesUp = met.shiftedPt(pat::MET::JetEnUp);
-    PFMET_jesDn = met.shiftedPt(pat::MET::JetEnDown);
-    PFMETPhi = met.phi();
+  GenMET=GenMETPhi=-99;
+  if (metHandle.isValid()){
+     const pat::MET &met = metHandle->front();
+     
+     metobj.extras.met = metobj.extras.met_original = metobj.extras.met_raw
+     = metobj.extras.met_METup = metobj.extras.met_METdn
+     = metobj.extras.met_JERup = metobj.extras.met_JERdn
+     = metobj.extras.met_PUup = metobj.extras.met_PUdn
+     
+     = metobj_corrected.extras.met = metobj_corrected.extras.met_original = metobj_corrected.extras.met_raw
+     = metobj_corrected.extras.met_METup = metobj_corrected.extras.met_METdn
+     = metobj_corrected.extras.met_JERup = metobj_corrected.extras.met_JERdn
+     = metobj_corrected.extras.met_PUup = metobj_corrected.extras.met_PUdn
+     
+     = met.pt();
+     metobj.extras.phi = metobj.extras.phi_original = metobj.extras.phi_raw
+     = metobj.extras.phi_METup = metobj.extras.phi_METdn
+     = metobj.extras.phi_JECup = metobj.extras.phi_JECdn
+     = metobj.extras.phi_JERup = metobj.extras.phi_JERdn
+     = metobj.extras.phi_PUup = metobj.extras.phi_PUdn
+     
+     = metobj_corrected.extras.phi = metobj_corrected.extras.phi_original = metobj_corrected.extras.phi_raw
+     = metobj_corrected.extras.phi_METup = metobj_corrected.extras.phi_METdn
+     = metobj_corrected.extras.phi_JECup = metobj_corrected.extras.phi_JECdn
+     = metobj_corrected.extras.phi_JERup = metobj_corrected.extras.phi_JERdn
+     = metobj_corrected.extras.phi_PUup = metobj_corrected.extras.phi_PUdn
+     
+     = met.phi();
+     
+     metobj.extras.met_JECup = metobj_corrected.extras.met_JECup = met.shiftedPt(pat::MET::JetEnUp);
+     metobj.extras.met_JECdn = metobj_corrected.extras.met_JECdn = met.shiftedPt(pat::MET::JetEnDown);
+     metobj.extras.phi_JECup = metobj_corrected.extras.phi_JECup = met.shiftedPhi(pat::MET::JetEnUp);
+     metobj.extras.phi_JECdn = metobj_corrected.extras.phi_JECdn = met.shiftedPhi(pat::MET::JetEnDown);
+     
+     if (isMC && metCorrHandler && met.genMET()){
+        GenMET = met.genMET()->pt();
+        GenMETPhi = met.genMET()->phi();
+        metCorrHandler->correctMET(GenMET, GenMETPhi, &metobj_corrected, false); // FIXME: Last argument should be for isFastSim, but we don't have it yet
+     }
+     else if (isMC){
+        cms::Exception e("METCorrectionHandler");
+        e << "Either no met.genMET or metCorrHandler!";
+        throw e;
+     }
+  }
+  else{
+     metobj.extras.met = metobj.extras.met_original = metobj.extras.met_raw
+     = metobj.extras.met_METup = metobj.extras.met_METdn
+     = metobj.extras.met_JECup = metobj.extras.met_JECdn
+     = metobj.extras.met_JERup = metobj.extras.met_JERdn
+     = metobj.extras.met_PUup = metobj.extras.met_PUdn
+     
+     = metobj_corrected.extras.met = metobj_corrected.extras.met_original = metobj_corrected.extras.met_raw
+     = metobj_corrected.extras.met_METup = metobj_corrected.extras.met_METdn
+     = metobj_corrected.extras.met_JECup = metobj_corrected.extras.met_JECdn
+     = metobj_corrected.extras.met_JERup = metobj_corrected.extras.met_JERdn
+     = metobj_corrected.extras.met_PUup = metobj_corrected.extras.met_PUdn
+     
+     = metobj.extras.phi = metobj.extras.phi_original = metobj.extras.phi_raw
+     = metobj.extras.phi_METup = metobj.extras.phi_METdn
+     = metobj.extras.phi_JECup = metobj.extras.phi_JECdn
+     = metobj.extras.phi_JERup = metobj.extras.phi_JERdn
+     = metobj.extras.phi_PUup = metobj.extras.phi_PUdn
+     
+     = metobj_corrected.extras.phi = metobj_corrected.extras.phi_original = metobj_corrected.extras.phi_raw
+     = metobj_corrected.extras.phi_METup = metobj_corrected.extras.phi_METdn
+     = metobj_corrected.extras.phi_JECup = metobj_corrected.extras.phi_JECdn
+     = metobj_corrected.extras.phi_JERup = metobj_corrected.extras.phi_JERdn
+     = metobj_corrected.extras.phi_PUup = metobj_corrected.extras.phi_PUdn
+     
+     = -99;
+  }
+   
+  // Photons
+  Handle<pat::PhotonCollection> photonCands;
+  event.getByToken(photonToken, photonCands);
+  vector<const pat::Photon*> photons;
+   
+  for(unsigned int i = 0; i< photonCands->size(); ++i){
+     const pat::Photon* photon = &((*photonCands)[i]);
+     photons.push_back(&*photon);
+  }
+   
+   
+  if (addPhotons){
+     for (unsigned i=0; i<photons.size(); ++i) {
+        FillPhoton(year, *(photons.at(i)));
+     }
   }
 	
   // all soft leptons
@@ -575,13 +645,29 @@ void ZNtupleMaker::FillCandidate(const pat::CompositeCandidate& cand, bool evtPa
   LepPt.clear();
   LepEta.clear();
   LepPhi.clear();
+  LepSCEta.clear();
   LepLepId.clear();
   LepSIP.clear();
+  Lepdxy.clear();
+  Lepdz.clear();
   LepTime.clear();
   LepisID.clear();
   LepBDT.clear();
-  LepScale_Unc.clear();
-  LepSmear_Unc.clear();
+  LepisCrack.clear();
+  LepScale_Total_Up.clear();
+  LepScale_Total_Dn.clear();
+  LepScale_Stat_Up.clear();
+  LepScale_Stat_Dn.clear();
+  LepScale_Syst_Up.clear();
+  LepScale_Syst_Dn.clear();
+  LepScale_Gain_Up.clear();
+  LepScale_Gain_Dn.clear();
+  LepSigma_Total_Up.clear();
+  LepSigma_Total_Dn.clear();
+  LepSigma_Rho_Up.clear();
+  LepSigma_Rho_Dn.clear();
+  LepSigma_Phi_Up.clear();
+  LepSigma_Phi_Dn.clear();
   LepMissingHit.clear();
   LepChargedHadIso.clear();
   LepNeutralHadIso.clear();
@@ -599,14 +685,30 @@ void ZNtupleMaker::FillCandidate(const pat::CompositeCandidate& cand, bool evtPa
     LepPt .push_back( leptons[i]->pt() );
     LepEta.push_back( leptons[i]->eta() );
     LepPhi.push_back( leptons[i]->phi() );
+    LepSCEta.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"SCeta") : -99. );
     LepLepId.push_back( leptons[i]->pdgId() );
     LepSIP  .push_back( userdatahelpers::getUserFloat(leptons[i],"SIP") );
+    Lepdxy  .push_back( userdatahelpers::getUserFloat(leptons[i],"dxy") );
+    Lepdz   .push_back( userdatahelpers::getUserFloat(leptons[i],"dz") );
     LepTime .push_back( lepFlav==13 ? userdatahelpers::getUserFloat(leptons[i],"time") : 0. );
     LepisID .push_back( userdatahelpers::getUserFloat(leptons[i],"ID") );
-    LepBDT  .push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"BDT") : 0. );
+    LepBDT  .push_back( userdatahelpers::getUserFloat(leptons[i],"BDT"));
+    LepisCrack.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"isCrack") : 0 );
     LepMissingHit.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"missingHit") : 0 );
-    LepScale_Unc.push_back( lepFlav==13 && year == 2018? 0. : userdatahelpers::getUserFloat(leptons[i],"scale_unc"));//[FIXME] Temporary hack so it does not crash in 2018 without MUON CORRECTIONS turned on
-    LepSmear_Unc.push_back( lepFlav==13 && year == 2018? 0. : userdatahelpers::getUserFloat(leptons[i],"smear_unc"));//[FIXME] Temporary hack so it does not crash in 2018 without MUON CORRECTIONS turned on
+    LepScale_Total_Up.push_back( userdatahelpers::getUserFloat(leptons[i],"scale_total_up") );
+    LepScale_Total_Dn.push_back( userdatahelpers::getUserFloat(leptons[i],"scale_total_dn") );
+    LepScale_Stat_Up.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"scale_stat_up") : -99. );
+    LepScale_Stat_Dn.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"scale_stat_dn") : -99. );
+    LepScale_Syst_Up.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"scale_syst_up") : -99. );
+    LepScale_Syst_Dn.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"scale_syst_dn") : -99. );
+    LepScale_Gain_Up.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"scale_gain_up") : -99. );
+    LepScale_Gain_Dn.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"scale_gain_dn") : -99. );
+    LepSigma_Total_Up.push_back( userdatahelpers::getUserFloat(leptons[i],"sigma_total_up") );
+    LepSigma_Total_Dn.push_back( userdatahelpers::getUserFloat(leptons[i],"sigma_total_dn") );
+    LepSigma_Rho_Up.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"sigma_rho_up") : -99. );
+    LepSigma_Rho_Dn.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"sigma_rho_dn") : -99. );
+    LepSigma_Phi_Up.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"sigma_phi_up") : -99. );
+    LepSigma_Phi_Dn.push_back( lepFlav==11 ? userdatahelpers::getUserFloat(leptons[i],"sigma_phi_dn") : -99. );
     LepChargedHadIso.push_back( userdatahelpers::getUserFloat(leptons[i],"PFChargedHadIso") );
     LepNeutralHadIso.push_back( userdatahelpers::getUserFloat(leptons[i],"PFNeutralHadIso") );
     LepPhotonIso    .push_back( userdatahelpers::getUserFloat(leptons[i],"PFPhotonIso") );
@@ -724,22 +826,37 @@ void ZNtupleMaker::FillJet(const pat::Jet& jet)
     JetMult .push_back( jet.userFloat("mult"));
     JetPtD .push_back( jet.userFloat("ptD"));
   }
-  JetSigma .push_back(jet.userFloat("jec_unc"));
+  JetSigma .push_back(jet.userFloat("jes_unc"));
   JetHadronFlavour .push_back(jet.hadronFlavour());
   JetPartonFlavour .push_back(jet.partonFlavour());
 	
-  JetJERUp .push_back(jet.userFloat("pt_jerup"));
-  JetJERDown .push_back(jet.userFloat("pt_jerdn"));
-
+  JetPt_JESUp .push_back(jet.userFloat("pt_jesup"));
+  JetPt_JESDown .push_back(jet.userFloat("pt_jesdn"));
+  
+  JetPt_JERUp .push_back(jet.userFloat("pt_jerup"));
+  JetPt_JERDown .push_back(jet.userFloat("pt_jerdn"));
+   
+  JetRawPt  .push_back( jet.userFloat("RawPt"));
+  JetPtJEC_noJER .push_back( jet.userFloat("pt_JEC_noJER"));
+    
+  JetID.push_back(jet.userFloat("JetID"));
+  JetPUID.push_back(jet.userFloat("PUjetID"));
+    
   if (jet.hasUserFloat("pileupJetIdUpdated:fullDiscriminant")) { // if JEC is reapplied, we set this
 	  JetPUValue.push_back(jet.userFloat("pileupJetIdUpdated:fullDiscriminant"));
-     JetPUID.push_back(jet.userInt("pileupJetIdUpdated:fullId"));
    } else {
      JetPUValue.push_back(jet.userFloat("pileupJetId:fullDiscriminant"));
-     JetPUID.push_back(jet.userInt("pileupJetId:fullId"));
    }
 }
 
+void ZNtupleMaker::FillPhoton(int year, const pat::Photon& photon)
+{
+   PhotonPt  .push_back( photon.pt());
+   PhotonEta .push_back( photon.eta());
+   PhotonPhi .push_back( photon.phi());
+   
+   PhotonIsCutBasedLooseID .push_back( PhotonIDHelper::isCutBasedID_Loose(year, photon) );
+}
 
 // ------------ method called once each job just before starting event loop  ------------
 void ZNtupleMaker::beginJob()
@@ -807,198 +924,39 @@ void ZNtupleMaker::fillDescriptions(edm::ConfigurationDescriptions& descriptions
 }
 
 
-Float_t ZNtupleMaker::getAllWeight(const reco::Candidate* Lep) const //FIXME: synchronize with HH4lXNtupleMaker
+Float_t ZNtupleMaker::getAllWeight(const reco::Candidate* Lep)
 {
  Int_t   myLepID = abs(Lep->pdgId());
  if (skipMuDataMCWeight&& myLepID==13) return 1.;
  if (skipEleDataMCWeight&& myLepID==11) return 1.;
- if (myLepID==22) return 1.; // FIXME - what SFs should be used for TLEs?
-
- Float_t weight  = 1.;
- //Float_t errCorr = 0.;
- //Float_t errCorrSyst = 0.;
 
  Float_t myLepPt = Lep->pt();
  Float_t myLepEta = Lep->eta();
- Float_t mySIP = userdatahelpers::getUserFloat(Lep, "SIP");
-
- Float_t RecoSF = 0.;
- //Float_t RecoSF_Unc = 0.;
-
- Float_t SelSF = 0.;
- //Float_t SelSF_Unc = 0.;
+   
+ float SF = 1.0;
+ //float SF_Unc = 0.0;
 
 
-//MUONS
- if(myLepID == 13 )
- {
-	if(year == 2016)
-	{
-	  RecoSF = 1.; // The scale factor combines all afficiecnies
-	  //RecoSF_Unc = 0.;
-	  SelSF = hTH2D_Mu_All->GetBinContent(hTH2D_Mu_All->GetXaxis()->FindBin(myLepEta),hTH2D_Mu_All->GetYaxis()->FindBin(std::min(myLepPt,199.f))); //last bin contains the overflow
-	  //SelSF_Unc = hTH2D_Mu_Unc->GetBinContent(hTH2D_Mu_Unc->GetXaxis()->FindBin(myLepEta),hTH2D_Mu_Unc->GetYaxis()->FindBin(std::min(myLepPt,199.f))); //last bin contains the overflow
-
-	  weight = RecoSF*SelSF;
-	}
-	else if(year == 2017)
-	{
-	  RecoSF = 1.; // The scale factor combines all afficiecnies
-	  //RecoSF_Unc = 0.;
-	  SelSF = hTH2D_Mu_All->GetBinContent(hTH2D_Mu_All->GetXaxis()->FindBin(myLepEta),hTH2D_Mu_All->GetYaxis()->FindBin(std::min(myLepPt,199.f))); //last bin contains the overflow
-	  //SelSF_Unc = hTH2D_Mu_Unc->GetBinContent(hTH2D_Mu_Unc->GetXaxis()->FindBin(myLepEta),hTH2D_Mu_Unc->GetYaxis()->FindBin(std::min(myLepPt,199.f))); //last bin contains the overflow
-
-	  weight = RecoSF*SelSF;
-	}
-	else if(year == 2018) //[FIXME] Update when 2018 available
-		{
-		  RecoSF = 1.; // The scale factor combines all afficiecnies
-		  SelSF = 1.; //last bin contains the overflow
-		}
- }
-
- else if(myLepID == 11) {
-
-	// electron reconstruction scale factor, as a function of supercluster eta
-	Float_t SCeta = userdatahelpers::getUserFloat(Lep,"SCeta");
-	Float_t mySCeta;
-	 
-	// Deal with very rare cases when SCeta is out of 2.5 bonds
-	if ( myLepEta <= 2.5 && SCeta >= 2.5) mySCeta = 2.49;
-	else if ( myLepEta >= -2.5 && SCeta <= -2.5) mySCeta = -2.49;
-	else mySCeta = SCeta;
-	 
-	if(year == 2016)
-	{
-		if(myLepPt < 20.)
-		{
-			RecoSF = hTH2F_El_Reco_lowPT->GetBinContent(hTH2F_El_Reco_lowPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_lowPT->GetYaxis()->FindBin(15.));// FIXME: the histogram contains 1 pt bin only
-			//RecoSF_Unc = hTH2F_El_Reco_lowPT->GetBinError(hTH2F_El_Reco_lowPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_lowPT->GetYaxis()->FindBin(15.));// FIXME: the histogram contains 1 pt bin only
-		}
-		else
-		{
-			RecoSF = hTH2F_El_Reco_highPT->GetBinContent(hTH2F_El_Reco_highPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_highPT->GetYaxis()->FindBin(std::min(myLepPt,499.f)));
-			//RecoSF_Unc = hTH2F_El_Reco_highPT->GetBinError(hTH2F_El_Reco_highPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_highPT->GetYaxis()->FindBin(std::min(myLepPt,499.f)));
-		}
-	}
-	 else if(year == 2017)
-	{
-		if(myLepPt < 20.)
-		{
-			RecoSF = hTH2F_El_Reco_lowPT->GetBinContent(hTH2F_El_Reco_lowPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_lowPT->GetYaxis()->FindBin(15.));// FIXME: the histogram contains 1 pt bin only
-			//RecoSF_Unc = hTH2F_El_Reco_lowPT->GetBinError(hTH2F_El_Reco_lowPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_lowPT->GetYaxis()->FindBin(15.));// FIXME: the histogram contains 1 pt bin only
-		}
-		else
-		{
-			RecoSF = hTH2F_El_Reco_highPT->GetBinContent(hTH2F_El_Reco_highPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_highPT->GetYaxis()->FindBin(std::min(myLepPt,499.f)));
-			//RecoSF_Unc = hTH2F_El_Reco_highPT->GetBinError(hTH2F_El_Reco_highPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_highPT->GetYaxis()->FindBin(std::min(myLepPt,499.f)));
-		}
-	}
-	else if(year == 2018) //[FIXME] Update when 2018 available
-      {
-		if(myLepPt < 20.)
-		{
-			RecoSF = hTH2F_El_Reco_lowPT->GetBinContent(hTH2F_El_Reco_lowPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_lowPT->GetYaxis()->FindBin(15.));// FIXME: the histogram contains 1 pt bin only
-			//RecoSF_Unc = hTH2F_El_Reco_lowPT->GetBinError(hTH2F_El_Reco_lowPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_lowPT->GetYaxis()->FindBin(15.));// FIXME: the histogram contains 1 pt bin only
-		}
-		else
-		{
-			RecoSF = hTH2F_El_Reco_highPT->GetBinContent(hTH2F_El_Reco_highPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_highPT->GetYaxis()->FindBin(std::min(myLepPt,499.f)));
-			//RecoSF_Unc = hTH2F_El_Reco_highPT->GetBinError(hTH2F_El_Reco_highPT->GetXaxis()->FindBin(mySCeta),hTH2F_El_Reco_highPT->GetYaxis()->FindBin(std::min(myLepPt,499.f)));
-		}
-		}
-	else {
-			edm::LogError("MC scale factor") << "ele SFs for < 2016 no longer supported";
-			abort();
-		 }
-	 
-
-	if(year == 2016)
-	{
-		if(mySIP >= 4.0 )
-		{ // FIXME: use a better way to find RSE electrons!
-			 // This is also the case for the loose lepton in Z+l
-			SelSF = hTH2F_El_RSE->GetBinContent(hTH2F_El_RSE->FindFixBin(mySCeta, std::min(myLepPt,199.f)));
-			//SelSF_Unc = hTH2F_El_RSE->GetBinError(hTH2F_El_RSE->FindFixBin(mySCeta, std::min(myLepPt,199.f)));
-		}
-		
-		else
-		{
-			if((bool)userdatahelpers::getUserFloat(Lep,"isCrack"))
-			{
-			 SelSF = hTH2D_El_IdIsoSip_Cracks->GetBinContent(hTH2D_El_IdIsoSip_Cracks->FindFixBin(mySCeta, std::min(myLepPt,199.f)));
-			 //SelSF_Unc = hTH2D_El_IdIsoSip_Cracks->GetBinError(hTH2D_El_IdIsoSip_Cracks->FindFixBin(mySCeta, std::min(myLepPt,199.f)));
-			}
-			else
-			{
-			 SelSF = hTH2D_El_IdIsoSip_notCracks->GetBinContent(hTH2D_El_IdIsoSip_notCracks->FindFixBin(mySCeta, std::min(myLepPt,199.f)));
-			 //SelSF_Unc = hTH2D_El_IdIsoSip_notCracks->GetBinError(hTH2D_El_IdIsoSip_notCracks->FindFixBin(mySCeta, std::min(myLepPt,199.f)));
-			}
-		}
-	
-	}
- 
- else if(year == 2017)
-	{
-		if(mySIP >= 4.0 )
-		{ // FIXME: use a better way to find RSE electrons!
-			 // This is also the case for the loose lepton in Z+l
-			SelSF = hTH2F_El_RSE->GetBinContent(hTH2F_El_RSE->FindFixBin(mySCeta, std::min(myLepPt,199.f)));
-			//SelSF_Unc = hTH2F_El_RSE->GetBinError(hTH2F_El_RSE->FindFixBin(mySCeta, std::min(myLepPt,199.f)));
-		}
-		
-		else
-		{
-			if((bool)userdatahelpers::getUserFloat(Lep,"isCrack"))
-			{
-			 SelSF = hTH2D_El_IdIsoSip_Cracks->GetBinContent(hTH2D_El_IdIsoSip_Cracks->FindFixBin(mySCeta, std::min(myLepPt,499.f)));
-			 //SelSF_Unc = hTH2D_El_IdIsoSip_Cracks->GetBinError(hTH2D_El_IdIsoSip_Cracks->FindFixBin(mySCeta, std::min(myLepPt,499.f)));
-			}
-			else
-			{
-			 SelSF = hTH2D_El_IdIsoSip_notCracks->GetBinContent(hTH2D_El_IdIsoSip_notCracks->FindFixBin(mySCeta, std::min(myLepPt,499.f)));
-			 //SelSF_Unc = hTH2D_El_IdIsoSip_notCracks->GetBinError(hTH2D_El_IdIsoSip_notCracks->FindFixBin(mySCeta, std::min(myLepPt,499.f)));
-			}
-		}
-	
-	}
-	
-	else if(year == 2018) //[FIXME] Update when 2018 available
-		{
-			if(mySIP >= 4.0 )
-			{ // FIXME: use a better way to find RSE electrons!
-				 // This is also the case for the loose lepton in Z+l
-				SelSF = 1.;
-			}
-			
-			else
-			{
-				if((bool)userdatahelpers::getUserFloat(Lep,"isCrack"))
-				{
-				 SelSF = 1.;
-				}
-				else
-				{
-				 SelSF = 1.;
-				}
-			}
-		
-		}
-	 
-	else {
-			edm::LogError("MC scale factor") << "ele SFs for < 2016 no longer supported";
-			abort();
-		 }
-	 
-	weight = RecoSF*SelSF;
- }
-
- else {
-	edm::LogError("MC scale factor") << "ERROR! wrong lepton ID "<<myLepID;
-	weight = 0.;
- }
-
-  return weight;
+ Float_t SCeta;
+ if (myLepID == 11) SCeta = userdatahelpers::getUserFloat(Lep,"SCeta");
+ else SCeta = myLepEta;
+   
+ Float_t mySCeta;
+   
+ // Deal with very rare cases when SCeta is out of 2.5 bonds
+ if ( myLepEta <= 2.5 && SCeta >= 2.5) mySCeta = 2.49;
+ else if ( myLepEta >= -2.5 && SCeta <= -2.5) mySCeta = -2.49;
+ else mySCeta = SCeta;
+   
+ bool isCrack;
+ if (myLepID == 11) isCrack = userdatahelpers::getUserFloat(Lep,"isCrack");
+ else isCrack = false;
+   
+   
+ SF = lepSFHelper->getSF(year,myLepID,myLepPt,myLepEta, mySCeta, isCrack);
+ //SF_Unc = lepSFHelper->getSFError(year,myLepID,myLepPt,myLepEta, mySCeta, isCrack);
+   
+ return SF;
 }
 
 
@@ -1022,13 +980,29 @@ void ZNtupleMaker::BookAllBranches(){
   myTree->Book("LepPt",LepPt);
   myTree->Book("LepEta",LepEta);
   myTree->Book("LepPhi",LepPhi);
+  myTree->Book("LepSCEta",LepSCEta);
   myTree->Book("LepLepId",LepLepId);
   myTree->Book("LepSIP",LepSIP);
+  myTree->Book("Lepdxy",Lepdxy);
+  myTree->Book("Lepdz",Lepdz);
   myTree->Book("LepTime",LepTime);
   myTree->Book("LepisID",LepisID);
   myTree->Book("LepBDT",LepBDT);
-  myTree->Book("LepScale_Unc",LepScale_Unc);
-  myTree->Book("LepSmear_Unc",LepSmear_Unc);
+  myTree->Book("LepisCrack",LepisCrack, false);
+  myTree->Book("LepScale_Total_Up",LepScale_Total_Up, false);
+  myTree->Book("LepScale_Total_Dn",LepScale_Total_Dn, false);
+  myTree->Book("LepScale_Stat_Up",LepScale_Stat_Up, false);
+  myTree->Book("LepScale_Stat_Dn",LepScale_Stat_Dn, false);
+  myTree->Book("LepScale_Syst_Up",LepScale_Syst_Up, false);
+  myTree->Book("LepScale_Syst_Dn",LepScale_Syst_Dn, false);
+  myTree->Book("LepScale_Gain_Up",LepScale_Gain_Up, false);
+  myTree->Book("LepScale_Gain_Dn",LepScale_Gain_Dn, false);
+  myTree->Book("LepSigma_Total_Up",LepSigma_Total_Up, false);
+  myTree->Book("LepSigma_Total_Dn",LepSigma_Total_Dn, false);
+  myTree->Book("LepSigma_Rho_Up",LepSigma_Rho_Up, false);
+  myTree->Book("LepSigma_Rho_Dn",LepSigma_Rho_Dn, false);
+  myTree->Book("LepSigma_Phi_Up",LepSigma_Phi_Up, false);
+  myTree->Book("LepSigma_Phi_Dn",LepSigma_Phi_Up, false);
   myTree->Book("LepMissingHit",LepMissingHit);
   myTree->Book("LepChargedHadIso",LepChargedHadIso);
   myTree->Book("LepNeutralHadIso",LepNeutralHadIso);
@@ -1069,7 +1043,19 @@ void ZNtupleMaker::BookAllBranches(){
     myTree->Book("AddMuCombRelIsoPF",AddMuCombRelIsoPF);
   }
 	
-  myTree->Book("nCleanedJetsPt30",nCleanedJetsPt30);
+   myTree->Book("nCleanedJetsPt30",nCleanedJetsPt30);
+   myTree->Book("nCleanedJetsPt30_jesUp",nCleanedJetsPt30_jesUp);
+   myTree->Book("nCleanedJetsPt30_jesDn",nCleanedJetsPt30_jesDn);
+   myTree->Book("nCleanedJetsPt30_jerUp",nCleanedJetsPt30_jerUp);
+   myTree->Book("nCleanedJetsPt30_jerDn",nCleanedJetsPt30_jerDn);
+   myTree->Book("nCleanedJetsPt30BTagged",nCleanedJetsPt30BTagged);
+   myTree->Book("nCleanedJetsPt30BTagged_bTagSF",nCleanedJetsPt30BTagged_bTagSF);
+   myTree->Book("nCleanedJetsPt30BTagged_bTagSF_jesUp",nCleanedJetsPt30BTagged_bTagSF_jesUp);
+   myTree->Book("nCleanedJetsPt30BTagged_bTagSF_jesDn",nCleanedJetsPt30BTagged_bTagSF_jesDn);
+   myTree->Book("nCleanedJetsPt30BTagged_bTagSF_jerUp",nCleanedJetsPt30BTagged_bTagSF_jerUp);
+   myTree->Book("nCleanedJetsPt30BTagged_bTagSF_jerDn",nCleanedJetsPt30BTagged_bTagSF_jerDn);
+   myTree->Book("nCleanedJetsPt30BTagged_bTagSFUp",nCleanedJetsPt30BTagged_bTagSFUp);
+   myTree->Book("nCleanedJetsPt30BTagged_bTagSFDn",nCleanedJetsPt30BTagged_bTagSFDn);
 
   if (addJets) {
     myTree->Book("JetPt",JetPt);
@@ -1085,14 +1071,48 @@ void ZNtupleMaker::BookAllBranches(){
     myTree->Book("JetSigma",JetSigma);
     myTree->Book("JetHadronFlavour",JetHadronFlavour);
     myTree->Book("JetPartonFlavour",JetPartonFlavour);
-	 myTree->Book("JetJERUp",JetJERUp);
-    myTree->Book("JetJERDown",JetJERDown);
+    myTree->Book("JetPt_JESUp",JetPt_JESUp);
+    myTree->Book("JetPt_JESDown",JetPt_JESDown);
+    myTree->Book("JetPt_JERUp",JetPt_JERUp);
+    myTree->Book("JetPt_JERDown",JetPt_JERDown);
+    myTree->Book("JetRawPt",JetRawPt);
+    myTree->Book("JetPtJEC_noJER",JetPtJEC_noJER);
     myTree->Book("JetPUID", JetPUID);
+    myTree->Book("JetID", JetID);
     myTree->Book("JetPUValue", JetPUValue);
-	 myTree->Book("PFMET",PFMET);
-    myTree->Book("PFMET_jesUp",PFMET_jesUp);
-    myTree->Book("PFMET_jesDn",PFMET_jesDn);
-    myTree->Book("PFMETPhi",PFMETPhi);
+    myTree->Book("GenMET", GenMET);
+    myTree->Book("GenMETPhi", GenMETPhi);
+    myTree->Book("PFMET", metobj.extras.met);
+    myTree->Book("PFMET_jesUp", metobj.extras.met_JECup);
+    myTree->Book("PFMET_jesDn", metobj.extras.met_JECdn);
+    myTree->Book("PFMETPhi", metobj.extras.phi);
+    myTree->Book("PFMETPhi_jesUp", metobj.extras.phi_JECup);
+    myTree->Book("PFMETPhi_jesDn", metobj.extras.phi_JECdn);
+    myTree->Book("PFMET_corrected", metobj_corrected.extras.met);
+    myTree->Book("PFMET_corrected_jesUp", metobj_corrected.extras.met_JECup);
+    myTree->Book("PFMET_corrected_jesDn", metobj_corrected.extras.met_JECdn);
+    myTree->Book("PFMET_corrected_jerUp", metobj_corrected.extras.met_JERup);
+    myTree->Book("PFMET_corrected_jerDn", metobj_corrected.extras.met_JERdn);
+    myTree->Book("PFMET_corrected_puUp", metobj_corrected.extras.met_PUup);
+    myTree->Book("PFMET_corrected_puDn", metobj_corrected.extras.met_PUdn);
+    myTree->Book("PFMET_corrected_metUp", metobj_corrected.extras.met_METup);
+    myTree->Book("PFMET_corrected_metDn", metobj_corrected.extras.met_METdn);
+    myTree->Book("PFMETPhi_corrected", metobj_corrected.extras.phi);
+    myTree->Book("PFMETPhi_corrected_jesUp", metobj_corrected.extras.phi_JECup);
+    myTree->Book("PFMETPhi_corrected_jesDn", metobj_corrected.extras.phi_JECdn);
+    myTree->Book("PFMETPhi_corrected_jerUp", metobj_corrected.extras.phi_JERup);
+    myTree->Book("PFMETPhi_corrected_jerDn", metobj_corrected.extras.phi_JERdn);
+    myTree->Book("PFMETPhi_corrected_puUp", metobj_corrected.extras.phi_PUup);
+    myTree->Book("PFMETPhi_corrected_puDn", metobj_corrected.extras.phi_PUdn);
+    myTree->Book("PFMETPhi_corrected_metUp", metobj_corrected.extras.phi_METup);
+    myTree->Book("PFMETPhi_corrected_metDn", metobj_corrected.extras.phi_METdn);
+  }
+   
+  if(addPhotons){
+    myTree->Book("PhotonPt",PhotonPt);
+    myTree->Book("PhotonEta",PhotonEta);
+    myTree->Book("PhotonPhi",PhotonPhi);
+    myTree->Book("PhotonIsCutBasedLooseID",PhotonIsCutBasedLooseID);
   }
 	
   if(addQGLInputs){
@@ -1105,6 +1125,9 @@ void ZNtupleMaker::BookAllBranches(){
     myTree->Book("xsec",xsection);
     myTree->Book("dataMCWeight",dataMCWeight);
     myTree->Book("overallEventWeight",overallEventWeight);
+    myTree->Book("L1prefiringWeight", L1prefiringWeight);
+    myTree->Book("L1prefiringWeightUp", L1prefiringWeightUp);
+    myTree->Book("L1prefiringWeightDn", L1prefiringWeightDn);
   }
 }
 
