@@ -1,16 +1,16 @@
 
 #DATA_TAG = "ReReco" # Change to PromptReco for Run2016 period H
 LEPTON_SETUP = 2018  # current default = 2018 
-ELECORRTYPE = "None" # "None" to switch off
-ELEREGRESSION = "None" # "None" to switch off
-APPLYMUCORR = False  # Switch off muon scale corrections
-APPLYJEC = False     #
-APPLYJER = False     #
-RECORRECTMET = False #
+#ELECORRTYPE = "None" # "None" to switch off
+#ELEREGRESSION = "None" # "None" to switch off
+#APPLYMUCORR = False  # Switch off muon scale corrections
+#APPLYJEC = False     #
+#APPLYJER = False     #
+#RECORRECTMET = False #
 KINREFIT = False    # control KinZFitter (very slow)
 PROCESS_CR = False   # Uncomment to run CR paths and trees
 #ADDLOOSEELE = True  # Run paths for loose electrons
-APPLYTRIG = False    # Skip events failing required triggers. They are stored with sel<0 if set to False 
+#APPLYTRIG = False    # Skip events failing required triggers. They are stored with sel<0 if set to False 
 #KEEPLOOSECOMB = True # Do not skip loose lepton ZZ combinations (for debugging)
 ADDZTREE = False      # Add tree for Z analysis
 
@@ -137,7 +137,7 @@ process.dumpUserData =  cms.EDAnalyzer("dumpUserData",
         ZL  = cms.InputTag("ZlCand"),
      ),
      jetSrc = cms.InputTag("cleanJets"),
-     photonSrc = cms.InputTag("pikaPhotons"),
+#     photonSrc = cms.InputTag("pikaPhotons"),
 )
 
 # Create lepton sync file

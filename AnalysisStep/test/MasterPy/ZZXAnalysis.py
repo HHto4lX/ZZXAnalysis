@@ -402,7 +402,7 @@ if APPLYMUCORR :
 else:
     process.cleanedMu.src = cms.InputTag("slimmedMuons")
     process.muons =  cms.Sequence(process.cleanedMu + process.bareSoftMuons + process.softMuons)
-
+    #FIXME: if APPLYMUCORR is false this will not work since some userfloat are defined in the RochesterPATMuonCorrector plugin and not in the MuFiller plugin 
 
 
 
