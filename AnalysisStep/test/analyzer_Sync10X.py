@@ -48,7 +48,8 @@ import sys
 options = VarParsing.VarParsing()
 
 options.register('inputFile',
-                 'root://eoscms//eos/cms/store/user/covarell/HH/SM/4lbb/testMINIAOD_HHSM_4lbb_1.root', #default value 
+#                 'root://eoscms//eos/cms/store/user/covarell/HH/SM/4lbb/testMINIAOD_HHSM_4lbb_1.root', #default value 
+                 '/store/user/ilmargje/HH_bb4l_Signal_48kDR_MiniAOD/HH_bb4l_2018_NLO_gen-sim/processed_gen-sim-premix_step2/200119_190213/0000/HIG_GluGluToHHTobbZZ4L-RunIIAutumn18MiniAOD_99.root',
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.string,
                  "inputFile")
