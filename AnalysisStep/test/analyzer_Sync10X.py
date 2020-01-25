@@ -8,11 +8,11 @@ LEPTON_SETUP = 2018  # current default = 2018
 #APPLYJER = False     #
 #RECORRECTMET = False #
 KINREFIT = False    # control KinZFitter (very slow)
-PROCESS_CR = False   # Uncomment to run CR paths and trees
+PROCESS_CR = True   # Uncomment to run CR paths and trees
 #ADDLOOSEELE = True  # Run paths for loose electrons
 #APPLYTRIG = False    # Skip events failing required triggers. They are stored with sel<0 if set to False 
 #KEEPLOOSECOMB = True # Do not skip loose lepton ZZ combinations (for debugging)
-ADDZTREE = False      # Add tree for Z analysis
+ADDZTREE = True      # Add tree for Z analysis
 
 # tau parameters
 TAUCUT = "pt>15"
