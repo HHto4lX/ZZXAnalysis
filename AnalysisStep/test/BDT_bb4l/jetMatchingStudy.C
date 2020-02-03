@@ -77,6 +77,22 @@ void jetMatchingStudy(){
   int count0match_Method1 = 0;
   int countTOTmatch_Method1 = 0;
 
+  int count2match_Method2 = 0;
+  int count1match_Method2 = 0;
+  int count0match_Method2 = 0;
+  int countTOTmatch_Method2 = 0;
+
+  int count2match_Method3 = 0;
+  int count1match_Method3 = 0;
+  int count0match_Method3 = 0;
+  int countTOTmatch_Method3 = 0;
+
+
+  // histos
+  TH1F* h_matches_Method1 = new TH1F("matches_Method1","reco-GEN jet matches;# reco jet with GEN match;eff", 3,-0.5,2.5);
+  TH1F* h_matches_Method2 = new TH1F("matches_Method2","reco-GEN jet matches;# reco jet with GEN match;eff", 3,-0.5,2.5);
+  TH1F* h_matches_Method3 = new TH1F("matches_Method3","reco-GEN jet matches;# reco jet with GEN match;eff", 3,-0.5,2.5);
+
   
 
   TString inFile = "/eos/user/a/acappati/samples_4lX/allsamples/HH4lbb/ZZXAnalysis.root";
@@ -236,9 +252,249 @@ void jetMatchingStudy(){
     // ----------------------------------------------
 
 
+
+
+    // -------------------------------------------
+    // --- jet selection METHOD2: 2 high btagger jets
+    vector<TLorentzVector> JetVec_Method2; // TLorentz vector with all Jets per Event
+    vector<TLorentzVector> JetPair_Method2; // TLorentz vector with all Jets Pairs
+    vector<float> JetpT_Method2; // vector with the pT per each Jet of the Event
+    vector<float> JetBinfo_Method2; // vector with the Btagger per each Jet of the Event
+
+    int d1_Method2 = -999; // position of higest btagger jet
+    int d2_Method2 = -999; // position of second-highest btagger jet
+
+
+    for (UInt_t j = 0; j < JetPt->size(); j++)
+    {
+      if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 20 ) ) continue; // pt cut 20GeV from ntuplizer 
+	  
+      TLorentzVector temp;
+      temp.SetPtEtaPhiM(JetPt->at(j), JetEta->at(j), JetPhi->at(j), JetMass->at(j));
+      JetVec_Method2.push_back(temp);
+      JetpT_Method2.push_back(JetPt->at(j));
+      JetBinfo_Method2.push_back(JetBTagger->at(j));
+    }
+
+    // at least 2 jets in the acceptance
+    if (JetVec_Method2.size() >= 2){
+
+      // count number of events with at least 2 jets
+      countTOTmatch_Method2++;
+
+      // find the position of the highest btagger jet
+      d1_Method2 = distance( JetBinfo_Method2.begin(), max_element(JetBinfo_Method2.begin(), JetBinfo_Method2.end()));
+
+      // find the position of the second-highest btagger jet
+      float max = -9999.;
+      for(UInt_t i=0; i<JetBinfo_Method2.size(); i++){
+        if(i == d1_Method2) continue;
+        float temp = JetBinfo_Method2.at(i);
+        if(temp > max){
+          max = temp;
+          d2_Method2 = i;
+        }
+      }
+
+      cout<<d1_Method2<<" "<<d2_Method2<<endl;      
+
+
+      // find match between 1st reco jets and GEN jets
+      bool bool_match1_Method2 = false;
+      for(UInt_t pr = 0; pr<prunedGenPartEta->size(); pr++){
+        if (fabs(prunedGenPartID->at(pr)) == 5 && prunedGenMotherID->at(pr) == 25){     // check that GEN particle is b quark and mother of b quark is Higgs
+   
+          float deltaPhi1 = JetVec_Method2.at(d1_Method2).Phi() - prunedGenPartPhi->at(pr);
+          if(fabs(deltaPhi1) > acos(-1)){ deltaPhi1 = (2*acos(-1)) - fabs(deltaPhi1); }
+          float deltaEta1 = JetVec_Method2.at(d1_Method2).Eta() - prunedGenPartEta->at(pr);
+
+          float deltaR1 = sqrt(deltaEta1*deltaEta1 + deltaPhi1*deltaPhi1);
+
+          if(deltaR1 < DELTAR){ bool_match1_Method2 = true ;}
+        }
+      }
+
+      // find match between 2nd reco jets and GEN jets
+      bool bool_match2_Method2 = false;
+      for(UInt_t pr = 0; pr<prunedGenPartEta->size(); pr++){
+        if (fabs(prunedGenPartID->at(pr)) == 5 && prunedGenMotherID->at(pr) == 25){     // check that GEN particle is b quark and mother of b quark is Higgs
+   
+          float deltaPhi2 = JetVec_Method2.at(d2_Method2).Phi() - prunedGenPartPhi->at(pr);
+          if(fabs(deltaPhi2) > acos(-1)){ deltaPhi2 = (2*acos(-1)) - fabs(deltaPhi2); }
+          float deltaEta2 = JetVec_Method2.at(d2_Method2).Eta() - prunedGenPartEta->at(pr);
+
+          float deltaR2 = sqrt(deltaEta2*deltaEta2 + deltaPhi2*deltaPhi2);
+
+          if(deltaR2 < 0.4){ bool_match2_Method2 = true ;}
+        }
+      }
+
+      cout<<bool_match1_Method2<<" "<<bool_match2_Method2<<endl;
+
+      if(bool_match1_Method2 && bool_match2_Method2) {count2match_Method2++;}
+      else if( (bool_match1_Method2 && !bool_match2_Method2) || (!bool_match1_Method2 && bool_match2_Method2) ) {count1match_Method2++;}
+      else {count0match_Method2++;}
+
+      cout<<count0match_Method2<<" "<<count1match_Method2<<" "<<count2match_Method2<<" "<<countTOTmatch_Method2<<endl;
+
+    } 
+    // --- end jet selection METHOD2: 2 high btagger jets
+    // ----------------------------------------------
+
+
+
+    // -------------------------------------------
+    // --- jet selection METHOD3: higher btagger jet + higher pT jet
+    vector<TLorentzVector> JetVec_Method3; // TLorentz vector with all Jets per Event
+    vector<TLorentzVector> JetPair_Method3; // TLorentz vector with all Jets Pairs
+    vector<float> JetpT_Method3; // vector with the pT per each Jet of the Event
+    vector<float> JetBinfo_Method3; // vector with the Btagger per each Jet of the Event
+
+    int d1_Method3 = -999; // position of higest btagger jet
+    int d2_Method3 = -999; // position of second-highest btagger jet
+
+
+    for (UInt_t j = 0; j < JetPt->size(); j++)
+    {
+      if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 20 ) ) continue; // pt cut 20GeV from ntuplizer 
+	  
+      TLorentzVector temp;
+      temp.SetPtEtaPhiM(JetPt->at(j), JetEta->at(j), JetPhi->at(j), JetMass->at(j));
+      JetVec_Method3.push_back(temp);
+      JetpT_Method3.push_back(JetPt->at(j));
+      JetBinfo_Method3.push_back(JetBTagger->at(j));
+    }
+
+
+    // at least 2 jets in the acceptance
+    if (JetVec_Method3.size() >= 2){
+
+      // count number of events with at least 2 jets
+      countTOTmatch_Method3++;
+
+      // find the position of the highest btagger jet
+      d1_Method3 = distance( JetBinfo_Method3.begin(), max_element(JetBinfo_Method3.begin(), JetBinfo_Method3.end()));
+
+      // find the position of the highest pT jet
+      float max = -9999.;
+      for(UInt_t i=0; i<JetpT_Method3.size(); i++){
+        if(i == d1_Method3) continue;
+        float temp = JetpT_Method3.at(i);
+        if(temp > max){
+          max = temp;
+          d2_Method3 = i;
+        }
+      }
+
+      cout<<d1_Method3<<" "<<d2_Method3<<endl;      
+    
+
+      // find match between 1st reco jets and GEN jets
+      bool bool_match1_Method3 = false;
+      for(UInt_t pr = 0; pr<prunedGenPartEta->size(); pr++){
+        if (fabs(prunedGenPartID->at(pr)) == 5 && prunedGenMotherID->at(pr) == 25){     // check that GEN particle is b quark and mother of b quark is Higgs
+   
+          float deltaPhi1 = JetVec_Method3.at(d1_Method3).Phi() - prunedGenPartPhi->at(pr);
+          if(fabs(deltaPhi1) > acos(-1)){ deltaPhi1 = (2*acos(-1)) - fabs(deltaPhi1); }
+          float deltaEta1 = JetVec_Method3.at(d1_Method3).Eta() - prunedGenPartEta->at(pr);
+
+          float deltaR1 = sqrt(deltaEta1*deltaEta1 + deltaPhi1*deltaPhi1);
+
+          if(deltaR1 < DELTAR){ bool_match1_Method3 = true ;}
+        }
+      }
+
+      // find match between 2nd reco jets and GEN jets
+      bool bool_match2_Method3 = false;
+      for(UInt_t pr = 0; pr<prunedGenPartEta->size(); pr++){
+        if (fabs(prunedGenPartID->at(pr)) == 5 && prunedGenMotherID->at(pr) == 25){     // check that GEN particle is b quark and mother of b quark is Higgs
+   
+          float deltaPhi2 = JetVec_Method3.at(d2_Method3).Phi() - prunedGenPartPhi->at(pr);
+          if(fabs(deltaPhi2) > acos(-1)){ deltaPhi2 = (2*acos(-1)) - fabs(deltaPhi2); }
+          float deltaEta2 = JetVec_Method3.at(d2_Method3).Eta() - prunedGenPartEta->at(pr);
+
+          float deltaR2 = sqrt(deltaEta2*deltaEta2 + deltaPhi2*deltaPhi2);
+
+          if(deltaR2 < 0.4){ bool_match2_Method3 = true ;}
+        }
+      }
+
+      cout<<bool_match1_Method3<<" "<<bool_match2_Method3<<endl;
+
+      if(bool_match1_Method3 && bool_match2_Method3) {count2match_Method3++;}
+      else if( (bool_match1_Method3 && !bool_match2_Method3) || (!bool_match1_Method3 && bool_match2_Method3) ) {count1match_Method3++;}
+      else {count0match_Method3++;}
+
+      cout<<count0match_Method3<<" "<<count1match_Method3<<" "<<count2match_Method3<<" "<<countTOTmatch_Method3<<endl;
+
+    } 
+    // --- end jet selection METHOD3: higher btagger jet + higher pT jet
+    // ----------------------------------------------
+
+
+
   }// end loop over tree entries
 
+  
 
+
+
+
+  // count matching efficiencies 
+
+  // method 1
+  cout<<(float)count0match_Method1/(float)countTOTmatch_Method1<<" "<<(float)count1match_Method1/(float)countTOTmatch_Method1<<" "<<(float)count2match_Method1/(float)countTOTmatch_Method1<<" "<<(float)countTOTmatch_Method1/(float)countTOTmatch_Method1<<endl;
+
+  h_matches_Method1->SetBinContent(1, (float)count0match_Method1/(float)countTOTmatch_Method1);
+  h_matches_Method1->SetBinContent(2, (float)count1match_Method1/(float)countTOTmatch_Method1);
+  h_matches_Method1->SetBinContent(3, (float)count2match_Method1/(float)countTOTmatch_Method1);
+
+  // method 2
+  cout<<(float)count0match_Method2/(float)countTOTmatch_Method2<<" "<<(float)count1match_Method2/(float)countTOTmatch_Method2<<" "<<(float)count2match_Method2/(float)countTOTmatch_Method2<<" "<<(float)countTOTmatch_Method2/(float)countTOTmatch_Method2<<endl;
+
+  h_matches_Method2->SetBinContent(1, (float)count0match_Method2/(float)countTOTmatch_Method2);
+  h_matches_Method2->SetBinContent(2, (float)count1match_Method2/(float)countTOTmatch_Method2);
+  h_matches_Method2->SetBinContent(3, (float)count2match_Method2/(float)countTOTmatch_Method2);
+
+  // method 3
+  cout<<(float)count0match_Method3/(float)countTOTmatch_Method3<<" "<<(float)count1match_Method3/(float)countTOTmatch_Method3<<" "<<(float)count2match_Method3/(float)countTOTmatch_Method3<<" "<<(float)countTOTmatch_Method3/(float)countTOTmatch_Method3<<endl;
+
+  h_matches_Method3->SetBinContent(1, (float)count0match_Method3/(float)countTOTmatch_Method3);
+  h_matches_Method3->SetBinContent(2, (float)count1match_Method3/(float)countTOTmatch_Method3);
+  h_matches_Method3->SetBinContent(3, (float)count2match_Method3/(float)countTOTmatch_Method3);
+
+
+
+  // draw histos
+  gStyle->SetOptStat(0);
+
+  TCanvas* c_matches = new TCanvas();
+  c_matches->cd();
+
+  h_matches_Method1->SetLineColor(kBlue);
+  h_matches_Method1->Draw("hist");
+
+  h_matches_Method2->SetLineColor(kRed);
+  h_matches_Method2->Draw("hist same");
+
+  h_matches_Method3->SetLineColor(kGreen+2);
+  h_matches_Method3->Draw("hist same");
+
+
+  TLegend* leg = new TLegend(0.65,0.21,0.94,0.39);
+  leg->AddEntry(h_matches_Method1, "2 highest pT", "l");
+  leg->AddEntry(h_matches_Method2, "2 highest btagger", "l");
+  leg->AddEntry(h_matches_Method3, "highest btagger +", "l");
+  leg->AddEntry((TObject*)0,"highest pT","");
+  leg->SetFillColor(kWhite);
+  leg->SetLineColor(kBlack);
+  leg->SetTextFont(43);
+  leg->SetTextSize(20);
+  leg->Draw();
+
+  c_matches->Update();
+
+  c_matches->SaveAs("jetmatches.png");
 
 
 }
