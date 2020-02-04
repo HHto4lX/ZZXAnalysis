@@ -151,15 +151,18 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 
   
   //output file 
-  float f_lept1_ptsignal_4mu;
-  float f_lept2_ptsignal_4mu;
-  float f_lept3_ptsignal_4mu;
-  float f_lept4_ptsignal_4mu;
-  float f_bdiscjet1signal_4mu;
-  float f_bdiscjet2signal_4mu;
-  float f_deltarsignal_4mu;
-  float f_METsignal_4mu;
-  float f_weightsignal_4mu;
+  float f_lept1_ptsignal;
+  float f_lept2_ptsignal;
+  float f_lept3_ptsignal;
+  float f_lept4_ptsignal;
+  float f_massjetjet;
+  float f_ptjet1;
+  float f_ptjet2;
+  float f_bdiscjet1signal;
+  float f_bdiscjet2signal;
+  float f_deltarsignal;
+  float f_METsignal;
+  float f_weightsignal;
 
   float f_Z1Mass;
   float f_Z2Mass;
@@ -171,15 +174,18 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
   TFile *f = new TFile(outFile,"recreate");
   TTree *tnew = new TTree("reducedTree","");
 
-  tnew->Branch("f_lept1_pt",    &f_lept1_ptsignal_4mu);
-  tnew->Branch("f_lept2_pt",    &f_lept2_ptsignal_4mu);
-  tnew->Branch("f_lept3_pt",    &f_lept3_ptsignal_4mu);
-  tnew->Branch("f_lept4_pt",    &f_lept4_ptsignal_4mu);
-  tnew->Branch("f_bdiscjet1",   &f_bdiscjet1signal_4mu);
-  tnew->Branch("f_bdiscjet2",   &f_bdiscjet2signal_4mu);
-  tnew->Branch("f_deltar_norm", &f_deltarsignal_4mu); 
-  tnew->Branch("f_MET_norm",    &f_METsignal_4mu); 
-  tnew->Branch("f_weight",      &f_weightsignal_4mu); 
+  tnew->Branch("f_lept1_pt",    &f_lept1_ptsignal);
+  tnew->Branch("f_lept2_pt",    &f_lept2_ptsignal);
+  tnew->Branch("f_lept3_pt",    &f_lept3_ptsignal);
+  tnew->Branch("f_lept4_pt",    &f_lept4_ptsignal);
+  tnew->Branch("f_massjetjet",  &f_massjetjet);
+  tnew->Branch("f_ptjet1",      &f_ptjet1);
+  tnew->Branch("f_ptjet2",      &f_ptjet2);
+  tnew->Branch("f_bdiscjet1",   &f_bdiscjet1signal);
+  tnew->Branch("f_bdiscjet2",   &f_bdiscjet2signal);
+  tnew->Branch("f_deltar_norm", &f_deltarsignal); 
+  tnew->Branch("f_MET_norm",    &f_METsignal); 
+  tnew->Branch("f_weight",      &f_weightsignal); 
   tnew->Branch("f_Z1Mass",      &f_Z1Mass); 
   tnew->Branch("f_Z2Mass",      &f_Z2Mass); 
   tnew->Branch("f_ZZmass",      &f_ZZmass); 
@@ -247,10 +253,15 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 
 
 
+    //save only events for 1 final state at the time
+    if(currentFinalState != fs_4mu)   continue;  // save 4mu only
+    //if(currentFinalState != fs_4e)    continue;  // save 4e only
+    //if(currentFinalState != fs_2e2mu) continue;  // save 2e2mu only
+    cout<<currentFinalState<<endl;
 
 
     // mass cut: signal region
-    // if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
+    if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
 
  
 
@@ -297,17 +308,24 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
         }
       }
       // save btagger value of the second jet (the one with max pt)
-      f_bdiscjet2signal_4mu = JetBinfo.at(d2_maxJetPt);
+      f_bdiscjet2signal = JetBinfo.at(d2_maxJetPt);
+
+      // save jet pT
+      f_ptjet1 = JetVec.at(d1_maxbtag).Pt();
+      f_ptjet2 = JetVec.at(d2_maxJetPt).Pt();
   
   
       // build H->bb tlorentzvector
       TLorentzVector Hbb_Vec = JetVec.at(d1_maxbtag) + JetVec.at(d2_maxJetPt);
   
       // build H-H DeltaR
-      float DeltaR = sqrt( (( ZZPhi - Hbb_Vec.Phi() )*( ZZPhi - Hbb_Vec.Phi() )) + (( ZZEta - Hbb_Vec.Eta() )*( ZZEta - Hbb_Vec.Eta() )) );
+      float DeltaPhi = ZZPhi - Hbb_Vec.Phi();
+      if( fabs(DeltaPhi) > acos(-1) ) { DeltaPhi = (2*acos(-1)) - fabs(DeltaPhi); }
+      float DeltaEta = ZZEta - Hbb_Vec.Eta();
+      float DeltaR = sqrt( DeltaPhi*DeltaPhi + DeltaEta*DeltaEta );
   
       // save DeltaR
-      f_deltarsignal_4mu = DeltaR;
+      f_deltarsignal = DeltaR;
     
 
 
@@ -322,6 +340,9 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
       // save bb and HH masses
       f_bbmass = Hbb_Vec.M();
       f_HHmass = HH_Vec.M();
+
+      // save jet jet inv mass
+      f_massjetjet = Hbb_Vec.M();
 
     } // end if JETSELECTION
 
@@ -350,17 +371,17 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     f_ZZmass = ZZMass;
 
     // save lepton pt
-    f_lept1_ptsignal_4mu = LepPt->at(0);
-    f_lept2_ptsignal_4mu = LepPt->at(1);
-    f_lept3_ptsignal_4mu = LepPt->at(2);
-    f_lept4_ptsignal_4mu = LepPt->at(3);
+    f_lept1_ptsignal = LepPt->at(0);
+    f_lept2_ptsignal = LepPt->at(1);
+    f_lept3_ptsignal = LepPt->at(2);
+    f_lept4_ptsignal = LepPt->at(3);
 
     // save MET
-    f_METsignal_4mu = PFMET;    
+    f_METsignal = PFMET;    
  
 
     // save event weight
-    f_weightsignal_4mu = eventWeight; 
+    f_weightsignal = eventWeight; 
 
 
 
@@ -420,9 +441,6 @@ void prepareNtupleMVA()
                              "ZZZ",
                              "Z+X",
                              "AllData", 
-                             //"Zzto4lamcatnlo",
-                             // "DY3JetsToLL_M50",
-                             // "DY2JetsToLL_M50" 
                              };
 
 
@@ -430,7 +448,7 @@ void prepareNtupleMVA()
   cout<< "number of input files: " << nInputFiles<<endl;
 
 
-  string outputFilePath = "200109_mvaNtuples_4lsel_full4lmass";
+  string outputFilePath = "200204_mvaNtuples_4mu";
   gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
 
 
