@@ -89,10 +89,15 @@ void jetMatchingStudy(){
 
 
   // histos
-  TH1F* h_matches_Method1 = new TH1F("matches_Method1","reco-GEN jet matches;# reco jet with GEN match;eff", 3,-0.5,2.5);
-  TH1F* h_matches_Method2 = new TH1F("matches_Method2","reco-GEN jet matches;# reco jet with GEN match;eff", 3,-0.5,2.5);
-  TH1F* h_matches_Method3 = new TH1F("matches_Method3","reco-GEN jet matches;# reco jet with GEN match;eff", 3,-0.5,2.5);
+  TH1F* h_matches_Method1 = new TH1F("h_matches_Method1","reco-GEN jet matches;# reco jet with GEN match;eff", 3,-0.5,2.5);
+  TH1F* h_matches_Method2 = new TH1F("h_matches_Method2","reco-GEN jet matches;# reco jet with GEN match;eff", 3,-0.5,2.5);
+  TH1F* h_matches_Method3 = new TH1F("h_matches_Method3","reco-GEN jet matches;# reco jet with GEN match;eff", 3,-0.5,2.5);
 
+  TH1F* h_bbmass_Method1 = new TH1F("h_bbmass_Method1", ";bbMass;events", 300, 0., 300.); h_bbmass_Method1->Sumw2(true);
+  TH1F* h_bbmass_Method2 = new TH1F("h_bbmass_Method2", ";bbMass;events", 300, 0., 300.); h_bbmass_Method2->Sumw2(true);
+  TH1F* h_bbmass_Method3 = new TH1F("h_bbmass_Method3", ";bbMass;events", 300, 0., 300.); h_bbmass_Method3->Sumw2(true);
+  TH1F* h_bbmass_GEN     = new TH1F("h_bbmass_GEN",     ";bbMass;events", 100, 0., 300.);
+  
   
 
   TString inFile = "/eos/user/a/acappati/samples_4lX/allsamples/HH4lbb/ZZXAnalysis.root";
@@ -153,12 +158,13 @@ void jetMatchingStudy(){
     }
 
 
+    // mass cut: signal region
+    if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
+
+
     // fill eventweight
     Double_t eventWeight = partialSampleWeight * xsec * overallEventWeight ;  //kfactor e l1prefiring non ci sono, tanto uso solo HH sample
 
-
-    // mass cut: signal region
-    if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
 
 
 
@@ -178,7 +184,7 @@ void jetMatchingStudy(){
 
     for (UInt_t j = 0; j < JetPt->size(); j++)
     {
-      if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 20 ) ) continue; // pt cut 20GeV from ntuplizer 
+      if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 30 ) ) continue; // pt cut 20GeV from ntuplizer 
 	  
       TLorentzVector temp;
       temp.SetPtEtaPhiM(JetPt->at(j), JetEta->at(j), JetPhi->at(j), JetMass->at(j));
@@ -247,6 +253,10 @@ void jetMatchingStudy(){
 
       cout<<count0match_Method1<<" "<<count1match_Method1<<" "<<count2match_Method1<<" "<<countTOTmatch_Method1<<endl;
 
+
+      TLorentzVector Hbb_vec_Method1 = JetVec_Method1.at(d1_Method1) + JetVec_Method1.at(d2_Method1);
+      h_bbmass_Method1->Fill(Hbb_vec_Method1.M(), eventWeight);
+
     } 
     // --- end jet selection METHOD1: 2 high pT jets
     // ----------------------------------------------
@@ -267,7 +277,7 @@ void jetMatchingStudy(){
 
     for (UInt_t j = 0; j < JetPt->size(); j++)
     {
-      if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 20 ) ) continue; // pt cut 20GeV from ntuplizer 
+      if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 30 ) ) continue; // pt cut 20GeV from ntuplizer 
 	  
       TLorentzVector temp;
       temp.SetPtEtaPhiM(JetPt->at(j), JetEta->at(j), JetPhi->at(j), JetMass->at(j));
@@ -337,6 +347,9 @@ void jetMatchingStudy(){
 
       cout<<count0match_Method2<<" "<<count1match_Method2<<" "<<count2match_Method2<<" "<<countTOTmatch_Method2<<endl;
 
+      TLorentzVector Hbb_vec_Method2 = JetVec_Method2.at(d1_Method2) + JetVec_Method2.at(d2_Method2);
+      h_bbmass_Method2->Fill(Hbb_vec_Method2.M(), eventWeight);
+
     } 
     // --- end jet selection METHOD2: 2 high btagger jets
     // ----------------------------------------------
@@ -356,7 +369,7 @@ void jetMatchingStudy(){
 
     for (UInt_t j = 0; j < JetPt->size(); j++)
     {
-      if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 20 ) ) continue; // pt cut 20GeV from ntuplizer 
+      if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 30 ) ) continue; // pt cut 20GeV from ntuplizer 
 	  
       TLorentzVector temp;
       temp.SetPtEtaPhiM(JetPt->at(j), JetEta->at(j), JetPhi->at(j), JetMass->at(j));
@@ -427,6 +440,9 @@ void jetMatchingStudy(){
 
       cout<<count0match_Method3<<" "<<count1match_Method3<<" "<<count2match_Method3<<" "<<countTOTmatch_Method3<<endl;
 
+      TLorentzVector Hbb_vec_Method3 = JetVec_Method3.at(d1_Method3) + JetVec_Method3.at(d2_Method3);
+      h_bbmass_Method3->Fill(Hbb_vec_Method3.M(), eventWeight);
+
     } 
     // --- end jet selection METHOD3: higher btagger jet + higher pT jet
     // ----------------------------------------------
@@ -444,6 +460,8 @@ void jetMatchingStudy(){
 
   // method 1
   cout<<(float)count0match_Method1/(float)countTOTmatch_Method1<<" "<<(float)count1match_Method1/(float)countTOTmatch_Method1<<" "<<(float)count2match_Method1/(float)countTOTmatch_Method1<<" "<<(float)countTOTmatch_Method1/(float)countTOTmatch_Method1<<endl;
+  cout<<(float)count0match_Method1<<" "<<(float)count1match_Method1<<" "<<(float)count2match_Method1<<" "<<(float)countTOTmatch_Method1<<endl;
+
 
   h_matches_Method1->SetBinContent(1, (float)count0match_Method1/(float)countTOTmatch_Method1);
   h_matches_Method1->SetBinContent(2, (float)count1match_Method1/(float)countTOTmatch_Method1);
@@ -451,6 +469,7 @@ void jetMatchingStudy(){
 
   // method 2
   cout<<(float)count0match_Method2/(float)countTOTmatch_Method2<<" "<<(float)count1match_Method2/(float)countTOTmatch_Method2<<" "<<(float)count2match_Method2/(float)countTOTmatch_Method2<<" "<<(float)countTOTmatch_Method2/(float)countTOTmatch_Method2<<endl;
+  cout<<(float)count0match_Method2<<" "<<(float)count1match_Method2<<" "<<(float)count2match_Method2<<" "<<(float)countTOTmatch_Method2<<endl;
 
   h_matches_Method2->SetBinContent(1, (float)count0match_Method2/(float)countTOTmatch_Method2);
   h_matches_Method2->SetBinContent(2, (float)count1match_Method2/(float)countTOTmatch_Method2);
@@ -458,16 +477,19 @@ void jetMatchingStudy(){
 
   // method 3
   cout<<(float)count0match_Method3/(float)countTOTmatch_Method3<<" "<<(float)count1match_Method3/(float)countTOTmatch_Method3<<" "<<(float)count2match_Method3/(float)countTOTmatch_Method3<<" "<<(float)countTOTmatch_Method3/(float)countTOTmatch_Method3<<endl;
+  cout<<(float)count0match_Method3<<" "<<(float)count1match_Method3<<" "<<(float)count2match_Method3<<" "<<(float)countTOTmatch_Method3<<endl;
 
   h_matches_Method3->SetBinContent(1, (float)count0match_Method3/(float)countTOTmatch_Method3);
   h_matches_Method3->SetBinContent(2, (float)count1match_Method3/(float)countTOTmatch_Method3);
   h_matches_Method3->SetBinContent(3, (float)count2match_Method3/(float)countTOTmatch_Method3);
 
+  
 
 
   // draw histos
   gStyle->SetOptStat(0);
 
+  // jet matching
   TCanvas* c_matches = new TCanvas();
   c_matches->cd();
 
@@ -495,6 +517,44 @@ void jetMatchingStudy(){
   c_matches->Update();
 
   c_matches->SaveAs("jetmatches.png");
+
+
+
+  //get yields
+  cout<<"yields"<<h_bbmass_Method1->Integral()<<" "<<h_bbmass_Method2->Integral()<<" "<<h_bbmass_Method3->Integral()<<endl;
+
+  // bbmass
+  TCanvas* c_Massbb = new TCanvas();
+  c_Massbb->cd();
+
+  h_bbmass_Method2->SetLineColor(kRed);
+  h_bbmass_Method2->Draw("hist");
+
+  h_bbmass_Method3->SetLineColor(kGreen+2);
+  h_bbmass_Method3->Draw("hist same");
+
+  h_bbmass_Method1->SetLineColor(kBlue);
+  h_bbmass_Method1->Draw("hist same");
+
+
+  TLegend* leg2 = new TLegend(0.65,0.21,0.94,0.39);
+  leg2->AddEntry(h_bbmass_Method1, "2 highest pT", "l");
+  leg2->AddEntry(h_bbmass_Method2, "2 highest btagger", "l");
+  leg2->AddEntry(h_bbmass_Method3, "highest btagger +", "l");
+  leg2->AddEntry((TObject*)0,      "highest pT","");
+  leg2->SetFillColor(kWhite);
+  leg2->SetLineColor(kBlack);
+  leg2->SetTextFont(43);
+  leg2->SetTextSize(20);
+  leg2->Draw();
+
+  c_Massbb->Update();
+
+  c_Massbb->SaveAs("bbMass.png");
+
+
+
+
 
 
 }
