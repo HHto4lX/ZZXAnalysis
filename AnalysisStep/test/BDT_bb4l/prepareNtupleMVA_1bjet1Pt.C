@@ -254,9 +254,9 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 
 
     //save only events for 1 final state at the time
-    if(currentFinalState != fs_4mu)   continue;  // save 4mu only
-    //if(currentFinalState != fs_4e)    continue;  // save 4e only
-    //if(currentFinalState != fs_2e2mu) continue;  // save 2e2mu only
+    //    if(currentFinalState != fs_4mu)   continue;  // save 4mu only
+    //    if(currentFinalState != fs_4e)    continue;  // save 4e only
+    if(currentFinalState != fs_2e2mu) continue;  // save 2e2mu only
     cout<<currentFinalState<<endl;
 
 
@@ -412,13 +412,13 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 }
 
 
-void prepareNtupleMVA()
+void prepareNtupleMVA_1bjet1Pt()
 {
 
   float lumi = 59.74; //fb-1
 
-  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/allsamples/";
-  TString inputFileName[] = {"HH4lbb",
+  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/20200205_samples2018/";
+  TString inputFileName[] = {"HH4lbb_Angela",
                              "ggH125",
                              "VBFH125",
                              "WplusH125",
@@ -439,8 +439,8 @@ void prepareNtupleMVA()
                              "WWZ",
                              "WZZ",
                              "ZZZ",
-                             "Z+X",
-                             "AllData", 
+			     //                             "Z+X",
+			     //                             "AllData", 
                              };
 
 
@@ -448,7 +448,7 @@ void prepareNtupleMVA()
   cout<< "number of input files: " << nInputFiles<<endl;
 
 
-  string outputFilePath = "200204_mvaNtuples_1bjet1Pt_4mu";
+  string outputFilePath = "200204_mvaNtuples_1bjet1Pt_2e2mu";
   gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
 
 
