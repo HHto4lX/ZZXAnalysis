@@ -50,7 +50,8 @@ void jetMatchingStudy(){
   Long64_t nEvent;
   Int_t nLumi;
   Float_t overallEventWeight;
-  Float_t xsec;
+  //  Float_t xsec = 0.0000447896; //pb
+  Float_t xsec = 0.00001017; //pb Angela
 
   Short_t ZZsel;
   vector<Float_t> *LepPt = 0;
@@ -98,6 +99,9 @@ void jetMatchingStudy(){
   TH1F* h_bbmass_Method3 = new TH1F("h_bbmass_Method3", ";bbMass;events", 300, 0., 300.); h_bbmass_Method3->Sumw2(true);
   TH1F* h_bbmass_GEN     = new TH1F("h_bbmass_GEN",     ";bbMass;events", 100, 0., 300.);
   
+  TH1F* h_weights1 = new TH1F("h_weights1","",100,-0.0001,0.0008);
+  TH1F* h_weights2 = new TH1F("h_weights2","",100,-0.0001,0.0008);
+  TH1F* h_weights3 = new TH1F("h_weights3","",100,-0.0001,0.0008);
   
 
   TString inFile = "/eos/user/a/acappati/samples_4lX/allsamples/HH4lbb/ZZXAnalysis.root";
@@ -115,7 +119,7 @@ void jetMatchingStudy(){
   inputTree->SetBranchAddress("EventNumber", &nEvent);
   inputTree->SetBranchAddress("LumiNumber", &nLumi);
   inputTree->SetBranchAddress("overallEventWeight", &overallEventWeight);
-  inputTree->SetBranchAddress("xsec", &xsec);
+  //  inputTree->SetBranchAddress("xsec", &xsec);
 
   inputTree->SetBranchAddress("ZZsel", &ZZsel);
   inputTree->SetBranchAddress("LepPt", &LepPt);
@@ -256,6 +260,7 @@ void jetMatchingStudy(){
 
       TLorentzVector Hbb_vec_Method1 = JetVec_Method1.at(d1_Method1) + JetVec_Method1.at(d2_Method1);
       h_bbmass_Method1->Fill(Hbb_vec_Method1.M(), eventWeight);
+      h_weights1->Fill(eventWeight);
 
     } 
     // --- end jet selection METHOD1: 2 high pT jets
@@ -349,7 +354,7 @@ void jetMatchingStudy(){
 
       TLorentzVector Hbb_vec_Method2 = JetVec_Method2.at(d1_Method2) + JetVec_Method2.at(d2_Method2);
       h_bbmass_Method2->Fill(Hbb_vec_Method2.M(), eventWeight);
-
+      h_weights2->Fill(eventWeight);
     } 
     // --- end jet selection METHOD2: 2 high btagger jets
     // ----------------------------------------------
@@ -442,7 +447,7 @@ void jetMatchingStudy(){
 
       TLorentzVector Hbb_vec_Method3 = JetVec_Method3.at(d1_Method3) + JetVec_Method3.at(d2_Method3);
       h_bbmass_Method3->Fill(Hbb_vec_Method3.M(), eventWeight);
-
+      h_weights3->Fill(eventWeight);
     } 
     // --- end jet selection METHOD3: higher btagger jet + higher pT jet
     // ----------------------------------------------
@@ -521,7 +526,8 @@ void jetMatchingStudy(){
 
 
   //get yields
-  cout<<"yields"<<h_bbmass_Method1->Integral()<<" "<<h_bbmass_Method2->Integral()<<" "<<h_bbmass_Method3->Integral()<<endl;
+  cout<<"yields "<<h_bbmass_Method1->Integral(0,-1)<<" "<<h_bbmass_Method2->Integral(0,-1)<<" "<<h_bbmass_Method3->Integral(0,-1)<<endl;
+  cout<<"entries "<<h_bbmass_Method1->GetEntries()<<" "<<h_bbmass_Method2->GetEntries()<<" "<<h_bbmass_Method3->GetEntries()<<endl;
 
   // bbmass
   TCanvas* c_Massbb = new TCanvas();
@@ -556,5 +562,16 @@ void jetMatchingStudy(){
 
 
 
+  //weights
+  TCanvas* c_weights = new TCanvas();
+  c_weights->cd();
+  h_weights1->SetLineColor(kBlue);
+  h_weights1->Draw("hist");
+  h_weights2->SetLineColor(kRed);
+  h_weights2->Draw("hist");
+  h_weights3->SetLineColor(kGreen+3);
+  h_weights3->Draw("hist");
+
+  c_weights->SaveAs("weights.png");
 
 }

@@ -64,7 +64,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
   Long64_t nEvent;
   Int_t nLumi;
   Float_t overallEventWeight;
-  Float_t xsec;
+  Float_t xsec = 0.00001017; //pb Angela
 
   Float_t KFactor_QCD_ggZZ_Nominal;
   Float_t KFactor_EW_qqZZ;
@@ -114,7 +114,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     inputTree->SetBranchAddress("EventNumber", &nEvent);
     inputTree->SetBranchAddress("LumiNumber", &nLumi);
     if (!isDATA) inputTree->SetBranchAddress("overallEventWeight", &overallEventWeight);
-    if (!isDATA) inputTree->SetBranchAddress("xsec", &xsec);
+    //    if (!isDATA) inputTree->SetBranchAddress("xsec", &xsec);
   }
   if(isZX){ inputTree->SetBranchAddress("weight", &weight); }
   inputTree->SetBranchAddress("ZZsel", &ZZsel);
@@ -291,7 +291,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
       
   
       // get and save vector with max btagger value
-      f_bdiscjet1signal_4mu = *max_element(JetBinfo.begin(), JetBinfo.end());
+      f_bdiscjet1signal = *max_element(JetBinfo.begin(), JetBinfo.end());
   
       // get and save btagger value of the second jet (the one with max pt)
       int d1_maxbtag = distance( JetBinfo.begin(), max_element(JetBinfo.begin(), JetBinfo.end()));
@@ -448,7 +448,7 @@ void prepareNtupleMVA()
   cout<< "number of input files: " << nInputFiles<<endl;
 
 
-  string outputFilePath = "200204_mvaNtuples_4mu";
+  string outputFilePath = "200204_mvaNtuples_1bjet1Pt_4mu";
   gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
 
 
