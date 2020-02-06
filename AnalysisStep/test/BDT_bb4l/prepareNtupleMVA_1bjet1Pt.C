@@ -32,7 +32,7 @@
 
 using namespace std;
 
-#define JETSELECTION 0
+#define JETSELECTION 1
 #define MERGE2E2MU 1
 
 enum FinalState {fs_4mu=0, fs_4e=1, fs_2e2mu=2, fs_2mu2e=3};  // 4mu, 4e, 2e2mu, 2mu2e
@@ -46,10 +46,13 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 
   bool isDATA = false;
   bool isZX   = false;
+  bool isHH   = false;
   if ( inFile.Contains("AllData") ) isDATA = true;
-  if ( inFile.Contains("Z+X") ) isZX   = true;
+  if ( inFile.Contains("Z+X") )     isZX   = true;
+  if ( inFile.Contains("HH4lbb") )  isHH   = true;
   cout<<"isDATA "<<isDATA<<endl;
   cout<<"isZX "<<isZX<<endl;
+  cout<<"isHH "<<isHH<<endl;
 
   // input file branches
   TFile* inputFile;
@@ -64,7 +67,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
   Long64_t nEvent;
   Int_t nLumi;
   Float_t overallEventWeight;
-  Float_t xsec = 0.00001017; //pb Angela
+  Float_t xsec = 1.; 
 
   Float_t KFactor_QCD_ggZZ_Nominal;
   Float_t KFactor_EW_qqZZ;
@@ -114,7 +117,9 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     inputTree->SetBranchAddress("EventNumber", &nEvent);
     inputTree->SetBranchAddress("LumiNumber", &nLumi);
     if (!isDATA) inputTree->SetBranchAddress("overallEventWeight", &overallEventWeight);
-    //    if (!isDATA) inputTree->SetBranchAddress("xsec", &xsec);
+    if (!isDATA && !isHH ) inputTree->SetBranchAddress("xsec", &xsec);
+    if (isHH) xsec = 0.00001017; // fb Angela
+    cout<<" xsec "<<xsec<<endl; 
   }
   if(isZX){ inputTree->SetBranchAddress("weight", &weight); }
   inputTree->SetBranchAddress("ZZsel", &ZZsel);
@@ -254,10 +259,10 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 
 
     //save only events for 1 final state at the time
-    //    if(currentFinalState != fs_4mu)   continue;  // save 4mu only
-    //    if(currentFinalState != fs_4e)    continue;  // save 4e only
-    if(currentFinalState != fs_2e2mu) continue;  // save 2e2mu only
-    cout<<currentFinalState<<endl;
+    //if(currentFinalState != fs_4mu)   continue;  // save 4mu only
+    if(currentFinalState != fs_4e)    continue;  // save 4e only
+    //if(currentFinalState != fs_2e2mu) continue;  // save 2e2mu only
+    //    cout<<currentFinalState<<endl;
 
 
     // mass cut: signal region
@@ -361,6 +366,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     if(!isDATA && !isZX) eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight;
     if(isZX) eventWeight = weight; //ZX weight
 
+    cout<<" -- xsec "<<xsec<<endl;
 
 
     // save Z1 and Z2 mass
@@ -448,7 +454,7 @@ void prepareNtupleMVA_1bjet1Pt()
   cout<< "number of input files: " << nInputFiles<<endl;
 
 
-  string outputFilePath = "200204_mvaNtuples_1bjet1Pt_2e2mu";
+  string outputFilePath = "200206_mvaNtuples_1bjet1Pt_4e";
   gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
 
 
