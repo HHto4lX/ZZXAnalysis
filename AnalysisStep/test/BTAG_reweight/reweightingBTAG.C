@@ -47,7 +47,7 @@ void reweightingBTAG(){
   // set up calibration + reader
   cout << "Loading the .csv file..." << endl;
     
-  std::string inputCSVfile = "../../data/BTagging/DeepCSV_102XSF_V1.csv ";  
+  std::string inputCSVfile = "../../data/BTagging/DeepCSV_102XSF_V1.csv";  
   std::string measType = "iterativefit";
   std::string sysType = "central";
   std::string sysTypeJESUp = "up_jes";
