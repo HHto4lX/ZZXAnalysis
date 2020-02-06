@@ -47,27 +47,27 @@ void reweightingBTAG(){
   // set up calibration + reader
   cout << "Loading the .csv file..." << endl;
     
-  std::string inputCSVfile = "../../data/BTagging/DeepCSV_102XSF_V1.csv";  
-  std::string measType = "iterativefit";
-  std::string sysType = "central";
-  std::string sysTypeJESUp = "up_jes";
-  std::string sysTypeJESDown = "down_jes";
-  std::string sysTypeHFUp = "up_hf";
-  std::string sysTypeHFDown = "down_hf";
-  std::string sysTypeLFUp = "up_lf";
-  std::string sysTypeLFDown = "down_lf";
-  std::string sysTypehfstats1Up = "up_hfstats1";
+  std::string inputCSVfile        = "../../data/BTagging/DeepCSV_102XSF_V1.csv";  
+  std::string measType            = "iterativefit";
+  std::string sysType             = "central";
+  std::string sysTypeJESUp        = "up_jes";
+  std::string sysTypeJESDown      = "down_jes";
+  std::string sysTypeHFUp         = "up_hf";
+  std::string sysTypeHFDown       = "down_hf";
+  std::string sysTypeLFUp         = "up_lf";
+  std::string sysTypeLFDown       = "down_lf";
+  std::string sysTypehfstats1Up   = "up_hfstats1";
   std::string sysTypehfstats1Down = "down_hfstats1";
-  std::string sysTypehfstats2Up = "up_hfstats2";
+  std::string sysTypehfstats2Up   = "up_hfstats2";
   std::string sysTypehfstats2Down = "down_hfstats2";
-  std::string sysTypelfstats1Up = "up_lfstats1";
+  std::string sysTypelfstats1Up   = "up_lfstats1";
   std::string sysTypelfstats1Down = "down_lfstats1";
-  std::string sysTypelfstats2Up = "up_lfstats2";
+  std::string sysTypelfstats2Up   = "up_lfstats2";
   std::string sysTypelfstats2Down = "down_lfstats2";
-  std::string sysTypecfErr1Up = "up_cferr1";
-  std::string sysTypecfErr1Down = "down_cferr1";
-  std::string sysTypecfErr2Up = "up_cferr2";
-  std::string sysTypecfErr2Down = "down_cferr2";
+  std::string sysTypecfErr1Up     = "up_cferr1";
+  std::string sysTypecfErr1Down   = "down_cferr1";
+  std::string sysTypecfErr2Up     = "up_cferr2";
+  std::string sysTypecfErr2Down   = "down_cferr2";
     
   BTagCalibration calib("csvv2", inputCSVfile);
   //nominal
@@ -190,7 +190,7 @@ void reweightingBTAG(){
   Int_t nLumi;
   Float_t overallEventWeight;
   //  Float_t xsec = 0.0000447896; //pb
-  Float_t xsec = 0.00001017; //pb Angela
+  Float_t xsec; 
 
   Short_t ZZsel;
   vector<Float_t> *LepPt = 0;
@@ -224,7 +224,8 @@ void reweightingBTAG(){
   inputTree->SetBranchAddress("EventNumber", &nEvent);
   inputTree->SetBranchAddress("LumiNumber", &nLumi);
   inputTree->SetBranchAddress("overallEventWeight", &overallEventWeight);
-  //  inputTree->SetBranchAddress("xsec", &xsec);
+  //  inputTree->SetBranchAddress("xsec", &xsec)
+  xsec = 0.00001017; //pb Angela
 
   inputTree->SetBranchAddress("ZZsel", &ZZsel);
   inputTree->SetBranchAddress("LepPt", &LepPt);
@@ -268,10 +269,10 @@ void reweightingBTAG(){
 
     // jet in the acceptance
     vector<TLorentzVector> JetVec_; 
-    vector<float> JetpT_; 
-    vector<float> Jeteta_; 
-    vector<float> Jethadronflavour_; 
-    vector<float> JetBtagger_; 
+    vector<float>          JetpT_; 
+    vector<float>          Jeteta_; 
+    vector<float>          Jethadronflavour_; 
+    vector<float>          JetBtagger_; 
 
     int d1_ = -999; // position of higest btagger jet
     int d2_ = -999; // position of highest pT jet
@@ -283,22 +284,25 @@ void reweightingBTAG(){
 	  
       TLorentzVector temp;
       temp.SetPtEtaPhiM(JetPt->at(j), JetEta->at(j), JetPhi->at(j), JetMass->at(j));
-      JetVec_.push_back(temp);
-      JetpT_.push_back(JetPt->at(j));
-      Jeteta_.push_back(JetEta->at(j));
+      JetVec_          .push_back(temp);
+      JetpT_           .push_back(JetPt->at(j));
+      Jeteta_          .push_back(JetEta->at(j));
       Jethadronflavour_.push_back(JetHadronFlavour->at(j));
-      JetBtagger_.push_back(JetBTagger->at(j));
+      JetBtagger_      .push_back(JetBTagger->at(j));
     }
 
 
     // at least 2 jets in the acceptance
-    if (JetVec_.size() >= 2){
-
-      cout<<"ciao"<<endl;
-
-    } 
+    if (JetVec_.size() < 2) continue;
 
 
+    cout<<"ciao"<<endl;
+
+
+    double * scaleFactors;
+    scaleFactors = evalEventSF( int(JetVec_.size()), Jethadronflavour_, Jeteta_, JetpT_, JetBtagger_, CSVreader, CSVreaderJESUp, CSVreaderJESDown, CSVreaderHFUp, CSVreaderHFDown, CSVreaderLFUp, CSVreaderLFDown, CSVreaderhfstats1Up, CSVreaderhfstats1Down, CSVreaderhfstats2Up, CSVreaderhfstats2Down, CSVreaderlfstats1Up, CSVreaderlfstats1Down, CSVreaderlfstats2Up, CSVreaderlfstats2Down, CSVreadercfErr1Up, CSVreadercfErr1Down, CSVreadercfErr2Up, CSVreadercfErr2Down );
+
+    cout<<"SF "<<scaleFactors[0]<<endl;
 
     // fill eventweight
     Double_t eventWeight = partialSampleWeight * xsec * overallEventWeight ;  //kfactor e l1prefiring non ci sono, tanto uso solo HH sample

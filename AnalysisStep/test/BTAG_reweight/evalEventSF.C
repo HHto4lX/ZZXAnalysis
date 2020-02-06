@@ -1,4 +1,4 @@
-double * evalEventSF( int nAK4Jets, int nAK8Jets, vector<float> * AK4JetFlavor, vector<float> * AK4JetEta, vector<float> * AK4JetPt, vector<float> * AK4JetBtag, vector<float> * Sub0Eta, vector<float> * Sub0Pt, vector<float> * Sub0Btag,  vector<float> * Sub0Flavor, vector<float> * Sub1Eta, vector<float> * Sub1Pt, vector<float> * Sub1Btag, vector<float> * Sub1Flavor, BTagCalibrationReader CSV_nominal, BTagCalibrationReader CSV_JESUp, BTagCalibrationReader CSV_JESDown, BTagCalibrationReader CSV_HFUp, BTagCalibrationReader CSV_HFDown, BTagCalibrationReader CSV_LFUp, BTagCalibrationReader CSV_LFDown, BTagCalibrationReader CSV_hfstats1Up, BTagCalibrationReader CSV_hfstats1Down, BTagCalibrationReader CSV_hfstats2Up, BTagCalibrationReader CSV_hfstats2Down, BTagCalibrationReader CSV_lfstats1Up, BTagCalibrationReader CSV_lfstats1Down, BTagCalibrationReader CSV_lfstats2Up, BTagCalibrationReader CSV_lfstats2Down, BTagCalibrationReader CSV_cfErr1Up, BTagCalibrationReader CSV_cfErr1Down, BTagCalibrationReader CSV_cfErr2Up, BTagCalibrationReader CSV_cfErr2Down ) {
+double * evalEventSF( int nAK4Jets, vector<float> AK4JetFlavor, vector<float> AK4JetEta, vector<float> AK4JetPt, vector<float> AK4JetBtag, BTagCalibrationReader CSV_nominal, BTagCalibrationReader CSV_JESUp, BTagCalibrationReader CSV_JESDown, BTagCalibrationReader CSV_HFUp, BTagCalibrationReader CSV_HFDown, BTagCalibrationReader CSV_LFUp, BTagCalibrationReader CSV_LFDown, BTagCalibrationReader CSV_hfstats1Up, BTagCalibrationReader CSV_hfstats1Down, BTagCalibrationReader CSV_hfstats2Up, BTagCalibrationReader CSV_hfstats2Down, BTagCalibrationReader CSV_lfstats1Up, BTagCalibrationReader CSV_lfstats1Down, BTagCalibrationReader CSV_lfstats2Up, BTagCalibrationReader CSV_lfstats2Down, BTagCalibrationReader CSV_cfErr1Up, BTagCalibrationReader CSV_cfErr1Down, BTagCalibrationReader CSV_cfErr2Up, BTagCalibrationReader CSV_cfErr2Down ) {
     
         double * output;
         output = new double[22]; //returned by evalEventSF
@@ -197,59 +197,59 @@ double * evalEventSF( int nAK4Jets, int nAK8Jets, vector<float> * AK4JetFlavor, 
         
             for (int i = 0; i < nAK4Jets; i++) {
                 
-                if ( fabs(AK4JetFlavor->at(i)) == 5 ) { /*b flavor*/
+                if ( fabs(AK4JetFlavor.at(i)) == 5 ) { /*b flavor*/
                     
                     nB++;
                 
-                    double mycsv_weight_BF_ak4 = CSV_nominal.eval(BTagEntry::FLAV_B, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_BF_ak4JESUp = CSV_JESUp.eval(BTagEntry::FLAV_B, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_BF_ak4JESDown = CSV_JESDown.eval(BTagEntry::FLAV_B, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_BF_ak4HFUp = CSV_HFUp.eval(BTagEntry::FLAV_B, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_BF_ak4HFDown = CSV_HFDown.eval(BTagEntry::FLAV_B, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_BF_ak4LFUp = CSV_LFUp.eval(BTagEntry::FLAV_B, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_BF_ak4LFDown = CSV_LFDown.eval(BTagEntry::FLAV_B, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_BF_ak4hfstats1Up = CSV_hfstats1Up.eval(BTagEntry::FLAV_B, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_BF_ak4hfstats1Down = CSV_hfstats1Down.eval(BTagEntry::FLAV_B, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_BF_ak4hfstats2Up = CSV_hfstats2Up.eval(BTagEntry::FLAV_B, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_BF_ak4hfstats2Down = CSV_hfstats2Down.eval(BTagEntry::FLAV_B, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_BF_ak4lfstats1Up = CSV_lfstats1Up.eval(BTagEntry::FLAV_B, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_BF_ak4lfstats1Down = CSV_lfstats1Down.eval(BTagEntry::FLAV_B, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_BF_ak4lfstats2Up = CSV_lfstats2Up.eval(BTagEntry::FLAV_B, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_BF_ak4lfstats2Down = CSV_lfstats2Down.eval(BTagEntry::FLAV_B, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_BF_ak4             = CSV_nominal.eval(BTagEntry::FLAV_B,      fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_BF_ak4JESUp        = CSV_JESUp.eval(BTagEntry::FLAV_B,        fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_BF_ak4JESDown      = CSV_JESDown.eval(BTagEntry::FLAV_B,      fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_BF_ak4HFUp         = CSV_HFUp.eval(BTagEntry::FLAV_B,         fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_BF_ak4HFDown       = CSV_HFDown.eval(BTagEntry::FLAV_B,       fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_BF_ak4LFUp         = CSV_LFUp.eval(BTagEntry::FLAV_B,         fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_BF_ak4LFDown       = CSV_LFDown.eval(BTagEntry::FLAV_B,       fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_BF_ak4hfstats1Up   = CSV_hfstats1Up.eval(BTagEntry::FLAV_B,   fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_BF_ak4hfstats1Down = CSV_hfstats1Down.eval(BTagEntry::FLAV_B, fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_BF_ak4hfstats2Up   = CSV_hfstats2Up.eval(BTagEntry::FLAV_B,   fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_BF_ak4hfstats2Down = CSV_hfstats2Down.eval(BTagEntry::FLAV_B, fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_BF_ak4lfstats1Up   = CSV_lfstats1Up.eval(BTagEntry::FLAV_B,   fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_BF_ak4lfstats1Down = CSV_lfstats1Down.eval(BTagEntry::FLAV_B, fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_BF_ak4lfstats2Up   = CSV_lfstats2Up.eval(BTagEntry::FLAV_B,   fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_BF_ak4lfstats2Down = CSV_lfstats2Down.eval(BTagEntry::FLAV_B, fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
                     //no cfErr is computed for b-flavored jets
                     
-                    if (mycsv_weight_BF_ak4 != 0) csv_weight_BF_ak4 *= mycsv_weight_BF_ak4;
-                    if (mycsv_weight_BF_ak4JESUp != 0) csv_weight_BF_ak4JESUp *= mycsv_weight_BF_ak4JESUp;
-                    if (mycsv_weight_BF_ak4JESDown != 0) csv_weight_BF_ak4JESDown *= mycsv_weight_BF_ak4JESDown;
-                    if (mycsv_weight_BF_ak4HFUp != 0) csv_weight_BF_ak4HFUp *= mycsv_weight_BF_ak4HFUp;
-                    if (mycsv_weight_BF_ak4HFDown != 0) csv_weight_BF_ak4HFDown *= mycsv_weight_BF_ak4HFDown;
-                    if (mycsv_weight_BF_ak4LFUp != 0) csv_weight_BF_ak4LFUp *= mycsv_weight_BF_ak4LFUp;
-                    if (mycsv_weight_BF_ak4LFDown != 0) csv_weight_BF_ak4LFDown *= mycsv_weight_BF_ak4LFDown;
-                    if (mycsv_weight_BF_ak4hfstats1Up != 0) csv_weight_BF_ak4hfstats1Up *= mycsv_weight_BF_ak4hfstats1Up;
+                    if (mycsv_weight_BF_ak4 != 0)             csv_weight_BF_ak4             *= mycsv_weight_BF_ak4;
+                    if (mycsv_weight_BF_ak4JESUp != 0)        csv_weight_BF_ak4JESUp        *= mycsv_weight_BF_ak4JESUp;
+                    if (mycsv_weight_BF_ak4JESDown != 0)      csv_weight_BF_ak4JESDown      *= mycsv_weight_BF_ak4JESDown;
+                    if (mycsv_weight_BF_ak4HFUp != 0)         csv_weight_BF_ak4HFUp         *= mycsv_weight_BF_ak4HFUp;
+                    if (mycsv_weight_BF_ak4HFDown != 0)       csv_weight_BF_ak4HFDown       *= mycsv_weight_BF_ak4HFDown;
+                    if (mycsv_weight_BF_ak4LFUp != 0)         csv_weight_BF_ak4LFUp         *= mycsv_weight_BF_ak4LFUp;
+                    if (mycsv_weight_BF_ak4LFDown != 0)       csv_weight_BF_ak4LFDown       *= mycsv_weight_BF_ak4LFDown;
+                    if (mycsv_weight_BF_ak4hfstats1Up != 0)   csv_weight_BF_ak4hfstats1Up   *= mycsv_weight_BF_ak4hfstats1Up;
                     if (mycsv_weight_BF_ak4hfstats1Down != 0) csv_weight_BF_ak4hfstats1Down *= mycsv_weight_BF_ak4hfstats1Down;
-                    if (mycsv_weight_BF_ak4hfstats2Up != 0) csv_weight_BF_ak4hfstats2Up *= mycsv_weight_BF_ak4hfstats2Up;
+                    if (mycsv_weight_BF_ak4hfstats2Up != 0)   csv_weight_BF_ak4hfstats2Up   *= mycsv_weight_BF_ak4hfstats2Up;
                     if (mycsv_weight_BF_ak4hfstats2Down != 0) csv_weight_BF_ak4hfstats2Down *= mycsv_weight_BF_ak4hfstats2Down;
-                    if (mycsv_weight_BF_ak4lfstats1Up != 0) csv_weight_BF_ak4lfstats1Up *= mycsv_weight_BF_ak4lfstats1Up;
+                    if (mycsv_weight_BF_ak4lfstats1Up != 0)   csv_weight_BF_ak4lfstats1Up   *= mycsv_weight_BF_ak4lfstats1Up;
                     if (mycsv_weight_BF_ak4lfstats1Down != 0) csv_weight_BF_ak4lfstats1Down *= mycsv_weight_BF_ak4lfstats1Down;
-                    if (mycsv_weight_BF_ak4lfstats2Up != 0) csv_weight_BF_ak4lfstats2Up *= mycsv_weight_BF_ak4lfstats2Up;
+                    if (mycsv_weight_BF_ak4lfstats2Up != 0)   csv_weight_BF_ak4lfstats2Up   *= mycsv_weight_BF_ak4lfstats2Up;
                     if (mycsv_weight_BF_ak4lfstats2Down != 0) csv_weight_BF_ak4lfstats2Down *= mycsv_weight_BF_ak4lfstats2Down;
                 }
                 
-                else if ( fabs(AK4JetFlavor->at(i)) == 4 ) { /*c flavor*/
+                else if ( fabs(AK4JetFlavor.at(i)) == 4 ) { /*c flavor*/
                     
                     nC++;
                 
-                    double mycsv_weight_CF_ak4 = CSV_nominal.eval(BTagEntry::FLAV_C, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_CF_ak4cfErr1Up = CSV_cfErr1Up.eval(BTagEntry::FLAV_C, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_CF_ak4cfErr1Down = CSV_cfErr1Down.eval(BTagEntry::FLAV_C, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_CF_ak4cfErr2Up = CSV_cfErr2Up.eval(BTagEntry::FLAV_C, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_CF_ak4cfErr2Down = CSV_cfErr2Down.eval(BTagEntry::FLAV_C, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_CF_ak4           = CSV_nominal.eval(BTagEntry::FLAV_C,    fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_CF_ak4cfErr1Up   = CSV_cfErr1Up.eval(BTagEntry::FLAV_C,   fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_CF_ak4cfErr1Down = CSV_cfErr1Down.eval(BTagEntry::FLAV_C, fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_CF_ak4cfErr2Up   = CSV_cfErr2Up.eval(BTagEntry::FLAV_C,   fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_CF_ak4cfErr2Down = CSV_cfErr2Down.eval(BTagEntry::FLAV_C, fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
                     //for c-flavored jets only the cfErr uncertainty is applied
                     
-                    if (mycsv_weight_CF_ak4 != 0) csv_weight_CF_ak4 *= mycsv_weight_CF_ak4;
-                    if (mycsv_weight_CF_ak4cfErr1Up != 0) csv_weight_CF_ak4cfErr1Up *= mycsv_weight_CF_ak4cfErr1Up;
+                    if (mycsv_weight_CF_ak4 != 0)           csv_weight_CF_ak4           *= mycsv_weight_CF_ak4;
+                    if (mycsv_weight_CF_ak4cfErr1Up != 0)   csv_weight_CF_ak4cfErr1Up   *= mycsv_weight_CF_ak4cfErr1Up;
                     if (mycsv_weight_CF_ak4cfErr1Down != 0) csv_weight_CF_ak4cfErr1Down *= mycsv_weight_CF_ak4cfErr1Down;
-                    if (mycsv_weight_CF_ak4cfErr2Up != 0) csv_weight_CF_ak4cfErr2Up *= mycsv_weight_CF_ak4cfErr2Up;
+                    if (mycsv_weight_CF_ak4cfErr2Up != 0)   csv_weight_CF_ak4cfErr2Up   *= mycsv_weight_CF_ak4cfErr2Up;
                     if (mycsv_weight_CF_ak4cfErr2Down != 0) csv_weight_CF_ak4cfErr2Down *= mycsv_weight_CF_ak4cfErr2Down;
                 
                 }
@@ -258,37 +258,37 @@ double * evalEventSF( int nAK4Jets, int nAK8Jets, vector<float> * AK4JetFlavor, 
                     
                     nL++;
                 
-                    double mycsv_weight_LF_ak4 = CSV_nominal.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_LF_ak4JESUp = CSV_JESUp.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_LF_ak4JESDown = CSV_JESDown.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_LF_ak4HFUp = CSV_HFUp.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_LF_ak4HFDown = CSV_HFDown.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_LF_ak4LFUp = CSV_LFUp.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_LF_ak4LFDown = CSV_LFDown.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_LF_ak4hfstats1Up = CSV_hfstats1Up.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_LF_ak4hfstats1Down = CSV_hfstats1Down.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_LF_ak4hfstats2Up = CSV_hfstats2Up.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_LF_ak4hfstats2Down = CSV_hfstats2Down.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_LF_ak4lfstats1Up = CSV_lfstats1Up.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_LF_ak4lfstats1Down = CSV_lfstats1Down.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_LF_ak4lfstats2Up = CSV_lfstats2Up.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
-                    double mycsv_weight_LF_ak4lfstats2Down = CSV_lfstats2Down.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_LF_ak4             = CSV_nominal.eval(BTagEntry::FLAV_UDSG,      fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_LF_ak4JESUp        = CSV_JESUp.eval(BTagEntry::FLAV_UDSG,        fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_LF_ak4JESDown      = CSV_JESDown.eval(BTagEntry::FLAV_UDSG,      fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_LF_ak4HFUp         = CSV_HFUp.eval(BTagEntry::FLAV_UDSG,         fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_LF_ak4HFDown       = CSV_HFDown.eval(BTagEntry::FLAV_UDSG,       fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_LF_ak4LFUp         = CSV_LFUp.eval(BTagEntry::FLAV_UDSG,         fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_LF_ak4LFDown       = CSV_LFDown.eval(BTagEntry::FLAV_UDSG,       fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_LF_ak4hfstats1Up   = CSV_hfstats1Up.eval(BTagEntry::FLAV_UDSG,   fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_LF_ak4hfstats1Down = CSV_hfstats1Down.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_LF_ak4hfstats2Up   = CSV_hfstats2Up.eval(BTagEntry::FLAV_UDSG,   fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_LF_ak4hfstats2Down = CSV_hfstats2Down.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_LF_ak4lfstats1Up   = CSV_lfstats1Up.eval(BTagEntry::FLAV_UDSG,   fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_LF_ak4lfstats1Down = CSV_lfstats1Down.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_LF_ak4lfstats2Up   = CSV_lfstats2Up.eval(BTagEntry::FLAV_UDSG,   fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_LF_ak4lfstats2Down = CSV_lfstats2Down.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
                     //no cfErr is computed for light-flavored jets
                     
-                    if (mycsv_weight_LF_ak4 != 0) csv_weight_LF_ak4 *= mycsv_weight_LF_ak4;
-                    if (mycsv_weight_LF_ak4JESUp != 0) csv_weight_LF_ak4JESUp *= mycsv_weight_LF_ak4JESUp;
-                    if (mycsv_weight_LF_ak4JESDown != 0) csv_weight_LF_ak4JESDown *= mycsv_weight_LF_ak4JESDown;
-                    if (mycsv_weight_LF_ak4HFUp != 0) csv_weight_LF_ak4HFUp *= mycsv_weight_LF_ak4HFUp;
-                    if (mycsv_weight_LF_ak4HFDown != 0) csv_weight_LF_ak4HFDown *= mycsv_weight_LF_ak4HFDown;
-                    if (mycsv_weight_LF_ak4LFUp != 0) csv_weight_LF_ak4LFUp *= mycsv_weight_LF_ak4LFUp;
-                    if (mycsv_weight_LF_ak4LFDown != 0) csv_weight_LF_ak4LFDown *= mycsv_weight_LF_ak4LFDown;
-                    if (mycsv_weight_LF_ak4hfstats1Up != 0) csv_weight_LF_ak4hfstats1Up *= mycsv_weight_LF_ak4hfstats1Up;
+                    if (mycsv_weight_LF_ak4 != 0)             csv_weight_LF_ak4 *= mycsv_weight_LF_ak4;
+                    if (mycsv_weight_LF_ak4JESUp != 0)        csv_weight_LF_ak4JESUp *= mycsv_weight_LF_ak4JESUp;
+                    if (mycsv_weight_LF_ak4JESDown != 0)      csv_weight_LF_ak4JESDown *= mycsv_weight_LF_ak4JESDown;
+                    if (mycsv_weight_LF_ak4HFUp != 0)         csv_weight_LF_ak4HFUp *= mycsv_weight_LF_ak4HFUp;
+                    if (mycsv_weight_LF_ak4HFDown != 0)       csv_weight_LF_ak4HFDown *= mycsv_weight_LF_ak4HFDown;
+                    if (mycsv_weight_LF_ak4LFUp != 0)         csv_weight_LF_ak4LFUp *= mycsv_weight_LF_ak4LFUp;
+                    if (mycsv_weight_LF_ak4LFDown != 0)       csv_weight_LF_ak4LFDown *= mycsv_weight_LF_ak4LFDown;
+                    if (mycsv_weight_LF_ak4hfstats1Up != 0)   csv_weight_LF_ak4hfstats1Up *= mycsv_weight_LF_ak4hfstats1Up;
                     if (mycsv_weight_LF_ak4hfstats1Down != 0) csv_weight_LF_ak4hfstats1Down *= mycsv_weight_LF_ak4hfstats1Down;
-                    if (mycsv_weight_LF_ak4hfstats2Up != 0) csv_weight_LF_ak4hfstats2Up *= mycsv_weight_LF_ak4hfstats2Up;
+                    if (mycsv_weight_LF_ak4hfstats2Up != 0)   csv_weight_LF_ak4hfstats2Up *= mycsv_weight_LF_ak4hfstats2Up;
                     if (mycsv_weight_LF_ak4hfstats2Down != 0) csv_weight_LF_ak4hfstats2Down *= mycsv_weight_LF_ak4hfstats2Down;
-                    if (mycsv_weight_LF_ak4lfstats1Up != 0) csv_weight_LF_ak4lfstats1Up *= mycsv_weight_LF_ak4lfstats1Up;
+                    if (mycsv_weight_LF_ak4lfstats1Up != 0)   csv_weight_LF_ak4lfstats1Up *= mycsv_weight_LF_ak4lfstats1Up;
                     if (mycsv_weight_LF_ak4lfstats1Down != 0) csv_weight_LF_ak4lfstats1Down *= mycsv_weight_LF_ak4lfstats1Down;
-                    if (mycsv_weight_LF_ak4lfstats2Up != 0) csv_weight_LF_ak4lfstats2Up *= mycsv_weight_LF_ak4lfstats2Up;
+                    if (mycsv_weight_LF_ak4lfstats2Up != 0)   csv_weight_LF_ak4lfstats2Up *= mycsv_weight_LF_ak4lfstats2Up;
                     if (mycsv_weight_LF_ak4lfstats2Down != 0) csv_weight_LF_ak4lfstats2Down *= mycsv_weight_LF_ak4lfstats2Down;
                 
                 }
@@ -319,231 +319,231 @@ double * evalEventSF( int nAK4Jets, int nAK8Jets, vector<float> * AK4JetFlavor, 
             
             
             
-            //loop over AK8 jets and compute scale factors depending on subjet flavor, absolute value of subjet eta, subjet pt, subjet CSV score
+            // //loop over AK8 jets and compute scale factors depending on subjet flavor, absolute value of subjet eta, subjet pt, subjet CSV score
          
-            //first subjet
-            for (int i = 0; i < nAK8Jets; i++) {
+            // //first subjet
+            // for (int i = 0; i < nAK8Jets; i++) {
                 
-                if ( fabs(Sub0Flavor->at(i)) == 5 ) { /*b flavor*/
+            //     if ( fabs(Sub0Flavor->at(i)) == 5 ) { /*b flavor*/
                     
-                    nB++;
+            //         nB++;
                 
-                    double mycsv_weight_BF_ak8 = CSV_nominal.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_BF_ak8JESUp = CSV_JESUp.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_BF_ak8JESDown = CSV_JESDown.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_BF_ak8HFUp = CSV_HFUp.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_BF_ak8HFDown = CSV_HFDown.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_BF_ak8LFUp = CSV_LFUp.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_BF_ak8LFDown = CSV_LFDown.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_BF_ak8hfstats1Up = CSV_hfstats1Up.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_BF_ak8hfstats1Down = CSV_hfstats1Down.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_BF_ak8hfstats2Up = CSV_hfstats2Up.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_BF_ak8hfstats2Down = CSV_hfstats2Down.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_BF_ak8lfstats1Up = CSV_lfstats1Up.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_BF_ak8lfstats1Down = CSV_lfstats1Down.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_BF_ak8lfstats2Up = CSV_lfstats2Up.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_BF_ak8lfstats2Down = CSV_lfstats2Down.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    //no cfErr is computed for b-flavored subjets
+            //         double mycsv_weight_BF_ak8 = CSV_nominal.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_BF_ak8JESUp = CSV_JESUp.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_BF_ak8JESDown = CSV_JESDown.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_BF_ak8HFUp = CSV_HFUp.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_BF_ak8HFDown = CSV_HFDown.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_BF_ak8LFUp = CSV_LFUp.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_BF_ak8LFDown = CSV_LFDown.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_BF_ak8hfstats1Up = CSV_hfstats1Up.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_BF_ak8hfstats1Down = CSV_hfstats1Down.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_BF_ak8hfstats2Up = CSV_hfstats2Up.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_BF_ak8hfstats2Down = CSV_hfstats2Down.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_BF_ak8lfstats1Up = CSV_lfstats1Up.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_BF_ak8lfstats1Down = CSV_lfstats1Down.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_BF_ak8lfstats2Up = CSV_lfstats2Up.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_BF_ak8lfstats2Down = CSV_lfstats2Down.eval(BTagEntry::FLAV_B, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         //no cfErr is computed for b-flavored subjets
                     
-                    if (mycsv_weight_BF_ak8 != 0) csv_weight_BF_ak8 *= mycsv_weight_BF_ak8;
-                    if (mycsv_weight_BF_ak8JESUp != 0) csv_weight_BF_ak8JESUp *= mycsv_weight_BF_ak8JESUp;
-                    if (mycsv_weight_BF_ak8JESDown != 0) csv_weight_BF_ak8JESDown *= mycsv_weight_BF_ak8JESDown;
-                    if (mycsv_weight_BF_ak8HFUp != 0) csv_weight_BF_ak8HFUp *= mycsv_weight_BF_ak8HFUp;
-                    if (mycsv_weight_BF_ak8HFDown != 0) csv_weight_BF_ak8HFDown *= mycsv_weight_BF_ak8HFDown;
-                    if (mycsv_weight_BF_ak8LFUp != 0) csv_weight_BF_ak8LFUp *= mycsv_weight_BF_ak8LFUp;
-                    if (mycsv_weight_BF_ak8LFDown != 0) csv_weight_BF_ak8LFDown *= mycsv_weight_BF_ak8LFDown;
-                    if (mycsv_weight_BF_ak8hfstats1Up != 0) csv_weight_BF_ak8hfstats1Up *= mycsv_weight_BF_ak8hfstats1Up;
-                    if (mycsv_weight_BF_ak8hfstats1Down != 0) csv_weight_BF_ak8hfstats1Down *= mycsv_weight_BF_ak8hfstats1Down;
-                    if (mycsv_weight_BF_ak8hfstats2Up != 0) csv_weight_BF_ak8hfstats2Up *= mycsv_weight_BF_ak8hfstats2Up;
-                    if (mycsv_weight_BF_ak8hfstats2Down != 0) csv_weight_BF_ak8hfstats2Down *= mycsv_weight_BF_ak8hfstats2Down;
-                    if (mycsv_weight_BF_ak8lfstats1Up != 0) csv_weight_BF_ak8lfstats1Up *= mycsv_weight_BF_ak8lfstats1Up;
-                    if (mycsv_weight_BF_ak8lfstats1Down != 0) csv_weight_BF_ak8lfstats1Down *= mycsv_weight_BF_ak8lfstats1Down;
-                    if (mycsv_weight_BF_ak8lfstats2Up != 0) csv_weight_BF_ak8lfstats2Up *= mycsv_weight_BF_ak8lfstats2Up;
-                    if (mycsv_weight_BF_ak8lfstats2Down != 0) csv_weight_BF_ak8lfstats2Down *= mycsv_weight_BF_ak8lfstats2Down;
+            //         if (mycsv_weight_BF_ak8 != 0) csv_weight_BF_ak8 *= mycsv_weight_BF_ak8;
+            //         if (mycsv_weight_BF_ak8JESUp != 0) csv_weight_BF_ak8JESUp *= mycsv_weight_BF_ak8JESUp;
+            //         if (mycsv_weight_BF_ak8JESDown != 0) csv_weight_BF_ak8JESDown *= mycsv_weight_BF_ak8JESDown;
+            //         if (mycsv_weight_BF_ak8HFUp != 0) csv_weight_BF_ak8HFUp *= mycsv_weight_BF_ak8HFUp;
+            //         if (mycsv_weight_BF_ak8HFDown != 0) csv_weight_BF_ak8HFDown *= mycsv_weight_BF_ak8HFDown;
+            //         if (mycsv_weight_BF_ak8LFUp != 0) csv_weight_BF_ak8LFUp *= mycsv_weight_BF_ak8LFUp;
+            //         if (mycsv_weight_BF_ak8LFDown != 0) csv_weight_BF_ak8LFDown *= mycsv_weight_BF_ak8LFDown;
+            //         if (mycsv_weight_BF_ak8hfstats1Up != 0) csv_weight_BF_ak8hfstats1Up *= mycsv_weight_BF_ak8hfstats1Up;
+            //         if (mycsv_weight_BF_ak8hfstats1Down != 0) csv_weight_BF_ak8hfstats1Down *= mycsv_weight_BF_ak8hfstats1Down;
+            //         if (mycsv_weight_BF_ak8hfstats2Up != 0) csv_weight_BF_ak8hfstats2Up *= mycsv_weight_BF_ak8hfstats2Up;
+            //         if (mycsv_weight_BF_ak8hfstats2Down != 0) csv_weight_BF_ak8hfstats2Down *= mycsv_weight_BF_ak8hfstats2Down;
+            //         if (mycsv_weight_BF_ak8lfstats1Up != 0) csv_weight_BF_ak8lfstats1Up *= mycsv_weight_BF_ak8lfstats1Up;
+            //         if (mycsv_weight_BF_ak8lfstats1Down != 0) csv_weight_BF_ak8lfstats1Down *= mycsv_weight_BF_ak8lfstats1Down;
+            //         if (mycsv_weight_BF_ak8lfstats2Up != 0) csv_weight_BF_ak8lfstats2Up *= mycsv_weight_BF_ak8lfstats2Up;
+            //         if (mycsv_weight_BF_ak8lfstats2Down != 0) csv_weight_BF_ak8lfstats2Down *= mycsv_weight_BF_ak8lfstats2Down;
                 
-                }
+            //     }
                 
-                else if ( fabs(Sub0Flavor->at(i)) == 4 ) { /*c flavor*/
+            //     else if ( fabs(Sub0Flavor->at(i)) == 4 ) { /*c flavor*/
                     
-                    nC++;
+            //         nC++;
                 
-                    double mycsv_weight_CF_ak8 = CSV_nominal.eval(BTagEntry::FLAV_C, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_CF_ak8cfErr1Up = CSV_cfErr1Up.eval(BTagEntry::FLAV_C, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_CF_ak8cfErr1Down = CSV_cfErr1Down.eval(BTagEntry::FLAV_C, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_CF_ak8cfErr2Up = CSV_cfErr2Up.eval(BTagEntry::FLAV_C, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_CF_ak8cfErr2Down = CSV_cfErr2Down.eval(BTagEntry::FLAV_C, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    //for c-flavored subjets only the cfErr uncertainty is applied
+            //         double mycsv_weight_CF_ak8 = CSV_nominal.eval(BTagEntry::FLAV_C, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_CF_ak8cfErr1Up = CSV_cfErr1Up.eval(BTagEntry::FLAV_C, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_CF_ak8cfErr1Down = CSV_cfErr1Down.eval(BTagEntry::FLAV_C, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_CF_ak8cfErr2Up = CSV_cfErr2Up.eval(BTagEntry::FLAV_C, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_CF_ak8cfErr2Down = CSV_cfErr2Down.eval(BTagEntry::FLAV_C, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         //for c-flavored subjets only the cfErr uncertainty is applied
                     
-                    if (mycsv_weight_CF_ak8 != 0) csv_weight_CF_ak8 *= mycsv_weight_CF_ak8;
-                    if (mycsv_weight_CF_ak8cfErr1Up != 0) csv_weight_CF_ak8cfErr1Up *= mycsv_weight_CF_ak8cfErr1Up;
-                    if (mycsv_weight_CF_ak8cfErr1Down != 0) csv_weight_CF_ak8cfErr1Down *= mycsv_weight_CF_ak8cfErr1Down;
-                    if (mycsv_weight_CF_ak8cfErr2Up != 0) csv_weight_CF_ak8cfErr2Up *= mycsv_weight_CF_ak8cfErr2Up;
-                    if (mycsv_weight_CF_ak8cfErr2Down != 0) csv_weight_CF_ak8cfErr2Down *= mycsv_weight_CF_ak8cfErr2Down;
+            //         if (mycsv_weight_CF_ak8 != 0) csv_weight_CF_ak8 *= mycsv_weight_CF_ak8;
+            //         if (mycsv_weight_CF_ak8cfErr1Up != 0) csv_weight_CF_ak8cfErr1Up *= mycsv_weight_CF_ak8cfErr1Up;
+            //         if (mycsv_weight_CF_ak8cfErr1Down != 0) csv_weight_CF_ak8cfErr1Down *= mycsv_weight_CF_ak8cfErr1Down;
+            //         if (mycsv_weight_CF_ak8cfErr2Up != 0) csv_weight_CF_ak8cfErr2Up *= mycsv_weight_CF_ak8cfErr2Up;
+            //         if (mycsv_weight_CF_ak8cfErr2Down != 0) csv_weight_CF_ak8cfErr2Down *= mycsv_weight_CF_ak8cfErr2Down;
                     
-                }
+            //     }
                 
-                else  { /*light flavor*/
+            //     else  { /*light flavor*/
                     
-                    nL++;
+            //         nL++;
                 
-                    double mycsv_weight_LF_ak8 = CSV_nominal.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_LF_ak8JESUp = CSV_JESUp.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_LF_ak8JESDown = CSV_JESDown.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_LF_ak8HFUp = CSV_HFUp.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_LF_ak8HFDown = CSV_HFDown.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_LF_ak8LFUp = CSV_LFUp.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_LF_ak8LFDown = CSV_LFDown.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_LF_ak8hfstats1Up = CSV_hfstats1Up.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_LF_ak8hfstats1Down = CSV_hfstats1Down.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_LF_ak8hfstats2Up = CSV_hfstats2Up.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_LF_ak8hfstats2Down = CSV_hfstats2Down.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_LF_ak8lfstats1Up = CSV_lfstats1Up.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_LF_ak8lfstats1Down = CSV_lfstats1Down.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_LF_ak8lfstats2Up = CSV_lfstats2Up.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
-                    double mycsv_weight_LF_ak8lfstats2Down = CSV_lfstats2Down.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_LF_ak8 = CSV_nominal.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_LF_ak8JESUp = CSV_JESUp.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_LF_ak8JESDown = CSV_JESDown.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_LF_ak8HFUp = CSV_HFUp.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_LF_ak8HFDown = CSV_HFDown.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_LF_ak8LFUp = CSV_LFUp.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_LF_ak8LFDown = CSV_LFDown.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_LF_ak8hfstats1Up = CSV_hfstats1Up.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_LF_ak8hfstats1Down = CSV_hfstats1Down.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_LF_ak8hfstats2Up = CSV_hfstats2Up.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_LF_ak8hfstats2Down = CSV_hfstats2Down.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_LF_ak8lfstats1Up = CSV_lfstats1Up.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_LF_ak8lfstats1Down = CSV_lfstats1Down.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_LF_ak8lfstats2Up = CSV_lfstats2Up.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
+            //         double mycsv_weight_LF_ak8lfstats2Down = CSV_lfstats2Down.eval(BTagEntry::FLAV_UDSG, fabs(Sub0Eta->at(i)), Sub0Pt->at(i), Sub0Btag->at(i));
                     
-                    if (mycsv_weight_LF_ak8 != 0) csv_weight_LF_ak8 *= mycsv_weight_LF_ak8;
-                    if (mycsv_weight_LF_ak8JESUp != 0) csv_weight_LF_ak8JESUp *= mycsv_weight_LF_ak8JESUp;
-                    if (mycsv_weight_LF_ak8JESDown != 0) csv_weight_LF_ak8JESDown *= mycsv_weight_LF_ak8JESDown;
-                    if (mycsv_weight_LF_ak8HFUp != 0) csv_weight_LF_ak8HFUp *= mycsv_weight_LF_ak8HFUp;
-                    if (mycsv_weight_LF_ak8HFDown != 0) csv_weight_LF_ak8HFDown *= mycsv_weight_LF_ak8HFDown;
-                    if (mycsv_weight_LF_ak8LFUp != 0) csv_weight_LF_ak8LFUp *= mycsv_weight_LF_ak8LFUp;
-                    if (mycsv_weight_LF_ak8LFDown != 0) csv_weight_LF_ak8LFDown *= mycsv_weight_LF_ak8LFDown;
-                    if (mycsv_weight_LF_ak8hfstats1Up != 0) csv_weight_LF_ak8hfstats1Up *= mycsv_weight_LF_ak8hfstats1Up;
-                    if (mycsv_weight_LF_ak8hfstats1Down != 0) csv_weight_LF_ak8hfstats1Down *= mycsv_weight_LF_ak8hfstats1Down;
-                    if (mycsv_weight_LF_ak8hfstats2Up != 0) csv_weight_LF_ak8hfstats2Up *= mycsv_weight_LF_ak8hfstats2Up;
-                    if (mycsv_weight_LF_ak8hfstats2Down != 0) csv_weight_LF_ak8hfstats2Down *= mycsv_weight_LF_ak8hfstats2Down;
-                    if (mycsv_weight_LF_ak8lfstats1Up != 0) csv_weight_LF_ak8lfstats1Up *= mycsv_weight_LF_ak8lfstats1Up;
-                    if (mycsv_weight_LF_ak8lfstats1Down != 0) csv_weight_LF_ak8lfstats1Down *= mycsv_weight_LF_ak8lfstats1Down;
-                    if (mycsv_weight_LF_ak8lfstats2Up != 0) csv_weight_LF_ak8lfstats2Up *= mycsv_weight_LF_ak8lfstats2Up;
-                    if (mycsv_weight_LF_ak8lfstats2Down != 0) csv_weight_LF_ak8lfstats2Down *= mycsv_weight_LF_ak8lfstats2Down;
+            //         if (mycsv_weight_LF_ak8 != 0) csv_weight_LF_ak8 *= mycsv_weight_LF_ak8;
+            //         if (mycsv_weight_LF_ak8JESUp != 0) csv_weight_LF_ak8JESUp *= mycsv_weight_LF_ak8JESUp;
+            //         if (mycsv_weight_LF_ak8JESDown != 0) csv_weight_LF_ak8JESDown *= mycsv_weight_LF_ak8JESDown;
+            //         if (mycsv_weight_LF_ak8HFUp != 0) csv_weight_LF_ak8HFUp *= mycsv_weight_LF_ak8HFUp;
+            //         if (mycsv_weight_LF_ak8HFDown != 0) csv_weight_LF_ak8HFDown *= mycsv_weight_LF_ak8HFDown;
+            //         if (mycsv_weight_LF_ak8LFUp != 0) csv_weight_LF_ak8LFUp *= mycsv_weight_LF_ak8LFUp;
+            //         if (mycsv_weight_LF_ak8LFDown != 0) csv_weight_LF_ak8LFDown *= mycsv_weight_LF_ak8LFDown;
+            //         if (mycsv_weight_LF_ak8hfstats1Up != 0) csv_weight_LF_ak8hfstats1Up *= mycsv_weight_LF_ak8hfstats1Up;
+            //         if (mycsv_weight_LF_ak8hfstats1Down != 0) csv_weight_LF_ak8hfstats1Down *= mycsv_weight_LF_ak8hfstats1Down;
+            //         if (mycsv_weight_LF_ak8hfstats2Up != 0) csv_weight_LF_ak8hfstats2Up *= mycsv_weight_LF_ak8hfstats2Up;
+            //         if (mycsv_weight_LF_ak8hfstats2Down != 0) csv_weight_LF_ak8hfstats2Down *= mycsv_weight_LF_ak8hfstats2Down;
+            //         if (mycsv_weight_LF_ak8lfstats1Up != 0) csv_weight_LF_ak8lfstats1Up *= mycsv_weight_LF_ak8lfstats1Up;
+            //         if (mycsv_weight_LF_ak8lfstats1Down != 0) csv_weight_LF_ak8lfstats1Down *= mycsv_weight_LF_ak8lfstats1Down;
+            //         if (mycsv_weight_LF_ak8lfstats2Up != 0) csv_weight_LF_ak8lfstats2Up *= mycsv_weight_LF_ak8lfstats2Up;
+            //         if (mycsv_weight_LF_ak8lfstats2Down != 0) csv_weight_LF_ak8lfstats2Down *= mycsv_weight_LF_ak8lfstats2Down;
                 
-                }
-            }
+            //     }
+            // }
             
             
-            //second subjet
-            for (int i = 0; i < nAK8Jets; i++) {
+            // //second subjet
+            // for (int i = 0; i < nAK8Jets; i++) {
                 
-                if ( fabs(Sub1Flavor->at(i)) == 5 ) { /*b flavor*/
+            //     if ( fabs(Sub1Flavor->at(i)) == 5 ) { /*b flavor*/
                     
-                    nB++;
+            //         nB++;
                 
-                    double mycsv_weight_BF_ak8 = CSV_nominal.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_BF_ak8JESUp = CSV_JESUp.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_BF_ak8JESDown = CSV_JESDown.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_BF_ak8HFUp = CSV_HFUp.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_BF_ak8HFDown = CSV_HFDown.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_BF_ak8LFUp = CSV_LFUp.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_BF_ak8LFDown = CSV_LFDown.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_BF_ak8hfstats1Up = CSV_hfstats1Up.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_BF_ak8hfstats1Down = CSV_hfstats1Down.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_BF_ak8hfstats2Up = CSV_hfstats2Up.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_BF_ak8hfstats2Down = CSV_hfstats2Down.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_BF_ak8lfstats1Up = CSV_lfstats1Up.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_BF_ak8lfstats1Down = CSV_lfstats1Down.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_BF_ak8lfstats2Up = CSV_lfstats2Up.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_BF_ak8lfstats2Down = CSV_lfstats2Down.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    //no cfErr is computed for b-flavored subjets
+            //         double mycsv_weight_BF_ak8 = CSV_nominal.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_BF_ak8JESUp = CSV_JESUp.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_BF_ak8JESDown = CSV_JESDown.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_BF_ak8HFUp = CSV_HFUp.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_BF_ak8HFDown = CSV_HFDown.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_BF_ak8LFUp = CSV_LFUp.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_BF_ak8LFDown = CSV_LFDown.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_BF_ak8hfstats1Up = CSV_hfstats1Up.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_BF_ak8hfstats1Down = CSV_hfstats1Down.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_BF_ak8hfstats2Up = CSV_hfstats2Up.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_BF_ak8hfstats2Down = CSV_hfstats2Down.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_BF_ak8lfstats1Up = CSV_lfstats1Up.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_BF_ak8lfstats1Down = CSV_lfstats1Down.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_BF_ak8lfstats2Up = CSV_lfstats2Up.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_BF_ak8lfstats2Down = CSV_lfstats2Down.eval(BTagEntry::FLAV_B, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         //no cfErr is computed for b-flavored subjets
                     
-                    if (mycsv_weight_BF_ak8 != 0) csv_weight_BF_ak8 *= mycsv_weight_BF_ak8;
-                    if (mycsv_weight_BF_ak8JESUp != 0) csv_weight_BF_ak8JESUp *= mycsv_weight_BF_ak8JESUp;
-                    if (mycsv_weight_BF_ak8JESDown != 0) csv_weight_BF_ak8JESDown *= mycsv_weight_BF_ak8JESDown;
-                    if (mycsv_weight_BF_ak8HFUp != 0) csv_weight_BF_ak8HFUp *= mycsv_weight_BF_ak8HFUp;
-                    if (mycsv_weight_BF_ak8HFDown != 0) csv_weight_BF_ak8HFDown *= mycsv_weight_BF_ak8HFDown;
-                    if (mycsv_weight_BF_ak8LFUp != 0) csv_weight_BF_ak8LFUp *= mycsv_weight_BF_ak8LFUp;
-                    if (mycsv_weight_BF_ak8LFDown != 0) csv_weight_BF_ak8LFDown *= mycsv_weight_BF_ak8LFDown;
-                    if (mycsv_weight_BF_ak8hfstats1Up != 0) csv_weight_BF_ak8hfstats1Up *= mycsv_weight_BF_ak8hfstats1Up;
-                    if (mycsv_weight_BF_ak8hfstats1Down != 0) csv_weight_BF_ak8hfstats1Down *= mycsv_weight_BF_ak8hfstats1Down;
-                    if (mycsv_weight_BF_ak8hfstats2Up != 0) csv_weight_BF_ak8hfstats2Up *= mycsv_weight_BF_ak8hfstats2Up;
-                    if (mycsv_weight_BF_ak8hfstats2Down != 0) csv_weight_BF_ak8hfstats2Down *= mycsv_weight_BF_ak8hfstats2Down;
-                    if (mycsv_weight_BF_ak8lfstats1Up != 0) csv_weight_BF_ak8lfstats1Up *= mycsv_weight_BF_ak8lfstats1Up;
-                    if (mycsv_weight_BF_ak8lfstats1Down != 0) csv_weight_BF_ak8lfstats1Down *= mycsv_weight_BF_ak8lfstats1Down;
-                    if (mycsv_weight_BF_ak8lfstats2Up != 0) csv_weight_BF_ak8lfstats2Up *= mycsv_weight_BF_ak8lfstats2Up;
-                    if (mycsv_weight_BF_ak8lfstats2Down != 0) csv_weight_BF_ak8lfstats2Down *= mycsv_weight_BF_ak8lfstats2Down;
+            //         if (mycsv_weight_BF_ak8 != 0) csv_weight_BF_ak8 *= mycsv_weight_BF_ak8;
+            //         if (mycsv_weight_BF_ak8JESUp != 0) csv_weight_BF_ak8JESUp *= mycsv_weight_BF_ak8JESUp;
+            //         if (mycsv_weight_BF_ak8JESDown != 0) csv_weight_BF_ak8JESDown *= mycsv_weight_BF_ak8JESDown;
+            //         if (mycsv_weight_BF_ak8HFUp != 0) csv_weight_BF_ak8HFUp *= mycsv_weight_BF_ak8HFUp;
+            //         if (mycsv_weight_BF_ak8HFDown != 0) csv_weight_BF_ak8HFDown *= mycsv_weight_BF_ak8HFDown;
+            //         if (mycsv_weight_BF_ak8LFUp != 0) csv_weight_BF_ak8LFUp *= mycsv_weight_BF_ak8LFUp;
+            //         if (mycsv_weight_BF_ak8LFDown != 0) csv_weight_BF_ak8LFDown *= mycsv_weight_BF_ak8LFDown;
+            //         if (mycsv_weight_BF_ak8hfstats1Up != 0) csv_weight_BF_ak8hfstats1Up *= mycsv_weight_BF_ak8hfstats1Up;
+            //         if (mycsv_weight_BF_ak8hfstats1Down != 0) csv_weight_BF_ak8hfstats1Down *= mycsv_weight_BF_ak8hfstats1Down;
+            //         if (mycsv_weight_BF_ak8hfstats2Up != 0) csv_weight_BF_ak8hfstats2Up *= mycsv_weight_BF_ak8hfstats2Up;
+            //         if (mycsv_weight_BF_ak8hfstats2Down != 0) csv_weight_BF_ak8hfstats2Down *= mycsv_weight_BF_ak8hfstats2Down;
+            //         if (mycsv_weight_BF_ak8lfstats1Up != 0) csv_weight_BF_ak8lfstats1Up *= mycsv_weight_BF_ak8lfstats1Up;
+            //         if (mycsv_weight_BF_ak8lfstats1Down != 0) csv_weight_BF_ak8lfstats1Down *= mycsv_weight_BF_ak8lfstats1Down;
+            //         if (mycsv_weight_BF_ak8lfstats2Up != 0) csv_weight_BF_ak8lfstats2Up *= mycsv_weight_BF_ak8lfstats2Up;
+            //         if (mycsv_weight_BF_ak8lfstats2Down != 0) csv_weight_BF_ak8lfstats2Down *= mycsv_weight_BF_ak8lfstats2Down;
                 
-                }
+            //     }
                 
-                else if ( fabs(Sub1Flavor->at(i)) == 4 ) { /*c flavor*/
+            //     else if ( fabs(Sub1Flavor->at(i)) == 4 ) { /*c flavor*/
                     
-                    nC++;
+            //         nC++;
                                                  
-                    double mycsv_weight_CF_ak8 = CSV_nominal.eval(BTagEntry::FLAV_C, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_CF_ak8cfErr1Up = CSV_cfErr1Up.eval(BTagEntry::FLAV_C, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_CF_ak8cfErr1Down = CSV_cfErr1Down.eval(BTagEntry::FLAV_C, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_CF_ak8cfErr2Up = CSV_cfErr2Up.eval(BTagEntry::FLAV_C, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_CF_ak8cfErr2Down = CSV_cfErr2Down.eval(BTagEntry::FLAV_C, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    //for c-flavored subjets only the cfErr uncertainty is applied
+            //         double mycsv_weight_CF_ak8 = CSV_nominal.eval(BTagEntry::FLAV_C, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_CF_ak8cfErr1Up = CSV_cfErr1Up.eval(BTagEntry::FLAV_C, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_CF_ak8cfErr1Down = CSV_cfErr1Down.eval(BTagEntry::FLAV_C, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_CF_ak8cfErr2Up = CSV_cfErr2Up.eval(BTagEntry::FLAV_C, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_CF_ak8cfErr2Down = CSV_cfErr2Down.eval(BTagEntry::FLAV_C, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         //for c-flavored subjets only the cfErr uncertainty is applied
                     
-                    if (mycsv_weight_CF_ak8 != 0) csv_weight_CF_ak8 *= mycsv_weight_CF_ak8;
-                    if (mycsv_weight_CF_ak8cfErr1Up != 0) csv_weight_CF_ak8cfErr1Up *= mycsv_weight_CF_ak8cfErr1Up;
-                    if (mycsv_weight_CF_ak8cfErr1Down != 0) csv_weight_CF_ak8cfErr1Down *= mycsv_weight_CF_ak8cfErr1Down;
-                    if (mycsv_weight_CF_ak8cfErr2Up != 0) csv_weight_CF_ak8cfErr2Up *= mycsv_weight_CF_ak8cfErr2Up;
-                    if (mycsv_weight_CF_ak8cfErr2Down != 0) csv_weight_CF_ak8cfErr2Down *= mycsv_weight_CF_ak8cfErr2Down;
+            //         if (mycsv_weight_CF_ak8 != 0) csv_weight_CF_ak8 *= mycsv_weight_CF_ak8;
+            //         if (mycsv_weight_CF_ak8cfErr1Up != 0) csv_weight_CF_ak8cfErr1Up *= mycsv_weight_CF_ak8cfErr1Up;
+            //         if (mycsv_weight_CF_ak8cfErr1Down != 0) csv_weight_CF_ak8cfErr1Down *= mycsv_weight_CF_ak8cfErr1Down;
+            //         if (mycsv_weight_CF_ak8cfErr2Up != 0) csv_weight_CF_ak8cfErr2Up *= mycsv_weight_CF_ak8cfErr2Up;
+            //         if (mycsv_weight_CF_ak8cfErr2Down != 0) csv_weight_CF_ak8cfErr2Down *= mycsv_weight_CF_ak8cfErr2Down;
                 
-                }
+            //     }
                 
-                else  { /*light flavor*/
+            //     else  { /*light flavor*/
                     
-                    nL++;
+            //         nL++;
                 
-                    double mycsv_weight_LF_ak8 = CSV_nominal.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_LF_ak8JESUp = CSV_JESUp.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_LF_ak8JESDown = CSV_JESDown.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_LF_ak8HFUp = CSV_HFUp.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_LF_ak8HFDown = CSV_HFDown.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_LF_ak8LFUp = CSV_LFUp.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_LF_ak8LFDown = CSV_LFDown.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_LF_ak8hfstats1Up = CSV_hfstats1Up.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_LF_ak8hfstats1Down = CSV_hfstats1Down.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_LF_ak8hfstats2Up = CSV_hfstats2Up.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_LF_ak8hfstats2Down = CSV_hfstats2Down.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_LF_ak8lfstats1Up = CSV_lfstats1Up.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_LF_ak8lfstats1Down = CSV_lfstats1Down.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_LF_ak8lfstats2Up = CSV_lfstats2Up.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
-                    double mycsv_weight_LF_ak8lfstats2Down = CSV_lfstats2Down.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_LF_ak8 = CSV_nominal.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_LF_ak8JESUp = CSV_JESUp.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_LF_ak8JESDown = CSV_JESDown.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_LF_ak8HFUp = CSV_HFUp.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_LF_ak8HFDown = CSV_HFDown.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_LF_ak8LFUp = CSV_LFUp.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_LF_ak8LFDown = CSV_LFDown.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_LF_ak8hfstats1Up = CSV_hfstats1Up.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_LF_ak8hfstats1Down = CSV_hfstats1Down.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_LF_ak8hfstats2Up = CSV_hfstats2Up.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_LF_ak8hfstats2Down = CSV_hfstats2Down.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_LF_ak8lfstats1Up = CSV_lfstats1Up.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_LF_ak8lfstats1Down = CSV_lfstats1Down.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_LF_ak8lfstats2Up = CSV_lfstats2Up.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
+            //         double mycsv_weight_LF_ak8lfstats2Down = CSV_lfstats2Down.eval(BTagEntry::FLAV_UDSG, fabs(Sub1Eta->at(i)), Sub1Pt->at(i), Sub1Btag->at(i));
                     
-                    if (mycsv_weight_LF_ak8 != 0) csv_weight_LF_ak8 *= mycsv_weight_LF_ak8;
-                    if (mycsv_weight_LF_ak8JESUp != 0) csv_weight_LF_ak8JESUp *= mycsv_weight_LF_ak8JESUp;
-                    if (mycsv_weight_LF_ak8JESDown != 0) csv_weight_LF_ak8JESDown *= mycsv_weight_LF_ak8JESDown;
-                    if (mycsv_weight_LF_ak8HFUp != 0) csv_weight_LF_ak8HFUp *= mycsv_weight_LF_ak8HFUp;
-                    if (mycsv_weight_LF_ak8HFDown != 0) csv_weight_LF_ak8HFDown *= mycsv_weight_LF_ak8HFDown;
-                    if (mycsv_weight_LF_ak8LFUp != 0) csv_weight_LF_ak8LFUp *= mycsv_weight_LF_ak8LFUp;
-                    if (mycsv_weight_LF_ak8LFDown != 0) csv_weight_LF_ak8LFDown *= mycsv_weight_LF_ak8LFDown;
-                    if (mycsv_weight_LF_ak8hfstats1Up != 0) csv_weight_LF_ak8hfstats1Up *= mycsv_weight_LF_ak8hfstats1Up;
-                    if (mycsv_weight_LF_ak8hfstats1Down != 0) csv_weight_LF_ak8hfstats1Down *= mycsv_weight_LF_ak8hfstats1Down;
-                    if (mycsv_weight_LF_ak8hfstats2Up != 0) csv_weight_LF_ak8hfstats2Up *= mycsv_weight_LF_ak8hfstats2Up;
-                    if (mycsv_weight_LF_ak8hfstats2Down != 0) csv_weight_LF_ak8hfstats2Down *= mycsv_weight_LF_ak8hfstats2Down;
-                    if (mycsv_weight_LF_ak8lfstats1Up != 0) csv_weight_LF_ak8lfstats1Up *= mycsv_weight_LF_ak8lfstats1Up;
-                    if (mycsv_weight_LF_ak8lfstats1Down != 0) csv_weight_LF_ak8lfstats1Down *= mycsv_weight_LF_ak8lfstats1Down;
-                    if (mycsv_weight_LF_ak8lfstats2Up != 0) csv_weight_LF_ak8lfstats2Up *= mycsv_weight_LF_ak8lfstats2Up;
-                    if (mycsv_weight_LF_ak8lfstats2Down != 0) csv_weight_LF_ak8lfstats2Down *= mycsv_weight_LF_ak8lfstats2Down;
+            //         if (mycsv_weight_LF_ak8 != 0) csv_weight_LF_ak8 *= mycsv_weight_LF_ak8;
+            //         if (mycsv_weight_LF_ak8JESUp != 0) csv_weight_LF_ak8JESUp *= mycsv_weight_LF_ak8JESUp;
+            //         if (mycsv_weight_LF_ak8JESDown != 0) csv_weight_LF_ak8JESDown *= mycsv_weight_LF_ak8JESDown;
+            //         if (mycsv_weight_LF_ak8HFUp != 0) csv_weight_LF_ak8HFUp *= mycsv_weight_LF_ak8HFUp;
+            //         if (mycsv_weight_LF_ak8HFDown != 0) csv_weight_LF_ak8HFDown *= mycsv_weight_LF_ak8HFDown;
+            //         if (mycsv_weight_LF_ak8LFUp != 0) csv_weight_LF_ak8LFUp *= mycsv_weight_LF_ak8LFUp;
+            //         if (mycsv_weight_LF_ak8LFDown != 0) csv_weight_LF_ak8LFDown *= mycsv_weight_LF_ak8LFDown;
+            //         if (mycsv_weight_LF_ak8hfstats1Up != 0) csv_weight_LF_ak8hfstats1Up *= mycsv_weight_LF_ak8hfstats1Up;
+            //         if (mycsv_weight_LF_ak8hfstats1Down != 0) csv_weight_LF_ak8hfstats1Down *= mycsv_weight_LF_ak8hfstats1Down;
+            //         if (mycsv_weight_LF_ak8hfstats2Up != 0) csv_weight_LF_ak8hfstats2Up *= mycsv_weight_LF_ak8hfstats2Up;
+            //         if (mycsv_weight_LF_ak8hfstats2Down != 0) csv_weight_LF_ak8hfstats2Down *= mycsv_weight_LF_ak8hfstats2Down;
+            //         if (mycsv_weight_LF_ak8lfstats1Up != 0) csv_weight_LF_ak8lfstats1Up *= mycsv_weight_LF_ak8lfstats1Up;
+            //         if (mycsv_weight_LF_ak8lfstats1Down != 0) csv_weight_LF_ak8lfstats1Down *= mycsv_weight_LF_ak8lfstats1Down;
+            //         if (mycsv_weight_LF_ak8lfstats2Up != 0) csv_weight_LF_ak8lfstats2Up *= mycsv_weight_LF_ak8lfstats2Up;
+            //         if (mycsv_weight_LF_ak8lfstats2Down != 0) csv_weight_LF_ak8lfstats2Down *= mycsv_weight_LF_ak8lfstats2Down;
                 
-                }
+            //     }
                 
-                }
+            //     }
             
             
-            //compute total ak8 weight
-            csv_weight_total_ak8 = csv_weight_BF_ak8 * csv_weight_CF_ak8 * csv_weight_LF_ak8;
-            csv_weight_total_ak8JESUp = csv_weight_BF_ak8JESUp * csv_weight_CF_ak8JESUp * csv_weight_LF_ak8JESUp;
-            csv_weight_total_ak8JESDown = csv_weight_BF_ak8JESDown * csv_weight_CF_ak8JESDown * csv_weight_LF_ak8JESDown;
-            csv_weight_total_ak8HFUp = csv_weight_BF_ak8HFUp * csv_weight_CF_ak8HFUp * csv_weight_LF_ak8HFUp;
-            csv_weight_total_ak8HFDown = csv_weight_BF_ak8HFDown * csv_weight_CF_ak8HFDown * csv_weight_LF_ak8HFDown;
-            csv_weight_total_ak8LFUp = csv_weight_BF_ak8LFUp * csv_weight_CF_ak8LFUp * csv_weight_LF_ak8LFUp;
-            csv_weight_total_ak8LFDown = csv_weight_BF_ak8LFDown * csv_weight_CF_ak8LFDown * csv_weight_LF_ak8LFDown;
-            csv_weight_total_ak8hfstats1Up = csv_weight_BF_ak8hfstats1Up * csv_weight_CF_ak8hfstats1Up * csv_weight_LF_ak8hfstats1Up;
-            csv_weight_total_ak8hfstats1Down = csv_weight_BF_ak8hfstats1Down * csv_weight_CF_ak8hfstats1Down * csv_weight_LF_ak8hfstats1Down;
-            csv_weight_total_ak8hfstats2Up = csv_weight_BF_ak8hfstats2Up * csv_weight_CF_ak8hfstats2Up * csv_weight_LF_ak8hfstats2Up;
-            csv_weight_total_ak8hfstats2Down = csv_weight_BF_ak8hfstats2Down * csv_weight_CF_ak8hfstats2Down * csv_weight_LF_ak8hfstats2Down;
-            csv_weight_total_ak8lfstats1Up = csv_weight_BF_ak8lfstats1Up * csv_weight_CF_ak8lfstats1Up * csv_weight_LF_ak8lfstats1Up;
-            csv_weight_total_ak8lfstats1Down = csv_weight_BF_ak8lfstats1Down * csv_weight_CF_ak8lfstats1Down * csv_weight_LF_ak8lfstats1Down;
-            csv_weight_total_ak8lfstats2Up = csv_weight_BF_ak8lfstats2Up * csv_weight_CF_ak8lfstats2Up * csv_weight_LF_ak8lfstats2Up;
-            csv_weight_total_ak8lfstats2Down = csv_weight_BF_ak8lfstats2Down * csv_weight_CF_ak8lfstats2Down * csv_weight_LF_ak8lfstats2Down;
-            csv_weight_total_ak8cfErr1Up = csv_weight_BF_ak8cfErr1Up * csv_weight_CF_ak8cfErr1Up * csv_weight_LF_ak8cfErr1Up;
-            csv_weight_total_ak8cfErr1Down = csv_weight_BF_ak8cfErr1Down * csv_weight_CF_ak8cfErr1Down * csv_weight_LF_ak8cfErr1Down;
-            csv_weight_total_ak8cfErr2Up = csv_weight_BF_ak8cfErr2Up * csv_weight_CF_ak8cfErr2Up * csv_weight_LF_ak8cfErr2Up;
-            csv_weight_total_ak8cfErr2Down = csv_weight_BF_ak8cfErr2Down * csv_weight_CF_ak8cfErr2Down * csv_weight_LF_ak8cfErr2Down;
+            // //compute total ak8 weight
+            // csv_weight_total_ak8 = csv_weight_BF_ak8 * csv_weight_CF_ak8 * csv_weight_LF_ak8;
+            // csv_weight_total_ak8JESUp = csv_weight_BF_ak8JESUp * csv_weight_CF_ak8JESUp * csv_weight_LF_ak8JESUp;
+            // csv_weight_total_ak8JESDown = csv_weight_BF_ak8JESDown * csv_weight_CF_ak8JESDown * csv_weight_LF_ak8JESDown;
+            // csv_weight_total_ak8HFUp = csv_weight_BF_ak8HFUp * csv_weight_CF_ak8HFUp * csv_weight_LF_ak8HFUp;
+            // csv_weight_total_ak8HFDown = csv_weight_BF_ak8HFDown * csv_weight_CF_ak8HFDown * csv_weight_LF_ak8HFDown;
+            // csv_weight_total_ak8LFUp = csv_weight_BF_ak8LFUp * csv_weight_CF_ak8LFUp * csv_weight_LF_ak8LFUp;
+            // csv_weight_total_ak8LFDown = csv_weight_BF_ak8LFDown * csv_weight_CF_ak8LFDown * csv_weight_LF_ak8LFDown;
+            // csv_weight_total_ak8hfstats1Up = csv_weight_BF_ak8hfstats1Up * csv_weight_CF_ak8hfstats1Up * csv_weight_LF_ak8hfstats1Up;
+            // csv_weight_total_ak8hfstats1Down = csv_weight_BF_ak8hfstats1Down * csv_weight_CF_ak8hfstats1Down * csv_weight_LF_ak8hfstats1Down;
+            // csv_weight_total_ak8hfstats2Up = csv_weight_BF_ak8hfstats2Up * csv_weight_CF_ak8hfstats2Up * csv_weight_LF_ak8hfstats2Up;
+            // csv_weight_total_ak8hfstats2Down = csv_weight_BF_ak8hfstats2Down * csv_weight_CF_ak8hfstats2Down * csv_weight_LF_ak8hfstats2Down;
+            // csv_weight_total_ak8lfstats1Up = csv_weight_BF_ak8lfstats1Up * csv_weight_CF_ak8lfstats1Up * csv_weight_LF_ak8lfstats1Up;
+            // csv_weight_total_ak8lfstats1Down = csv_weight_BF_ak8lfstats1Down * csv_weight_CF_ak8lfstats1Down * csv_weight_LF_ak8lfstats1Down;
+            // csv_weight_total_ak8lfstats2Up = csv_weight_BF_ak8lfstats2Up * csv_weight_CF_ak8lfstats2Up * csv_weight_LF_ak8lfstats2Up;
+            // csv_weight_total_ak8lfstats2Down = csv_weight_BF_ak8lfstats2Down * csv_weight_CF_ak8lfstats2Down * csv_weight_LF_ak8lfstats2Down;
+            // csv_weight_total_ak8cfErr1Up = csv_weight_BF_ak8cfErr1Up * csv_weight_CF_ak8cfErr1Up * csv_weight_LF_ak8cfErr1Up;
+            // csv_weight_total_ak8cfErr1Down = csv_weight_BF_ak8cfErr1Down * csv_weight_CF_ak8cfErr1Down * csv_weight_LF_ak8cfErr1Down;
+            // csv_weight_total_ak8cfErr2Up = csv_weight_BF_ak8cfErr2Up * csv_weight_CF_ak8cfErr2Up * csv_weight_LF_ak8cfErr2Up;
+            // csv_weight_total_ak8cfErr2Down = csv_weight_BF_ak8cfErr2Down * csv_weight_CF_ak8cfErr2Down * csv_weight_LF_ak8cfErr2Down;
             
             //compute total weight
             csv_weight_total = csv_weight_total_ak4 * csv_weight_total_ak8;
@@ -590,18 +590,18 @@ double * evalEventSF( int nAK4Jets, int nAK8Jets, vector<float> * AK4JetFlavor, 
             output[21] = nB;
             
             return output;
-            delete output;
-            delete AK4JetFlavor;
-            delete AK4JetEta;
-            delete AK4JetEta;
-            delete AK4JetBtag;
-            delete Sub0Eta;
-            delete Sub0Pt;
-            delete Sub0Btag;
-            delete Sub0Flavor;
-            delete Sub1Eta;
-            delete Sub1Pt;
-            delete Sub1Btag;
-            delete Sub1Flavor;
+            // delete output;
+            // delete AK4JetFlavor;
+            // delete AK4JetEta;
+            // delete AK4JetEta;
+            // delete AK4JetBtag;
+            // delete Sub0Eta;
+            // delete Sub0Pt;
+            // delete Sub0Btag;
+            // delete Sub0Flavor;
+            // delete Sub1Eta;
+            // delete Sub1Pt;
+            // delete Sub1Btag;
+            // delete Sub1Flavor;
             
 } 
