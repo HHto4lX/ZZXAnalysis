@@ -204,8 +204,15 @@ void reweightingBTAG(){
   vector<Float_t> *JetBTagger = 0;
   vector<Short_t> *JetHadronFlavour = 0;
 
+  float deepCSV_jet1;
+  float deepCSV_jet2;
 
 
+  TH1F* h_BtagSF = new TH1F("h_BtagSF",";BtagSF;events", 10, 0.,2.);
+  TH1F* h_Btagger_jet1_preSF  = new TH1F("h_Btagger_jet1_preSF" ,";deepCSV jet1;events", 10, 0., 1.);
+  TH1F* h_Btagger_jet1_postSF = new TH1F("h_Btagger_jet1_postSF",";deepCSV jet1;events", 10, 0., 1.);
+  TH1F* h_Btagger_jet2_preSF  = new TH1F("h_Btagger_jet2_preSF" ,";deepCSV jet2;events", 10, 0., 1.);
+  TH1F* h_Btagger_jet2_postSF = new TH1F("h_Btagger_jet2_postSF",";deepCSV jet2;events", 10, 0., 1.);
 
 
 
@@ -274,9 +281,6 @@ void reweightingBTAG(){
     vector<float>          Jethadronflavour_; 
     vector<float>          JetBtagger_; 
 
-    int d1_ = -999; // position of higest btagger jet
-    int d2_ = -999; // position of highest pT jet
-
 
     for (UInt_t j = 0; j < JetPt->size(); j++)
     {
@@ -296,22 +300,102 @@ void reweightingBTAG(){
     if (JetVec_.size() < 2) continue;
 
 
-    cout<<"ciao"<<endl;
-
-
+    // compute SF
     double * scaleFactors;
     scaleFactors = evalEventSF( int(JetVec_.size()), Jethadronflavour_, Jeteta_, JetpT_, JetBtagger_, CSVreader, CSVreaderJESUp, CSVreaderJESDown, CSVreaderHFUp, CSVreaderHFDown, CSVreaderLFUp, CSVreaderLFDown, CSVreaderhfstats1Up, CSVreaderhfstats1Down, CSVreaderhfstats2Up, CSVreaderhfstats2Down, CSVreaderlfstats1Up, CSVreaderlfstats1Down, CSVreaderlfstats2Up, CSVreaderlfstats2Down, CSVreadercfErr1Up, CSVreadercfErr1Down, CSVreadercfErr2Up, CSVreadercfErr2Down );
 
-    cout<<"SF "<<scaleFactors[0]<<endl;
+    // print SF
+    //cout<<"SF "<<scaleFactors[0]<<endl;
+
+
 
     // fill eventweight
     Double_t eventWeight = partialSampleWeight * xsec * overallEventWeight ;  //kfactor e l1prefiring non ci sono, tanto uso solo HH sample
 
 
+
+    // --- choose 2 jets
+    int d1_ = -999; // position of higest btagger jet
+    int d2_ = -999; // position of highest pT jet
+
+    // get and save vector with max btagger value
+    deepCSV_jet1 = *max_element(JetBtagger_.begin(), JetBtagger_.end());
+  
+    // get and save btagger value of the second jet (the one with max pt)
+    d1_ = distance( JetBtagger_.begin(), max_element(JetBtagger_.begin(), JetBtagger_.end()));
+    float maxpt = -9999.;
+    for(UInt_t i=0; i<JetVec_.size(); i++){
+      if(i == d1_) continue;
+      float temp = JetVec_.at(i).Pt();
+      if (temp > maxpt){
+	maxpt = temp;
+	d2_ = i;
+      }
+    }
+    deepCSV_jet2 = JetBtagger_.at(d2_);
+
+
+
+    // fill histos
+    h_BtagSF->Fill(scaleFactors[0]);
+    h_Btagger_jet1_preSF ->Fill(deepCSV_jet1, eventWeight);
+    h_Btagger_jet1_postSF->Fill(deepCSV_jet1, eventWeight*scaleFactors[0]);
+    h_Btagger_jet2_preSF ->Fill(deepCSV_jet2, eventWeight);
+    h_Btagger_jet2_postSF->Fill(deepCSV_jet2, eventWeight*scaleFactors[0]); 
+
+
+
   }// end loop over tree entries
 
   
+  
 
+
+  // Draw histos
+  gStyle->SetOptStat(0);
+
+  TCanvas *c_btagSF = new TCanvas();
+  c_btagSF->cd();
+  h_BtagSF->SetLineColor(kBlue);
+  h_BtagSF->Draw("hist");
+  c_btagSF->SaveAs("btagSF.png");
+
+  TCanvas *c_btagger_jet1 = new TCanvas();
+  c_btagger_jet1->cd();
+  h_Btagger_jet1_preSF->SetLineColor(kBlue);
+  h_Btagger_jet1_preSF->Draw("hist");
+  h_Btagger_jet1_postSF->SetLineColor(kRed);
+  h_Btagger_jet1_postSF->Draw("hist same");
+
+  TLegend* leg_j1 = new TLegend(0.45,0.75,0.6,0.89);
+  leg_j1->AddEntry(h_Btagger_jet1_preSF , "no SF", "l");
+  leg_j1->AddEntry(h_Btagger_jet1_postSF, "with SF", "l");
+  leg_j1->SetFillColor(kWhite);
+  leg_j1->SetLineColor(kBlack);
+  leg_j1->SetTextFont(43);
+  leg_j1->SetTextSize(20);
+  leg_j1->Draw();
+
+  c_btagger_jet1->SaveAs("btagger_jet1_SF.png");
+
+
+  TCanvas *c_btagger_jet2 = new TCanvas();
+  c_btagger_jet2->cd();
+  h_Btagger_jet2_preSF->SetLineColor(kBlue);
+  h_Btagger_jet2_preSF->Draw("hist");
+  h_Btagger_jet2_postSF->SetLineColor(kRed);
+  h_Btagger_jet2_postSF->Draw("hist same");
+
+  TLegend* leg_j2 = new TLegend(0.45,0.75,0.6,0.89);
+  leg_j2->AddEntry(h_Btagger_jet2_preSF , "no SF", "l");
+  leg_j2->AddEntry(h_Btagger_jet2_postSF, "with SF", "l");
+  leg_j2->SetFillColor(kWhite);
+  leg_j2->SetLineColor(kBlack);
+  leg_j2->SetTextFont(43);
+  leg_j2->SetTextSize(20);
+  leg_j2->Draw();
+
+  c_btagger_jet2->SaveAs("btagger_jet2_SF.png");
 
 
 
