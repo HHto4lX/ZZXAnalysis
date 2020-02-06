@@ -22,7 +22,7 @@
 
 class BTagEntry
 {
- public:
+public:
   enum OperatingPoint {
     OP_LOOSE=0,
     OP_MEDIUM=1,
@@ -48,17 +48,17 @@ class BTagEntry
 
     // default constructor
     Parameters(
-	       OperatingPoint op=OP_TIGHT,
-	       std::string measurement_type="comb",
-	       std::string sys_type="central",
-	       JetFlavor jf=FLAV_B,
-	       float eta_min=-99999.,
-	       float eta_max=99999.,
-	       float pt_min=0.,
-	       float pt_max=99999.,
-	       float discr_min=0.,
+      OperatingPoint op=OP_TIGHT,
+      std::string measurement_type="comb",
+      std::string sys_type="central",
+      JetFlavor jf=FLAV_B,
+      float eta_min=-99999.,
+      float eta_max=99999.,
+      float pt_min=0.,
+      float pt_max=99999.,
+      float discr_min=0.,
       float discr_max=99999.
-	       );
+    );
 
   };
 
@@ -107,7 +107,7 @@ class BTagEntry
 
 class BTagCalibration
 {
- public:
+public:
   BTagCalibration() {}
   BTagCalibration(const std::string &tagger);
   BTagCalibration(const std::string &tagger, const std::string &filename);
@@ -123,7 +123,7 @@ class BTagCalibration
   void makeCSV(std::ostream &s) const;
   std::string makeCSV() const;
 
- protected:
+protected:
   static std::string token(const BTagEntry::Parameters &par);
 
   std::string tagger_;
@@ -152,7 +152,7 @@ class BTagCalibration
 
 class BTagCalibrationReader
 {
- public:
+public:
   class BTagCalibrationReaderImpl;
 
   BTagCalibrationReader() {}
@@ -174,12 +174,10 @@ class BTagCalibrationReader
                           float eta,
                           float pt,
                           float discr=0.) const;
-
   std::pair<float, float> min_max_pt(BTagEntry::JetFlavor jf,
                                      float eta,
                                      float discr=0.) const;
-
- protected:
+protected:
   std::shared_ptr<BTagCalibrationReaderImpl> pimpl;
 };
 
