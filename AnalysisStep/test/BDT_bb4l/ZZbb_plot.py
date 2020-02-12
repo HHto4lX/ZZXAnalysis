@@ -5,17 +5,18 @@ from ROOT import TFile, TH1F, TCanvas, gSystem, TAttFill, TLegend, TStyle, THSta
 import CMSGraphics, CMS_lumi
 
 # create output directory
-OutputPath = 'ZZbb_plots'
+OutputPath = 'inputBDT_SR_plots'
 gSystem.Exec("mkdir -p " + OutputPath)
 print "Output directory created!"
 
 
 # inputh file phath
-inputFilePath = 'histos_4lbb_4lsel/'
+inputFilePath = 'histos_plotsinputBDT_SR/'
 
 
 # hist names
-namelist = ['h_4leptonsPt','h_MET','h_M4l']
+#namelist = ['h_4leptonsPt','h_MET','h_M4l']
+namelist = ['h_bTagger_jet1','h_bTagger_jet2','h_pT_jet1','h_pT_jet2','h_MET','h_DeltaR','h_mjj']
 
 
 # read files
@@ -25,7 +26,7 @@ for iname_AllData in namelist :
     histos_AllData.append(inFile_AllData.Get(iname_AllData))
 
 
-inFile_HH4lbb = TFile.Open(inputFilePath + 'histos_HH4lbb.root')
+inFile_HH4lbb = TFile.Open(inputFilePath + 'histos_HH4lbb_Angela.root')
 histos_HH4lbb = []
 for iname_HH4lbb in namelist :
     histos_HH4lbb.append(inFile_HH4lbb.Get(iname_HH4lbb))
@@ -109,8 +110,7 @@ for iname_ggTo2mu2tau_Contin_MCFM701 in namelist :
     histos_ggTo2mu2tau_Contin_MCFM701.append(inFile_ggTo2mu2tau_Contin_MCFM701.Get(iname_ggTo2mu2tau_Contin_MCFM701))
 
 
-inFile_ZZTo4lext1 = TFile.Open(inputFilePath + 'histos_ZZTo4lext1.root')
-#inFile_ZZTo4lext1 = TFile.Open(inputFilePath + 'histos_ZZTo4lamcatnlo.root')
+inFile_ZZTo4lext1 = TFile.Open(inputFilePath + 'histos_ZZTo4lamcatnlo.root')
 histos_ZZTo4lext1 = []
 for iname_ZZTo4lext1 in namelist :
     histos_ZZTo4lext1.append(inFile_ZZTo4lext1.Get(iname_ZZTo4lext1))
@@ -152,10 +152,10 @@ for iname_ZZZ in namelist :
     histos_ZZZ.append(inFile_ZZZ.Get(iname_ZZZ))
 
 
-inFile_ZX = TFile.Open(inputFilePath + 'histos_Z+X.root')
-histos_ZX = []
-for iname_ZX in namelist :
-    histos_ZX.append(inFile_ZX.Get(iname_ZX))
+# inFile_ZX = TFile.Open(inputFilePath + 'histos_Z+X.root')
+# histos_ZX = []
+# for iname_ZX in namelist :
+#     histos_ZX.append(inFile_ZX.Get(iname_ZX))
 
 
 print 'files read'
@@ -178,10 +178,10 @@ for name in namelist :
     histos_tribosons.SetLineColor(kGreen-1)
     hs.Add(histos_tribosons)
 
-    # ZX background
-    histos_ZX[i].SetFillColor(kGreen+3)
-    histos_ZX[i].SetLineColor(kGreen+4)
-    hs.Add(histos_ZX[i])
+    # # ZX background
+    # histos_ZX[i].SetFillColor(kGreen+3)
+    # histos_ZX[i].SetLineColor(kGreen+4)
+    # hs.Add(histos_ZX[i])
 
     # TTZ
     histos_TTV = histos_TTZJets_M10_MLMext1[i].Clone('histos_TTV')
@@ -261,11 +261,14 @@ for name in namelist :
 
  
     #if logy (leppt e MET)
-    if '4leptonsPt' in name or 'MET' in name : 
-        hs.SetMaximum(10e5)
-        hs.SetMinimum(10e-1)
+    # if '4leptonsPt' in name or 'MET' in name : 
+    #     hs.SetMaximum(10e5)
+    #     hs.SetMinimum(10e-1)
 
-    
+    else :
+        hs.SetMaximum(10e4)
+        hs.SetMinimum(10e-4)
+
     hs.Draw('histo')
     histos_HH4lbb[i].Draw('histosame')
     histos_AllData[i].Draw('samepe')  
@@ -294,7 +297,7 @@ for name in namelist :
     legend.AddEntry(histos_ZZTo4lext1[i],            "qq->ZZ",        "f")
     legend.AddEntry(histos_ggZZ,                     "gg->ZZ",        "f")
     legend.AddEntry(histos_TTV,                      "TTV; V=Z,W",    "f")
-    legend.AddEntry(histos_ZX[i],                    "Z+X",           "f")
+#    legend.AddEntry(histos_ZX[i],                    "Z+X",           "f")
     legend.AddEntry(histos_tribosons,                "VVV; V=Z,W",    "f")
     legend.AddEntry(histos_AllData[i],               "Data",          "lp")
     legend.SetFillColor(kWhite)
@@ -316,6 +319,9 @@ for name in namelist :
     #     hs.GetXaxis().SetMoreLogLabels()
     #     hs.GetXaxis().SetNoExponent()
 
+    else:
+        pad1.SetLogy()
+
     canvas.Update()
 
 
@@ -326,7 +332,7 @@ for name in namelist :
     mc_tot.Add(histos_ZZTo4lext1[i])
     mc_tot.Add(histos_TTV)
     mc_tot.Add(histos_ggZZ)
-    mc_tot.Add(histos_ZX[i])
+#    mc_tot.Add(histos_ZX[i])
     mc_tot.Add(histos_tribosons)
 
 

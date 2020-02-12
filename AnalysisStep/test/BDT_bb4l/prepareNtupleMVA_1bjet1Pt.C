@@ -32,7 +32,7 @@
 
 using namespace std;
 
-#define JETSELECTION 1
+#define JETSELECTION 0
 #define MERGE2E2MU 1
 
 enum FinalState {fs_4mu=0, fs_4e=1, fs_2e2mu=2, fs_2mu2e=3};  // 4mu, 4e, 2e2mu, 2mu2e
@@ -67,7 +67,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
   Long64_t nEvent;
   Int_t nLumi;
   Float_t overallEventWeight;
-  Float_t xsec = 1.; 
+  Float_t xsec; 
 
   Float_t KFactor_QCD_ggZZ_Nominal;
   Float_t KFactor_EW_qqZZ;
@@ -117,9 +117,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     inputTree->SetBranchAddress("EventNumber", &nEvent);
     inputTree->SetBranchAddress("LumiNumber", &nLumi);
     if (!isDATA) inputTree->SetBranchAddress("overallEventWeight", &overallEventWeight);
-    if (!isDATA && !isHH ) inputTree->SetBranchAddress("xsec", &xsec);
-    if (isHH) xsec = 0.00001017; // fb Angela
-    cout<<" xsec "<<xsec<<endl; 
+    if (!isDATA) inputTree->SetBranchAddress("xsec", &xsec);
   }
   if(isZX){ inputTree->SetBranchAddress("weight", &weight); }
   inputTree->SetBranchAddress("ZZsel", &ZZsel);
@@ -259,19 +257,22 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 
 
     //save only events for 1 final state at the time
-    //if(currentFinalState != fs_4mu)   continue;  // save 4mu only
-    if(currentFinalState != fs_4e)    continue;  // save 4e only
-    //if(currentFinalState != fs_2e2mu) continue;  // save 2e2mu only
+    //    if(currentFinalState != fs_4mu)   continue;  // save 4mu only
+    //    if(currentFinalState != fs_4e)    continue;  // save 4e only
+    //    if(currentFinalState != fs_2e2mu) continue;  // save 2e2mu only
     //    cout<<currentFinalState<<endl;
 
 
     // mass cut: signal region
-    if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
+     if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
+    //    if(ZZMass < 118 || ZZMass > 130) continue;
 
  
 
 
-    if(JETSELECTION){
+    //    if(JETSELECTION){
+
+    //JETSELECTION---------------------------------------------------
       // jet quantities
       vector<TLorentzVector> JetVec; // TLorentz vector with all Jets per Event
       vector<TLorentzVector> JetPair; // TLorentz vector with all Jets Pairs
@@ -280,7 +281,8 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
   
       for (UInt_t j = 0; j < JetPt->size(); j++)
         {
-  	if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 20 ) ) continue; // pt cut 20GeV from ntuplizer 
+	  if ( fabs( JetEta->at(j) ) > 2.4 ) continue;
+          if (JetPt->at(j) < 20 )  continue; // pt cut 20GeV from ntuplizer 
   	  
   	TLorentzVector temp;
   	temp.SetPtEtaPhiM(JetPt->at(j), JetEta->at(j), JetPhi->at(j), JetMass->at(j));
@@ -349,7 +351,8 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
       // save jet jet inv mass
       f_massjetjet = Hbb_Vec.M();
 
-    } // end if JETSELECTION
+      //    } // end if JETSELECTION
+    //JETSELECTION---------------------------------------------------
 
 
 
@@ -362,12 +365,14 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     //ggZZ samples                       
     else if(inFile.Contains("ggTo")) { kfactor = KFactor_QCD_ggZZ_Nominal; }
 
+    //    if (isHH) xsec = 0.00001017; // fb Angela
+
     Double_t eventWeight = 1.;
     if(!isDATA && !isZX) eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight;
     if(isZX) eventWeight = weight; //ZX weight
 
-    cout<<" -- xsec "<<xsec<<endl;
-
+    //    cout<<" -- xsec "<<xsec<<endl;
+    //    break;
 
     // save Z1 and Z2 mass
     f_Z1Mass = Z1Mass;
@@ -421,32 +426,35 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 void prepareNtupleMVA_1bjet1Pt()
 {
 
-  float lumi = 59.74; //fb-1
+  float lumi = 59.74; //fb-1 2018
+  //float lumi = 41.5; //fb-1 2017
 
-  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/20200205_samples2018/";
-  TString inputFileName[] = {"HH4lbb_Angela",
-                             "ggH125",
-                             "VBFH125",
-                             "WplusH125",
-                             "WminusH125",
-                             "ZH125",
-                             "bbH125",
-                             "ttH125",
-                             "ZZTo4lext1",
-                             "TTZJets_M10_MLMext1",
-                             "TTZToLL_M1to1O_MLM",
-                             "TTWJetsToLNu",
-                             "ggTo4e_Contin_MCFM701",
-                             "ggTo4mu_Contin_MCFM701",
-                             "ggTo4tau_Contin_MCFM701",
-                             "ggTo2e2mu_Contin_MCFM701",
-                             "ggTo2e2tau_Contin_MCFM701",
-                             "ggTo2mu2tau_Contin_MCFM701",
-                             "WWZ",
-                             "WZZ",
-                             "ZZZ",
-			     //                             "Z+X",
-			     //                             "AllData", 
+  //  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/20200205_samples2018/";
+  //  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/20200209_samples2017/";
+  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/allsamples/";
+  TString inputFileName[] = {// "HH4lbb_Angela",
+                             // "ggH125",
+                             // "VBFH125",
+                             // "WplusH125",
+                             // "WminusH125",
+                             // "ZH125",
+                             // "bbH125",
+                             // "ttH125",
+                             // "ZZTo4lamcatnlo",
+                             // "TTZJets_M10_MLMext1",
+                             // "TTZToLL_M1to1O_MLM",
+                             // "TTWJetsToLNu",
+                             // "ggTo4e_Contin_MCFM701",
+                             // "ggTo4mu_Contin_MCFM701",
+                             // "ggTo4tau_Contin_MCFM701",
+                             // "ggTo2e2mu_Contin_MCFM701",
+                             // "ggTo2e2tau_Contin_MCFM701",
+                             // "ggTo2mu2tau_Contin_MCFM701",
+                             // "WWZ",
+                             // "WZZ",
+                             // "ZZZ",
+                             // "Z+X",
+			     "AllData", 
                              };
 
 
@@ -454,7 +462,8 @@ void prepareNtupleMVA_1bjet1Pt()
   cout<< "number of input files: " << nInputFiles<<endl;
 
 
-  string outputFilePath = "200206_mvaNtuples_1bjet1Pt_4e";
+  //string outputFilePath = "out";
+  string outputFilePath = "200212_mvaNtuples_1bjet1Pt_4l";
   gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
 
 
