@@ -19,7 +19,7 @@ eval `scram runtime -csh`
 
 set SETNAME=`basename $PWD`
 
-set STORAGEPATH=/eos/user/a/acappati/samples_4lX
+set STORAGEPATH=/eos/user/a/acappati/samples_HH4lbb
 set TREEPATH=${STORAGEPATH}/$1
 
 
