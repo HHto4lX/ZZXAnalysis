@@ -32,7 +32,7 @@
 
 using namespace std;
 
-#define JETSELECTION 0
+#define JETSELECTION 1
 #define MERGE2E2MU 1
 
 enum FinalState {fs_4mu=0, fs_4e=1, fs_2e2mu=2, fs_2mu2e=3};  // 4mu, 4e, 2e2mu, 2mu2e
@@ -257,7 +257,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 
 
     //save only events for 1 final state at the time
-    //    if(currentFinalState != fs_4mu)   continue;  // save 4mu only
+    if(currentFinalState != fs_4mu)   continue;  // save 4mu only
     //    if(currentFinalState != fs_4e)    continue;  // save 4e only
     //    if(currentFinalState != fs_2e2mu) continue;  // save 2e2mu only
     //    cout<<currentFinalState<<endl;
@@ -403,6 +403,10 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     yield_4l += eventWeight; 
 
 
+    ofstream outFile;
+    outFile.open("porcaputtanavacca_1bjet1Pt_4mu.csv",ios::app);
+    outFile<<ZZMass<<","<<Z1Mass<<","<<Z2Mass<<","<<LepPt->at(0)<<","<<LepPt->at(1)<<","<<LepPt->at(2)<<","<<LepPt->at(3)<<","<<f_bbmass<<","<<f_ptjet1<<","<<f_ptjet2<<","<<f_bdiscjet1signal<<","<<f_bdiscjet2signal<<","<<f_HHmass<<","<<DeltaPhi<<","<<DeltaEta<<","<<DeltaR<<","<<PFMET<<","<<eventWeight<<","<<isHH<<endl;
+    outFile.close();
     
 
     tnew->Fill();
@@ -429,32 +433,32 @@ void prepareNtupleMVA_1bjet1Pt()
   float lumi = 59.74; //fb-1 2018
   //float lumi = 41.5; //fb-1 2017
 
-  //  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/20200205_samples2018/";
+  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/20200205_bestKD_samples2018/";
   //  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/20200209_samples2017/";
-  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/allsamples/";
-  TString inputFileName[] = {// "HH4lbb_Angela",
-                             // "ggH125",
-                             // "VBFH125",
-                             // "WplusH125",
-                             // "WminusH125",
-                             // "ZH125",
-                             // "bbH125",
-                             // "ttH125",
-                             // "ZZTo4lamcatnlo",
-                             // "TTZJets_M10_MLMext1",
-                             // "TTZToLL_M1to1O_MLM",
-                             // "TTWJetsToLNu",
-                             // "ggTo4e_Contin_MCFM701",
-                             // "ggTo4mu_Contin_MCFM701",
-                             // "ggTo4tau_Contin_MCFM701",
-                             // "ggTo2e2mu_Contin_MCFM701",
-                             // "ggTo2e2tau_Contin_MCFM701",
-                             // "ggTo2mu2tau_Contin_MCFM701",
-                             // "WWZ",
-                             // "WZZ",
-                             // "ZZZ",
-                             // "Z+X",
-			     "AllData", 
+  //  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/allsamples/";
+  TString inputFileName[] = {"HH4lbb_Angela",
+                             "ggH125",
+                             "VBFH125",
+                             "WplusH125",
+                             "WminusH125",
+                             "ZH125",
+                             "bbH125",
+                             "ttH125",
+                             "ZZTo4lamcatnlo",
+                             "TTZJets_M10_MLMext1",
+                             //"TTZToLL_M1to1O_MLM",
+                             "TTWJetsToLNu",
+                             "ggTo4e_Contin_MCFM701",
+                             "ggTo4mu_Contin_MCFM701",
+                             "ggTo4tau_Contin_MCFM701",
+                             "ggTo2e2mu_Contin_MCFM701",
+                             "ggTo2e2tau_Contin_MCFM701",
+                             "ggTo2mu2tau_Contin_MCFM701",
+                             "WWZ",
+                             "WZZ",
+                             "ZZZ",
+                             // "ZX",
+			     //"AllData", 
                              };
 
 
@@ -462,8 +466,8 @@ void prepareNtupleMVA_1bjet1Pt()
   cout<< "number of input files: " << nInputFiles<<endl;
 
 
-  //string outputFilePath = "out";
-  string outputFilePath = "200212_mvaNtuples_1bjet1Pt_4l";
+  string outputFilePath = "out";
+  //string outputFilePath = "200212_mvaNtuples_1bjet1Pt_4l";
   gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
 
 
