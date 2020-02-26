@@ -256,108 +256,6 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 
 
 
-    //save only events for 1 final state at the time
-    if(currentFinalState != fs_4mu)   continue;  // save 4mu only
-    //    if(currentFinalState != fs_4e)    continue;  // save 4e only
-    //    if(currentFinalState != fs_2e2mu) continue;  // save 2e2mu only
-    //    cout<<currentFinalState<<endl;
-
-
-    // mass cut: signal region
-     if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
-    //    if(ZZMass < 118 || ZZMass > 130) continue;
-
- 
-
-
-    //    if(JETSELECTION){
-
-    //JETSELECTION---------------------------------------------------
-      // jet quantities
-      vector<TLorentzVector> JetVec; // TLorentz vector with all Jets per Event
-      vector<TLorentzVector> JetPair; // TLorentz vector with all Jets Pairs
-      vector<float> JetBinfo; // vector with b-tag info per each Jet of the Event
-      
-  
-      for (UInt_t j = 0; j < JetPt->size(); j++)
-        {
-	  if ( fabs( JetEta->at(j) ) > 2.4 ) continue;
-          if (JetPt->at(j) < 20 )  continue; // pt cut 20GeV from ntuplizer 
-  	  
-  	TLorentzVector temp;
-  	temp.SetPtEtaPhiM(JetPt->at(j), JetEta->at(j), JetPhi->at(j), JetMass->at(j));
-  	JetVec.push_back(temp);
-  	JetBinfo.push_back(JetBTagger->at(j));
-        }
-  
-  
-  
-      // at least 2 jets in the acceptance
-      if (JetVec.size() < 2) continue;   
-          
-      
-  
-      // get and save vector with max btagger value
-      f_bdiscjet1signal = *max_element(JetBinfo.begin(), JetBinfo.end());
-  
-      // get and save btagger value of the second jet (the one with max pt)
-      int d1_maxbtag = distance( JetBinfo.begin(), max_element(JetBinfo.begin(), JetBinfo.end()));
-  
-      float maxJetPt = -9999.;
-      int d2_maxJetPt = -9999;
-      for(UInt_t i=0; i<JetVec.size(); i++){
-  
-        if(i == d1_maxbtag) continue;
-        float temp = JetVec.at(i).Pt();
-        if (temp > maxJetPt){
-          maxJetPt = temp;
-          d2_maxJetPt = i;
-        }
-      }
-      // save btagger value of the second jet (the one with max pt)
-      f_bdiscjet2signal = JetBinfo.at(d2_maxJetPt);
-
-      // save jet pT
-      f_ptjet1 = JetVec.at(d1_maxbtag).Pt();
-      f_ptjet2 = JetVec.at(d2_maxJetPt).Pt();
-  
-  
-      // build H->bb tlorentzvector
-      TLorentzVector Hbb_Vec = JetVec.at(d1_maxbtag) + JetVec.at(d2_maxJetPt);
-  
-      // build H-H DeltaR
-      float DeltaPhi = ZZPhi - Hbb_Vec.Phi();
-      if( fabs(DeltaPhi) > acos(-1) ) { DeltaPhi = (2*acos(-1)) - fabs(DeltaPhi); }
-      float DeltaEta = ZZEta - Hbb_Vec.Eta();
-      float DeltaR = sqrt( DeltaPhi*DeltaPhi + DeltaEta*DeltaEta );
-  
-      // save DeltaR
-      f_deltarsignal = DeltaR;
-    
-
-
-      // build HZZ tlorentzvector
-      TLorentzVector HZZ_Vec;
-      HZZ_Vec.SetPtEtaPhiM(ZZPt, ZZEta, ZZPhi, ZZMass);
-    
-      // build HH tlorentzvector
-      TLorentzVector HH_Vec = HZZ_Vec + Hbb_Vec;
-
-
-      // save bb and HH masses
-      f_bbmass = Hbb_Vec.M();
-      f_HHmass = HH_Vec.M();
-
-      // save jet jet inv mass
-      f_massjetjet = Hbb_Vec.M();
-
-      //    } // end if JETSELECTION
-    //JETSELECTION---------------------------------------------------
-
-
-
-
-
     // fill k factors and event weights
     Float_t kfactor = 1.;
     // qqZZ sample
@@ -365,11 +263,139 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     //ggZZ samples                       
     else if(inFile.Contains("ggTo")) { kfactor = KFactor_QCD_ggZZ_Nominal; }
 
-    //    if (isHH) xsec = 0.00001017; // fb Angela
-
     Double_t eventWeight = 1.;
     if(!isDATA && !isZX) eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight;
     if(isZX) eventWeight = weight; //ZX weight
+
+
+
+    //save only events for 1 final state at the time
+    if(currentFinalState != fs_4mu)   continue;  // save 4mu only
+    //    if(currentFinalState != fs_4e)    continue;  // save 4e only
+    //    if(currentFinalState != fs_2e2mu) continue;  // save 2e2mu only
+    //    cout<<currentFinalState<<endl;
+
+
+
+    //***SYNC*** out on file for sync1
+    ofstream fout1;
+    fout1.open("sync1_ggH_4mu_4lsel.txt",ios::app);
+    fout1<<nRun<<":"<<nLumi<<":"<<nEvent<<":"<<Z1Mass<<":"<<Z2Mass<<":"<<ZZMass<<":"<<JetPt->size()<<":"<<eventWeight<<endl;
+    fout1.close();
+
+    
+
+
+    // mass cut: signal region
+     if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
+
+ 
+
+
+    //    if(JETSELECTION){
+
+    //JETSELECTION---------------------------------------------------
+    // jet quantities
+    vector<TLorentzVector> JetVec; // TLorentz vector with all Jets per Event
+    vector<TLorentzVector> JetPair; // TLorentz vector with all Jets Pairs
+    vector<float> JetBinfo; // vector with b-tag info per each Jet of the Event
+    
+
+    for (UInt_t j = 0; j < JetPt->size(); j++)
+      {
+	  if ( fabs( JetEta->at(j) ) > 2.4 ) continue;
+        if (JetPt->at(j) < 20 )  continue; // pt cut 20GeV from ntuplizer 
+	  
+	TLorentzVector temp;
+	temp.SetPtEtaPhiM(JetPt->at(j), JetEta->at(j), JetPhi->at(j), JetMass->at(j));
+	JetVec.push_back(temp);
+	JetBinfo.push_back(JetBTagger->at(j));
+      }
+
+
+    //***SYNC*** sync, at least 1 jet
+    if (JetVec.size() >= 1){  
+      // out on file for sync2
+      ofstream fout2;
+      fout2.open("sync2_ggH_4mu_4lsel1jet.txt",ios::app);
+      fout2<<nRun<<":"<<nLumi<<":"<<nEvent<<":"<<Z1Mass<<":"<<Z2Mass<<":"<<ZZMass<<":"<<JetVec.size()<<":"<<eventWeight<<endl;
+      fout2.close();
+    }
+  
+  
+  
+    // at least 2 jets in the acceptance
+    if (JetVec.size() < 2) continue;   
+
+
+    //***SYNC*** out on file for sync3
+    ofstream fout3;
+    fout3.open("sync3_ggH_4mu_4lsel2jet.txt",ios::app);
+    fout3<<nRun<<":"<<nLumi<<":"<<nEvent<<":"<<Z1Mass<<":"<<Z2Mass<<":"<<ZZMass<<":"<<JetVec.size()<<":"<<eventWeight<<endl;
+    fout3.close();
+
+        
+    
+
+    // get and save vector with max btagger value
+    f_bdiscjet1signal = *max_element(JetBinfo.begin(), JetBinfo.end());
+
+    // get and save btagger value of the second jet (the one with max pt)
+    int d1_maxbtag = distance( JetBinfo.begin(), max_element(JetBinfo.begin(), JetBinfo.end()));
+
+    float maxJetPt = -9999.;
+    int d2_maxJetPt = -9999;
+    for(UInt_t i=0; i<JetVec.size(); i++){
+
+      if(i == d1_maxbtag) continue;
+      float temp = JetVec.at(i).Pt();
+      if (temp > maxJetPt){
+        maxJetPt = temp;
+        d2_maxJetPt = i;
+      }
+    }
+    // save btagger value of the second jet (the one with max pt)
+    f_bdiscjet2signal = JetBinfo.at(d2_maxJetPt);
+
+    // save jet pT
+    f_ptjet1 = JetVec.at(d1_maxbtag).Pt();
+    f_ptjet2 = JetVec.at(d2_maxJetPt).Pt();
+
+
+    // build H->bb tlorentzvector
+    TLorentzVector Hbb_Vec = JetVec.at(d1_maxbtag) + JetVec.at(d2_maxJetPt);
+
+    // build H-H DeltaR
+    float DeltaPhi = ZZPhi - Hbb_Vec.Phi();
+    if( fabs(DeltaPhi) > acos(-1) ) { DeltaPhi = (2*acos(-1)) - fabs(DeltaPhi); }
+    float DeltaEta = ZZEta - Hbb_Vec.Eta();
+    float DeltaR = sqrt( DeltaPhi*DeltaPhi + DeltaEta*DeltaEta );
+
+    // save DeltaR
+    f_deltarsignal = DeltaR;
+  
+
+
+    // build HZZ tlorentzvector
+    TLorentzVector HZZ_Vec;
+    HZZ_Vec.SetPtEtaPhiM(ZZPt, ZZEta, ZZPhi, ZZMass);
+  
+    // build HH tlorentzvector
+    TLorentzVector HH_Vec = HZZ_Vec + Hbb_Vec;
+
+
+    // save bb and HH masses
+    f_bbmass = Hbb_Vec.M();
+    f_HHmass = HH_Vec.M();
+
+    // save jet jet inv mass
+    f_massjetjet = Hbb_Vec.M();
+
+    //    } // end if JETSELECTION
+    //JETSELECTION---------------------------------------------------
+
+
+
 
     //    cout<<" -- xsec "<<xsec<<endl;
     //    break;
@@ -403,10 +429,10 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     yield_4l += eventWeight; 
 
 
-    ofstream outFile;
-    outFile.open("porcaputtanavacca_1bjet1Pt_4mu.csv",ios::app);
-    outFile<<ZZMass<<","<<Z1Mass<<","<<Z2Mass<<","<<LepPt->at(0)<<","<<LepPt->at(1)<<","<<LepPt->at(2)<<","<<LepPt->at(3)<<","<<f_bbmass<<","<<f_ptjet1<<","<<f_ptjet2<<","<<f_bdiscjet1signal<<","<<f_bdiscjet2signal<<","<<f_HHmass<<","<<DeltaPhi<<","<<DeltaEta<<","<<DeltaR<<","<<PFMET<<","<<eventWeight<<","<<isHH<<endl;
-    outFile.close();
+    // ofstream outFile;
+    // outFile.open("porcaputtanavacca_1bjet1Pt_4mu.csv",ios::app);
+    // outFile<<ZZMass<<","<<Z1Mass<<","<<Z2Mass<<","<<LepPt->at(0)<<","<<LepPt->at(1)<<","<<LepPt->at(2)<<","<<LepPt->at(3)<<","<<f_bbmass<<","<<f_ptjet1<<","<<f_ptjet2<<","<<f_bdiscjet1signal<<","<<f_bdiscjet2signal<<","<<f_HHmass<<","<<DeltaPhi<<","<<DeltaEta<<","<<DeltaR<<","<<PFMET<<","<<eventWeight<<","<<isHH<<endl;
+    // outFile.close();
     
 
     tnew->Fill();
@@ -432,6 +458,7 @@ void prepareNtupleMVA_1bjet1Pt()
 
   float lumi = 59.74; //fb-1 2018
   //float lumi = 41.5; //fb-1 2017
+
 
   TString inputFilePath = "/eos/user/a/acappati/samples_4lX/20200205_bestKD_samples2018/";
   //  TString inputFilePath = "/eos/user/a/acappati/samples_4lX/20200209_samples2017/";
@@ -472,10 +499,12 @@ void prepareNtupleMVA_1bjet1Pt()
 
 
   //call function
-  for(UInt_t i=0; i<nInputFiles; i++){
-    cout<<"Processing sample "<<inputFileName[i]<<" ... "<<endl;
-    doNtuplesForMVA(inputFilePath + inputFileName[i] + "/ZZXAnalysis.root", outputFilePath + "/reduced_" + inputFileName[i] + ".root", lumi);
-  }
+  // for(UInt_t i=0; i<nInputFiles; i++){
+  //   cout<<"Processing sample "<<inputFileName[i]<<" ... "<<endl;
+  //   doNtuplesForMVA(inputFilePath + inputFileName[i] + "/ZZXAnalysis.root", outputFilePath + "/reduced_" + inputFileName[i] + ".root", lumi);
+  // }
 
 
+  //***SYNC*** call function for sync only
+  doNtuplesForMVA("../ZZXAnalysis.root", outputFilePath + "/reduced_sync.root", lumi);
 }
