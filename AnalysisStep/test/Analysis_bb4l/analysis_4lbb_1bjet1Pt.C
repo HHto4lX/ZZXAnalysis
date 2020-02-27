@@ -45,8 +45,8 @@ int year = 2018;
 //*************************************************************************************
 // FINAL STATES
 enum FinalState {fs_4mu=0, fs_4e=1, fs_2mu2e=3};  // 4mu, 4e, 2e2mu
-const int nFinalState = 3;
-TString FinalState[nFinalState+1] = {"4mu", "4e","2e2mu","4l"};
+const int nFinalStates = 3;
+TString sFinalState[nFinalStates+1] = {"4mu", "4e","2e2mu","4l"};
 //*************************************************************************************
 // PROCESSES
 enum Process {Data=0, HH=1, ggH=2, VBF=3, VH=4, ttH=5, bbH=6, qqZZ=7, ggZZ=8, TTV=9, VVV=10, ZX=11, HWW=12}; 
@@ -65,16 +65,20 @@ void doHistos()
   //---lumi and input path
   float lumi = 0.;
   TString inFilePath;
+  TString sYear;
   if(year==2016){
     lumi       = 35.9; //fb-1 2016
+    sYear      = "2016";
     inFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
   }
   else if(year==2017){
     lumi       = 41.5; //fb-1 2017
+    sYear      = "2017";
     inFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
   }
   else if(year==2018){
     lumi       = 59.7; //fb-1 2018
+    sYear      = "2018";
     inFilePath = "/eos/user/a/acappati/samples_4lX/20200205_bestKD_samples2018/";
     inDataPath = "/eos/user/a/acappati/samples_4lX/allsamples/";
   }
@@ -155,10 +159,26 @@ void doHistos()
   vector<Float_t> *JetBTagger = 0;
   Float_t PFMET;
 
-  Float_t yield_4e = 0.;
-  Float_t yield_4mu = 0.;
-  Float_t yield_2e2mu = 0.;
-  Float_t yield_4l = 0.;
+
+  // define 1D histos
+  TH1F* h1_m4l_4lselOnly[nFinalStates+1][nProcesses]; 
+  //  TH1F* h1_m4l_4ljjsel[nFinalStates+1][nProcesses]; 
+  //  TH1F* h1_mbb_4ljjsel[nFinalStates+1][nProcesses];
+  for(int fs=0; fs<nFinalStates+1; fs++){
+    for(int pr=0; pr<nProcesses; pr++){
+      h1_m4l_4lselOnly[fs][pr] = new TH1F("h1_m4l_4lselOnly_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events / 2 GeV", 65, 70., 200.);
+      h1_m4l_4lselOnly[fs][pr]->Sumw2(true);
+      //  h1_m4l_4ljjsel[fs][pr]; 
+    }
+  }
+
+  int currentFinalState;
+  int currentProcess;  
+
+
+  //--- loop over all datasets
+  for(int d=0; d<nDatasets; d++){
+
 
 
   inputFile =  TFile::Open( inFile );
@@ -213,52 +233,9 @@ void doHistos()
     inputTree->SetBranchAddress("KFactor_QCD_qqZZ_Pt", &KFactor_QCD_qqZZ_Pt);
   }
 
-  
-  //output file 
-  float f_lept1_ptsignal;
-  float f_lept2_ptsignal;
-  float f_lept3_ptsignal;
-  float f_lept4_ptsignal;
-  float f_massjetjet;
-  float f_ptjet1;
-  float f_ptjet2;
-  float f_bdiscjet1signal;
-  float f_bdiscjet2signal;
-  float f_deltarsignal;
-  float f_METsignal;
-  float f_weightsignal;
-
-  float f_Z1Mass;
-  float f_Z2Mass;
-  float f_ZZmass;
-  float f_bbmass;
-  float f_HHmass;
-
-
-  TFile *f = new TFile(outFile,"recreate");
-  TTree *tnew = new TTree("reducedTree","");
-
-  tnew->Branch("f_lept1_pt",    &f_lept1_ptsignal);
-  tnew->Branch("f_lept2_pt",    &f_lept2_ptsignal);
-  tnew->Branch("f_lept3_pt",    &f_lept3_ptsignal);
-  tnew->Branch("f_lept4_pt",    &f_lept4_ptsignal);
-  tnew->Branch("f_massjetjet",  &f_massjetjet);
-  tnew->Branch("f_ptjet1",      &f_ptjet1);
-  tnew->Branch("f_ptjet2",      &f_ptjet2);
-  tnew->Branch("f_bdiscjet1",   &f_bdiscjet1signal);
-  tnew->Branch("f_bdiscjet2",   &f_bdiscjet2signal);
-  tnew->Branch("f_deltar_norm", &f_deltarsignal); 
-  tnew->Branch("f_MET_norm",    &f_METsignal); 
-  tnew->Branch("f_weight",      &f_weightsignal); 
-  tnew->Branch("f_Z1Mass",      &f_Z1Mass); 
-  tnew->Branch("f_Z2Mass",      &f_Z2Mass); 
-  tnew->Branch("f_ZZmass",      &f_ZZmass); 
-  tnew->Branch("f_bbmass",      &f_bbmass); 
-  tnew->Branch("f_HHmass",      &f_HHmass); 
 
 
 
-  int currentFinalState;
 
 
   // loop over input tree
@@ -481,6 +458,7 @@ void doHistos()
   tnew->Write();
   f->Close();
 
+  }//end loop over datasets
 }
 
 
