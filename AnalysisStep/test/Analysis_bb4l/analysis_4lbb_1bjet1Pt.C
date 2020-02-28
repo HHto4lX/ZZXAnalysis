@@ -49,9 +49,9 @@ const int nFinalStates = 3;
 TString sFinalState[nFinalStates+1] = {"4mu", "4e","2e2mu","4l"};
 //*************************************************************************************
 // PROCESSES
-enum Process {Data=0, HH=1, ggH=2, VBF=3, VH=4, ttH=5, bbH=6, qqZZ=7, ggZZ=8, TTV=9, VVV=10, ZX=11, HWW=12}; 
-const int nProcesses = 13;
-TString sProcess[nProcesses] = {"HH", "ggH", "VBF", "VH", "ttH", "bbH", "qqZZ", "ggZZ", "TTV", "VVV", "ZX", "HWW"};
+enum Process {Data=0, HH=1, ggH=2, VBF=3, VH=4, ttH=5, bbH=6, qqZZ=7, ggZZ=8, TTZ=9, TTW=10, VVV=11, ZX=12, HWW=13}; 
+const int nProcesses = 14;
+TString sProcess[nProcesses] = {"HH", "ggH", "VBF", "VH", "ttH", "bbH", "qqZZ", "ggZZ", "TTZ", "TTW", "VVV", "ZX", "HWW"};
 //*************************************************************************************
 
 
@@ -91,7 +91,7 @@ void doHistos()
 
   //---datasets
   int nDatasets = 22;
-  TString inputFileName[] = {
+  TString datasets[] = {
     "AllData", 
     "HH4lbb_Angela",
     "ggH125",
@@ -179,7 +179,27 @@ void doHistos()
   //--- loop over all datasets
   for(int d=0; d<nDatasets; d++){
 
+    currentProcess = -1;
 
+    if(datasets[d]=="AllData") currentProcess = Data;
+    if(datasets[d]=="HH4lbb_Angela") currentProcess = HH;
+    if(datasets[d]=="ggH125") currentProcess = ggH;
+    if(datasets[d]=="VBFH125") currentProcess = VBF;
+    if(datasets[d]=="WplusH125" ||
+       datasets[d]=="WminusH125" || 
+       datasets[d]=="ZH125") currentProcess = VH; 
+    if(datasets[d]=="ttH125") currentProcess = ttH;
+    if(datasets[d]=="bbH125") currentProcess = bbH;
+    if(datasets[d]=="ZZTo4lamcatnlo") currentProcess = qqZZ;
+    if(datasets[d]=="ggTo4e_Contin_MCFM701" ||
+       datasets[d]=="ggTo4mu_Contin_MCFM701" ||
+       datasets[d]=="ggTo4tau_Contin_MCFM701" ||
+       datasets[d]=="ggTo2e2mu_Contin_MCFM701" ||
+       datasets[d]=="ggTo2e2tau_Contin_MCFM701" ||
+       datasets[d]=="ggTo2mu2tau_Contin_MCFM70") currentProcess = ggZZ;
+    if(datasets[d]=="TTZToLLNuNu_M10") currentProcess = TTZ; 
+    if(datasets[d]=="TTWJetsToLNu") currentProcess = TTW;
+    
 
   inputFile =  TFile::Open( inFile );
 
