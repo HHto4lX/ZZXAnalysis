@@ -49,9 +49,9 @@ const int nFinalStates = 3;
 TString sFinalState[nFinalStates+1] = {"4mu", "4e","2e2mu","4l"};
 //*************************************************************************************
 // PROCESSES
-enum Process {Data=0, HH=1, ggH=2, VBF=3, VH=4, ttH=5, bbH=6, qqZZ=7, ggZZ=8, TTZ=9, TTW=10, VVV=11, ZX=12, HWW=13}; 
+enum Process {Data=0, HH=1, ggH=2, VBF=3, VH=4, ttH=5, bbH=6, qqZZ=7, ggZZ=8, TTZ=9, TTW=10, VVV=11, HWW=12, ZX=12}; 
 const int nProcesses = 14;
-TString sProcess[nProcesses] = {"HH", "ggH", "VBF", "VH", "ttH", "bbH", "qqZZ", "ggZZ", "TTZ", "TTW", "VVV", "ZX", "HWW"};
+TString sProcess[nProcesses] = {"HH", "ggH", "VBF", "VH", "ttH", "bbH", "qqZZ", "ggZZ", "TTZ", "TTW", "VVV", "HWW", "ZX"};
 //*************************************************************************************
 
 
@@ -199,18 +199,28 @@ void doHistos()
        datasets[d]=="ggTo2mu2tau_Contin_MCFM70") currentProcess = ggZZ;
     if(datasets[d]=="TTZToLLNuNu_M10") currentProcess = TTZ; 
     if(datasets[d]=="TTWJetsToLNu") currentProcess = TTW;
+    if(datasets[d]=="WWZ" ||
+       datasets[d]=="WZZ" ||
+       datasets[d]=="ZZZ") currentProcess = VVV;
+    if(datasets[d]=="Z+X") currentProcess = ZX;
     
 
-  inputFile =  TFile::Open( inFile );
+    // select input file
+    TString inputFileName = currentProcess==Data?inDataPath:inFilePath + datasets[d] + "/ZZXAnalysis.root"; 
+    inputFile = TFile::Open(inputFileName);
 
-  if(!isZX){
-    hCounters = (TH1F*)inputFile->Get("ZZTree/Counters");
-    NGenEvt = (Float_t)hCounters->GetBinContent(1);
-    gen_sumWeights = (Float_t)hCounters->GetBinContent(40);
-    partialSampleWeight = lumi * 1000 / gen_sumWeights;
-    inputTree = (TTree*)inputFile->Get("ZZTree/candTree");
-  }
-  else inputTree = (TTree*)inputFile->Get("candTree");
+    if(currentProcess == ZX){
+
+    }
+
+    if(!isZX){
+      hCounters = (TH1F*)inputFile->Get("ZZTree/Counters");
+      NGenEvt = (Float_t)hCounters->GetBinContent(1);
+      gen_sumWeights = (Float_t)hCounters->GetBinContent(40);
+      partialSampleWeight = lumi * 1000 / gen_sumWeights;
+      inputTree = (TTree*)inputFile->Get("ZZTree/candTree");
+    }
+    else inputTree = (TTree*)inputFile->Get("candTree");
 
   // set branch addresses
   if(!isZX){
