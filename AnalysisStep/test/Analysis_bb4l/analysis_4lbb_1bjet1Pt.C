@@ -51,7 +51,7 @@ TString sFinalState[nFinalStates+1] = {"4mu", "4e","2e2mu","4l"};
 // PROCESSES
 enum Process {Data=0, HH=1, ggH=2, VBF=3, VH=4, ttH=5, bbH=6, qqZZ=7, ggZZ=8, TTZ=9, TTW=10, VVV=11, HWW=12, ZX=12}; 
 const int nProcesses = 14;
-TString sProcess[nProcesses] = {"HH", "ggH", "VBF", "VH", "ttH", "bbH", "qqZZ", "ggZZ", "TTZ", "TTW", "VVV", "HWW", "ZX"};
+TString sProcess[nProcesses] = {"Data", "HH", "ggH", "VBF", "VH", "ttH", "bbH", "qqZZ", "ggZZ", "TTZ", "TTW", "VVV", "HWW", "ZX"};
 //*************************************************************************************
 
 
@@ -71,17 +71,19 @@ void doHistos()
     lumi       = 35.9; //fb-1 2016
     sYear      = "2016";
     inFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
+    inDataPath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
   }
   else if(year==2017){
     lumi       = 41.5; //fb-1 2017
     sYear      = "2017";
     inFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
+    inDataPath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
   }
   else if(year==2018){
     lumi       = 59.7; //fb-1 2018
     sYear      = "2018";
-    inFilePath = "/eos/user/a/acappati/samples_4lX/20200205_bestKD_samples2018/";
-    inDataPath = "/eos/user/a/acappati/samples_4lX/allsamples/";
+    inFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
+    inDataPath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
   }
   else{ 
     cout<<"wrong year selected!"<<endl;
@@ -90,7 +92,7 @@ void doHistos()
 
 
   //---datasets
-  int nDatasets = 22;
+  int nDatasets = 28;
   TString datasets[] = {
     "AllData", 
     "HH4lbb_Angela",
@@ -102,18 +104,24 @@ void doHistos()
     "bbH125",
     "ttH125",
     "ZZTo4lamcatnlo",
-    "TTZJets_M10_MLMext1",
-    "TTWJetsToLNu",
     "ggTo4e_Contin_MCFM701",
     "ggTo4mu_Contin_MCFM701",
     "ggTo4tau_Contin_MCFM701",
     "ggTo2e2mu_Contin_MCFM701",
     "ggTo2e2tau_Contin_MCFM701",
     "ggTo2mu2tau_Contin_MCFM701",
+    "TTZJets_M10_MLMext1",
+    "TTWJetsToLNu",
     "WWZ",
     "WZZ",
     "ZZZ",
-    "Z+X",
+    "HToWW125_ggH",
+    "HToWW125_VBFH",
+    "HToWW125_HWplusJ",
+    "HToWW125_HWminusJ",
+    "HToWW125_HZJ",
+    "HToWW125_bbH",
+    "Z+X"
   };
 
 
@@ -202,6 +210,12 @@ void doHistos()
     if(datasets[d]=="WWZ" ||
        datasets[d]=="WZZ" ||
        datasets[d]=="ZZZ") currentProcess = VVV;
+    if(datasets[d]=="HToWW125_ggH" ||
+       datasets[d]=="HToWW125_VBFH" ||
+       datasets[d]=="HToWW125_HWplusJ" ||
+       datasets[d]=="HToWW125_HWminusJ" ||
+       datasets[d]=="HToWW125_HZJ" ||
+       datasets[d]=="HToWW125_bbH") currentProcess = HWW;
     if(datasets[d]=="Z+X") currentProcess = ZX;
     
 
