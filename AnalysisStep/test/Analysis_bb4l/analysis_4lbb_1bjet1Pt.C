@@ -49,9 +49,9 @@ const int nFinalStates = 3;
 TString sFinalState[nFinalStates+1] = {"4mu", "4e","2e2mu","4l"};
 //*************************************************************************************
 // PROCESSES
-enum Process {Data=0, HH=1, ggH=2, VBF=3, VH=4, ttH=5, bbH=6, qqZZ=7, ggZZ=8, TTZ=9, TTW=10, VVV=11, HWW=12, ZX=12}; 
+enum Process {Data=0, HH=1, ggH=2, VBF=3, VH=4, ttH=5, bbH=6, qqZZ=7, ggZZ=8, TTZ=9, TTW=10, VVV=11, HWW=12, ZXbkg=13}; 
 const int nProcesses = 14;
-TString sProcess[nProcesses] = {"Data", "HH", "ggH", "VBF", "VH", "ttH", "bbH", "qqZZ", "ggZZ", "TTZ", "TTW", "VVV", "HWW", "ZX"};
+TString sProcess[nProcesses] = {"Data", "HH", "ggH", "VBF", "VH", "ttH", "bbH", "qqZZ", "ggZZ", "TTZ", "TTW", "VVV", "HWW", "ZXbkg"};
 //*************************************************************************************
 
 
@@ -88,7 +88,7 @@ void doHistos()
   else{ 
     cout<<"wrong year selected!"<<endl;
   }
-
+  cout<<"Year chosen: "<<year<<endl;
 
 
   //---datasets
@@ -110,7 +110,7 @@ void doHistos()
     "ggTo2e2mu_Contin_MCFM701",
     "ggTo2e2tau_Contin_MCFM701",
     "ggTo2mu2tau_Contin_MCFM701",
-    "TTZJets_M10_MLMext1",
+    "TTZToLLNuNu_M10",
     "TTWJetsToLNu",
     "WWZ",
     "WZZ",
@@ -121,7 +121,7 @@ void doHistos()
     "HToWW125_HWminusJ",
     "HToWW125_HZJ",
     "HToWW125_bbH",
-    "Z+X"
+    "ZXbkg",
   };
 
 
@@ -204,7 +204,7 @@ void doHistos()
        datasets[d]=="ggTo4tau_Contin_MCFM701" ||
        datasets[d]=="ggTo2e2mu_Contin_MCFM701" ||
        datasets[d]=="ggTo2e2tau_Contin_MCFM701" ||
-       datasets[d]=="ggTo2mu2tau_Contin_MCFM70") currentProcess = ggZZ;
+       datasets[d]=="ggTo2mu2tau_Contin_MCFM701") currentProcess = ggZZ;
     if(datasets[d]=="TTZToLLNuNu_M10") currentProcess = TTZ; 
     if(datasets[d]=="TTWJetsToLNu") currentProcess = TTW;
     if(datasets[d]=="WWZ" ||
@@ -216,16 +216,17 @@ void doHistos()
        datasets[d]=="HToWW125_HWminusJ" ||
        datasets[d]=="HToWW125_HZJ" ||
        datasets[d]=="HToWW125_bbH") currentProcess = HWW;
-    if(datasets[d]=="Z+X") currentProcess = ZX;
+    if(datasets[d]=="ZXbkg") currentProcess = ZXbkg;
     
 
     // select input file
     TString inputFileName;
     if(currentProcess == Data) inputFileName = inDataPath + datasets[d] + "/ZZXAnalysis.root";
     else inputFileName = inFilePath + datasets[d] + "/ZZXAnalysis.root";
+    cout<<"Opening file "<<inputFileName<<" ..."<<endl;
     inputFile[d] = TFile::Open(inputFileName);
 
-    if(currentProcess == ZX){
+    if(currentProcess == ZXbkg){
       hCounters[d] = 0;
       NGenEvt[d] = 0;
       gen_sumWeights[d] = 0.;
@@ -239,17 +240,17 @@ void doHistos()
       partialSampleWeight[d] = lumi * 1000 / gen_sumWeights[d];
       inputTree[d] = (TTree*)inputFile[d]->Get("ZZTree/candTree");
     }
-    cout<<"debug "<<datasets[d]<<" "<<currentProcess<<endl;
+    cout<<"debug "<<datasets[d]<<" "<<currentProcess<<" "<<sProcess[currentProcess]<<endl;
 
     // set branch addresses
-    if(currentProcess != ZX){
+    if(currentProcess != ZXbkg){
       inputTree[d]->SetBranchAddress("RunNumber", &nRun);
       inputTree[d]->SetBranchAddress("EventNumber", &nEvent);
       inputTree[d]->SetBranchAddress("LumiNumber", &nLumi);
       if(currentProcess != Data) inputTree[d]->SetBranchAddress("overallEventWeight", &overallEventWeight);
       if(currentProcess != Data) inputTree[d]->SetBranchAddress("xsec", &xsec);
     } 
-    if(currentProcess == ZX) inputTree[d]->SetBranchAddress("weight", &weight);
+    if(currentProcess == ZXbkg) inputTree[d]->SetBranchAddress("weight", &weight);
     inputTree[d]->SetBranchAddress("ZZsel", &ZZsel);
     inputTree[d]->SetBranchAddress("LepPt", &LepPt);
     inputTree[d]->SetBranchAddress("LepEta", &LepEta);
@@ -302,13 +303,13 @@ void doHistos()
       else if(currentProcess == ggZZ) { kfactor = KFactor_QCD_ggZZ_Nominal; } //ggZZ samples 
 
       Double_t eventWeight = 1.;
-      if(currentProcess != Data && currentProcess != ZX) eventWeight = partialSampleWeight[d] * xsec * kfactor * overallEventWeight;
-      if(currentProcess == ZX) eventWeight = weight; //ZX weight
+      if(currentProcess != Data && currentProcess != ZXbkg) eventWeight = partialSampleWeight[d] * xsec * kfactor * overallEventWeight;
+      if(currentProcess == ZXbkg) eventWeight = weight; //ZX weight
 
 
       // --- select final state
       currentFinalState = -1;
-      if (currentProcess != ZX){
+      if (currentProcess != ZXbkg){
 	if (Z1Flav == -121){
 	  if (Z2Flav == -121) {currentFinalState = fs_4e;}
           else if ( Z2Flav == -169) {currentFinalState = fs_2e2mu;}
@@ -322,7 +323,7 @@ void doHistos()
 	else{ cerr << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; Z1Flav = " << Z1Flav << endl; }
       }
 
-      else if (currentProcess == ZX){
+      else if (currentProcess == ZXbkg){
 	if (Z1Flav == -121){
 	  if (Z2Flav == +121) { currentFinalState = fs_4e; }
           else if (Z2Flav == +169) { currentFinalState = fs_2e2mu; }
@@ -335,7 +336,6 @@ void doHistos()
 	}
 	else{ cerr << "error, Z2Flav: " << endl; }
       }
-      cout<<"debug: final state "<<currentFinalState<<endl;
 
       
 
