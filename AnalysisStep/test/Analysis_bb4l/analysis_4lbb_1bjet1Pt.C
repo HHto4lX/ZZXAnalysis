@@ -167,25 +167,33 @@ void doHistos()
   vector<Float_t> *JetBTagger = 0;
   Float_t PFMET;
 
+  // define yields histos
+  TH1F* hYields[nProcesses][nFinalStates+1];
+  for(int pr=0; pr<nProcesses; pr++){
+    for(int fs=0; fs<nFinalStates+1; fs++){
+      hYields[pr][fs] = new TH1F("hYields_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,"",1,0.,1.);
+      hYields[pr][fs]->Sumw2(true);
+    }
+  }
 
   // define 1D histos
-  TH1F* h1_m4l_4lselOnly[nFinalStates+1][nProcesses]; 
-  TH1F* h1_m4l_4ljjsel[nFinalStates+1][nProcesses]; 
-  TH1F* h1_mbb_4ljjsel[nFinalStates+1][nProcesses];
-  TH1F* h1_j1Eta_4ljjsel[nFinalStates+1][nProcesses];
-  TH1F* h1_j2Eta_4ljjsel[nFinalStates+1][nProcesses];
-  for(int fs=0; fs<nFinalStates+1; fs++){
-    for(int pr=0; pr<nProcesses; pr++){
-      h1_m4l_4lselOnly[fs][pr] = new TH1F("h1_m4l_4lselOnly_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events/2 GeV", 65, 70., 200.);
-      h1_m4l_4lselOnly[fs][pr]->Sumw2(true);
-      h1_m4l_4ljjsel[fs][pr] = new TH1F("h1_m4l_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events/2 GeV", 65, 70., 200.);
-      h1_m4l_4ljjsel[fs][pr]->Sumw2(true);
-      h1_mbb_4ljjsel[fs][pr] = new TH1F("h1_mbb_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{jj} (GeV); Events/2 GeV", 100, 0., 200.); 
-      h1_mbb_4ljjsel[fs][pr]->Sumw2(true);
-      h1_j1Eta_4ljjsel[fs][pr] = new TH1F("h1_j1Eta_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j1 #eta ; Events",56, -2.8, 2.8);
-      h1_j1Eta_4ljjsel[fs][pr]->Sumw2(true);
-      h1_j2Eta_4ljjsel[fs][pr] = new TH1F("h1_j2Eta_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j2 #eta ; Events",56, -2.8, 2.8);
-      h1_j2Eta_4ljjsel[fs][pr]->Sumw2(true);      
+  TH1F* h1_m4l_4lselOnly[nProcesses][nFinalStates+1]; 
+  TH1F* h1_m4l_4ljjsel  [nProcesses][nFinalStates+1]; 
+  TH1F* h1_mbb_4ljjsel  [nProcesses][nFinalStates+1];
+  TH1F* h1_j1Eta_4ljjsel[nProcesses][nFinalStates+1];
+  TH1F* h1_j2Eta_4ljjsel[nProcesses][nFinalStates+1];
+  for(int pr=0; pr<nProcesses; pr++){
+    for(int fs=0; fs<nFinalStates+1; fs++){
+      h1_m4l_4lselOnly[pr][fs] = new TH1F("h1_m4l_4lselOnly_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events/2 GeV", 65, 70., 200.);
+      h1_m4l_4lselOnly[pr][fs]->Sumw2(true);
+      h1_m4l_4ljjsel  [pr][fs] = new TH1F("h1_m4l_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events/2 GeV", 65, 70., 200.);
+      h1_m4l_4ljjsel  [pr][fs]->Sumw2(true);
+      h1_mbb_4ljjsel  [pr][fs] = new TH1F("h1_mbb_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{jj} (GeV); Events/2 GeV", 100, 0., 200.); 
+      h1_mbb_4ljjsel  [pr][fs]->Sumw2(true);
+      h1_j1Eta_4ljjsel[pr][fs] = new TH1F("h1_j1Eta_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j1 #eta ; Events",56, -2.8, 2.8);
+      h1_j1Eta_4ljjsel[pr][fs]->Sumw2(true);
+      h1_j2Eta_4ljjsel[pr][fs] = new TH1F("h1_j2Eta_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j2 #eta ; Events",56, -2.8, 2.8);
+      h1_j2Eta_4ljjsel[pr][fs]->Sumw2(true);      
     }
   }
 
@@ -316,6 +324,7 @@ void doHistos()
       if(currentProcess == ZXbkg) eventWeight = weight; //ZX weight
 
 
+
       // --- select final state
       currentFinalState = -1;
       if (currentProcess != ZXbkg){
@@ -349,7 +358,7 @@ void doHistos()
       
 
       // --- fill histos 4l sel only
-      h1_m4l_4lselOnly[currentFinalState][currentProcess]->Fill(ZZMass, eventWeight);
+      h1_m4l_4lselOnly[currentProcess][currentFinalState]->Fill(ZZMass, eventWeight);
 
 
 
@@ -393,11 +402,15 @@ void doHistos()
       TLorentzVector Hbb_tlzvec = tlzvec_j1_ + tlzvec_j2_;
       Float_t bbMass = Hbb_tlzvec.M();
 
-      // --- fill histos 4ljj sel
-      h1_m4l_4ljjsel[currentFinalState][currentProcess]->Fill(ZZMass, eventWeight);
-      h1_mbb_4ljjsel[currentFinalState][currentProcess]->Fill(bbMass, eventWeight);
-      h1_j1Eta_4ljjsel[currentFinalState][currentProcess]->Fill(JetEta->at(dj1_), eventWeight);
-      h1_j2Eta_4ljjsel[currentFinalState][currentProcess]->Fill(JetEta->at(dj2_), eventWeight);
+
+      // --- fill yields after 4ljj sel
+      hYields[currentProcess][currentFinalState]->Fill(0.5, eventWeight);
+
+      // --- fill histos after 4ljj sel
+      h1_m4l_4ljjsel  [currentProcess][currentFinalState]->Fill(ZZMass, eventWeight);
+      h1_mbb_4ljjsel  [currentProcess][currentFinalState]->Fill(bbMass, eventWeight);
+      h1_j1Eta_4ljjsel[currentProcess][currentFinalState]->Fill(JetEta->at(dj1_), eventWeight);
+      h1_j2Eta_4ljjsel[currentProcess][currentFinalState]->Fill(JetEta->at(dj2_), eventWeight);
 
   
       // // build H-H DeltaR
@@ -438,19 +451,41 @@ void doHistos()
   }//end loop over datasets
 
 
-  //save histos in a root file
-  TFile* fout_histos = new TFile("f_histos_h1.root", "recreate");
-  fout_histos->cd();
-  for(int fs=0; fs<nFinalStates+1; fs++){
-    for(int pr=0; pr<nProcesses; pr++){
-      h1_m4l_4lselOnly[fs][pr]->Write();
-      h1_m4l_4ljjsel[fs][pr]->Write();
-      h1_mbb_4ljjsel[fs][pr]->Write();
-      h1_j1Eta_4ljjsel[fs][pr]->Write();
-      h1_j2Eta_4ljjsel[fs][pr]->Write();      
+  //---fill inclusive yields and histos
+  for(int pr=0; pr<nProcesses; pr++){
+    for(int fs=0; fs<nFinalstates; fs++){
+      hYields[pr][nFinalstates]->Add(hYields[pr][fs]);
+      h1_m4l_4lselOnly[pr][nFinalstates]->Add(h1_m4l_4lselOnly[pr][fs]);
+      h1_m4l_4ljjsel  [pr][nFinalstates]->Add(h1_m4l_4ljjsel  [pr][fs]);
+      h1_mbb_4ljjsel  [pr][nFinalstates]->Add(h1_mbb_4ljjsel  [pr][fs]);
+      h1_j1Eta_4ljjsel[pr][nFinalstates]->Add(h1_j1Eta_4ljjsel[pr][fs]);
+      h1_j2Eta_4ljjsel[pr][nFinalstates]->Add(h1_j2Eta_4ljjsel[pr][fs]);
     }
   }
-  fout_histos->Close();
+
+  //---save yields in a root file
+  TFile* fout_yields = new TFile("f_yields.root", "recreate");
+  fout_yields->cd();
+  for(int pr=0; pr<nProcesses; pr++){
+    for(int fs=0; fs<nFinalStates+1; fs++){
+      hYields[pr][fs]->Write();
+    }
+  }
+  fout_yields->Close();
+
+  //---save histos in a root file
+  TFile* fout_1Dhistos = new TFile("f_histos_h1.root", "recreate");
+  fout_1Dhistos->cd();
+  for(int pr=0; pr<nProcesses; pr++){
+    for(int fs=0; fs<nFinalStates+1; fs++){
+      h1_m4l_4lselOnly[pr][fs]->Write();
+      h1_m4l_4ljjsel  [pr][fs]->Write();
+      h1_mbb_4ljjsel  [pr][fs]->Write();
+      h1_j1Eta_4ljjsel[pr][fs]->Write();
+      h1_j2Eta_4ljjsel[pr][fs]->Write();      
+    }
+  }
+  fout_1Dhistos->Close();
   
 
 
