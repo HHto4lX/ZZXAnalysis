@@ -170,13 +170,22 @@ void doHistos()
 
   // define 1D histos
   TH1F* h1_m4l_4lselOnly[nFinalStates+1][nProcesses]; 
-  //  TH1F* h1_m4l_4ljjsel[nFinalStates+1][nProcesses]; 
-  //  TH1F* h1_mbb_4ljjsel[nFinalStates+1][nProcesses];
+  TH1F* h1_m4l_4ljjsel[nFinalStates+1][nProcesses]; 
+  TH1F* h1_mbb_4ljjsel[nFinalStates+1][nProcesses];
+  TH1F* h1_j1Eta_4ljjsel[nFinalStates+1][nProcesses];
+  TH1F* h1_j2Eta_4ljjsel[nFinalStates+1][nProcesses];
   for(int fs=0; fs<nFinalStates+1; fs++){
     for(int pr=0; pr<nProcesses; pr++){
-      h1_m4l_4lselOnly[fs][pr] = new TH1F("h1_m4l_4lselOnly_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events / 2 GeV", 65, 70., 200.);
+      h1_m4l_4lselOnly[fs][pr] = new TH1F("h1_m4l_4lselOnly_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events/2 GeV", 65, 70., 200.);
       h1_m4l_4lselOnly[fs][pr]->Sumw2(true);
-      //  h1_m4l_4ljjsel[fs][pr]; 
+      h1_m4l_4ljjsel[fs][pr] = new TH1F("h1_m4l_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events/2 GeV", 65, 70., 200.);
+      h1_m4l_4ljjsel[fs][pr]->Sumw2(true);
+      h1_mbb_4ljjsel[fs][pr] = new TH1F("h1_mbb_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{jj} (GeV); Events/2 GeV", 100, 0., 200.); 
+      h1_mbb_4ljjsel[fs][pr]->Sumw2(true);
+      h1_j1Eta_4ljjsel[fs][pr] = new TH1F("h1_j1Eta_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j1 #eta ; Events",56, -2.8, 2.8);
+      h1_j1Eta_4ljjsel[fs][pr]->Sumw2(true);
+      h1_j2Eta_4ljjsel[fs][pr] = new TH1F("h1_j2Eta_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j2 #eta ; Events",56, -2.8, 2.8);
+      h1_j2Eta_4ljjsel[fs][pr]->Sumw2(true);      
     }
   }
 
@@ -345,64 +354,51 @@ void doHistos()
 
 
 
-      // // mass cut: signal region
-      //  if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
+      // mass cut: signal region
+       if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
 
  
 
 
-      // //JETSELECTION---------------------------------------------------
-      // // jet quantities
-      // vector<TLorentzVector> JetVec; // TLorentz vector with all Jets per Event
-      // vector<TLorentzVector> JetPair; // TLorentz vector with all Jets Pairs
-      // vector<float> JetBinfo; // vector with b-tag info per each Jet of the Event
-      
-  
-      // for (UInt_t j = 0; j < JetPt->size(); j++)
-      //   {
-      // 	  if ( fabs( JetEta->at(j) ) > 2.4 ) continue;
-      //     if (JetPt->at(j) < 20 )  continue; // pt cut 20GeV from ntuplizer 
-  	  
-      // 	TLorentzVector temp;
-      // 	temp.SetPtEtaPhiM(JetPt->at(j), JetEta->at(j), JetPhi->at(j), JetMass->at(j));
-      // 	JetVec.push_back(temp);
-      // 	JetBinfo.push_back(JetBTagger->at(j));
-      //   }
-  
-  
-  
-      // // at least 2 jets in the acceptance
-      // if (JetVec.size() < 2) continue;   
+      //JETSELECTION--------------------------------------------------  
+      // at least 2 jets in the acceptance
+      if (JetPt->size() < 2) continue;   
           
       
+      // index of jet with max btagger value (j1)
+      int dj1_ = distance( JetBTagger->begin(), max_element(JetBTagger->begin(), JetBTagger->end()));
+      
+      // index of jet with max pT (j2)  
+      float maxJetPt = -9999.;
+      int dj2_ = -9999;
+      for(UInt_t i=0; i<JetPt->size(); i++){
   
-      // // get and save vector with max btagger value
-      // f_bdiscjet1signal = *max_element(JetBinfo.begin(), JetBinfo.end());
-  
-      // // get and save btagger value of the second jet (the one with max pt)
-      // int d1_maxbtag = distance( JetBinfo.begin(), max_element(JetBinfo.begin(), JetBinfo.end()));
-  
-      // float maxJetPt = -9999.;
-      // int d2_maxJetPt = -9999;
-      // for(UInt_t i=0; i<JetVec.size(); i++){
-  
-      //   if(i == d1_maxbtag) continue;
-      //   float temp = JetVec.at(i).Pt();
-      //   if (temp > maxJetPt){
-      //     maxJetPt = temp;
-      //     d2_maxJetPt = i;
-      //   }
-      // }
-      // // save btagger value of the second jet (the one with max pt)
-      // f_bdiscjet2signal = JetBinfo.at(d2_maxJetPt);
+        if(i == dj1_) continue;
+        float temp = JetPt->at(i);
+        if (temp > maxJetPt){
+          maxJetPt = temp;
+          dj2_ = i;
+        }
+      }
 
-      // // save jet pT
-      // f_ptjet1 = JetVec.at(d1_maxbtag).Pt();
-      // f_ptjet2 = JetVec.at(d2_maxJetPt).Pt();
-  
-  
-      // // build H->bb tlorentzvector
-      // TLorentzVector Hbb_Vec = JetVec.at(d1_maxbtag) + JetVec.at(d2_maxJetPt);
+      
+      // build 2 jets tlorentzvectors
+      TLorentzVector tlzvec_j1_;
+      tlzvec_j1_.SetPtEtaPhiM(JetPt->at(dj1_), JetEta->at(dj1_), JetPhi->at(dj1_), JetMass->at(dj1_));
+      TLorentzVector tlzvec_j2_;
+      tlzvec_j2_.SetPtEtaPhiM(JetPt->at(dj2_), JetEta->at(dj2_), JetPhi->at(dj2_), JetMass->at(dj2_));
+      
+      
+      // build H->bb tlorentzvector
+      TLorentzVector Hbb_tlzvec = tlzvec_j1_ + tlzvec_j2_;
+      Float_t bbMass = Hbb_tlzvec.M();
+
+      // --- fill histos 4ljj sel
+      h1_m4l_4ljjsel[currentFinalState][currentProcess]->Fill(ZZMass, eventWeight);
+      h1_mbb_4ljjsel[currentFinalState][currentProcess]->Fill(bbMass, eventWeight);
+      h1_j1Eta_4ljjsel[currentFinalState][currentProcess]->Fill(JetEta->at(dj1_), eventWeight);
+      h1_j2Eta_4ljjsel[currentFinalState][currentProcess]->Fill(JetEta->at(dj2_), eventWeight);
+
   
       // // build H-H DeltaR
       // float DeltaPhi = ZZPhi - Hbb_Vec.Phi();
@@ -430,7 +426,7 @@ void doHistos()
       // // save jet jet inv mass
       // f_massjetjet = Hbb_Vec.M();
 
-      // //JETSELECTION---------------------------------------------------
+      //JETSELECTION---------------------------------------------------
 
 
 
@@ -440,7 +436,25 @@ void doHistos()
     }//end loop over tree events
 
   }//end loop over datasets
-}
+
+
+  //save histos in a root file
+  TFile* fout_histos = new TFile("f_histos_h1.root", "recreate");
+  fout_histos->cd();
+  for(int fs=0; fs<nFinalStates+1; fs++){
+    for(int pr=0; pr<nProcesses; pr++){
+      h1_m4l_4lselOnly[fs][pr]->Write();
+      h1_m4l_4ljjsel[fs][pr]->Write();
+      h1_mbb_4ljjsel[fs][pr]->Write();
+      h1_j1Eta_4ljjsel[fs][pr]->Write();
+      h1_j2Eta_4ljjsel[fs][pr]->Write();      
+    }
+  }
+  fout_histos->Close();
+  
+
+
+}//end doHistos function
 
 
 void analysis_4lbb_1bjet1Pt()
