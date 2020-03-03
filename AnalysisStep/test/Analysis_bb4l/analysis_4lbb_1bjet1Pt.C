@@ -453,13 +453,13 @@ void doHistos()
 
   //---fill inclusive yields and histos
   for(int pr=0; pr<nProcesses; pr++){
-    for(int fs=0; fs<nFinalstates; fs++){
-      hYields[pr][nFinalstates]->Add(hYields[pr][fs]);
-      h1_m4l_4lselOnly[pr][nFinalstates]->Add(h1_m4l_4lselOnly[pr][fs]);
-      h1_m4l_4ljjsel  [pr][nFinalstates]->Add(h1_m4l_4ljjsel  [pr][fs]);
-      h1_mbb_4ljjsel  [pr][nFinalstates]->Add(h1_mbb_4ljjsel  [pr][fs]);
-      h1_j1Eta_4ljjsel[pr][nFinalstates]->Add(h1_j1Eta_4ljjsel[pr][fs]);
-      h1_j2Eta_4ljjsel[pr][nFinalstates]->Add(h1_j2Eta_4ljjsel[pr][fs]);
+    for(int fs=0; fs<nFinalStates; fs++){
+      hYields[pr][nFinalStates]->Add(hYields[pr][fs]);
+      h1_m4l_4lselOnly[pr][nFinalStates]->Add(h1_m4l_4lselOnly[pr][fs]);
+      h1_m4l_4ljjsel  [pr][nFinalStates]->Add(h1_m4l_4ljjsel  [pr][fs]);
+      h1_mbb_4ljjsel  [pr][nFinalStates]->Add(h1_mbb_4ljjsel  [pr][fs]);
+      h1_j1Eta_4ljjsel[pr][nFinalStates]->Add(h1_j1Eta_4ljjsel[pr][fs]);
+      h1_j2Eta_4ljjsel[pr][nFinalStates]->Add(h1_j2Eta_4ljjsel[pr][fs]);
     }
   }
 
