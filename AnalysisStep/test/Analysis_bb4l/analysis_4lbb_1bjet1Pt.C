@@ -1,5 +1,4 @@
 // ***********************
-// prepare ntuples for mva
 // run with:
 //
 // root -l -b -q analysis_4lbb_1bjet1Pt.C++
@@ -32,7 +31,7 @@
 
 using namespace std;
 
-
+#define REDOHISTOS 0
 
 //******************
 //int year = 2016;
@@ -492,6 +491,13 @@ void doHistos()
 }//end doHistos function
 
 
+void printYields(){
+ 
+     
+
+}
+
+
 void analysis_4lbb_1bjet1Pt()
 {
 
@@ -499,6 +505,8 @@ void analysis_4lbb_1bjet1Pt()
   // //string outputFilePath = "200212_mvaNtuples_1bjet1Pt_4l";
   // gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
 
-  doHistos();
+  if(REDOHISTOS) doHistos();
+
+  printYields();
 
 }
