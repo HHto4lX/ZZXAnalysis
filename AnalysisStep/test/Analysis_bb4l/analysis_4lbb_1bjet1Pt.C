@@ -477,7 +477,7 @@ void doHistos()
   }
 
   //---save yields in a root file
-  TSTring fout_yields_name = "f_yields_"+ sYear + ".root";
+  TString fout_yields_name = "f_yields_"+ sYear + ".root";
   TFile* fout_yields = new TFile(fout_yields_name, "recreate");
   fout_yields->cd();
   for(int pr=0; pr<nProcesses; pr++){
