@@ -548,7 +548,7 @@ void printYields(){
   // **********************************************
   // --- print number of event selected after 4l sel for sync (no weight) 
   ofstream f_events4lsel_sync;
-  TString f_events4lsel_sync_name = "nEvents_4lsel_perSync_"+ sYear;
+  TString f_events4lsel_sync_name = "nEvents_4lsel_perSync_"+ sYear + ".txt";
   f_events4lsel_sync.open(f_events4lsel_sync_name);
   f_events4lsel_sync<<"|Final state |signal HH |ttZ |ttH |ZZ |Higgs+VBF(=ggH+VBF+H->WW) |others(=VVV+VH+TTW) |Z+X |"<<endl;
   for(int fs=0; fs<nFinalStates+1; fs++){
@@ -558,7 +558,7 @@ void printYields(){
 
   // --- print number of event selected after 4ljj sel for sync (no weight) 
   ofstream f_events4ljjsel_sync;
-  TString f_events4ljjsel_sync_name = "nEvents_4ljjsel_perSync_"+ sYear;
+  TString f_events4ljjsel_sync_name = "nEvents_4ljjsel_perSync_"+ sYear + ".txt";
   f_events4ljjsel_sync.open(f_events4ljjsel_sync_name);
   f_events4ljjsel_sync<<"|Final state |signal HH |ttZ |ttH |ZZ |Higgs+VBF(=ggH+VBF+H->WW) |others(=VVV+VH+TTW) |Z+X |"<<endl;
   for(int fs=0; fs<nFinalStates+1; fs++){
@@ -573,7 +573,7 @@ void printYields(){
   // ********************
   // --- print yields for sync 
   ofstream f_yields_sync;
-  TString f_yields_sync_name = "yields_perSync_"+ sYear;
+  TString f_yields_sync_name = "yields_perSync_"+ sYear + ".txt";
   f_yields_sync.open(f_yields_sync_name);
   f_yields_sync<<"|Final state |signal HH |ttZ |ttH |ZZ |Higgs+VBF(=ggH+VBF+H->WW) |others(=VVV+VH+TTW) |Z+X |"<<endl;
   for(int fs=0; fs<nFinalStates+1; fs++){
@@ -583,7 +583,7 @@ void printYields(){
 
   // --- print yields process per process
   ofstream f_yields_process;
-  TString f_yields_process_name = "yields_perProcess_"+ sYear;
+  TString f_yields_process_name = "yields_perProcess_"+ sYear + ".txt";
   f_yields_process.open(f_yields_process_name);
   f_yields_process<<"|Process |"<<sFinalState[fs_4mu]<<" |"<<sFinalState[fs_4e]<<" |"<<sFinalState[fs_2e2mu]<<" |"<<endl;
   for(int pr=0; pr<nProcesses; pr++){
