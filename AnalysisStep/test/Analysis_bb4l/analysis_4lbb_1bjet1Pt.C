@@ -16,6 +16,7 @@
 #include "TFrame.h"
 #include "TF1.h"
 #include "TH1F.h"
+#include "TH2F.h"
 #include "TLegend.h"
 #include "TLegendEntry.h"
 #include "TLine.h"
@@ -201,6 +202,15 @@ void doHistos()
       h1_j2Eta_4ljjsel[pr][fs]->Sumw2(true);      
     }
   }
+
+  // define 2D histos
+  TH2F* h2_m4lvsmbb_4ljjsel[nProcesses][nFinalStates];
+  for(int pr=0; pr<nProcesses; pr++){
+    for(int fs=0; fs<nFinalStates; fs++){
+      h2_m4lvsmbb_4ljjsel[pr][fs] = new TH2F("h2_m4lvsmbb_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} ;m_{bb}", 20, 115., 135., 240, 60., 180.);
+    }
+  }
+  
 
   int currentFinalState;
   int currentProcess;  
@@ -422,8 +432,11 @@ void doHistos()
       h1_mbb_4ljjsel  [currentProcess][currentFinalState]->Fill(bbMass, eventWeight);
       h1_j1Eta_4ljjsel[currentProcess][currentFinalState]->Fill(JetEta->at(dj1_), eventWeight);
       h1_j2Eta_4ljjsel[currentProcess][currentFinalState]->Fill(JetEta->at(dj2_), eventWeight);
+      //2D histo
+      h2_m4lvsmbb_4ljjsel[currentProcess][currentFinalState]->Fill(ZZMass, bbMass, eventWeight);
 
-  
+
+
       // // build H-H DeltaR
       // float DeltaPhi = ZZPhi - Hbb_Vec.Phi();
       // if( fabs(DeltaPhi) > acos(-1) ) { DeltaPhi = (2*acos(-1)) - fabs(DeltaPhi); }
@@ -503,7 +516,17 @@ void doHistos()
     }
   }
   fout_1Dhistos->Close();
-  
+    
+  //---save 2D histos in a root file
+  TString fout_2Dhistos_name = "f_histos_h2_" + sYear + ".root";
+  TFile* fout_2Dhistos = new TFile(fout_2Dhistos_name, "recreate");  
+  fout_2Dhistos->cd();
+  for(int pr=0; pr<nProcesses; pr++){
+    for(int fs=0; fs<nFinalStates; fs++){
+      h2_m4lvsmbb_4ljjsel[pr][fs]->Write();
+    }
+  }
+  fout_2Dhistos->Close();
 
 
 }//end doHistos function
