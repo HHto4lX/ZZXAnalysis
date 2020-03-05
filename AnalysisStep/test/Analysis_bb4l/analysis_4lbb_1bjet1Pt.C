@@ -325,7 +325,6 @@ void doHistos()
       else if(currentProcess == ggZZ) { kfactor = KFactor_QCD_ggZZ_Nominal; } //ggZZ samples 
 
       Double_t eventWeight = 1.;
-      if(currentProcess == HH) {xsec = 0.03105 * 0.00014425; cout<<xsec<<endl;} 
       if(currentProcess != Data && currentProcess != ZXbkg) eventWeight = partialSampleWeight[d] * xsec * kfactor * overallEventWeight;
       if(currentProcess == ZXbkg) eventWeight = weight; //ZX weight
 
