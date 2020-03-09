@@ -168,13 +168,16 @@ void doHistos()
   Float_t PFMET;
 
   // define yields histos and nEvents histos (no weight)
-  TH1F* hYields        [nProcesses][nFinalStates+1];
+  TH1F* hYields_4lsel  [nProcesses][nFinalStates+1];
+  TH1F* hYields_4ljjsel[nProcesses][nFinalStates+1];
   TH1F* hEvents_4lsel  [nProcesses][nFinalStates+1];
   TH1F* hEvents_4ljjsel[nProcesses][nFinalStates+1];
   for(int pr=0; pr<nProcesses; pr++){
     for(int fs=0; fs<nFinalStates+1; fs++){
-      hYields        [pr][fs] = new TH1F("hYields_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,"",1,0.,1.);
-      hYields        [pr][fs]->Sumw2(true);
+      hYields_4lsel  [pr][fs] = new TH1F("hYields_4lsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,"",1,0.,1.);
+      hYields_4lsel  [pr][fs]->Sumw2(true);
+      hYields_4ljjsel[pr][fs] = new TH1F("hYields_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,"",1,0.,1.);
+      hYields_4ljjsel[pr][fs]->Sumw2(true);
       hEvents_4lsel  [pr][fs] = new TH1F("hEvents_4lsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,"",1,0.,1.);
       hEvents_4lsel  [pr][fs]->Sumw2(true);
       hEvents_4ljjsel[pr][fs] = new TH1F("hEvents_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,"",1,0.,1.);
@@ -183,15 +186,15 @@ void doHistos()
   }
 
   // define 1D histos
-  TH1F* h1_m4l_4lselOnly[nProcesses][nFinalStates+1]; 
+  TH1F* h1_m4l_4lsel    [nProcesses][nFinalStates+1]; 
   TH1F* h1_m4l_4ljjsel  [nProcesses][nFinalStates+1]; 
   TH1F* h1_mbb_4ljjsel  [nProcesses][nFinalStates+1];
   TH1F* h1_j1Eta_4ljjsel[nProcesses][nFinalStates+1];
   TH1F* h1_j2Eta_4ljjsel[nProcesses][nFinalStates+1];
   for(int pr=0; pr<nProcesses; pr++){
     for(int fs=0; fs<nFinalStates+1; fs++){
-      h1_m4l_4lselOnly[pr][fs] = new TH1F("h1_m4l_4lselOnly_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events/2 GeV", 65, 70., 200.);
-      h1_m4l_4lselOnly[pr][fs]->Sumw2(true);
+      h1_m4l_4lsel    [pr][fs] = new TH1F("h1_m4l_4lsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events/2 GeV", 65, 70., 200.);
+      h1_m4l_4lsel    [pr][fs]->Sumw2(true);
       h1_m4l_4ljjsel  [pr][fs] = new TH1F("h1_m4l_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events/2 GeV", 65, 70., 200.);
       h1_m4l_4ljjsel  [pr][fs]->Sumw2(true);
       h1_mbb_4ljjsel  [pr][fs] = new TH1F("h1_mbb_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{jj} (GeV); Events/2 GeV", 100, 0., 200.); 
@@ -372,8 +375,11 @@ void doHistos()
 
       
 
-      // --- fill histos 4l sel only
-      h1_m4l_4lselOnly[currentProcess][currentFinalState]->Fill(ZZMass, eventWeight);
+      // --- fill histos 4l sel
+      h1_m4l_4lsel[currentProcess][currentFinalState]->Fill(ZZMass, eventWeight);
+
+      // --- fill yields after 4l sel
+      hYields_4lsel[currentProcess][currentFinalState]->Fill(0.5, eventWeight);
 
       // --- fill number of non weighted events selected after 4l sel
       hEvents_4lsel[currentProcess][currentFinalState]->Fill(0.5, 1.);
@@ -422,7 +428,7 @@ void doHistos()
 
 
       // --- fill yields after 4ljj sel
-      hYields[currentProcess][currentFinalState]->Fill(0.5, eventWeight);
+      hYields_4ljjsel[currentProcess][currentFinalState]->Fill(0.5, eventWeight);
       // --- fill number of non weighted events selected after 4ljj sel
       hEvents_4ljjsel[currentProcess][currentFinalState]->Fill(0.5, 1.);
       
@@ -478,10 +484,11 @@ void doHistos()
   //---fill inclusive yields and histos
   for(int pr=0; pr<nProcesses; pr++){
     for(int fs=0; fs<nFinalStates; fs++){
-      hYields        [pr][nFinalStates]->Add(hYields        [pr][fs]);
-      hEvents_4lsel  [pr][nFinalStates]->Add(hEvents_4lsel  [pr][fs]);
-      hEvents_4ljjsel[pr][nFinalStates]->Add(hEvents_4ljjsel[pr][fs]);
-      h1_m4l_4lselOnly[pr][nFinalStates]->Add(h1_m4l_4lselOnly[pr][fs]);
+      hYields_4lsel   [pr][nFinalStates]->Add(hYields_4lsel   [pr][fs]);
+      hYields_4ljjsel [pr][nFinalStates]->Add(hYields_4ljjsel [pr][fs]);
+      hEvents_4lsel   [pr][nFinalStates]->Add(hEvents_4lsel   [pr][fs]);
+      hEvents_4ljjsel [pr][nFinalStates]->Add(hEvents_4ljjsel [pr][fs]);
+      h1_m4l_4lsel    [pr][nFinalStates]->Add(h1_m4l_4lsel    [pr][fs]);
       h1_m4l_4ljjsel  [pr][nFinalStates]->Add(h1_m4l_4ljjsel  [pr][fs]);
       h1_mbb_4ljjsel  [pr][nFinalStates]->Add(h1_mbb_4ljjsel  [pr][fs]);
       h1_j1Eta_4ljjsel[pr][nFinalStates]->Add(h1_j1Eta_4ljjsel[pr][fs]);
@@ -495,7 +502,8 @@ void doHistos()
   fout_yields->cd();
   for(int pr=0; pr<nProcesses; pr++){
     for(int fs=0; fs<nFinalStates+1; fs++){
-      hYields        [pr][fs]->Write();
+      hYields_4lsel  [pr][fs]->Write();
+      hYields_4ljjsel[pr][fs]->Write();
       hEvents_4lsel  [pr][fs]->Write();
       hEvents_4ljjsel[pr][fs]->Write();
     }
@@ -508,7 +516,7 @@ void doHistos()
   fout_1Dhistos->cd();
   for(int pr=0; pr<nProcesses; pr++){
     for(int fs=0; fs<nFinalStates+1; fs++){
-      h1_m4l_4lselOnly[pr][fs]->Write();
+      h1_m4l_4lsel    [pr][fs]->Write();
       h1_m4l_4ljjsel  [pr][fs]->Write();
       h1_mbb_4ljjsel  [pr][fs]->Write();
       h1_j1Eta_4ljjsel[pr][fs]->Write();
@@ -548,16 +556,20 @@ void printYields(){
   cout<<"Retrieving Data and MC yields histos from file "<<inFileName<<" ..."<<endl;
   TFile* fInYields = TFile::Open(inFileName);
 
+  TH1F* hTemp0;
   TH1F* hTemp1;
   TH1F* hTemp2;
   TH1F* hTemp3;
-  Float_t yield         [nProcesses][nFinalStates+1];
+  Float_t yield_4lsel   [nProcesses][nFinalStates+1];
+  Float_t yield_4ljjsel [nProcesses][nFinalStates+1];
   Float_t nEvent_4lsel  [nProcesses][nFinalStates+1];
   Float_t nEvent_4ljjsel[nProcesses][nFinalStates+1];
   for(int pr=0; pr<nProcesses; pr++){
     for(int fs=0; fs<nFinalStates+1; fs++){
-      hTemp1 = (TH1F*)fInYields->Get("hYields_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear);
-      yield[pr][fs] = hTemp1->GetBinContent(1);
+      hTemp0 = (TH1F*)fInYields->Get("hYields_4lsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear);
+      yield_4lsel[pr][fs] = hTemp0->GetBinContent(1);
+      hTemp1 = (TH1F*)fInYields->Get("hYields_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear);
+      yield_4ljjsel[pr][fs] = hTemp1->GetBinContent(1);
       hTemp2 = (TH1F*)fInYields->Get("hEvents_4lsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear);
       nEvent_4lsel[pr][fs] = hTemp2->GetBinContent(1);  
       hTemp3 = (TH1F*)fInYields->Get("hEvents_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear);
@@ -569,7 +581,8 @@ void printYields(){
   // **********************************************
   // *** PRINT NUMBER OF EVENTS SEL (no weight) ***
   // **********************************************
-  // --- print number of event selected after 4l sel for sync (no weight) 
+  // --- print number of event selected after 4l sel for sync (no weight)
+  cout<<"print number of event selected after 4l sel for sync (no weight) ... "<<endl; 
   ofstream f_events4lsel_sync;
   TString f_events4lsel_sync_name = "nEvents_4lsel_perSync_"+ sYear + ".txt";
   f_events4lsel_sync.open(f_events4lsel_sync_name);
@@ -579,7 +592,8 @@ void printYields(){
   }
   f_events4lsel_sync.close();
 
-  // --- print number of event selected after 4ljj sel for sync (no weight) 
+  // --- print number of event selected after 4ljj sel for sync (no weight)
+  cout<<"print number of event selected after 4ljj sel for sync (no weight) ... "<<endl; 
   ofstream f_events4ljjsel_sync;
   TString f_events4ljjsel_sync_name = "nEvents_4ljjsel_perSync_"+ sYear + ".txt";
   f_events4ljjsel_sync.open(f_events4ljjsel_sync_name);
@@ -594,25 +608,50 @@ void printYields(){
   // ********************
   // *** PRINT YIELDS ***
   // ********************
-  // --- print yields for sync 
-  ofstream f_yields_sync;
-  TString f_yields_sync_name = "yields_perSync_"+ sYear + ".txt";
-  f_yields_sync.open(f_yields_sync_name);
-  f_yields_sync<<"|Final state |signal HH |ttZ |ttH |ZZ |Higgs+VBF(=ggH+VBF+H->WW) |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  // --- print yields after 4l sel for sync 
+  cout<<"print yields after 4l sel for sync ... "<<endl;
+  ofstream f_yields4lsel_sync;
+  TString f_yields4lsel_sync_name = "yields4lsel_perSync_"+ sYear + ".txt";
+  f_yields4lsel_sync.open(f_yields4lsel_sync_name);
+  f_yields4lsel_sync<<"|Final state |signal HH |ttZ |ttH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF+H->WW) |others(=VVV+VH+TTW) |Z+X |"<<endl;
   for(int fs=0; fs<nFinalStates+1; fs++){
-    f_yields_sync<<"|"<<sFinalState[fs]<<" |"<<yield[HH][fs]<<" |"<<yield[TTZ][fs]<<" |"<<yield[ttH][fs]<<" |"<<yield[qqZZ][fs]+yield[ggZZ][fs]<<" |"<<yield[ggH][fs]+yield[VBF][fs]+yield[HWW][fs]<<" |"<<yield[VVV][fs]+yield[VH][fs]+yield[TTW][fs]<<" |"<<yield[ZXbkg][fs]<<" |"<<endl;
+    f_yields4lsel_sync<<"|"<<sFinalState[fs]<<" |"<<yield_4lsel[HH][fs]<<" |"<<yield_4lsel[TTZ][fs]<<" |"<<yield_4lsel[ttH][fs]<<" |"<<yield_4lsel[qqZZ][fs]+yield_4lsel[ggZZ][fs]<<" |"<<yield_4lsel[ggH][fs]+yield_4lsel[VBF][fs]+yield_4lsel[HWW][fs]<<" |"<<yield_4lsel[VVV][fs]+yield_4lsel[VH][fs]+yield_4lsel[TTW][fs]<<" |"<<yield_4lsel[ZXbkg][fs]<<" |"<<endl;
   }
-  f_yields_sync.close();
+  f_yields4lsel_sync.close();
 
-  // --- print yields process per process
-  ofstream f_yields_process;
-  TString f_yields_process_name = "yields_perProcess_"+ sYear + ".txt";
-  f_yields_process.open(f_yields_process_name);
-  f_yields_process<<"|Process |"<<sFinalState[fs_4mu]<<" |"<<sFinalState[fs_4e]<<" |"<<sFinalState[fs_2e2mu]<<" |"<<endl;
+  // --- print yields after 4l sel per process
+  cout<<"print yields after 4l sel per process ... "<<endl;
+  ofstream f_yields4lsel_process;
+  TString f_yields4lsel_process_name = "yields4lsel_perProcess_"+ sYear + ".txt";
+  f_yields4lsel_process.open(f_yields4lsel_process_name);
+  f_yields4lsel_process<<"|Process |"<<sFinalState[fs_4mu]<<" |"<<sFinalState[fs_4e]<<" |"<<sFinalState[fs_2e2mu]<<" |"<<endl;
   for(int pr=0; pr<nProcesses; pr++){
-    f_yields_process<<"|"<<sProcess[pr]<<" |"<<yield[pr][fs_4mu]<<" |"<<yield[pr][fs_4e]<<" |"<<yield[pr][fs_2e2mu]<<" |"<<endl;
+    f_yields4lsel_process<<"|"<<sProcess[pr]<<" |"<<yield_4lsel[pr][fs_4mu]<<" |"<<yield_4lsel[pr][fs_4e]<<" |"<<yield_4lsel[pr][fs_2e2mu]<<" |"<<endl;
   }
-  f_yields_process.close();
+  f_yields4lsel_process.close();
+
+
+  // --- print yields after 4ljj sel for sync 
+  cout<<"print yields after 4ljj sel for sync ... "<<endl;
+  ofstream f_yields4ljjsel_sync;
+  TString f_yields4ljjsel_sync_name = "yields4ljjsel_perSync_"+ sYear + ".txt";
+  f_yields4ljjsel_sync.open(f_yields4ljjsel_sync_name);
+  f_yields4ljjsel_sync<<"|Final state |signal HH |ttZ |ttH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF+H->WW) |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  for(int fs=0; fs<nFinalStates+1; fs++){
+    f_yields4ljjsel_sync<<"|"<<sFinalState[fs]<<" |"<<yield_4ljjsel[HH][fs]<<" |"<<yield_4ljjsel[TTZ][fs]<<" |"<<yield_4ljjsel[ttH][fs]<<" |"<<yield_4ljjsel[qqZZ][fs]+yield_4ljjsel[ggZZ][fs]<<" |"<<yield_4ljjsel[ggH][fs]+yield_4ljjsel[VBF][fs]+yield_4ljjsel[HWW][fs]<<" |"<<yield_4ljjsel[VVV][fs]+yield_4ljjsel[VH][fs]+yield_4ljjsel[TTW][fs]<<" |"<<yield_4ljjsel[ZXbkg][fs]<<" |"<<endl;
+  }
+  f_yields4ljjsel_sync.close();
+
+  // --- print yields after 4ljj sel per process
+  cout<<"print yields after 4ljj sel per process ... "<<endl;
+  ofstream f_yields4ljjsel_process;
+  TString f_yields4ljjsel_process_name = "yields4ljjsel_perProcess_"+ sYear + ".txt";
+  f_yields4ljjsel_process.open(f_yields4ljjsel_process_name);
+  f_yields4ljjsel_process<<"|Process |"<<sFinalState[fs_4mu]<<" |"<<sFinalState[fs_4e]<<" |"<<sFinalState[fs_2e2mu]<<" |"<<endl;
+  for(int pr=0; pr<nProcesses; pr++){
+    f_yields4ljjsel_process<<"|"<<sProcess[pr]<<" |"<<yield_4ljjsel[pr][fs_4mu]<<" |"<<yield_4ljjsel[pr][fs_4e]<<" |"<<yield_4ljjsel[pr][fs_2e2mu]<<" |"<<endl;
+  }
+  f_yields4ljjsel_process.close();
 
 }
 
