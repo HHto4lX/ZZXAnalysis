@@ -63,7 +63,7 @@ void jetMatchingStudy(){
   vector<Float_t> *JetMass   = 0;
   vector<Float_t> *JetBTagger = 0;
 
-  vector<Float_t> *GENjetParentID   = 0;
+  //  vector<Float_t> *GENjetParentID   = 0;
   vector<Float_t> *prunedGenPartID   = 0;
   vector<Float_t> *prunedGenPartPt   = 0;
   vector<Float_t> *prunedGenPartEta   = 0;
@@ -87,6 +87,11 @@ void jetMatchingStudy(){
   int count0match_Method3 = 0;
   int countTOTmatch_Method3 = 0;
 
+  // yields
+  float yield_Method1_ = 0.;
+  float yield_Method2_ = 0.;
+  float yield_Method3_ = 0.;
+
 
   // histos
   TH1F* h_matches_Method1 = new TH1F("h_matches_Method1","reco-GEN jet matches;# reco jet with GEN match;eff", 3,-0.5,2.5);
@@ -102,8 +107,11 @@ void jetMatchingStudy(){
   TH1F* h_weights2 = new TH1F("h_weights2","",100,-0.0001,0.0008);
   TH1F* h_weights3 = new TH1F("h_weights3","",100,-0.0001,0.0008);
   
-  TString inFile = "/eos/user/a/acappati/samples_4lX/allsamples/HH4lbb/ZZXAnalysis.root";
-  //  TString inFile = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/HH4lbb_Angela/ZZXAnalysis.root";
+  //  TString inFile = "/eos/user/a/acappati/samples_4lX/20200205_bestKD_samples2018/HH4lbb_Angela/ZZXAnalysis.root";
+  //  TString inFile = "/eos/user/a/acappati/samples_4lX/20200205_bestKD_samples2018/HH4lbb_Roberto/ZZXAnalysis.root";
+  //  TString inFile = "/eos/user/a/acappati/samples_4lX/allsamples/HH4lbb/ZZXAnalysis.root";
+  TString inFile = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/HH4lbb_Angela/ZZXAnalysis.root";
+  cout<<"reading file "<<inFile<<" ..."<<endl;
   inputFile =  TFile::Open( inFile );
 
 
@@ -131,7 +139,7 @@ void jetMatchingStudy(){
   inputTree->SetBranchAddress("JetPhi",  &JetPhi);
   inputTree->SetBranchAddress("JetBTagger",  &JetBTagger);
 
-  inputTree->SetBranchAddress("GENjetParentID",  &GENjetParentID);
+  //  inputTree->SetBranchAddress("GENjetParentID",  &GENjetParentID);
   inputTree->SetBranchAddress("prunedGenPartEta", &prunedGenPartEta );
   inputTree->SetBranchAddress("prunedGenPartPhi", &prunedGenPartPhi );
   inputTree->SetBranchAddress("prunedGenPartPt", &prunedGenPartPt );
@@ -150,6 +158,8 @@ void jetMatchingStudy(){
 
     inputTree->GetEntry(entry);
 
+    if(entry==10) cout<<"xsec  " <<xsec<<endl;
+
     // trigger check
     if( !(ZZsel >= 0) ) continue;
 
@@ -167,7 +177,7 @@ void jetMatchingStudy(){
 
     // fill eventweight
     Double_t eventWeight = partialSampleWeight * xsec * overallEventWeight ;  //kfactor e l1prefiring non ci sono, tanto uso solo HH sample
-
+    
 
 
 
@@ -199,6 +209,9 @@ void jetMatchingStudy(){
     // at least 2 jets in the acceptance
     if (JetVec_Method1.size() >= 2){
 
+      // count yield
+      yield_Method1_ += eventWeight;
+
       // count number of events with at least 2 jets
       countTOTmatch_Method1++;
 
@@ -216,7 +229,7 @@ void jetMatchingStudy(){
         }
       }
 
-      cout<<d1_Method1<<" "<<d2_Method1<<endl;      
+      //      cout<<d1_Method1<<" "<<d2_Method1<<endl;      
     
       // find match between 1st reco jets and GEN jets
       bool bool_match1_Method1 = false;
@@ -248,13 +261,13 @@ void jetMatchingStudy(){
         }
       }
 
-      cout<<bool_match1_Method1<<" "<<bool_match2_Method1<<endl;
+      //      cout<<bool_match1_Method1<<" "<<bool_match2_Method1<<endl;
 
       if(bool_match1_Method1 && bool_match2_Method1) {count2match_Method1++;}
       else if( (bool_match1_Method1 && !bool_match2_Method1) || (!bool_match1_Method1 && bool_match2_Method1) ) {count1match_Method1++;}
       else {count0match_Method1++;}
 
-      cout<<count0match_Method1<<" "<<count1match_Method1<<" "<<count2match_Method1<<" "<<countTOTmatch_Method1<<endl;
+      //      cout<<count0match_Method1<<" "<<count1match_Method1<<" "<<count2match_Method1<<" "<<countTOTmatch_Method1<<endl;
 
 
       TLorentzVector Hbb_vec_Method1 = JetVec_Method1.at(d1_Method1) + JetVec_Method1.at(d2_Method1);
@@ -293,6 +306,9 @@ void jetMatchingStudy(){
     // at least 2 jets in the acceptance
     if (JetVec_Method2.size() >= 2){
 
+      // count yield
+      yield_Method2_ += eventWeight;
+
       // count number of events with at least 2 jets
       countTOTmatch_Method2++;
 
@@ -310,7 +326,7 @@ void jetMatchingStudy(){
         }
       }
 
-      cout<<d1_Method2<<" "<<d2_Method2<<endl;      
+      //      cout<<d1_Method2<<" "<<d2_Method2<<endl;      
 
 
       // find match between 1st reco jets and GEN jets
@@ -343,13 +359,13 @@ void jetMatchingStudy(){
         }
       }
 
-      cout<<bool_match1_Method2<<" "<<bool_match2_Method2<<endl;
+      //      cout<<bool_match1_Method2<<" "<<bool_match2_Method2<<endl;
 
       if(bool_match1_Method2 && bool_match2_Method2) {count2match_Method2++;}
       else if( (bool_match1_Method2 && !bool_match2_Method2) || (!bool_match1_Method2 && bool_match2_Method2) ) {count1match_Method2++;}
       else {count0match_Method2++;}
 
-      cout<<count0match_Method2<<" "<<count1match_Method2<<" "<<count2match_Method2<<" "<<countTOTmatch_Method2<<endl;
+      //      cout<<count0match_Method2<<" "<<count1match_Method2<<" "<<count2match_Method2<<" "<<countTOTmatch_Method2<<endl;
 
       TLorentzVector Hbb_vec_Method2 = JetVec_Method2.at(d1_Method2) + JetVec_Method2.at(d2_Method2);
       h_bbmass_Method2->Fill(Hbb_vec_Method2.M(), eventWeight);
@@ -386,6 +402,9 @@ void jetMatchingStudy(){
     // at least 2 jets in the acceptance
     if (JetVec_Method3.size() >= 2){
 
+      // count yield
+      yield_Method3_ += eventWeight;
+
       // count number of events with at least 2 jets
       countTOTmatch_Method3++;
 
@@ -403,7 +422,7 @@ void jetMatchingStudy(){
         }
       }
 
-      cout<<d1_Method3<<" "<<d2_Method3<<endl;      
+      //      cout<<d1_Method3<<" "<<d2_Method3<<endl;      
     
 
       // find match between 1st reco jets and GEN jets
@@ -436,13 +455,13 @@ void jetMatchingStudy(){
         }
       }
 
-      cout<<bool_match1_Method3<<" "<<bool_match2_Method3<<endl;
+      //      cout<<bool_match1_Method3<<" "<<bool_match2_Method3<<endl;
 
       if(bool_match1_Method3 && bool_match2_Method3) {count2match_Method3++;}
       else if( (bool_match1_Method3 && !bool_match2_Method3) || (!bool_match1_Method3 && bool_match2_Method3) ) {count1match_Method3++;}
       else {count0match_Method3++;}
 
-      cout<<count0match_Method3<<" "<<count1match_Method3<<" "<<count2match_Method3<<" "<<countTOTmatch_Method3<<endl;
+      //      cout<<count0match_Method3<<" "<<count1match_Method3<<" "<<count2match_Method3<<" "<<countTOTmatch_Method3<<endl;
 
       TLorentzVector Hbb_vec_Method3 = JetVec_Method3.at(d1_Method3) + JetVec_Method3.at(d2_Method3);
       h_bbmass_Method3->Fill(Hbb_vec_Method3.M(), eventWeight);
@@ -497,11 +516,11 @@ void jetMatchingStudy(){
   TCanvas* c_matches = new TCanvas();
   c_matches->cd();
 
-  h_matches_Method1->SetLineColor(kBlue);
-  h_matches_Method1->Draw("hist");
-
   h_matches_Method2->SetLineColor(kRed);
-  h_matches_Method2->Draw("hist same");
+  h_matches_Method2->Draw("hist");
+
+  h_matches_Method1->SetLineColor(kBlue);
+  h_matches_Method1->Draw("hist same");
 
   h_matches_Method3->SetLineColor(kGreen+2);
   h_matches_Method3->Draw("hist same");
@@ -525,7 +544,8 @@ void jetMatchingStudy(){
 
 
   //get yields
-  cout<<"yields "<<h_bbmass_Method1->Integral(0,-1)<<" "<<h_bbmass_Method2->Integral(0,-1)<<" "<<h_bbmass_Method3->Integral(0,-1)<<endl;
+  cout<<"yields "<<yield_Method1_<<" "<<yield_Method2_<<" "<<yield_Method3_<<endl;
+  cout<<"mbb integral "<<h_bbmass_Method1->Integral(0,-1)<<" "<<h_bbmass_Method2->Integral(0,-1)<<" "<<h_bbmass_Method3->Integral(0,-1)<<endl;
   cout<<"entries "<<h_bbmass_Method1->GetEntries()<<" "<<h_bbmass_Method2->GetEntries()<<" "<<h_bbmass_Method3->GetEntries()<<endl;
 
   // bbmass
