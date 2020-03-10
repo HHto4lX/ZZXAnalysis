@@ -50,8 +50,7 @@ void jetMatchingStudy(){
   Long64_t nEvent;
   Int_t nLumi;
   Float_t overallEventWeight;
-  //  Float_t xsec = 0.0000447896; //pb
-  Float_t xsec = 0.00001017; //pb Angela
+  Float_t xsec;
 
   Short_t ZZsel;
   vector<Float_t> *LepPt = 0;
@@ -94,17 +93,17 @@ void jetMatchingStudy(){
   TH1F* h_matches_Method2 = new TH1F("h_matches_Method2","reco-GEN jet matches;# reco jet with GEN match;eff", 3,-0.5,2.5);
   TH1F* h_matches_Method3 = new TH1F("h_matches_Method3","reco-GEN jet matches;# reco jet with GEN match;eff", 3,-0.5,2.5);
 
-  TH1F* h_bbmass_Method1 = new TH1F("h_bbmass_Method1", ";bbMass;events", 300, 0., 300.); h_bbmass_Method1->Sumw2(true);
-  TH1F* h_bbmass_Method2 = new TH1F("h_bbmass_Method2", ";bbMass;events", 300, 0., 300.); h_bbmass_Method2->Sumw2(true);
-  TH1F* h_bbmass_Method3 = new TH1F("h_bbmass_Method3", ";bbMass;events", 300, 0., 300.); h_bbmass_Method3->Sumw2(true);
+  TH1F* h_bbmass_Method1 = new TH1F("h_bbmass_Method1", ";bbMass;events", 50, 0., 500.); h_bbmass_Method1->Sumw2(true);
+  TH1F* h_bbmass_Method2 = new TH1F("h_bbmass_Method2", ";bbMass;events", 50, 0., 500.); h_bbmass_Method2->Sumw2(true);
+  TH1F* h_bbmass_Method3 = new TH1F("h_bbmass_Method3", ";bbMass;events", 50, 0., 500.); h_bbmass_Method3->Sumw2(true);
   TH1F* h_bbmass_GEN     = new TH1F("h_bbmass_GEN",     ";bbMass;events", 100, 0., 300.);
   
   TH1F* h_weights1 = new TH1F("h_weights1","",100,-0.0001,0.0008);
   TH1F* h_weights2 = new TH1F("h_weights2","",100,-0.0001,0.0008);
   TH1F* h_weights3 = new TH1F("h_weights3","",100,-0.0001,0.0008);
   
-
   TString inFile = "/eos/user/a/acappati/samples_4lX/allsamples/HH4lbb/ZZXAnalysis.root";
+  //  TString inFile = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/HH4lbb_Angela/ZZXAnalysis.root";
   inputFile =  TFile::Open( inFile );
 
 
@@ -119,7 +118,7 @@ void jetMatchingStudy(){
   inputTree->SetBranchAddress("EventNumber", &nEvent);
   inputTree->SetBranchAddress("LumiNumber", &nLumi);
   inputTree->SetBranchAddress("overallEventWeight", &overallEventWeight);
-  //  inputTree->SetBranchAddress("xsec", &xsec);
+  inputTree->SetBranchAddress("xsec", &xsec);
 
   inputTree->SetBranchAddress("ZZsel", &ZZsel);
   inputTree->SetBranchAddress("LepPt", &LepPt);
@@ -188,7 +187,7 @@ void jetMatchingStudy(){
 
     for (UInt_t j = 0; j < JetPt->size(); j++)
     {
-      if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 30 ) ) continue; // pt cut 20GeV from ntuplizer 
+      if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 20 ) ) continue; // pt cut 20GeV from ntuplizer 
 	  
       TLorentzVector temp;
       temp.SetPtEtaPhiM(JetPt->at(j), JetEta->at(j), JetPhi->at(j), JetMass->at(j));
@@ -282,7 +281,7 @@ void jetMatchingStudy(){
 
     for (UInt_t j = 0; j < JetPt->size(); j++)
     {
-      if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 30 ) ) continue; // pt cut 20GeV from ntuplizer 
+      if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 20 ) ) continue; // pt cut 20GeV from ntuplizer 
 	  
       TLorentzVector temp;
       temp.SetPtEtaPhiM(JetPt->at(j), JetEta->at(j), JetPhi->at(j), JetMass->at(j));
@@ -374,7 +373,7 @@ void jetMatchingStudy(){
 
     for (UInt_t j = 0; j < JetPt->size(); j++)
     {
-      if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 30 ) ) continue; // pt cut 20GeV from ntuplizer 
+      if ( (fabs ( JetEta->at(j) ) > 2.4) || (JetPt->at(j) < 20 ) ) continue; // pt cut 20GeV from ntuplizer 
 	  
       TLorentzVector temp;
       temp.SetPtEtaPhiM(JetPt->at(j), JetEta->at(j), JetPhi->at(j), JetMass->at(j));
