@@ -107,11 +107,9 @@ void jetMatchingStudy(){
   TH1F* h_weights2 = new TH1F("h_weights2","",100,-0.0001,0.0008);
   TH1F* h_weights3 = new TH1F("h_weights3","",100,-0.0001,0.0008);
   
-  //  TString inFile = "/eos/user/a/acappati/samples_4lX/allsamples/HH4lbb/ZZXAnalysis.root";
-  //  TString inFile = "/eos/user/a/acappati/samples_4lX/20200205_bestKD_samples2018/HH4lbb_Roberto/ZZXAnalysis.root";
-  //  TString inFile = "/eos/user/a/acappati/samples_4lX/20200205_bestKD_samples2018/HH4lbb_Angela/ZZXAnalysis.root";
   //  TString inFile = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/HH4lbb_Angela/ZZXAnalysis.root";
-  TString inFile = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/HH4lbb_Roberto/ZZXAnalysis.root";
+  //  TString inFile = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/HH4lbb_Roberto_MadGraphLO/ZZXAnalysis.root";
+  TString inFile = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/HH4lbb_Roberto_PowhegNLO/ZZXAnalysis.root";
   cout<<"reading file "<<inFile<<" ..."<<endl;
   inputFile =  TFile::Open( inFile );
 
