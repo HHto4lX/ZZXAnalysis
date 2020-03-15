@@ -591,7 +591,7 @@ void printYields(){
   ofstream f_events4lsel_sync;
   TString f_events4lsel_sync_name = "nEvents_4lsel_perSync_"+ sYear + ".txt";
   f_events4lsel_sync.open(f_events4lsel_sync_name);
-  f_events4lsel_sync<<"|Final state |signal HH |ttZ |ttH |ZZ |Higgs+VBF(=ggH+VBF+H->WW) |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  f_events4lsel_sync<<"|Final state |signal HH |ttZ |ttH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF+H->WW) |others(=VVV+VH+TTW) |Z+X |"<<endl;
   for(int fs=0; fs<nFinalStates+1; fs++){
     f_events4lsel_sync<<"|"<<sFinalState[fs]<<" |"<<nEvent_4lsel[HH][fs]<<" |"<<nEvent_4lsel[TTZ][fs]<<" |"<<nEvent_4lsel[ttH][fs]<<" |"<<nEvent_4lsel[qqZZ][fs]+nEvent_4lsel[ggZZ][fs]<<" |"<<nEvent_4lsel[ggH][fs]+nEvent_4lsel[VBF][fs]+nEvent_4lsel[HWW][fs]<<" |"<<nEvent_4lsel[VVV][fs]+nEvent_4lsel[VH][fs]+nEvent_4lsel[TTW][fs]<<" |"<<nEvent_4lsel[ZXbkg][fs]<<" |"<<endl;
   }
@@ -602,7 +602,7 @@ void printYields(){
   ofstream f_events4ljjsel_sync;
   TString f_events4ljjsel_sync_name = "nEvents_4ljjsel_perSync_"+ sYear + ".txt";
   f_events4ljjsel_sync.open(f_events4ljjsel_sync_name);
-  f_events4ljjsel_sync<<"|Final state |signal HH |ttZ |ttH |ZZ |Higgs+VBF(=ggH+VBF+H->WW) |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  f_events4ljjsel_sync<<"|Final state |signal HH |ttZ |ttH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF+H->WW) |others(=VVV+VH+TTW) |Z+X |"<<endl;
   for(int fs=0; fs<nFinalStates+1; fs++){
     f_events4ljjsel_sync<<"|"<<sFinalState[fs]<<" |"<<nEvent_4ljjsel[HH][fs]<<" |"<<nEvent_4ljjsel[TTZ][fs]<<" |"<<nEvent_4ljjsel[ttH][fs]<<" |"<<nEvent_4ljjsel[qqZZ][fs]+nEvent_4ljjsel[ggZZ][fs]<<" |"<<nEvent_4ljjsel[ggH][fs]+nEvent_4ljjsel[VBF][fs]+nEvent_4ljjsel[HWW][fs]<<" |"<<nEvent_4ljjsel[VVV][fs]+nEvent_4ljjsel[VH][fs]+nEvent_4ljjsel[TTW][fs]<<" |"<<nEvent_4ljjsel[ZXbkg][fs]<<" |"<<endl;
   }
