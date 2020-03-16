@@ -56,7 +56,9 @@ TString sProcess[nProcesses] = {"Data", "HH", "ggH", "VBF", "VH", "ttH", "bbH", 
 
 
 
-
+//*************************
+//*** doHistos function ***
+//*************************
 void doHistos()
 {
 
@@ -545,7 +547,10 @@ void doHistos()
 }//end doHistos function
 
 
-void printYields(){
+//************************************
+//*** printYields_forSync function ***
+//************************************
+void printYields_forSync(){
 
   //---input path
   TString sYear;
@@ -658,9 +663,63 @@ void printYields(){
   }
   f_yields4ljjsel_process.close();
 
-}
+}// end function printyields_forSync
 
 
+
+//*************************************
+//*** printYields_forCards function ***
+//*************************************
+void  printYields_forCards(){
+
+  cout<<"print yields for cards ..."<<endl;
+
+  //---input path
+  TString sYear;
+  if(year==2016)      sYear = "2016";
+  else if(year==2017) sYear = "2017";
+  else if(year==2018) sYear = "2018";
+  else cout<<"wrong year selected!"<<endl;
+  cout<<"Year chosen: "<<year<<endl;
+
+ 
+  // retrieve yields histos from file
+  TString inFileName = "f_yields_" + sYear + ".root";     
+  cout<<"Retrieving Data and MC yields histos from file "<<inFileName<<" ..."<<endl;
+  TFile* fInYields = TFile::Open(inFileName);
+
+  TH1F* hTemp1;
+  Float_t yield_4ljjsel [nProcesses][nFinalStates+1];
+  for(int pr=0; pr<nProcesses; pr++){
+    for(int fs=0; fs<nFinalStates+1; fs++){
+      hTemp1 = (TH1F*)fInYields->Get("hYields_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear);
+      yield_4ljjsel[pr][fs] = hTemp1->GetBinContent(1);
+    }
+  }
+
+  //da fare per FS (only 4mu, 4e, 2e2mu)
+  cout<<"print yields after 4ljj sel per cards ... "<<endl;
+  for(int fs=0; fs<nFinalStates; fs++){
+    ofstream f_yields4ljjsel_cards;
+    TString f_yields4ljjsel_cards_name = "yields4ljjsel_perCards_"+ sYear + "_" + sFinalState[fs] + ".yaml";
+    f_yields4ljjsel_cards.open(f_yields4ljjsel_cards_name);
+    f_yields4ljjsel_cards<<"year2018: "<<endl;
+    for(int pr=1; pr<nProcesses; pr++){   //pr starts from 1=HH, not to print Data yield (0)
+      f_yields4ljjsel_cards<<"    "<<sProcess[pr]<<": '"<<yield_4ljjsel[pr][fs]<<"'"<<endl;
+    }
+    f_yields4ljjsel_cards.close();
+  }
+
+  
+
+
+}// end function printYields_forCards
+
+
+
+//*********************
+//*** main function ***
+//*********************
 void analysis_4lbb_2bjet()
 {
 
@@ -670,6 +729,8 @@ void analysis_4lbb_2bjet()
 
   if(REDOHISTOS) doHistos();
 
-  printYields();
+  printYields_forSync();
+
+  printYields_forCards();
 
 }
