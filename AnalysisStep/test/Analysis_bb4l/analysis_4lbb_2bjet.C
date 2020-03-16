@@ -703,7 +703,7 @@ void  printYields_forCards(){
     ofstream f_yields4ljjsel_cards;
     TString f_yields4ljjsel_cards_name = "yields4ljjsel_perCards_"+ sYear + "_" + sFinalState[fs] + ".yaml";
     f_yields4ljjsel_cards.open(f_yields4ljjsel_cards_name);
-    f_yields4ljjsel_cards<<"year2018: "<<endl;
+    f_yields4ljjsel_cards<<"year"<<sYear<<": "<<endl;
     for(int pr=1; pr<nProcesses; pr++){   //pr starts from 1=HH, not to print Data yield (0)
       f_yields4ljjsel_cards<<"    "<<sProcess[pr]<<": '"<<yield_4ljjsel[pr][fs]<<"'"<<endl;
     }
