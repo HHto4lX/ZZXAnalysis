@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <math.h>
 #include "TCanvas.h"
+#include "TPad.h"
+#include "THStack.h"
 #include "TColor.h"
 #include "TFile.h"
 #include "TFrame.h"
@@ -29,6 +31,8 @@
 #include "TTree.h"
 #include <vector>
 #include "TLorentzVector.h"
+
+
 
 using namespace std;
 
@@ -213,19 +217,19 @@ void doHistos()
       h1_j2Eta_4ljjsel[pr][fs] = new TH1F("h1_j2Eta_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j2 #eta ; Events",56, -2.8, 2.8);
       h1_j2Eta_4ljjsel[pr][fs]->Sumw2(true);      
       //BDT input histos
-      h1_j1btag_4ljjsel  [pr][fs] = new TH1F("h1_j1btag_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,"j1 DeepCSV; Events/0.04", 25, 0., 1.);
+      h1_j1btag_4ljjsel  [pr][fs] = new TH1F("h1_j1btag_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j1 DeepCSV; Events/0.04", 25, 0., 1.);
       h1_j1btag_4ljjsel  [pr][fs]->Sumw2(true);
-      h1_j2btag_4ljjsel  [pr][fs] = new TH1F("h1_j2btag_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,"j2 DeepCSV; Events/0.04", 25, 0., 1.);
+      h1_j2btag_4ljjsel  [pr][fs] = new TH1F("h1_j2btag_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j2 DeepCSV; Events/0.04", 25, 0., 1.);
       h1_j2btag_4ljjsel  [pr][fs]->Sumw2(true);
-      h1_j1pT_4ljjsel    [pr][fs] = new TH1F("h1_j1pT_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,"j1 pT(GeV); Events/5 GeV", 40, 0., 200.);
+      h1_j1pT_4ljjsel    [pr][fs] = new TH1F("h1_j1pT_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j1 pT(GeV); Events/5 GeV", 40, 0., 200.);
       h1_j1pT_4ljjsel    [pr][fs]->Sumw2(true);
-      h1_j2pT_4ljjsel    [pr][fs] = new TH1F("h1_j2pT_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,"j2 pT(GeV); Events/5 GeV", 40, 0., 200.);
+      h1_j2pT_4ljjsel    [pr][fs] = new TH1F("h1_j2pT_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j2 pT(GeV); Events/5 GeV", 40, 0., 200.);
       h1_j2pT_4ljjsel    [pr][fs]->Sumw2(true);
-      h1_MET_4ljjsel     [pr][fs] = new TH1F("h1_MET_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,"MET (GeV); Events/5 GeV", 40, 0., 200.);
+      h1_MET_4ljjsel     [pr][fs] = new TH1F("h1_MET_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";MET (GeV); Events/5 GeV", 40, 0., 200.);
       h1_MET_4ljjsel     [pr][fs]->Sumw2(true);
-      h1_DeltaRhh_4ljjsel[pr][fs] = new TH1F("h1_DeltaRhh_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,"Delta R H4l-Hbb; Events ", 25, 0., 10.);
+      h1_DeltaRhh_4ljjsel[pr][fs] = new TH1F("h1_DeltaRhh_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";Delta R H4l-Hbb; Events/0.4 ", 25, 0., 10.);
       h1_DeltaRhh_4ljjsel[pr][fs]->Sumw2(true);
-      h1_mbb_4ljjsel     [pr][fs] = new TH1F("h1_mbb_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{jj} (GeV); Events/2 GeV", 100, 0., 200.); 
+      h1_mbb_4ljjsel     [pr][fs] = new TH1F("h1_mbb_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{jj} (GeV); Events/5 GeV", 40, 0., 200.); 
       h1_mbb_4ljjsel     [pr][fs]->Sumw2(true);
     }
   }
@@ -750,20 +754,268 @@ void  printYields_forCards(){
 
 
 
+//*********************************
+//*** doPlots_inputBDT function ***
+//*********************************
+void doPlots_inputBDT(){
+
+ cout<<"do plots ..."<<endl;
+
+  //---input path
+  TString sYear;
+  TString lumiText;
+  if(year==2016){
+      sYear    = "2016";
+      lumiText = "35.9 fb^{-1}";
+  }
+  else if(year==2017){
+      sYear    = "2017";
+      lumiText = "41.5 fb^{-1}";
+  }
+  else if(year==2018){
+      sYear    = "2018";
+      lumiText = "59.7 fb^{-1}";
+  }
+  else cout<<"wrong year selected!"<<endl;
+  cout<<"Year chosen: "<<year<<endl;
+
+
+  TString outPath_inputBDTplots = "plots_inputBDT";
+  cout<<"creating output dir "<<outPath_inputBDTplots<<" ... "<<endl;
+  gSystem->Exec(("mkdir -p "+string(outPath_inputBDTplots)).c_str()); // create output dir
+
+
+
+  // retrieve yields histos from file
+  TString inFileName = "f_histos_h1_" + sYear + ".root";     
+  cout<<"Retrieving Data and MC histograms from file "<<inFileName<<" ..."<<endl;
+  TFile* fInhistos = TFile::Open(inFileName);
+  
+  // --- take histos from file
+  // (BDT input histos)
+  Int_t nBDTinputHistos = 7;
+  TString sBDTInputNames[] = {
+    "j1btag_4ljjsel",
+    "j2btag_4ljjsel",
+    "j1pT_4ljjsel",
+    "j2pT_4ljjsel",
+    "MET_4ljjsel",    
+    "DeltaRhh_4ljjsel",
+    "mbb_4ljjsel",
+  };
+  TH1F* h1_BDTinput_4ljjsel[nBDTinputHistos][nProcesses][nFinalStates+1];
+  for(int bdtIn=0; bdtIn<nBDTinputHistos; bdtIn++){
+    for(int pr=0; pr<nProcesses; pr++){
+      for(int fs=0; fs<nFinalStates+1; fs++){
+        h1_BDTinput_4ljjsel[bdtIn][pr][fs] = (TH1F*)fInhistos->Get("h1_"+sBDTInputNames[bdtIn]+"_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear);
+        cout<<h1_BDTinput_4ljjsel[bdtIn][pr][fs]->GetName()<<endl;
+      }
+    }
+  }   
+
+  // --- define canvas, hstack and pads for BDT input plots
+  TCanvas* c_BDTinput_4ljjsel     [nBDTinputHistos][nFinalStates+1];
+  THStack* hs_BDTinput_4ljjsel    [nBDTinputHistos][nFinalStates+1];
+  TPad*    pad1_BDTinput_4ljjsel  [nBDTinputHistos][nFinalStates+1];
+  TLegend* leg_BDTinput_4ljjsel   [nBDTinputHistos][nFinalStates+1];
+  TH1F*    hMCtot_BDTinput_4ljjsel[nBDTinputHistos][nFinalStates+1];
+  TPad*    pad2_BDTinput_4ljjsel  [nBDTinputHistos][nFinalStates+1];
+  TH1F*    rp_BDTinput_4ljjsel    [nBDTinputHistos][nFinalStates+1];
+  TH1F*    hUncMC_BDTinput_4ljjsel[nBDTinputHistos][nFinalStates+1];
+  
+  //BDT input plots
+  for(int bdtIn=0; bdtIn<nBDTinputHistos; bdtIn++){
+    for(int fs=0; fs<nFinalStates+1; fs++){
+      // canvas
+      c_BDTinput_4ljjsel[bdtIn][fs] = new TCanvas("c_"+sBDTInputNames[bdtIn]+"_"+sFinalState[fs]+"_"+sYear,"c_"+sBDTInputNames[bdtIn]+"_"+sFinalState[fs]+"_"+sYear,800,800);
+      // hstack
+      hs_BDTinput_4ljjsel[bdtIn][fs] = new THStack("hs_"+sBDTInputNames[bdtIn]+"_"+sFinalState[fs],"");
+      // VVV process
+      h1_BDTinput_4ljjsel[bdtIn][VVV][fs]->SetFillColor(kGreen-3);
+      h1_BDTinput_4ljjsel[bdtIn][VVV][fs]->SetLineColor(kGreen-1);
+      hs_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][VVV][fs]); //add to hs
+      // TTV process: TTW + TTV
+      h1_BDTinput_4ljjsel[bdtIn][TTW][fs]->SetFillColor(kBlue+3);
+      h1_BDTinput_4ljjsel[bdtIn][TTW][fs]->SetLineColor(kBlue+3);
+      hs_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][TTW][fs]); //add to hs
+      h1_BDTinput_4ljjsel[bdtIn][TTZ][fs]->SetFillColor(kBlue+3);
+      h1_BDTinput_4ljjsel[bdtIn][TTZ][fs]->SetLineColor(kBlue+3);
+      hs_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][TTZ][fs]); //add to hs
+      // ggZZ process
+      h1_BDTinput_4ljjsel[bdtIn][ggZZ][fs]->SetFillColor(kAzure-3);
+      h1_BDTinput_4ljjsel[bdtIn][ggZZ][fs]->SetLineColor(kBlue+2);
+      hs_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][ggZZ][fs]); //add to hs
+      // qqZZ process
+      h1_BDTinput_4ljjsel[bdtIn][qqZZ][fs]->SetFillColor(kAzure+6);
+      h1_BDTinput_4ljjsel[bdtIn][qqZZ][fs]->SetLineColor(kAzure-6);
+      hs_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][qqZZ][fs]); //add to hs
+      // SM Higgs processes: ggH + VBF + VH + ttH + bbH + HWW
+      h1_BDTinput_4ljjsel[bdtIn][ggH][fs]->SetFillColor(kViolet+6);
+      h1_BDTinput_4ljjsel[bdtIn][ggH][fs]->SetLineColor(kViolet+6);
+      hs_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][ggH][fs]); //add to hs
+      h1_BDTinput_4ljjsel[bdtIn][VBF][fs]->SetFillColor(kViolet+6);
+      h1_BDTinput_4ljjsel[bdtIn][VBF][fs]->SetLineColor(kViolet+6);
+      hs_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][VBF][fs]); //add to hs
+      h1_BDTinput_4ljjsel[bdtIn][VH][fs]->SetFillColor(kViolet+6);
+      h1_BDTinput_4ljjsel[bdtIn][VH][fs]->SetLineColor(kViolet+6);
+      hs_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][VH][fs]); //add to hs
+      h1_BDTinput_4ljjsel[bdtIn][ttH][fs]->SetFillColor(kViolet+6);
+      h1_BDTinput_4ljjsel[bdtIn][ttH][fs]->SetLineColor(kViolet+6);
+      hs_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][ttH][fs]); //add to hs
+      h1_BDTinput_4ljjsel[bdtIn][bbH][fs]->SetFillColor(kViolet+6);
+      h1_BDTinput_4ljjsel[bdtIn][bbH][fs]->SetLineColor(kViolet+6);
+      hs_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][bbH][fs]); //add to hs
+      h1_BDTinput_4ljjsel[bdtIn][HWW][fs]->SetFillColor(kViolet+6);
+      h1_BDTinput_4ljjsel[bdtIn][HWW][fs]->SetLineColor(kViolet+6);
+      hs_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][HWW][fs]); //add to hs
+      // HH signal
+      h1_BDTinput_4ljjsel[bdtIn][HH][fs]->SetLineColor(kRed);
+      h1_BDTinput_4ljjsel[bdtIn][HH][fs]->SetLineWidth(2);
+      h1_BDTinput_4ljjsel[bdtIn][HH][fs]->Scale(100.);
+      // data
+      h1_BDTinput_4ljjsel[bdtIn][Data][fs]->SetMarkerColor(kBlack);
+      h1_BDTinput_4ljjsel[bdtIn][Data][fs]->SetLineColor(kBlack);
+      h1_BDTinput_4ljjsel[bdtIn][Data][fs]->SetMarkerStyle(20);
+    
+      // --- upper plot pad
+      pad1_BDTinput_4ljjsel[bdtIn][fs] = new TPad("pad1_"+sBDTInputNames[bdtIn]+"_"+sFinalState[fs],"pad1_"+sBDTInputNames[bdtIn]+"_"+sFinalState[fs], 0, 0.3, 1, 1.0);
+      pad1_BDTinput_4ljjsel[bdtIn][fs]->Draw();
+      pad1_BDTinput_4ljjsel[bdtIn][fs]->cd();
+    
+      hs_BDTinput_4ljjsel[bdtIn][fs]->SetMaximum(10e04);
+      hs_BDTinput_4ljjsel[bdtIn][fs]->SetMinimum(10e-04);
+    
+      hs_BDTinput_4ljjsel[bdtIn][fs]->Draw("histo");
+      h1_BDTinput_4ljjsel[bdtIn][HH][fs]->Draw("histosame");
+      h1_BDTinput_4ljjsel[bdtIn][Data][fs]->Draw("samepe");
+
+      hs_BDTinput_4ljjsel[bdtIn][fs]->GetXaxis()->SetLabelFont(43);
+      hs_BDTinput_4ljjsel[bdtIn][fs]->GetXaxis()->SetLabelSize(15);
+      hs_BDTinput_4ljjsel[bdtIn][fs]->GetXaxis()->SetTitle(h1_BDTinput_4ljjsel[bdtIn][HH][fs]->GetXaxis()->GetTitle());
+      hs_BDTinput_4ljjsel[bdtIn][fs]->GetYaxis()->SetTitleSize(20);
+      hs_BDTinput_4ljjsel[bdtIn][fs]->GetYaxis()->SetTitleFont(43);
+      hs_BDTinput_4ljjsel[bdtIn][fs]->GetYaxis()->SetTitleOffset(1.4);
+      hs_BDTinput_4ljjsel[bdtIn][fs]->GetYaxis()->SetLabelFont(43);
+      hs_BDTinput_4ljjsel[bdtIn][fs]->GetYaxis()->SetLabelSize(15);
+      hs_BDTinput_4ljjsel[bdtIn][fs]->GetYaxis()->SetTitle(h1_BDTinput_4ljjsel[bdtIn][HH][fs]->GetYaxis()->GetTitle());
+
+      // --- legend
+      leg_BDTinput_4ljjsel[bdtIn][fs] = new TLegend(0.78,0.61,0.94,0.87);
+      leg_BDTinput_4ljjsel[bdtIn][fs]->AddEntry(h1_BDTinput_4ljjsel[bdtIn][Data][fs], "Data",          "lp");
+      leg_BDTinput_4ljjsel[bdtIn][fs]->AddEntry(h1_BDTinput_4ljjsel[bdtIn][HH][fs],   "HH->4lbb x100", "f");
+      leg_BDTinput_4ljjsel[bdtIn][fs]->AddEntry(h1_BDTinput_4ljjsel[bdtIn][ggH][fs],  "SM Higgs",      "f");
+      leg_BDTinput_4ljjsel[bdtIn][fs]->AddEntry(h1_BDTinput_4ljjsel[bdtIn][qqZZ][fs], "qq->ZZ",        "f");
+      leg_BDTinput_4ljjsel[bdtIn][fs]->AddEntry(h1_BDTinput_4ljjsel[bdtIn][ggZZ][fs], "gg->ZZ",        "f");
+      leg_BDTinput_4ljjsel[bdtIn][fs]->AddEntry(h1_BDTinput_4ljjsel[bdtIn][TTZ][fs],  "TTV; V=Z,W",    "f");
+      leg_BDTinput_4ljjsel[bdtIn][fs]->AddEntry(h1_BDTinput_4ljjsel[bdtIn][VVV][fs],  "VVV; V=Z,W",    "f");
+      leg_BDTinput_4ljjsel[bdtIn][fs]->SetFillColor(kWhite);
+      leg_BDTinput_4ljjsel[bdtIn][fs]->SetLineColor(kBlack);
+      leg_BDTinput_4ljjsel[bdtIn][fs]->SetTextFont(43);
+      leg_BDTinput_4ljjsel[bdtIn][fs]->Draw();
+
+      c_BDTinput_4ljjsel[bdtIn][fs]->Update();
+
+      pad1_BDTinput_4ljjsel[bdtIn][fs]->SetLogy();
+
+      c_BDTinput_4ljjsel[bdtIn][fs]->Update();
+
+      // --- tot hist for all MC
+      hMCtot_BDTinput_4ljjsel[bdtIn][fs] = (TH1F*)h1_BDTinput_4ljjsel[bdtIn][ggH][fs]->Clone("hMCtot_BDTinput_4ljjsel_"+sBDTInputNames[bdtIn]+"_"+sFinalState[fs]);
+      hMCtot_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][VBF][fs]);
+      hMCtot_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][VH][fs]);
+      hMCtot_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][ttH][fs]);
+      hMCtot_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][bbH][fs]);
+      hMCtot_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][HWW][fs]);
+      hMCtot_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][qqZZ][fs]);
+      hMCtot_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][ggZZ][fs]);
+      hMCtot_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][TTZ][fs]);
+      hMCtot_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][TTW][fs]);
+      hMCtot_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][VVV][fs]);
+      
+      // --- lower pad plot
+      c_BDTinput_4ljjsel[bdtIn][fs]->cd();
+      pad2_BDTinput_4ljjsel[bdtIn][fs] = new TPad("pad2","pad2", 0, 0.05, 1, 0.3);
+      pad2_BDTinput_4ljjsel[bdtIn][fs]->SetGridy();
+      pad2_BDTinput_4ljjsel[bdtIn][fs]->Draw();
+      pad2_BDTinput_4ljjsel[bdtIn][fs]->cd();
+
+      // --- define ratio plot
+      rp_BDTinput_4ljjsel[bdtIn][fs] = (TH1F*)h1_BDTinput_4ljjsel[bdtIn][Data][fs]->Clone("rp_BDTinput_4ljjsel_"+sBDTInputNames[bdtIn]+"_"+sFinalState[fs]);
+      rp_BDTinput_4ljjsel[bdtIn][fs]->SetLineColor(kBlack);
+      rp_BDTinput_4ljjsel[bdtIn][fs]->SetMinimum(0.);
+      rp_BDTinput_4ljjsel[bdtIn][fs]->SetMaximum(2.);
+      rp_BDTinput_4ljjsel[bdtIn][fs]->SetStats(0);
+      rp_BDTinput_4ljjsel[bdtIn][fs]->Divide(hMCtot_BDTinput_4ljjsel[bdtIn][fs]); //divide histo rp/MC
+      rp_BDTinput_4ljjsel[bdtIn][fs]->SetMarkerStyle(20);
+      rp_BDTinput_4ljjsel[bdtIn][fs]->SetMarkerColor(kBlack);
+      rp_BDTinput_4ljjsel[bdtIn][fs]->SetTitle("");
+
+      rp_BDTinput_4ljjsel[bdtIn][fs]->SetYTitle("Data/MC");
+      rp_BDTinput_4ljjsel[bdtIn][fs]->GetYaxis()->SetNdivisions(505);
+      rp_BDTinput_4ljjsel[bdtIn][fs]->GetYaxis()->SetTitleSize(20);
+      rp_BDTinput_4ljjsel[bdtIn][fs]->GetYaxis()->SetTitleFont(43);
+      rp_BDTinput_4ljjsel[bdtIn][fs]->GetYaxis()->SetTitleOffset(1.4);
+      rp_BDTinput_4ljjsel[bdtIn][fs]->GetYaxis()->SetLabelFont(43);
+      rp_BDTinput_4ljjsel[bdtIn][fs]->GetYaxis()->SetLabelSize(15);
+
+      rp_BDTinput_4ljjsel[bdtIn][fs]->GetXaxis()->SetTitleSize(20);
+      rp_BDTinput_4ljjsel[bdtIn][fs]->GetXaxis()->SetTitleFont(43);
+      rp_BDTinput_4ljjsel[bdtIn][fs]->GetXaxis()->SetTitleOffset(4.);
+      rp_BDTinput_4ljjsel[bdtIn][fs]->GetXaxis()->SetLabelFont(43);
+      rp_BDTinput_4ljjsel[bdtIn][fs]->GetXaxis()->SetLabelSize(15);
+
+      // --- define mc shadow unc plot
+      hUncMC_BDTinput_4ljjsel[bdtIn][fs] = (TH1F*)hMCtot_BDTinput_4ljjsel[bdtIn][fs]->Clone("hUncMC_BDTinput_4ljjsel_"+sBDTInputNames[bdtIn]+"_"+sFinalState[fs]);
+      for(int xbin=1; xbin < hUncMC_BDTinput_4ljjsel[bdtIn][fs]->GetXaxis()->GetNbins() + 1; xbin++){
+        float err = 0.;
+        if(hUncMC_BDTinput_4ljjsel[bdtIn][fs]->GetBinContent(xbin) == 0) continue;
+        err = hUncMC_BDTinput_4ljjsel[bdtIn][fs]->GetBinError(xbin) / hUncMC_BDTinput_4ljjsel[bdtIn][fs]->GetBinContent(xbin);
+        hUncMC_BDTinput_4ljjsel[bdtIn][fs]->SetBinContent(xbin, 1.);
+        hUncMC_BDTinput_4ljjsel[bdtIn][fs]->SetBinError(xbin, err);
+      }
+      hUncMC_BDTinput_4ljjsel[bdtIn][fs]->SetLineColor(1);
+      hUncMC_BDTinput_4ljjsel[bdtIn][fs]->SetFillStyle(3005);
+      hUncMC_BDTinput_4ljjsel[bdtIn][fs]->SetFillColor(kGray+3);
+      hUncMC_BDTinput_4ljjsel[bdtIn][fs]->SetMarkerColor(1);
+      hUncMC_BDTinput_4ljjsel[bdtIn][fs]->SetMarkerStyle(1);
+      hUncMC_BDTinput_4ljjsel[bdtIn][fs]->SetTitle("");
+      hUncMC_BDTinput_4ljjsel[bdtIn][fs]->SetStats(0);
+
+      // ---draw
+      rp_BDTinput_4ljjsel[bdtIn][fs]->Draw("ep");
+      hUncMC_BDTinput_4ljjsel[bdtIn][fs]->Draw("e2 same");
+
+      c_BDTinput_4ljjsel[bdtIn][fs]->Update();
+
+      // --- draw CMS and lumi text
+      
+
+
+      c_BDTinput_4ljjsel[bdtIn][fs]->SaveAs(outPath_inputBDTplots + "/" + c_BDTinput_4ljjsel[bdtIn][fs]->GetName() + ".png");
+      c_BDTinput_4ljjsel[bdtIn][fs]->SaveAs(outPath_inputBDTplots + "/" + c_BDTinput_4ljjsel[bdtIn][fs]->GetName() + ".pdf");
+      
+
+    }
+  }
+
+} // end doPlots_inputBDT function
+
+
+
+
 //*********************
 //*** main function ***
 //*********************
 void analysis_4lbb_2bjet()
 {
 
-  // string outputFilePath = "out";
-  // //string outputFilePath = "200212_mvaNtuples_1bjet1Pt_4l";
-  // gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
 
   if(REDOHISTOS) doHistos();
 
   printYields_forSync();
 
   printYields_forCards();
+
+  doPlots_inputBDT();
 
 }
