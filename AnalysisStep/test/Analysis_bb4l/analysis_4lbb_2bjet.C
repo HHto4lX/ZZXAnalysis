@@ -32,11 +32,12 @@
 #include <vector>
 #include "TLorentzVector.h"
 
+//#include "CMS_lumi.h"
 
 
 using namespace std;
 
-#define REDOHISTOS 1
+#define REDOHISTOS 0
 
 //******************
 //int year = 2016;
@@ -759,7 +760,7 @@ void  printYields_forCards(){
 //*********************************
 void doPlots_inputBDT(){
 
- cout<<"do plots ..."<<endl;
+ cout<<"do BDT input plots ..."<<endl;
 
   //---input path
   TString sYear;
@@ -987,8 +988,15 @@ void doPlots_inputBDT(){
 
       c_BDTinput_4ljjsel[bdtIn][fs]->Update();
 
-      // --- draw CMS and lumi text
-      
+      // // --- draw CMS and lumi text
+      // bool    writeExtraText = true;
+      // TString extraText      = "Preliminary";
+      // TString lumi_sqrtS     = lumiText + " (13 TeV)";
+      // float   cmsTextSize    = 0.6;
+      // float   lumiTextSize   = 0.46;
+      // float   extraOverCmsTextSize = 0.75;
+      // float   relPosX = 0.12;
+      // CMS_lumi(pad1_BDTinput_4ljjsel[bdtIn][fs], 0, 0);
 
 
       c_BDTinput_4ljjsel[bdtIn][fs]->SaveAs(outPath_inputBDTplots + "/" + c_BDTinput_4ljjsel[bdtIn][fs]->GetName() + ".png");
