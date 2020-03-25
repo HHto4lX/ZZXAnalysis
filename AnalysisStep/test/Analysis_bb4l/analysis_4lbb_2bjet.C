@@ -783,7 +783,7 @@ void doPlots_inputBDT(){
   cout<<"Year chosen: "<<year<<endl;
 
 
-  TString outPath_inputBDTplots = "plots_inputBDT";
+  TString outPath_inputBDTplots = "plots_inputBDT_" + sYear;
   cout<<"creating output dir "<<outPath_inputBDTplots<<" ... "<<endl;
   gSystem->Exec(("mkdir -p "+string(outPath_inputBDTplots)).c_str()); // create output dir
 
