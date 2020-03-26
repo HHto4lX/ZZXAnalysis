@@ -151,24 +151,24 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 
   
   //output file 
-  float f_lept1_ptsignal;
-  float f_lept2_ptsignal;
-  float f_lept3_ptsignal;
-  float f_lept4_ptsignal;
-  float f_massjetjet;
-  float f_ptjet1;
-  float f_ptjet2;
-  float f_bdiscjet1signal;
-  float f_bdiscjet2signal;
-  float f_deltarsignal;
-  float f_METsignal;
-  float f_weightsignal;
+  float f_lept1_ptsignal  = -9999.;
+  float f_lept2_ptsignal  = -9999.;
+  float f_lept3_ptsignal  = -9999.;
+  float f_lept4_ptsignal  = -9999.;
+  float f_massjetjet      = -9999.;
+  float f_ptjet1          = -9999.;
+  float f_ptjet2          = -9999.;
+  float f_bdiscjet1signal = -9999.;
+  float f_bdiscjet2signal = -9999.;
+  float f_deltarsignal    = -9999.;
+  float f_METsignal       = -9999.;
+  float f_weightsignal    = -9999.;
 
-  float f_Z1Mass;
-  float f_Z2Mass;
-  float f_ZZmass;
-  float f_bbmass;
-  float f_HHmass;
+  float f_Z1Mass = -9999.;
+  float f_Z2Mass = -9999.;
+  float f_ZZmass = -9999.;
+  float f_bbmass = -9999.;
+  float f_HHmass = -9999.;
 
 
   TFile *f = new TFile(outFile,"recreate");
@@ -283,8 +283,10 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     
 
 
-    // mass cut: signal region
-     if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
+    // // mass cut: signal region
+    //    if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
+    // mass cut: side bands
+    if(ZZMass >= 115 && ZZMass <= 135) continue; // ZZMass < 115 or ZZMass > 135 GeV
 
  
 
@@ -315,7 +317,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     // get and save vector with max btagger value
     f_bdiscjet1signal = *max_element(JetBTagger->begin(), JetBTagger->end());
 
-    // get and save btagger value of the second jet (the one with max pt)
+    // get and save btagger value of the second jet (the one with second max btag)
     int d1_maxbtag = distance( JetBTagger->begin(), max_element(JetBTagger->begin(), JetBTagger->end()));
 
     float maxJetBtag = -9999.;
@@ -329,7 +331,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
         d2_maxbtag = i;
       }
     }
-    // save btagger value of the second jet (the one with max pt)
+    // save btagger value of the second jet (the one with second max btag)
     f_bdiscjet2signal = JetBTagger->at(d2_maxbtag);
 
     // save jet pT
@@ -443,7 +445,7 @@ void prepareNtupleMVA_2bjet()
     "ZH125",
     "bbH125",
     "ttH125",
-    "ZZTo4lamcatnlo",
+    "ZZTo4lext2",
     "ggTo4e_Contin_MCFM701",
     "ggTo4mu_Contin_MCFM701",
     "ggTo4tau_Contin_MCFM701",
@@ -469,7 +471,7 @@ void prepareNtupleMVA_2bjet()
   cout<< "number of input files: " << nInputFiles<<endl;
 
 
-  string outputFilePath = "mvaNtuples_2bjet_4ljjsel_fs2e2mu";
+  string outputFilePath = "mvaNtuples_2bjet_2018_sidebands_4lsel_fs2e2mu";
   gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
 
 
