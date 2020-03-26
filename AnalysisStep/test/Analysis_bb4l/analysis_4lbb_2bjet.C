@@ -32,7 +32,7 @@
 #include <vector>
 #include "TLorentzVector.h"
 
-//#include "CMS_lumi.h"
+#include "CMS_lumi.C"
 
 
 using namespace std;
@@ -41,8 +41,8 @@ using namespace std;
 
 //******************
 //int year = 2016;
-int year = 2017;
-//int year = 2018;
+//int year = 2017;
+int year = 2018;
 //******************
 
 
@@ -111,8 +111,8 @@ void doHistos()
     "bbH125",
     "ttH125",
     //"ZZTo4lamcatnlo",
-    //"ZZTo4lext2",
-    "ZZTo4l",
+    "ZZTo4lext2",
+    //"ZZTo4l",
     "ggTo4e_Contin_MCFM701",
     "ggTo4mu_Contin_MCFM701",
     "ggTo4tau_Contin_MCFM701",
@@ -264,8 +264,8 @@ void doHistos()
     if(datasets[d]=="ttH125") currentProcess = ttH;
     if(datasets[d]=="bbH125") currentProcess = bbH;
     //    if(datasets[d]=="ZZTo4lamcatnlo") currentProcess = qqZZ;
-    //    if(datasets[d]=="ZZTo4lext2") currentProcess = qqZZ;
-    if(datasets[d]=="ZZTo4l") currentProcess = qqZZ;
+    if(datasets[d]=="ZZTo4lext2") currentProcess = qqZZ;
+    //if(datasets[d]=="ZZTo4l") currentProcess = qqZZ;
     if(datasets[d]=="ggTo4e_Contin_MCFM701" ||
        datasets[d]=="ggTo4mu_Contin_MCFM701" ||
        datasets[d]=="ggTo4tau_Contin_MCFM701" ||
@@ -990,15 +990,15 @@ void doPlots_inputBDT(){
 
       c_BDTinput_4ljjsel[bdtIn][fs]->Update();
 
-      // // --- draw CMS and lumi text
-      // bool    writeExtraText = true;
-      // TString extraText      = "Preliminary";
-      // TString lumi_sqrtS     = lumiText + " (13 TeV)";
-      // float   cmsTextSize    = 0.6;
-      // float   lumiTextSize   = 0.46;
-      // float   extraOverCmsTextSize = 0.75;
-      // float   relPosX = 0.12;
-      // CMS_lumi(pad1_BDTinput_4ljjsel[bdtIn][fs], 0, 0);
+      // --- draw CMS and lumi text
+      writeExtraText = true;
+      extraText      = "Preliminary";
+      lumi_sqrtS     = lumiText + " (13 TeV)";
+      cmsTextSize    = 0.6;
+      lumiTextSize   = 0.46;
+      extraOverCmsTextSize = 0.75;
+      relPosX = 0.12;
+      CMS_lumi(pad1_BDTinput_4ljjsel[bdtIn][fs], 0, 0);
 
 
       c_BDTinput_4ljjsel[bdtIn][fs]->SaveAs(outPath_inputBDTplots + "/" + c_BDTinput_4ljjsel[bdtIn][fs]->GetName() + ".png");
