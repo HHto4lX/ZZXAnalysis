@@ -149,7 +149,8 @@ void doHistos()
   Long64_t nEvent;
   Int_t nLumi;
   Float_t overallEventWeight;
-  Float_t xsec; 
+  Float_t xsec;
+  Float_t L1prefiringWeight; 
 
   Float_t KFactor_QCD_ggZZ_Nominal;
   Float_t KFactor_EW_qqZZ;
@@ -326,6 +327,7 @@ void doHistos()
       inputTree[d]->SetBranchAddress("LumiNumber", &nLumi);
       if(currentProcess != Data) inputTree[d]->SetBranchAddress("overallEventWeight", &overallEventWeight);
       if(currentProcess != Data) inputTree[d]->SetBranchAddress("xsec", &xsec);
+      if(currentProcess != Data) inputTree[d]->SetBranchAddress("L1prefiringWeight", &L1prefiringWeight);
     } 
     if(currentProcess == ZXbkg) inputTree[d]->SetBranchAddress("weight", &weight);
     inputTree[d]->SetBranchAddress("ZZsel", &ZZsel);
@@ -380,9 +382,8 @@ void doHistos()
       else if(currentProcess == ggZZ) { kfactor = KFactor_QCD_ggZZ_Nominal; } //ggZZ samples 
 
       Double_t eventWeight = 1.;
-      if(currentProcess != Data && currentProcess != ZXbkg) eventWeight = partialSampleWeight[d] * xsec * kfactor * overallEventWeight;
+      if(currentProcess != Data && currentProcess != ZXbkg) eventWeight = partialSampleWeight[d] * xsec * kfactor * overallEventWeight * L1prefiringWeight;
       if(currentProcess == ZXbkg) eventWeight = weight; //ZX weight
-
 
 
       // --- select final state
@@ -461,6 +462,7 @@ void doHistos()
       cout<<" indici (1,2) "<<dj1_ <<" "<<dj2_<<" valori btag(1); btag(2) "<<JetBTagger->at(dj1_)<<" "<<JetBTagger->at(dj2_)<<endl;
       if(JetBTagger->at(dj1_)>=JetBTagger->at(dj2_)) cout<<"FUNZIONA"<<endl;
       else cout<<"NON FUNZIONA"<<endl;
+      cout<<"debug:  L1Prefiringweight: "<<L1prefiringWeight<<endl;
 
 
       
