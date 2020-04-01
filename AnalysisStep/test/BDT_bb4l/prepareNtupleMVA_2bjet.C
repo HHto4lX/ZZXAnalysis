@@ -91,6 +91,11 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
   vector<Float_t> *JetBTagger = 0;
   Float_t PFMET;
 
+  vector<Float_t> *JetPt_JESUp = 0;
+  vector<Float_t> *JetPt_JESDown = 0;
+  vector<Float_t> *JetPt_JERUp = 0;
+  vector<Float_t> *JetPt_JERDown = 0;
+
   Float_t yield_4e = 0.;
   Float_t yield_4mu = 0.;
   Float_t yield_2e2mu = 0.;
@@ -129,6 +134,10 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
   inputTree->SetBranchAddress("ZZEta", &ZZEta);
   inputTree->SetBranchAddress("ZZPhi", &ZZPhi);
   inputTree->SetBranchAddress("JetPt", &JetPt);
+  inputTree->SetBranchAddress("JetPt_JESUp", &JetPt_JESUp);
+  inputTree->SetBranchAddress("JetPt_JESDown", &JetPt_JESDown);
+  inputTree->SetBranchAddress("JetPt_JERUp", &JetPt_JERUp);
+  inputTree->SetBranchAddress("JetPt_JERDown", &JetPt_JERDown);
   inputTree->SetBranchAddress("JetEta", &JetEta);
   inputTree->SetBranchAddress("JetMass", &JetMass);
   inputTree->SetBranchAddress("JetPhi",  &JetPhi);
@@ -284,9 +293,9 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 
 
     // // mass cut: signal region
-    //    if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
+    if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
     // mass cut: side bands
-    if(ZZMass >= 115 && ZZMass <= 135) continue; // ZZMass < 115 or ZZMass > 135 GeV
+    //    if(ZZMass >= 115 && ZZMass <= 135) continue; // ZZMass < 115 or ZZMass > 135 GeV
 
  
 
@@ -303,7 +312,12 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 
     //JETSELECTION---------------------------------------------------
     // at least 2 jets in the acceptance
-    if (JetPt->size() < 2) continue; 
+    if (JetPt_JERUp->size() < 2) continue; 
+    // cout<<JetPt->size()<<" "<<JetPt_JESUp->size()<<" "<<JetPt_JESDown->size()<<" "<<JetPt_JERUp->size()<<" "<<JetPt_JERDown->size()<<endl;
+    // for(int i=0; i<JetPt->size(); i++){
+    //   cout<<JetPt->at(i)<<" "<<JetPt_JESUp->at(i)<<" "<<JetPt_JESDown->at(i)<<" "<<JetPt_JERUp->at(i)<<" "<<JetPt_JERDown->at(i)<<endl;
+    // }
+
 
 
     // //***SYNC*** out on file for sync3
@@ -335,15 +349,15 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     f_bdiscjet2signal = JetBTagger->at(d2_maxbtag);
 
     // save jet pT
-    f_ptjet1 = JetPt->at(d1_maxbtag);
-    f_ptjet2 = JetPt->at(d2_maxbtag);
+    f_ptjet1 = JetPt_JERUp->at(d1_maxbtag);
+    f_ptjet2 = JetPt_JERUp->at(d2_maxbtag);
 
 
     // build 2 jets tlorentzvectors
     TLorentzVector tlzvec_j1_;
-    tlzvec_j1_.SetPtEtaPhiM(JetPt->at(d1_maxbtag), JetEta->at(d1_maxbtag), JetPhi->at(d1_maxbtag), JetMass->at(d1_maxbtag));
+    tlzvec_j1_.SetPtEtaPhiM(JetPt_JERUp->at(d1_maxbtag), JetEta->at(d1_maxbtag), JetPhi->at(d1_maxbtag), JetMass->at(d1_maxbtag));
     TLorentzVector tlzvec_j2_;
-    tlzvec_j2_.SetPtEtaPhiM(JetPt->at(d2_maxbtag), JetEta->at(d2_maxbtag), JetPhi->at(d2_maxbtag), JetMass->at(d2_maxbtag));
+    tlzvec_j2_.SetPtEtaPhiM(JetPt_JERUp->at(d2_maxbtag), JetEta->at(d2_maxbtag), JetPhi->at(d2_maxbtag), JetMass->at(d2_maxbtag));
 
 
     // build H->bb tlorentzvector
@@ -436,7 +450,7 @@ void prepareNtupleMVA_2bjet()
 
   TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
   TString inputFileName[] = {
-    "AllData", 
+    //       "AllData", 
     "HH4lbb_Angela",
     "ggH125",
     "VBFH125",
@@ -457,13 +471,13 @@ void prepareNtupleMVA_2bjet()
     "WWZ",
     "WZZ",
     "ZZZ",
-    "HToWW125_ggH",
-    "HToWW125_VBFH",
-    "HToWW125_HWplusJ",
-    "HToWW125_HWminusJ",
-    "HToWW125_HZJ",
-    "HToWW125_bbH",
-    "ZXbkg",
+    // "HToWW125_ggH",
+    // "HToWW125_VBFH",
+    // "HToWW125_HWplusJ",
+    // "HToWW125_HWminusJ",
+    // "HToWW125_HZJ",
+    // "HToWW125_bbH",
+    // "ZXbkg",
   };
 
 
@@ -471,7 +485,7 @@ void prepareNtupleMVA_2bjet()
   cout<< "number of input files: " << nInputFiles<<endl;
 
 
-  string outputFilePath = "mvaNtuples_2bjet_2018_sidebands_4lsel_fs2e2mu";
+  string outputFilePath = "mvaNtuples_2bjet_2018_SR_4ljjsel_JERUp_fs2e2mu";
   gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
 
 
