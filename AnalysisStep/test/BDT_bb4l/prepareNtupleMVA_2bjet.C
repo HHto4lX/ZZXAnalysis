@@ -65,6 +65,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
   Int_t nLumi;
   Float_t overallEventWeight;
   Float_t xsec; 
+  Float_t L1prefiringWeight;
 
   Float_t KFactor_QCD_ggZZ_Nominal;
   Float_t KFactor_EW_qqZZ;
@@ -120,6 +121,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     inputTree->SetBranchAddress("LumiNumber", &nLumi);
     if (!isDATA) inputTree->SetBranchAddress("overallEventWeight", &overallEventWeight);
     if (!isDATA) inputTree->SetBranchAddress("xsec", &xsec);
+    if( !isDATA) inputTree->SetBranchAddress("L1prefiringWeight", &L1prefiringWeight);
   }
   if(isZX){ inputTree->SetBranchAddress("weight", &weight); }
   inputTree->SetBranchAddress("ZZsel", &ZZsel);
@@ -270,7 +272,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     else if(inFile.Contains("ggTo")) { kfactor = KFactor_QCD_ggZZ_Nominal; }
 
     Double_t eventWeight = 1.;
-    if(!isDATA && !isZX) eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight;
+    if(!isDATA && !isZX) eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight * L1prefiringWeight;
     if(isZX) eventWeight = weight; //ZX weight
 
 
