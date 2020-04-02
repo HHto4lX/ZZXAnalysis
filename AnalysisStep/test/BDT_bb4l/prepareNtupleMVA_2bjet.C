@@ -447,10 +447,12 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 void prepareNtupleMVA_2bjet()
 {
 
-  float lumi = 59.7; //fb-1 2018
+  //  float lumi = 59.7; //fb-1 2018
+  float lumi = 41.5; //fb-1 2017
 
 
-  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
+  //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
+  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
   TString inputFileName[] = {
     //       "AllData", 
     "HH4lbb_Angela",
@@ -461,7 +463,8 @@ void prepareNtupleMVA_2bjet()
     "ZH125",
     "bbH125",
     "ttH125",
-    "ZZTo4lext2",
+    //    "ZZTo4lext2",
+    "ZZTo4l",
     "ggTo4e_Contin_MCFM701",
     "ggTo4mu_Contin_MCFM701",
     "ggTo4tau_Contin_MCFM701",
@@ -487,7 +490,7 @@ void prepareNtupleMVA_2bjet()
   cout<< "number of input files: " << nInputFiles<<endl;
 
 
-  string outputFilePath = "mvaNtuples_2bjet_2018_SR_4ljjsel_JERUp_fs2e2mu";
+  string outputFilePath = "mvaNtuples_2bjet_2017_SR_4ljjsel_JERUp_fs2e2mu";
   gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
 
 
