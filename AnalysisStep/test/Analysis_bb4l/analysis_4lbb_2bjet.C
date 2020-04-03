@@ -54,9 +54,9 @@ const int nFinalStates = 3;
 TString sFinalState[nFinalStates+1] = {"4mu", "4e","2e2mu","4l"};
 //*************************************************************************************
 // PROCESSES
-enum Process {Data=0, HH=1, ggH=2, VBF=3, VH=4, ttH=5, bbH=6, qqZZ=7, ggZZ=8, TTZ=9, TTW=10, VVV=11, HWW=12, ZXbkg=13}; 
-const int nProcesses = 14;
-TString sProcess[nProcesses] = {"Data", "HH", "ggH", "VBF", "VH", "ttH", "bbH", "qqZZ", "ggZZ", "TTZ", "TTW", "VVV", "HWW", "ZXbkg"};
+enum Process {Data=0, HH=1, ggH=2, VBF=3, VH=4, ttH=5, bbH=6, qqZZ=7, ggZZ=8, TTZ=9, TTW=10, VVV=11, ZXbkg=12}; 
+const int nProcesses = 13;
+TString sProcess[nProcesses] = {"Data", "HH", "ggH", "VBF", "VH", "ttH", "bbH", "qqZZ", "ggZZ", "TTZ", "TTW", "VVV", "ZXbkg"};
 //*************************************************************************************
 
 
@@ -99,7 +99,7 @@ void doHistos()
 
 
   //---datasets
-  int nDatasets = 28;
+  int nDatasets = 22;
   TString datasets[] = {
     "AllData", 
     "HH4lbb_Angela",
@@ -124,12 +124,6 @@ void doHistos()
     "WWZ",
     "WZZ",
     "ZZZ",
-    "HToWW125_ggH",
-    "HToWW125_VBFH",
-    "HToWW125_HWplusJ",
-    "HToWW125_HWminusJ",
-    "HToWW125_HZJ",
-    "HToWW125_bbH",
     "ZXbkg",
   };
 
@@ -288,12 +282,6 @@ void doHistos()
     if(datasets[d]=="WWZ" ||
        datasets[d]=="WZZ" ||
        datasets[d]=="ZZZ") currentProcess = VVV;
-    if(datasets[d]=="HToWW125_ggH" ||
-       datasets[d]=="HToWW125_VBFH" ||
-       datasets[d]=="HToWW125_HWplusJ" ||
-       datasets[d]=="HToWW125_HWminusJ" ||
-       datasets[d]=="HToWW125_HZJ" ||
-       datasets[d]=="HToWW125_bbH") currentProcess = HWW;
     if(datasets[d]=="ZXbkg") currentProcess = ZXbkg;
     
 
@@ -663,9 +651,9 @@ void printYields_forSync(){
   ofstream f_events4lsel_sync;
   TString f_events4lsel_sync_name = "nEvents_4lsel_perSync_"+ sYear + ".txt";
   f_events4lsel_sync.open(f_events4lsel_sync_name);
-  f_events4lsel_sync<<"|Final state |signal HH |ttZ |ttH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF+H->WW) |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  f_events4lsel_sync<<"|Final state |signal HH |ttZ |ttH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |others(=VVV+VH+TTW) |Z+X |"<<endl;
   for(int fs=0; fs<nFinalStates+1; fs++){
-    f_events4lsel_sync<<"|"<<sFinalState[fs]<<" |"<<nEvent_4lsel[HH][fs]<<" |"<<nEvent_4lsel[TTZ][fs]<<" |"<<nEvent_4lsel[ttH][fs]<<" |"<<nEvent_4lsel[qqZZ][fs]+nEvent_4lsel[ggZZ][fs]<<" |"<<nEvent_4lsel[ggH][fs]+nEvent_4lsel[VBF][fs]+nEvent_4lsel[HWW][fs]<<" |"<<nEvent_4lsel[VVV][fs]+nEvent_4lsel[VH][fs]+nEvent_4lsel[TTW][fs]<<" |"<<nEvent_4lsel[ZXbkg][fs]<<" |"<<endl;
+    f_events4lsel_sync<<"|"<<sFinalState[fs]<<" |"<<nEvent_4lsel[HH][fs]<<" |"<<nEvent_4lsel[TTZ][fs]<<" |"<<nEvent_4lsel[ttH][fs]<<" |"<<nEvent_4lsel[qqZZ][fs]+nEvent_4lsel[ggZZ][fs]<<" |"<<nEvent_4lsel[ggH][fs]+nEvent_4lsel[VBF][fs]<<" |"<<nEvent_4lsel[VVV][fs]+nEvent_4lsel[VH][fs]+nEvent_4lsel[TTW][fs]<<" |"<<nEvent_4lsel[ZXbkg][fs]<<" |"<<endl;
   }
   f_events4lsel_sync.close();
 
@@ -674,9 +662,9 @@ void printYields_forSync(){
   ofstream f_events4ljjsel_sync;
   TString f_events4ljjsel_sync_name = "nEvents_4ljjsel_perSync_"+ sYear + ".txt";
   f_events4ljjsel_sync.open(f_events4ljjsel_sync_name);
-  f_events4ljjsel_sync<<"|Final state |signal HH |ttZ |ttH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF+H->WW) |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  f_events4ljjsel_sync<<"|Final state |signal HH |ttZ |ttH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |others(=VVV+VH+TTW) |Z+X |"<<endl;
   for(int fs=0; fs<nFinalStates+1; fs++){
-    f_events4ljjsel_sync<<"|"<<sFinalState[fs]<<" |"<<nEvent_4ljjsel[HH][fs]<<" |"<<nEvent_4ljjsel[TTZ][fs]<<" |"<<nEvent_4ljjsel[ttH][fs]<<" |"<<nEvent_4ljjsel[qqZZ][fs]+nEvent_4ljjsel[ggZZ][fs]<<" |"<<nEvent_4ljjsel[ggH][fs]+nEvent_4ljjsel[VBF][fs]+nEvent_4ljjsel[HWW][fs]<<" |"<<nEvent_4ljjsel[VVV][fs]+nEvent_4ljjsel[VH][fs]+nEvent_4ljjsel[TTW][fs]<<" |"<<nEvent_4ljjsel[ZXbkg][fs]<<" |"<<endl;
+    f_events4ljjsel_sync<<"|"<<sFinalState[fs]<<" |"<<nEvent_4ljjsel[HH][fs]<<" |"<<nEvent_4ljjsel[TTZ][fs]<<" |"<<nEvent_4ljjsel[ttH][fs]<<" |"<<nEvent_4ljjsel[qqZZ][fs]+nEvent_4ljjsel[ggZZ][fs]<<" |"<<nEvent_4ljjsel[ggH][fs]+nEvent_4ljjsel[VBF][fs]<<" |"<<nEvent_4ljjsel[VVV][fs]+nEvent_4ljjsel[VH][fs]+nEvent_4ljjsel[TTW][fs]<<" |"<<nEvent_4ljjsel[ZXbkg][fs]<<" |"<<endl;
   }
   f_events4ljjsel_sync.close();
 
@@ -690,9 +678,9 @@ void printYields_forSync(){
   ofstream f_yields4lsel_sync;
   TString f_yields4lsel_sync_name = "yields4lsel_perSync_"+ sYear + ".txt";
   f_yields4lsel_sync.open(f_yields4lsel_sync_name);
-  f_yields4lsel_sync<<"|Final state |signal HH |ttZ |ttH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF+H->WW) |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  f_yields4lsel_sync<<"|Final state |signal HH |ttZ |ttH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |others(=VVV+VH+TTW) |Z+X |"<<endl;
   for(int fs=0; fs<nFinalStates+1; fs++){
-    f_yields4lsel_sync<<"|"<<sFinalState[fs]<<" |"<<yield_4lsel[HH][fs]<<" |"<<yield_4lsel[TTZ][fs]<<" |"<<yield_4lsel[ttH][fs]<<" |"<<yield_4lsel[qqZZ][fs]+yield_4lsel[ggZZ][fs]<<" |"<<yield_4lsel[ggH][fs]+yield_4lsel[VBF][fs]+yield_4lsel[HWW][fs]<<" |"<<yield_4lsel[VVV][fs]+yield_4lsel[VH][fs]+yield_4lsel[TTW][fs]<<" |"<<yield_4lsel[ZXbkg][fs]<<" |"<<endl;
+    f_yields4lsel_sync<<"|"<<sFinalState[fs]<<" |"<<yield_4lsel[HH][fs]<<" |"<<yield_4lsel[TTZ][fs]<<" |"<<yield_4lsel[ttH][fs]<<" |"<<yield_4lsel[qqZZ][fs]+yield_4lsel[ggZZ][fs]<<" |"<<yield_4lsel[ggH][fs]+yield_4lsel[VBF][fs]<<" |"<<yield_4lsel[VVV][fs]+yield_4lsel[VH][fs]+yield_4lsel[TTW][fs]<<" |"<<yield_4lsel[ZXbkg][fs]<<" |"<<endl;
   }
   f_yields4lsel_sync.close();
 
@@ -713,9 +701,9 @@ void printYields_forSync(){
   ofstream f_yields4ljjsel_sync;
   TString f_yields4ljjsel_sync_name = "yields4ljjsel_perSync_"+ sYear + ".txt";
   f_yields4ljjsel_sync.open(f_yields4ljjsel_sync_name);
-  f_yields4ljjsel_sync<<"|Final state |signal HH |ttZ |ttH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF+H->WW) |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  f_yields4ljjsel_sync<<"|Final state |signal HH |ttZ |ttH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |others(=VVV+VH+TTW) |Z+X |"<<endl;
   for(int fs=0; fs<nFinalStates+1; fs++){
-    f_yields4ljjsel_sync<<"|"<<sFinalState[fs]<<" |"<<yield_4ljjsel[HH][fs]<<" |"<<yield_4ljjsel[TTZ][fs]<<" |"<<yield_4ljjsel[ttH][fs]<<" |"<<yield_4ljjsel[qqZZ][fs]+yield_4ljjsel[ggZZ][fs]<<" |"<<yield_4ljjsel[ggH][fs]+yield_4ljjsel[VBF][fs]+yield_4ljjsel[HWW][fs]<<" |"<<yield_4ljjsel[VVV][fs]+yield_4ljjsel[VH][fs]+yield_4ljjsel[TTW][fs]<<" |"<<yield_4ljjsel[ZXbkg][fs]<<" |"<<endl;
+    f_yields4ljjsel_sync<<"|"<<sFinalState[fs]<<" |"<<yield_4ljjsel[HH][fs]<<" |"<<yield_4ljjsel[TTZ][fs]<<" |"<<yield_4ljjsel[ttH][fs]<<" |"<<yield_4ljjsel[qqZZ][fs]+yield_4ljjsel[ggZZ][fs]<<" |"<<yield_4ljjsel[ggH][fs]+yield_4ljjsel[VBF][fs]<<" |"<<yield_4ljjsel[VVV][fs]+yield_4ljjsel[VH][fs]+yield_4ljjsel[TTW][fs]<<" |"<<yield_4ljjsel[ZXbkg][fs]<<" |"<<endl;
   }
   f_yields4ljjsel_sync.close();
 
@@ -879,7 +867,7 @@ void doPlots_inputBDT(){
       h1_BDTinput_4ljjsel[bdtIn][qqZZ][fs]->SetFillColor(kAzure+6);
       h1_BDTinput_4ljjsel[bdtIn][qqZZ][fs]->SetLineColor(kAzure-6);
       hs_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][qqZZ][fs]); //add to hs
-      // SM Higgs processes: ggH + VBF + VH + ttH + bbH + HWW
+      // SM Higgs processes: ggH + VBF + VH + ttH + bbH
       h1_BDTinput_4ljjsel[bdtIn][ggH][fs]->SetFillColor(kViolet+6);
       h1_BDTinput_4ljjsel[bdtIn][ggH][fs]->SetLineColor(kViolet+6);
       hs_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][ggH][fs]); //add to hs
@@ -895,9 +883,6 @@ void doPlots_inputBDT(){
       h1_BDTinput_4ljjsel[bdtIn][bbH][fs]->SetFillColor(kViolet+6);
       h1_BDTinput_4ljjsel[bdtIn][bbH][fs]->SetLineColor(kViolet+6);
       hs_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][bbH][fs]); //add to hs
-      h1_BDTinput_4ljjsel[bdtIn][HWW][fs]->SetFillColor(kViolet+6);
-      h1_BDTinput_4ljjsel[bdtIn][HWW][fs]->SetLineColor(kViolet+6);
-      hs_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][HWW][fs]); //add to hs
       // HH signal
       h1_BDTinput_4ljjsel[bdtIn][HH][fs]->SetLineColor(kRed);
       h1_BDTinput_4ljjsel[bdtIn][HH][fs]->SetLineWidth(2);
@@ -955,7 +940,6 @@ void doPlots_inputBDT(){
       hMCtot_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][VH][fs]);
       hMCtot_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][ttH][fs]);
       hMCtot_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][bbH][fs]);
-      hMCtot_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][HWW][fs]);
       hMCtot_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][qqZZ][fs]);
       hMCtot_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][ggZZ][fs]);
       hMCtot_BDTinput_4ljjsel[bdtIn][fs]->Add(h1_BDTinput_4ljjsel[bdtIn][TTZ][fs]);
@@ -1129,7 +1113,7 @@ void doPlots_4ljjsel(){
       h1_4ljjsel[pl][qqZZ][fs]->SetFillColor(kAzure+6);
       h1_4ljjsel[pl][qqZZ][fs]->SetLineColor(kAzure-6);
       hs_4ljjsel[pl][fs]->Add(h1_4ljjsel[pl][qqZZ][fs]); //add to hs
-      // SM Higgs processes: ggH + VBF + VH + ttH + bbH + HWW
+      // SM Higgs processes: ggH + VBF + VH + ttH + bbH
       h1_4ljjsel[pl][ggH][fs]->SetFillColor(kViolet+6);
       h1_4ljjsel[pl][ggH][fs]->SetLineColor(kViolet+6);
       hs_4ljjsel[pl][fs]->Add(h1_4ljjsel[pl][ggH][fs]); //add to hs
@@ -1145,9 +1129,6 @@ void doPlots_4ljjsel(){
       h1_4ljjsel[pl][bbH][fs]->SetFillColor(kViolet+6);
       h1_4ljjsel[pl][bbH][fs]->SetLineColor(kViolet+6);
       hs_4ljjsel[pl][fs]->Add(h1_4ljjsel[pl][bbH][fs]); //add to hs
-      h1_4ljjsel[pl][HWW][fs]->SetFillColor(kViolet+6);
-      h1_4ljjsel[pl][HWW][fs]->SetLineColor(kViolet+6);
-      hs_4ljjsel[pl][fs]->Add(h1_4ljjsel[pl][HWW][fs]); //add to hs
       // HH signal
       h1_4ljjsel[pl][HH][fs]->SetLineColor(kRed);
       h1_4ljjsel[pl][HH][fs]->SetLineWidth(2);
@@ -1306,7 +1287,7 @@ void doPlots_4lsel(){
       h1_4lsel[pl][qqZZ][fs]->SetFillColor(kAzure+6);
       h1_4lsel[pl][qqZZ][fs]->SetLineColor(kAzure-6);
       hs_4lsel[pl][fs]->Add(h1_4lsel[pl][qqZZ][fs]); //add to hs
-      // SM Higgs processes: ggH + VBF + VH + ttH + bbH + HWW
+      // SM Higgs processes: ggH + VBF + VH + ttH + bbH
       h1_4lsel[pl][ggH][fs]->SetFillColor(kViolet+6);
       h1_4lsel[pl][ggH][fs]->SetLineColor(kViolet+6);
       hs_4lsel[pl][fs]->Add(h1_4lsel[pl][ggH][fs]); //add to hs
@@ -1322,9 +1303,6 @@ void doPlots_4lsel(){
       h1_4lsel[pl][bbH][fs]->SetFillColor(kViolet+6);
       h1_4lsel[pl][bbH][fs]->SetLineColor(kViolet+6);
       hs_4lsel[pl][fs]->Add(h1_4lsel[pl][bbH][fs]); //add to hs
-      h1_4lsel[pl][HWW][fs]->SetFillColor(kViolet+6);
-      h1_4lsel[pl][HWW][fs]->SetLineColor(kViolet+6);
-      hs_4lsel[pl][fs]->Add(h1_4lsel[pl][HWW][fs]); //add to hs
       // HH signal
       h1_4lsel[pl][HH][fs]->SetLineColor(kRed);
       h1_4lsel[pl][HH][fs]->SetLineWidth(2);
