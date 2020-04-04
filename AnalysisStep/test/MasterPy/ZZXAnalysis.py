@@ -1171,7 +1171,7 @@ if (LEPTON_SETUP == 2016): #DeepCSV, from https://twiki.cern.ch/twiki/bin/viewau
 elif (LEPTON_SETUP == 2017): #DeepCSV, from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation94X
    theBTagger="pfDeepCSVJetTags:probb"
    theBTaggerThr=0.4941
-   theBTagSFFile="ZZXAnalysis/AnalysisStep/data/BTagging/DeepCSV_94XSF_V4_B_F.csv"
+   theBTagSFFile="ZZXAnalysis/AnalysisStep/data/BTagging/DeepCSV_94XSF_V5_B_F.csv"
    theBTagMCEffFile="ZZXAnalysis/AnalysisStep/data/BTagging/bTagEfficiencies_94X_Moriond18_v1.root"
 elif (LEPTON_SETUP == 2018): #DeepCSV, from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation102X
    theBTagger="pfDeepCSVJetTags:probb"
