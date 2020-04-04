@@ -34,9 +34,9 @@
 
 
 // includes for btag SF
-#include "../BTAG_reweight/BTagCalibrationStandalone.h"
-#include "../BTAG_reweight/BTagCalibrationStandalone.cpp"
-#include "../BTAG_reweight/evalEventSF.C"
+#include "BTagCalibrationStandalone.h"
+#include "BTagCalibrationStandalone.cpp"
+#include "evalEventSF.C"
 
 
 #include "CMS_lumi.C"
@@ -134,7 +134,21 @@ void doHistos()
     "ZZZ",
     "ZXbkg",
   };
+  // size_t nDatasets = sizeof(datasets)/sizeof(datasets[0]);
+  // cout<< "number of input files: " << nDatasets<<endl;
 
+  for(int i=0; i<nDatasets; i++){
+    cout<<datasets[i]<<" ";
+  }
+  cout<<endl;
+
+  // arrays for BTagSF norm
+  float sum_eventsAfter_4lsel[nDatasets]; 
+  float sum_BTagSFAfter_4lsel[nDatasets]; 
+  float sum_eventsAfter_4ljjsel[nDatasets]; 
+  float sum_BTagSFAfter_4ljjsel[nDatasets]; 
+  float sum_eventsAfter_4ljjsel_masscut[nDatasets]; 
+  float sum_BTagSFAfter_4ljjsel_masscut[nDatasets]; 
 
 
   ///////////// SET UP B-TAG CALIBRATION ///////////////
@@ -142,10 +156,10 @@ void doHistos()
   // set up calibration + reader
   cout << "Loading the .csv file..." << endl;
     
-  if(year==2016)     { std::string inputCSVfile = "../../data/BTagging/DeepCSV_2016LegacySF_V1.csv"; }
-  else if(year==2017){ std::string inputCSVfile = "../../data/BTagging/DeepCSV_94XSF_V4_B_F.csv"; }
-  else if(year==2018){ std::string inputCSVfile = "../../data/BTagging/DeepCSV_102XSF_V1.csv"; }
-  else{ std::string inputCSVfile = ""; }
+  std::string inputCSVfile = "";
+  if(year==2016)     { inputCSVfile = "../../data/BTagging/DeepCSV_2016LegacySF_V1.csv"; }
+  else if(year==2017){ inputCSVfile = "../../data/BTagging/DeepCSV_94XSF_V4_B_F.csv"; }
+  else if(year==2018){ inputCSVfile = "../../data/BTagging/DeepCSV_102XSF_V1.csv"; }
   std::string measType            = "iterativefit";
   std::string sysType             = "central";
   std::string sysTypeJESUp        = "up_jes";
@@ -309,7 +323,7 @@ void doHistos()
   vector<Float_t> *JetPhi    = 0;
   vector<Float_t> *JetMass   = 0;
   vector<Float_t> *JetBTagger = 0;
-  vector<Short_t> *JetHadronFlavour = 0;
+  vector<Float_t> *JetHadronFlavour = 0;
   Float_t PFMET;
 
   // define yields histos and nEvents histos (no weight)
@@ -487,11 +501,81 @@ void doHistos()
       inputTree[d]->SetBranchAddress("KFactor_QCD_qqZZ_Pt", &KFactor_QCD_qqZZ_Pt);
     }
 
-    // loop over input tree
-    Long64_t entries = inputTree[d]->GetEntries();    
-    cout<<"Processing file: "<< datasets[d] << " (" << entries <<" entries) ..."<< endl;    
 
-    for(Long64_t z=0; z<entries; z++){
+    // --------------------------------------------------------
+    // --- first loop over input tree to get norm for BtagSF
+    Long64_t entries1 = inputTree[d]->GetEntries();    
+    cout<<"First loop over input files to get norm for BTagSF ..."<<endl;
+    cout<<"Processing file: "<< datasets[d] << " (" << entries1 <<" entries) ..."<< endl;    
+    for(Long64_t z=0; z<entries1; z++){
+
+      inputTree[d]->GetEntry(z);
+  
+      if( !(ZZsel>=0) ) continue;
+
+      // 4l selection
+      if(LepEta->size() != 4){
+	cout << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; stored leptons: "<< LepEta->size() << endl;
+	continue;
+      }
+
+
+      if(datasets[d] == "AllData" || datasets[d] == "ZXbkg"){
+        sum_eventsAfter_4lsel[d]           = 1.;      
+	sum_BTagSFAfter_4lsel[d]           = 1.;
+        sum_eventsAfter_4ljjsel[d]         = 1.;      
+	sum_BTagSFAfter_4ljjsel[d]         = 1.;
+        sum_eventsAfter_4ljjsel_masscut[d] = 1.;      
+	sum_BTagSFAfter_4ljjsel_masscut[d] = 1.;
+      }
+      else{
+
+        // compute SF
+        double * scaleFactors;
+        scaleFactors = evalEventSF( int(JetPt->size()), JetHadronFlavour, JetEta, JetPt, JetBTagger, CSVreader, CSVreaderJESUp, CSVreaderJESDown, CSVreaderHFUp, CSVreaderHFDown, CSVreaderLFUp, CSVreaderLFDown, CSVreaderhfstats1Up, CSVreaderhfstats1Down, CSVreaderhfstats2Up, CSVreaderhfstats2Down, CSVreaderlfstats1Up, CSVreaderlfstats1Down, CSVreaderlfstats2Up, CSVreaderlfstats2Down, CSVreadercfErr1Up, CSVreadercfErr1Down, CSVreadercfErr2Up, CSVreadercfErr2Down );
+
+        // total counters for BTagSF norm --- 4lsel
+        sum_eventsAfter_4lsel[d] += 1.; 
+        sum_BTagSFAfter_4lsel[d] += scaleFactors[0]; 
+
+        // JETSELECTION
+        // at least 2 jets in the acceptance
+        if (JetPt->size() < 2) continue;         
+
+        // total counters for BTagSF norm --- 4ljjsel
+        sum_eventsAfter_4ljjsel[d] += 1.; 
+        sum_BTagSFAfter_4ljjsel[d] += scaleFactors[0]; 
+
+        // mass cut
+        if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
+
+        // total counters for BTagSF norm --- 4ljjsel mass cut
+        sum_eventsAfter_4ljjsel_masscut[d] += 1.; 
+        sum_BTagSFAfter_4ljjsel_masscut[d] += scaleFactors[0]; 
+
+      }// end else
+    
+    } // end first loop over entries 
+
+    cout<<datasets[d]<<" "<<sum_eventsAfter_4lsel[d]<<" "<<sum_BTagSFAfter_4lsel[d]<<" "<<sum_eventsAfter_4ljjsel[d]<<" "<<sum_BTagSFAfter_4ljjsel[d]<<" "<<sum_eventsAfter_4ljjsel_masscut[d]<<" "<<sum_BTagSFAfter_4ljjsel_masscut[d]<<endl;
+
+    // --- control for norm
+    if( sum_eventsAfter_4lsel[d] == 0. || std::isnan(sum_eventsAfter_4lsel[d]) ){ sum_eventsAfter_4lsel[d] = 1.; }
+    if( sum_BTagSFAfter_4lsel[d] == 0. || std::isnan(sum_BTagSFAfter_4lsel[d]) ){ sum_BTagSFAfter_4lsel[d] = 1.; }
+    if( sum_eventsAfter_4ljjsel[d] == 0. || std::isnan(sum_eventsAfter_4ljjsel[d]) ){ sum_eventsAfter_4ljjsel[d] = 1.; }
+    if( sum_BTagSFAfter_4ljjsel[d] == 0. || std::isnan(sum_BTagSFAfter_4ljjsel[d]) ){ sum_BTagSFAfter_4ljjsel[d] = 1.; }
+    if( sum_eventsAfter_4ljjsel_masscut[d] == 0. || std::isnan(sum_eventsAfter_4ljjsel_masscut[d]) ){ sum_eventsAfter_4ljjsel_masscut[d] = 1.; }
+    if( sum_BTagSFAfter_4ljjsel_masscut[d] == 0. || std::isnan(sum_BTagSFAfter_4ljjsel_masscut[d]) ){ sum_BTagSFAfter_4ljjsel_masscut[d] = 1.; }
+
+    cout<<datasets[d]<<" "<<sum_eventsAfter_4lsel[d]<<" "<<sum_BTagSFAfter_4lsel[d]<<" "<<sum_eventsAfter_4ljjsel[d]<<" "<<sum_BTagSFAfter_4ljjsel[d]<<" "<<sum_eventsAfter_4ljjsel_masscut[d]<<" "<<sum_BTagSFAfter_4ljjsel_masscut[d]<<endl;
+    // --------------------------------------------------------
+
+
+    // --- second loop over input tree to do all the rest
+    Long64_t entries2 = inputTree[d]->GetEntries();    
+    cout<<"Second loop over input files to do all the rest ..."<<endl;
+    cout<<"Processing file: "<< datasets[d] << " (" << entries2 <<" entries) ..."<< endl;    
+    for(Long64_t z=0; z<entries2; z++){
 
       inputTree[d]->GetEntry(z);
 
@@ -512,7 +596,9 @@ void doHistos()
 
       // compute SF
       double * scaleFactors;
-      scaleFactors = evalEventSF( int(JetPt->size()), JetHadronFlavour, JetEta, JetPt, JetBTagger, CSVreader, CSVreaderJESUp, CSVreaderJESDown, CSVreaderHFUp, CSVreaderHFDown, CSVreaderLFUp, CSVreaderLFDown, CSVreaderhfstats1Up, CSVreaderhfstats1Down, CSVreaderhfstats2Up, CSVreaderhfstats2Down, CSVreaderlfstats1Up, CSVreaderlfstats1Down, CSVreaderlfstats2Up, CSVreaderlfstats2Down, CSVreadercfErr1Up, CSVreadercfErr1Down, CSVreadercfErr2Up, CSVreadercfErr2Down );
+      if(currentProcess != Data && currentProcess != ZXbkg){
+        scaleFactors = evalEventSF( int(JetPt->size()), JetHadronFlavour, JetEta, JetPt, JetBTagger, CSVreader, CSVreaderJESUp, CSVreaderJESDown, CSVreaderHFUp, CSVreaderHFDown, CSVreaderLFUp, CSVreaderLFDown, CSVreaderhfstats1Up, CSVreaderhfstats1Down, CSVreaderhfstats2Up, CSVreaderhfstats2Down, CSVreaderlfstats1Up, CSVreaderlfstats1Down, CSVreaderlfstats2Up, CSVreaderlfstats2Down, CSVreadercfErr1Up, CSVreadercfErr1Down, CSVreadercfErr2Up, CSVreadercfErr2Down );
+      }
 
       // --- event weights
       Double_t eventWeight = 1.;
@@ -551,20 +637,20 @@ void doHistos()
 	else{ cerr << "error, Z2Flav: " << endl; }
       }
 
-      
+
 
       // --- fill histos 4l sel
-      h1_m4l_4lsel[currentProcess][currentFinalState]->Fill(ZZMass, eventWeight);
+      h1_m4l_4lsel[currentProcess][currentFinalState]->Fill(ZZMass, eventWeight *sum_eventsAfter_4lsel[d]/sum_BTagSFAfter_4lsel[d]);
       // (in 4l sidebands)
       if(ZZMass<115 || ZZMass>135){ 
-        h1_MET_4lsel_sidebands[currentProcess][currentFinalState]->Fill(PFMET, eventWeight);
+        h1_MET_4lsel_sidebands[currentProcess][currentFinalState]->Fill(PFMET, eventWeight *sum_eventsAfter_4lsel[d]/sum_BTagSFAfter_4lsel[d]);
         for(int i=0; i<LepPt->size(); i++){
-          h1_pT4l_4lsel_sidebands[currentProcess][currentFinalState]->Fill(LepPt->at(i), eventWeight);
+          h1_pT4l_4lsel_sidebands[currentProcess][currentFinalState]->Fill(LepPt->at(i), eventWeight *sum_eventsAfter_4lsel[d]/sum_BTagSFAfter_4lsel[d]);
         }
       }
 
       // --- fill yields after 4l sel
-      hYields_4lsel[currentProcess][currentFinalState]->Fill(0.5, eventWeight);
+      hYields_4lsel[currentProcess][currentFinalState]->Fill(0.5, eventWeight *sum_eventsAfter_4lsel[d]/sum_BTagSFAfter_4lsel[d]);
 
       // --- fill number of non weighted events selected after 4l sel
       hEvents_4lsel[currentProcess][currentFinalState]->Fill(0.5, 1.);
@@ -577,7 +663,6 @@ void doHistos()
       // at least 2 jets in the acceptance
       if (JetPt->size() < 2) continue;   
           
-      cout<<"jetptsize: "<<JetPt->size()<<" jetbtaggersize: "<<JetBTagger->size()<<endl;
       // index of jet with max btagger value (j1)
       int dj1_ = distance( JetBTagger->begin(), max_element(JetBTagger->begin(), JetBTagger->end()));
       
@@ -585,7 +670,6 @@ void doHistos()
       float max2JetBtag = -9999.;
       int dj2_ = -9999;
       for(UInt_t i=0; i<JetBTagger->size(); i++){
-        cout<<JetBTagger->at(i)<<" ";
   
         if(i == dj1_) continue;
         float temp = JetBTagger->at(i);
@@ -594,10 +678,10 @@ void doHistos()
           dj2_ = i;
         }
       }
-      cout<<" indici (1,2) "<<dj1_ <<" "<<dj2_<<" valori btag(1); btag(2) "<<JetBTagger->at(dj1_)<<" "<<JetBTagger->at(dj2_)<<endl;
-      if(JetBTagger->at(dj1_)>=JetBTagger->at(dj2_)) cout<<"FUNZIONA"<<endl;
-      else cout<<"NON FUNZIONA"<<endl;
-      cout<<"debug:  L1Prefiringweight: "<<L1prefiringWeight<<endl;
+      // cout<<" indici (1,2) "<<dj1_ <<" "<<dj2_<<" valori btag(1); btag(2) "<<JetBTagger->at(dj1_)<<" "<<JetBTagger->at(dj2_)<<endl;
+      // if(JetBTagger->at(dj1_)>=JetBTagger->at(dj2_)) cout<<"FUNZIONA"<<endl;
+      // else cout<<"NON FUNZIONA"<<endl;
+      // cout<<"debug:  L1Prefiringweight: "<<L1prefiringWeight<<endl;
 
 
       
@@ -624,36 +708,36 @@ void doHistos()
 
 
       // --- fill histos after 4ljj sel (no mass cut)
-      h1_m4l_4ljjsel  [currentProcess][currentFinalState]->Fill(ZZMass, eventWeight);
+      h1_m4l_4ljjsel  [currentProcess][currentFinalState]->Fill(ZZMass, eventWeight *sum_eventsAfter_4ljjsel[d]/sum_BTagSFAfter_4ljjsel[d]);
 
 
 
       // --- MASSCUT: mass cut: signal region
-       if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
+      if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
 
 
 
 
       // --- fill yields after 4ljj sel
-      hYields_4ljjsel[currentProcess][currentFinalState]->Fill(0.5, eventWeight);
+      hYields_4ljjsel[currentProcess][currentFinalState]->Fill(0.5, eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
       // --- fill number of non weighted events selected after 4ljj sel
       hEvents_4ljjsel[currentProcess][currentFinalState]->Fill(0.5, 1.);
       
 
       // --- fill histos after 4ljj sel
-      h1_j1Eta_4ljjsel[currentProcess][currentFinalState]->Fill(JetEta->at(dj1_), eventWeight);
-      h1_j2Eta_4ljjsel[currentProcess][currentFinalState]->Fill(JetEta->at(dj2_), eventWeight);
+      h1_j1Eta_4ljjsel[currentProcess][currentFinalState]->Fill(JetEta->at(dj1_), eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
+      h1_j2Eta_4ljjsel[currentProcess][currentFinalState]->Fill(JetEta->at(dj2_), eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
       // (BDT input histos)
-      h1_j1btag_4ljjsel  [currentProcess][currentFinalState]->Fill(JetBTagger->at(dj1_), eventWeight);  
-      h1_j2btag_4ljjsel  [currentProcess][currentFinalState]->Fill(JetBTagger->at(dj2_), eventWeight);  
-      h1_j1pT_4ljjsel    [currentProcess][currentFinalState]->Fill(JetPt->at(dj1_), eventWeight);  
-      h1_j2pT_4ljjsel    [currentProcess][currentFinalState]->Fill(JetPt->at(dj2_), eventWeight);  
-      h1_MET_4ljjsel     [currentProcess][currentFinalState]->Fill(PFMET, eventWeight);
-      h1_DeltaRhh_4ljjsel[currentProcess][currentFinalState]->Fill(DeltaR, eventWeight);
-      h1_mbb_4ljjsel     [currentProcess][currentFinalState]->Fill(bbMass, eventWeight);
+      h1_j1btag_4ljjsel[currentProcess][currentFinalState]->Fill(JetBTagger->at(dj1_), eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
+      h1_j2btag_4ljjsel[currentProcess][currentFinalState]->Fill(JetBTagger->at(dj2_), eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
+      h1_j1pT_4ljjsel    [currentProcess][currentFinalState]->Fill(JetPt->at(dj1_), eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);  
+      h1_j2pT_4ljjsel    [currentProcess][currentFinalState]->Fill(JetPt->at(dj2_), eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
+      h1_MET_4ljjsel     [currentProcess][currentFinalState]->Fill(PFMET, eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
+      h1_DeltaRhh_4ljjsel[currentProcess][currentFinalState]->Fill(DeltaR, eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
+      h1_mbb_4ljjsel     [currentProcess][currentFinalState]->Fill(bbMass, eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
 
       //2D histo
-      h2_m4lvsmbb_4ljjsel[currentProcess][currentFinalState]->Fill(ZZMass, bbMass, eventWeight);
+      h2_m4lvsmbb_4ljjsel[currentProcess][currentFinalState]->Fill(ZZMass, bbMass, eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
 
 
 
