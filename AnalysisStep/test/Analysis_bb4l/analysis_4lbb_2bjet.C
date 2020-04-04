@@ -167,7 +167,7 @@ void doHistos()
     
   std::string inputCSVfile = "";
   if(year==2016)     { inputCSVfile = "../../data/BTagging/DeepCSV_2016LegacySF_V1.csv"; }
-  else if(year==2017){ inputCSVfile = "../../data/BTagging/DeepCSV_94XSF_V4_B_F.csv"; }
+  else if(year==2017){ inputCSVfile = "../../data/BTagging/DeepCSV_94XSF_V5_B_F.csv"; }
   else if(year==2018){ inputCSVfile = "../../data/BTagging/DeepCSV_102XSF_V1.csv"; }
   std::string measType            = "iterativefit";
   std::string sysType             = "central";
