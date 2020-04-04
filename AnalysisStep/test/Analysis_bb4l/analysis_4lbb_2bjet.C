@@ -107,7 +107,7 @@ void doHistos()
 
 
   //---datasets
-  int nDatasets = 22;
+  //  static int nDatasets = 22;
   TString datasets[] = {
     "AllData", 
     "HH4lbb_Angela",
@@ -134,8 +134,8 @@ void doHistos()
     "ZZZ",
     "ZXbkg",
   };
-  // size_t nDatasets = sizeof(datasets)/sizeof(datasets[0]);
-  // cout<< "number of input files: " << nDatasets<<endl;
+  static size_t nDatasets = sizeof(datasets)/sizeof(datasets[0]);
+  cout<< "number of input files: " << nDatasets<<endl;
 
   for(int i=0; i<nDatasets; i++){
     cout<<datasets[i]<<" ";
@@ -143,12 +143,21 @@ void doHistos()
   cout<<endl;
 
   // arrays for BTagSF norm
-  float sum_eventsAfter_4lsel[nDatasets]; 
-  float sum_BTagSFAfter_4lsel[nDatasets]; 
-  float sum_eventsAfter_4ljjsel[nDatasets]; 
-  float sum_BTagSFAfter_4ljjsel[nDatasets]; 
+  float sum_eventsAfter_4lsel[nDatasets];            
+  float sum_BTagSFAfter_4lsel[nDatasets];            
+  float sum_eventsAfter_4ljjsel[nDatasets];         
+  float sum_BTagSFAfter_4ljjsel[nDatasets];         
   float sum_eventsAfter_4ljjsel_masscut[nDatasets]; 
   float sum_BTagSFAfter_4ljjsel_masscut[nDatasets]; 
+  for(int i=0; i<nDatasets; i++){
+    sum_eventsAfter_4lsel[i] = 0.;           
+    sum_BTagSFAfter_4lsel[i] = 0.;           
+    sum_eventsAfter_4ljjsel[i] = 0.;        
+    sum_BTagSFAfter_4ljjsel[i] = 0.;        
+    sum_eventsAfter_4ljjsel_masscut[i] = 0.;
+    sum_BTagSFAfter_4ljjsel_masscut[i] = 0.;
+  }
+
 
 
   ///////////// SET UP B-TAG CALIBRATION ///////////////
