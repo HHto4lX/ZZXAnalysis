@@ -30,9 +30,14 @@
 #include <vector>
 #include "TLorentzVector.h"
 
+// includes for btag SF
+#include "BTagCalibrationStandalone.h"
+#include "BTagCalibrationStandalone.cpp"
+#include "evalEventSF.C"
+
+
 using namespace std;
 
-#define JETSELECTION 1
 #define MERGE2E2MU 1
 
 enum FinalState {fs_4mu=0, fs_4e=1, fs_2e2mu=2, fs_2mu2e=3};  // 4mu, 4e, 2e2mu, 2mu2e
@@ -41,7 +46,7 @@ string FinalState[nFinalState+1] = {"4mu", "4e","2e2mu","2mu2e", "4L"};
 
 
 
-void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
+void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear, TString massRegion, TString selection, TString finalstate)
 {
 
   bool isDATA = false;
@@ -50,6 +55,148 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
   if ( inFile.Contains("ZXbkg") )   isZX   = true;
   cout<<"isDATA "<<isDATA<<endl;
   cout<<"isZX "<<isZX<<endl;
+
+  
+  // arrays for BTagSF norm
+  float sum_eventsAfter_4lsel = 0.;            
+  float sum_BTagSFAfter_4lsel = 0.;            
+  float sum_eventsAfter_4ljjsel = 0.;         
+  float sum_BTagSFAfter_4ljjsel = 0.;         
+  float sum_eventsAfter_4ljjsel_masscut = 0.; 
+  float sum_BTagSFAfter_4ljjsel_masscut = 0.; 
+
+  ///////////// SET UP B-TAG CALIBRATION ///////////////
+    
+  // set up calibration + reader
+  cout << "Loading the .csv file..." << endl;
+    
+  std::string inputCSVfile = "";
+  if(syear=="2016")     { inputCSVfile = "../../data/BTagging/DeepCSV_2016LegacySF_V1.csv"; }
+  else if(syear=="2017"){ inputCSVfile = "../../data/BTagging/DeepCSV_94XSF_V5_B_F.csv"; }
+  else if(syear=="2018"){ inputCSVfile = "../../data/BTagging/DeepCSV_102XSF_V1.csv"; }
+  std::string measType            = "iterativefit";
+  std::string sysType             = "central";
+  std::string sysTypeJESUp        = "up_jes";
+  std::string sysTypeJESDown      = "down_jes";
+  std::string sysTypeHFUp         = "up_hf";
+  std::string sysTypeHFDown       = "down_hf";
+  std::string sysTypeLFUp         = "up_lf";
+  std::string sysTypeLFDown       = "down_lf";
+  std::string sysTypehfstats1Up   = "up_hfstats1";
+  std::string sysTypehfstats1Down = "down_hfstats1";
+  std::string sysTypehfstats2Up   = "up_hfstats2";
+  std::string sysTypehfstats2Down = "down_hfstats2";
+  std::string sysTypelfstats1Up   = "up_lfstats1";
+  std::string sysTypelfstats1Down = "down_lfstats1";
+  std::string sysTypelfstats2Up   = "up_lfstats2";
+  std::string sysTypelfstats2Down = "down_lfstats2";
+  std::string sysTypecfErr1Up     = "up_cferr1";
+  std::string sysTypecfErr1Down   = "down_cferr1";
+  std::string sysTypecfErr2Up     = "up_cferr2";
+  std::string sysTypecfErr2Down   = "down_cferr2";
+    
+  BTagCalibration calib("csvv2", inputCSVfile);
+  //nominal
+  BTagCalibrationReader CSVreader(BTagEntry::OP_RESHAPING, sysType);       
+  CSVreader.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreader.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreader.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //up_jes shift
+  BTagCalibrationReader CSVreaderJESUp(BTagEntry::OP_RESHAPING, sysTypeJESUp);       
+  CSVreaderJESUp.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderJESUp.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderJESUp.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //down_jes shift
+  BTagCalibrationReader CSVreaderJESDown(BTagEntry::OP_RESHAPING, sysTypeJESDown);       
+  CSVreaderJESDown.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderJESDown.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderJESDown.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //up_hf shift
+  BTagCalibrationReader CSVreaderHFUp(BTagEntry::OP_RESHAPING, sysTypeHFUp);       
+  CSVreaderHFUp.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderHFUp.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderHFUp.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //down_hf shift
+  BTagCalibrationReader CSVreaderHFDown(BTagEntry::OP_RESHAPING, sysTypeHFDown);       
+  CSVreaderHFDown.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderHFDown.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderHFDown.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //up_lf shift
+  BTagCalibrationReader CSVreaderLFUp(BTagEntry::OP_RESHAPING, sysTypeLFUp);       
+  CSVreaderLFUp.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderLFUp.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderLFUp.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //down_lf shift
+  BTagCalibrationReader CSVreaderLFDown(BTagEntry::OP_RESHAPING, sysTypeLFDown);       
+  CSVreaderLFDown.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderLFDown.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderLFDown.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //up_hfstats1 shift
+  BTagCalibrationReader CSVreaderhfstats1Up(BTagEntry::OP_RESHAPING, sysTypehfstats1Up);       
+  CSVreaderhfstats1Up.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderhfstats1Up.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderhfstats1Up.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //down_hfstats1 shift
+  BTagCalibrationReader CSVreaderhfstats1Down(BTagEntry::OP_RESHAPING, sysTypehfstats1Down);       
+  CSVreaderhfstats1Down.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderhfstats1Down.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderhfstats1Down.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //up_lfstats2 shift
+  BTagCalibrationReader CSVreaderhfstats2Up(BTagEntry::OP_RESHAPING, sysTypehfstats2Up);       
+  CSVreaderhfstats2Up.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderhfstats2Up.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderhfstats2Up.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //down_lfstats2 shift
+  BTagCalibrationReader CSVreaderhfstats2Down(BTagEntry::OP_RESHAPING, sysTypehfstats2Down);       
+  CSVreaderhfstats2Down.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderhfstats2Down.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderhfstats2Down.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //up_lfstats1 shift
+  BTagCalibrationReader CSVreaderlfstats1Up(BTagEntry::OP_RESHAPING, sysTypelfstats1Up);       
+  CSVreaderlfstats1Up.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderlfstats1Up.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderlfstats1Up.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //down_lfstats1 shift
+  BTagCalibrationReader CSVreaderlfstats1Down(BTagEntry::OP_RESHAPING, sysTypelfstats1Down);       
+  CSVreaderlfstats1Down.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderlfstats1Down.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderlfstats1Down.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //up_lfstats2 shift
+  BTagCalibrationReader CSVreaderlfstats2Up(BTagEntry::OP_RESHAPING, sysTypelfstats2Up);       
+  CSVreaderlfstats2Up.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderlfstats2Up.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderlfstats2Up.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //down_lfstats2 shift
+  BTagCalibrationReader CSVreaderlfstats2Down(BTagEntry::OP_RESHAPING, sysTypelfstats2Down);       
+  CSVreaderlfstats2Down.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderlfstats2Down.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderlfstats2Down.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //up_cferr1 shift
+  BTagCalibrationReader CSVreadercfErr1Up(BTagEntry::OP_RESHAPING, sysTypecfErr1Up);       
+  CSVreadercfErr1Up.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreadercfErr1Up.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreadercfErr1Up.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //down_cferr1 shift
+  BTagCalibrationReader CSVreadercfErr1Down(BTagEntry::OP_RESHAPING, sysTypecfErr1Down);       
+  CSVreadercfErr1Down.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreadercfErr1Down.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreadercfErr1Down.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //up_cferr2 shift
+  BTagCalibrationReader CSVreadercfErr2Up(BTagEntry::OP_RESHAPING, sysTypecfErr2Up);       
+  CSVreadercfErr2Up.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreadercfErr2Up.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreadercfErr2Up.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //down_cferr2 shift
+  BTagCalibrationReader CSVreadercfErr2Down(BTagEntry::OP_RESHAPING, sysTypecfErr2Down);       
+  CSVreadercfErr2Down.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreadercfErr2Down.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreadercfErr2Down.load(calib, BTagEntry::FLAV_UDSG, measType);
+    
+  cout << "Input CSV weight file = " << inputCSVfile << "; measurementType = " << measType << ";" << endl;
+
+  ///////////////////////////
+
+  
 
   // input file branches
   TFile* inputFile;
@@ -88,8 +235,8 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
   vector<Float_t> *JetEta    = 0;
   vector<Float_t> *JetPhi    = 0;
   vector<Float_t> *JetMass   = 0;
-  vector<Float_t> *JetIsBtagged = 0;
   vector<Float_t> *JetBTagger = 0;
+  vector<Float_t> *JetHadronFlavour = 0;
   Float_t PFMET;
 
   vector<Float_t> *JetPt_JESUp = 0;
@@ -144,7 +291,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
   inputTree->SetBranchAddress("JetMass", &JetMass);
   inputTree->SetBranchAddress("JetPhi",  &JetPhi);
   inputTree->SetBranchAddress("JetBTagger",  &JetBTagger);
-  inputTree->SetBranchAddress("JetIsBtagged",  &JetIsBtagged);  
+  inputTree->SetBranchAddress("JetHadronFlavour",  &JetHadronFlavour);
   inputTree->SetBranchAddress("PFMET",  &PFMET);  
   // ggZZ samples
   if(inFile.Contains("ggTo"))
@@ -207,12 +354,83 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 
   int currentFinalState;
 
+  
+  // --------------------------------------------------------
+  // --- first loop over input tree to get norm for BtagSF
+  Long64_t entries1 = inputTree->GetEntries();    
+  cout<<"First loop over input files to get norm for BTagSF ..."<<endl;
+  cout<<"Processing file: "<< inFile << " (" << entries1 <<" entries) ..."<< endl;    
+  for(Long64_t z=0; z<entries1; z++){
 
-  // loop over input tree
-  Long64_t entries = inputTree->GetEntries();
-  std::cout<<"Processing file: "<< inFile << "\nNumber of entries: " << entries << endl;
+    inputTree->GetEntry(z);
+  
+    if( !(ZZsel>=0) ) continue;
 
-  for (Long64_t entry = 0; entry < entries; entry++)
+    // 4l selection
+    if(LepEta->size() != 4){
+      cout << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; stored leptons: "<< LepEta->size() << endl;
+      continue;
+    }
+
+
+    if(inFile == "AllData" || inFile == "ZXbkg"){
+      sum_eventsAfter_4lsel           = 1.;      
+      sum_BTagSFAfter_4lsel           = 1.;
+      sum_eventsAfter_4ljjsel         = 1.;      
+      sum_BTagSFAfter_4ljjsel         = 1.;
+      sum_eventsAfter_4ljjsel_masscut = 1.;      
+      sum_BTagSFAfter_4ljjsel_masscut = 1.;
+    }
+    else{
+
+      // compute SF
+      double * scaleFactors;
+      scaleFactors = evalEventSF( int(JetPt->size()), JetHadronFlavour, JetEta, JetPt, JetBTagger, CSVreader, CSVreaderJESUp, CSVreaderJESDown, CSVreaderHFUp, CSVreaderHFDown, CSVreaderLFUp, CSVreaderLFDown, CSVreaderhfstats1Up, CSVreaderhfstats1Down, CSVreaderhfstats2Up, CSVreaderhfstats2Down, CSVreaderlfstats1Up, CSVreaderlfstats1Down, CSVreaderlfstats2Up, CSVreaderlfstats2Down, CSVreadercfErr1Up, CSVreadercfErr1Down, CSVreadercfErr2Up, CSVreadercfErr2Down );
+
+      // total counters for BTagSF norm --- 4lsel
+      sum_eventsAfter_4lsel += 1.; 
+      sum_BTagSFAfter_4lsel += scaleFactors[0]; 
+
+      // JETSELECTION
+      // at least 2 jets in the acceptance
+      if (JetPt->size() < 2) continue;         
+
+      // total counters for BTagSF norm --- 4ljjsel
+      sum_eventsAfter_4ljjsel += 1.; 
+      sum_BTagSFAfter_4ljjsel += scaleFactors[0]; 
+
+      // mass cut
+      if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
+
+      // total counters for BTagSF norm --- 4ljjsel mass cut
+      sum_eventsAfter_4ljjsel_masscut += 1.; 
+      sum_BTagSFAfter_4ljjsel_masscut += scaleFactors[0]; 
+
+    }// end else
+    
+  } // end first loop over entries 
+
+  cout<<inFile<<" "<<sum_eventsAfter_4lsel<<" "<<sum_BTagSFAfter_4lsel<<" "<<sum_eventsAfter_4ljjsel<<" "<<sum_BTagSFAfter_4ljjsel<<" "<<sum_eventsAfter_4ljjsel_masscut<<" "<<sum_BTagSFAfter_4ljjsel_masscut<<endl;
+
+  // --- control for norm
+  if( sum_eventsAfter_4lsel == 0. || std::isnan(sum_eventsAfter_4lsel) ){ sum_eventsAfter_4lsel = 1.; }
+  if( sum_BTagSFAfter_4lsel == 0. || std::isnan(sum_BTagSFAfter_4lsel) ){ sum_BTagSFAfter_4lsel = 1.; }
+  if( sum_eventsAfter_4ljjsel == 0. || std::isnan(sum_eventsAfter_4ljjsel) ){ sum_eventsAfter_4ljjsel = 1.; }
+  if( sum_BTagSFAfter_4ljjsel == 0. || std::isnan(sum_BTagSFAfter_4ljjsel) ){ sum_BTagSFAfter_4ljjsel = 1.; }
+  if( sum_eventsAfter_4ljjsel_masscut == 0. || std::isnan(sum_eventsAfter_4ljjsel_masscut) ){ sum_eventsAfter_4ljjsel_masscut = 1.; }
+  if( sum_BTagSFAfter_4ljjsel_masscut == 0. || std::isnan(sum_BTagSFAfter_4ljjsel_masscut) ){ sum_BTagSFAfter_4ljjsel_masscut = 1.; }
+
+  cout<<inFile<<" "<<sum_eventsAfter_4lsel<<" "<<sum_BTagSFAfter_4lsel<<" "<<sum_eventsAfter_4ljjsel<<" "<<sum_BTagSFAfter_4ljjsel<<" "<<sum_eventsAfter_4ljjsel_masscut<<" "<<sum_BTagSFAfter_4ljjsel_masscut<<endl;
+  // --------------------------------------------------------
+  
+
+
+
+  // --- second loop over input tree
+  Long64_t entries2 = inputTree->GetEntries();
+  cout<<"Second loop over input files to do all the rest ..."<<endl;
+  cout<<"Processing file: "<< inFile << " (" << entries2 <<" entries) ..."<< endl;   
+  for (Long64_t entry = 0; entry < entries2; entry++)
   {  
     inputTree->GetEntry(entry);
     
@@ -225,6 +443,26 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 	cerr << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; stored leptons: "<< LepEta->size() << endl;
 	continue;
       }
+
+
+    // --- fill k factors 
+    Float_t kfactor = 1.;
+    if(inFile.Contains("ZZTo4l")) { kfactor = KFactor_EW_qqZZ * KFactor_QCD_qqZZ_M; } // qqZZ sample
+    else if(inFile.Contains("ggTo")) { kfactor = KFactor_QCD_ggZZ_Nominal; }  //ggZZ samples 
+
+    // compute SF
+    double * scaleFactors;
+    if(!isDATA && !isZX){
+      scaleFactors = evalEventSF( int(JetPt->size()), JetHadronFlavour, JetEta, JetPt, JetBTagger, CSVreader, CSVreaderJESUp, CSVreaderJESDown, CSVreaderHFUp, CSVreaderHFDown, CSVreaderLFUp, CSVreaderLFDown, CSVreaderhfstats1Up, CSVreaderhfstats1Down, CSVreaderhfstats2Up, CSVreaderhfstats2Down, CSVreaderlfstats1Up, CSVreaderlfstats1Down, CSVreaderlfstats2Up, CSVreaderlfstats2Down, CSVreadercfErr1Up, CSVreadercfErr1Down, CSVreadercfErr2Up, CSVreadercfErr2Down );
+    }
+
+    // --- event weights
+    Double_t eventWeight = 1.;
+    if(!isDATA && !isZX){
+      eventWeight = partialSampleWeight *xsec *kfactor *overallEventWeight *L1prefiringWeight *scaleFactors[0] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut; } // normalizzazione per selezione 4ljjsel and masscut: sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+    if(isZX) eventWeight = weight; //ZX weight
+
+
 
 
 
@@ -264,53 +502,35 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 
 
 
-    // fill k factors and event weights
-    Float_t kfactor = 1.;
-    // qqZZ sample
-    if(inFile.Contains("ZZTo4l")) { kfactor = KFactor_EW_qqZZ * KFactor_QCD_qqZZ_M; }
-    //ggZZ samples                       
-    else if(inFile.Contains("ggTo")) { kfactor = KFactor_QCD_ggZZ_Nominal; }
 
-    Double_t eventWeight = 1.;
-    if(!isDATA && !isZX) eventWeight = partialSampleWeight * xsec * kfactor * overallEventWeight * L1prefiringWeight;
-    if(isZX) eventWeight = weight; //ZX weight
+    // --- save only events for 1 final state at the time
+    if(finalstate == "fs4mu"){ 
+      if(currentFinalState != fs_4mu){ continue; } // save 4mu only
+    } 
+    else if(finalstate == "fs4e"){
+      if(currentFinalState != fs_4e){ continue; } // save 4e only
+    }
+    else if(finalstate == "fs2e2mu"){
+      if(currentFinalState != fs_2e2mu) continue;  // save 2e2mu only
+    }
+    else cerr<<"wrong final state"<<endl;
 
-
-
-    //save only events for 1 final state at the time
-    if(currentFinalState != fs_4mu)   continue;  // save 4mu only
-    //    if(currentFinalState != fs_4e)    continue;  // save 4e only
-    //    if(currentFinalState != fs_2e2mu) continue;  // save 2e2mu only
-    //    cout<<currentFinalState<<endl;
-
-
-
-    // //***SYNC*** out on file for sync1
-    // ofstream fout1;
-    // fout1.open("sync1_ggH_4mu_4lsel.txt",ios::app);
-    // fout1<<nRun<<":"<<nLumi<<":"<<nEvent<<":"<<Z1Mass<<":"<<Z2Mass<<":"<<ZZMass<<":"<<JetPt->size()<<":"<<eventWeight<<endl;
-    // fout1.close();
 
     
 
-
-    // // mass cut: signal region
-    if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
-    // mass cut: side bands
-    //    if(ZZMass >= 115 && ZZMass <= 135) continue; // ZZMass < 115 or ZZMass > 135 GeV
-
+    // --- mass region
+    if(massRegion == "SR"){
+      // mass cut: signal region
+      if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
+    }
+    else if(massRegion == "sidebands"){
+      // mass cut: side bands
+      if(ZZMass >= 115 && ZZMass <= 135) continue; // ZZMass < 115 or ZZMass > 135 GeV
+    }
+    else cerr<<"wrong mass region!"<<endl;
  
 
 
-
-    // //***SYNC*** sync, at least 1 jet
-    // if (JetPt->size() >= 1){  
-    //   // out on file for sync2
-    //   ofstream fout2;
-    //   fout2.open("sync2_ggH_4mu_4lsel1jet.txt",ios::app);
-    //   fout2<<nRun<<":"<<nLumi<<":"<<nEvent<<":"<<Z1Mass<<":"<<Z2Mass<<":"<<ZZMass<<":"<<JetPt->size()<<":"<<eventWeight<<endl;
-    //   fout2.close();
-    // }
 
     //JETSELECTION---------------------------------------------------
     // at least 2 jets in the acceptance
@@ -320,13 +540,6 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     //   cout<<JetPt->at(i)<<" "<<JetPt_JESUp->at(i)<<" "<<JetPt_JESDown->at(i)<<" "<<JetPt_JERUp->at(i)<<" "<<JetPt_JERDown->at(i)<<endl;
     // }
 
-
-
-    // //***SYNC*** out on file for sync3
-    // ofstream fout3;
-    // fout3.open("sync3_ggH_4mu_4lsel2jet.txt",ios::app);
-    // fout3<<nRun<<":"<<nLumi<<":"<<nEvent<<":"<<Z1Mass<<":"<<Z2Mass<<":"<<ZZMass<<":"<<JetPt->size()<<":"<<eventWeight<<endl;
-    // fout3.close();
 
         
 
@@ -446,15 +659,35 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 
 void prepareNtupleMVA_2bjet()
 {
+  // --- mass region
+  TString massRegion = "SR";
+  //  TString massRegion = "sidebands";
 
-  //  float lumi = 59.7; //fb-1 2018
-  float lumi = 41.5; //fb-1 2017
+  // --- selection
+  TString selection = "4ljjsel";
+  //  TString selection = "4lsel";
+
+  // --- finalstate
+  TString finalstate = "fs4mu";
+  //  TString finalstate = "fs4e";
+  //  TString finalstate = "fs2e2mu";
+  
+  // -- year
+  //  TString syear = "2016";
+  //  TString syear = "2017";
+  TString syear = "2018";
+
+  // --- lumi
+  //  float lumi = 35.8; //fb-1 2016
+  //  float lumi = 41.5; //fb-1 2017
+  float lumi = 59.7; //fb-1 2018
 
 
-  //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
-  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
+  //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
+  //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
+  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
   TString inputFileName[] = {
-    //       "AllData", 
+    //"AllData", 
     "HH4lbb_Angela",
     "ggH125",
     "VBFH125",
@@ -463,8 +696,8 @@ void prepareNtupleMVA_2bjet()
     "ZH125",
     "bbH125",
     "ttH125",
-    //    "ZZTo4lext2",
-    "ZZTo4l",
+    "ZZTo4lext2",
+    //"ZZTo4l",
     "ggTo4e_Contin_MCFM701",
     "ggTo4mu_Contin_MCFM701",
     "ggTo4tau_Contin_MCFM701",
@@ -476,28 +709,24 @@ void prepareNtupleMVA_2bjet()
     "WWZ",
     "WZZ",
     "ZZZ",
-    // "HToWW125_ggH",
-    // "HToWW125_VBFH",
-    // "HToWW125_HWplusJ",
-    // "HToWW125_HWminusJ",
-    // "HToWW125_HZJ",
-    // "HToWW125_bbH",
-    // "ZXbkg",
+    //"ZXbkg",
   };
 
 
   size_t nInputFiles = sizeof(inputFileName)/sizeof(inputFileName[0]);
   cout<< "number of input files: " << nInputFiles<<endl;
 
+  
 
-  string outputFilePath = "mvaNtuples_2bjet_2017_SR_4ljjsel_fs4mu";
-  gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
+  TString outputFilePath = "mvaNtuples_2bjet_" + syear + "_" + massRegion + "_" + selection + "_" + finalstate;
+  cout<<"Output dir: "<<outputFilePath<<endl;
+  gSystem->Exec(("mkdir -p "+string(outputFilePath)).c_str()); // create output dir
 
 
   //call function
   for(UInt_t i=0; i<nInputFiles; i++){
     cout<<"Processing sample "<<inputFileName[i]<<" ... "<<endl;
-    doNtuplesForMVA(inputFilePath + inputFileName[i] + "/ZZXAnalysis.root", outputFilePath + "/reduced_" + inputFileName[i] + ".root", lumi);
+    doNtuplesForMVA(inputFilePath + inputFileName[i]+"/ZZXAnalysis.root",outputFilePath +"/reduced_"+ inputFileName[i]+".root",lumi,syear,massRegion,selection,finalstate);
   }
 
 
