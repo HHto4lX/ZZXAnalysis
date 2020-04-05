@@ -278,9 +278,9 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 
 
     //save only events for 1 final state at the time
-    //    if(currentFinalState != fs_4mu)   continue;  // save 4mu only
+    if(currentFinalState != fs_4mu)   continue;  // save 4mu only
     //    if(currentFinalState != fs_4e)    continue;  // save 4e only
-    if(currentFinalState != fs_2e2mu) continue;  // save 2e2mu only
+    //    if(currentFinalState != fs_2e2mu) continue;  // save 2e2mu only
     //    cout<<currentFinalState<<endl;
 
 
@@ -314,7 +314,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
 
     //JETSELECTION---------------------------------------------------
     // at least 2 jets in the acceptance
-    if (JetPt_JERUp->size() < 2) continue; 
+    if (JetPt->size() < 2) continue; 
     // cout<<JetPt->size()<<" "<<JetPt_JESUp->size()<<" "<<JetPt_JESDown->size()<<" "<<JetPt_JERUp->size()<<" "<<JetPt_JERDown->size()<<endl;
     // for(int i=0; i<JetPt->size(); i++){
     //   cout<<JetPt->at(i)<<" "<<JetPt_JESUp->at(i)<<" "<<JetPt_JESDown->at(i)<<" "<<JetPt_JERUp->at(i)<<" "<<JetPt_JERDown->at(i)<<endl;
@@ -351,15 +351,15 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi)
     f_bdiscjet2signal = JetBTagger->at(d2_maxbtag);
 
     // save jet pT
-    f_ptjet1 = JetPt_JERUp->at(d1_maxbtag);
-    f_ptjet2 = JetPt_JERUp->at(d2_maxbtag);
+    f_ptjet1 = JetPt->at(d1_maxbtag);
+    f_ptjet2 = JetPt->at(d2_maxbtag);
 
 
     // build 2 jets tlorentzvectors
     TLorentzVector tlzvec_j1_;
-    tlzvec_j1_.SetPtEtaPhiM(JetPt_JERUp->at(d1_maxbtag), JetEta->at(d1_maxbtag), JetPhi->at(d1_maxbtag), JetMass->at(d1_maxbtag));
+    tlzvec_j1_.SetPtEtaPhiM(JetPt->at(d1_maxbtag), JetEta->at(d1_maxbtag), JetPhi->at(d1_maxbtag), JetMass->at(d1_maxbtag));
     TLorentzVector tlzvec_j2_;
-    tlzvec_j2_.SetPtEtaPhiM(JetPt_JERUp->at(d2_maxbtag), JetEta->at(d2_maxbtag), JetPhi->at(d2_maxbtag), JetMass->at(d2_maxbtag));
+    tlzvec_j2_.SetPtEtaPhiM(JetPt->at(d2_maxbtag), JetEta->at(d2_maxbtag), JetPhi->at(d2_maxbtag), JetMass->at(d2_maxbtag));
 
 
     // build H->bb tlorentzvector
@@ -490,7 +490,7 @@ void prepareNtupleMVA_2bjet()
   cout<< "number of input files: " << nInputFiles<<endl;
 
 
-  string outputFilePath = "mvaNtuples_2bjet_2017_SR_4ljjsel_JERUp_fs2e2mu";
+  string outputFilePath = "mvaNtuples_2bjet_2017_SR_4ljjsel_fs4mu";
   gSystem->Exec(("mkdir -p "+outputFilePath).c_str()); // create output dir
 
 
