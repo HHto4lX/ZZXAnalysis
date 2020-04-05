@@ -723,27 +723,29 @@ void prepareNtupleMVA_2bjet()
   //  TString selection = "4lsel";
 
   // --- finalstate
-  TString finalstate = "fs4mu";
+  //  TString finalstate = "fs4mu";
   //  TString finalstate = "fs4e";
-  //  TString finalstate = "fs2e2mu";
+  TString finalstate = "fs2e2mu";
   
   // -- year
-  //  TString syear = "2016";
+  TString syear = "2016";
   //  TString syear = "2017";
-  TString syear = "2018";
+  //  TString syear = "2018";
 
   // --- lumi
-  //  float lumi = 35.8; //fb-1 2016
+  float lumi = 35.8; //fb-1 2016
   //  float lumi = 41.5; //fb-1 2017
-  float lumi = 59.7; //fb-1 2018
+  //  float lumi = 59.7; //fb-1 2018
+  cout<<lumi<<endl;
 
 
-  //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
+  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
   //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
-  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
+  //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
   TString inputFileName[] = {
     //"AllData", 
-    "HH4lbb_Angela",
+    //"HH4lbb_Angela",
+    "HH4lbb_Ilirjan",
     "ggH125",
     "VBFH125",
     "WplusH125",
@@ -751,8 +753,8 @@ void prepareNtupleMVA_2bjet()
     "ZH125",
     "bbH125",
     "ttH125",
-    "ZZTo4lext2",
-    //"ZZTo4l",
+    //"ZZTo4lext2",
+    "ZZTo4l",
     "ggTo4e_Contin_MCFM701",
     "ggTo4mu_Contin_MCFM701",
     "ggTo4tau_Contin_MCFM701",
