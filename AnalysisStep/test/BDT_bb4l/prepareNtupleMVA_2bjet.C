@@ -320,7 +320,25 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   float f_bdiscjet2signal = -9999.;
   float f_deltarsignal    = -9999.;
   float f_METsignal       = -9999.;
-  float f_weightsignal    = -9999.;
+  float f_weightsignal_nominal     = -9999.;
+  float f_weightsignal_JESUp       = -9999.;
+  float f_weightsignal_JESDown     = -9999.;
+  float f_weightsignal_HFUp        = -9999.;
+  float f_weightsignal_HFDown      = -9999.;
+  float f_weightsignal_LFUp        = -9999.;
+  float f_weightsignal_LFDown      = -9999.;
+  float f_weightsignal_hfstats1Up  = -9999.;
+  float f_weightsignal_hfstats1Down= -9999.;
+  float f_weightsignal_hfstats2Up  = -9999.;
+  float f_weightsignal_hfstats2Down= -9999.;
+  float f_weightsignal_lfstats1Up  = -9999.;
+  float f_weightsignal_lfstats1Down= -9999.;
+  float f_weightsignal_lfstats2Up  = -9999.;
+  float f_weightsignal_lfstats2Down= -9999.;
+  float f_weightsignal_cfErr1Up    = -9999.;
+  float f_weightsignal_cfErr1Down  = -9999.;
+  float f_weightsignal_cfErr2Up    = -9999.;
+  float f_weightsignal_cfErr2Down  = -9999.;
 
   float f_Z1Mass = -9999.;
   float f_Z2Mass = -9999.;
@@ -343,13 +361,30 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   tnew->Branch("f_bdiscjet2",   &f_bdiscjet2signal);
   tnew->Branch("f_deltar_norm", &f_deltarsignal); 
   tnew->Branch("f_MET_norm",    &f_METsignal); 
-  tnew->Branch("f_weight",      &f_weightsignal); 
   tnew->Branch("f_Z1Mass",      &f_Z1Mass); 
   tnew->Branch("f_Z2Mass",      &f_Z2Mass); 
   tnew->Branch("f_ZZmass",      &f_ZZmass); 
   tnew->Branch("f_bbmass",      &f_bbmass); 
   tnew->Branch("f_HHmass",      &f_HHmass); 
-
+  tnew->Branch("f_weightsignal_nominal",      &f_weightsignal_nominal     ); 
+  tnew->Branch("f_weightsignal_JESUp",        &f_weightsignal_JESUp       ); 
+  tnew->Branch("f_weightsignal_JESDown",      &f_weightsignal_JESDown     ); 
+  tnew->Branch("f_weightsignal_HFUp",         &f_weightsignal_HFUp        ); 
+  tnew->Branch("f_weightsignal_HFDown",       &f_weightsignal_HFDown      ); 
+  tnew->Branch("f_weightsignal_LFUp",         &f_weightsignal_LFUp        ); 
+  tnew->Branch("f_weightsignal_LFDown",       &f_weightsignal_LFDown      ); 
+  tnew->Branch("f_weightsignal_hfstats1Up",   &f_weightsignal_hfstats1Up  ); 
+  tnew->Branch("f_weightsignal_hfstats1Down", &f_weightsignal_hfstats1Down); 
+  tnew->Branch("f_weightsignal_hfstats2Up",   &f_weightsignal_hfstats2Up  ); 
+  tnew->Branch("f_weightsignal_hfstats2Down", &f_weightsignal_hfstats2Down); 
+  tnew->Branch("f_weightsignal_lfstats1Up",   &f_weightsignal_lfstats1Up  ); 
+  tnew->Branch("f_weightsignal_lfstats1Down", &f_weightsignal_lfstats1Down); 
+  tnew->Branch("f_weightsignal_lfstats2Up",   &f_weightsignal_lfstats2Up  ); 
+  tnew->Branch("f_weightsignal_lfstats2Down", &f_weightsignal_lfstats2Down); 
+  tnew->Branch("f_weightsignal_cfErr1Up",     &f_weightsignal_cfErr1Up    ); 
+  tnew->Branch("f_weightsignal_cfErr1Down",   &f_weightsignal_cfErr1Down  ); 
+  tnew->Branch("f_weightsignal_cfErr2Up",     &f_weightsignal_cfErr2Up    ); 
+  tnew->Branch("f_weightsignal_cfErr2Down",   &f_weightsignal_cfErr2Down  ); 
 
 
   int currentFinalState;
@@ -458,8 +493,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
 
     // --- event weights
     Double_t eventWeight = 1.;
-    if(!isDATA && !isZX){
-      eventWeight = partialSampleWeight *xsec *kfactor *overallEventWeight *L1prefiringWeight *scaleFactors[0] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut; } // normalizzazione per selezione 4ljjsel and masscut: sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+    if(!isDATA && !isZX){ eventWeight = partialSampleWeight *xsec *kfactor *overallEventWeight *L1prefiringWeight; }
     if(isZX) eventWeight = weight; //ZX weight
 
 
@@ -626,15 +660,36 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
  
 
     // save event weight
-    f_weightsignal = eventWeight; 
+    f_weightsignal_nominal = eventWeight * scaleFactors[0] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut; // norm per sel 4ljjsel and masscut 
+
+    // save event weight for BTagSF syst
+    f_weightsignal_JESUp        = eventWeight * scaleFactors[1]  * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+    f_weightsignal_JESDown      = eventWeight * scaleFactors[2]  * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+    f_weightsignal_HFUp         = eventWeight * scaleFactors[3]  * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+    f_weightsignal_HFDown       = eventWeight * scaleFactors[4]  * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+    f_weightsignal_LFUp         = eventWeight * scaleFactors[5]  * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+    f_weightsignal_LFDown       = eventWeight * scaleFactors[6]  * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+    f_weightsignal_hfstats1Up   = eventWeight * scaleFactors[7]  * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+    f_weightsignal_hfstats1Down = eventWeight * scaleFactors[8]  * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+    f_weightsignal_hfstats2Up   = eventWeight * scaleFactors[9]  * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+    f_weightsignal_hfstats2Down = eventWeight * scaleFactors[10] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+    f_weightsignal_lfstats1Up   = eventWeight * scaleFactors[11] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+    f_weightsignal_lfstats1Down = eventWeight * scaleFactors[12] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+    f_weightsignal_lfstats2Up   = eventWeight * scaleFactors[13] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+    f_weightsignal_lfstats2Down = eventWeight * scaleFactors[14] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+    f_weightsignal_cfErr1Up     = eventWeight * scaleFactors[15] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+    f_weightsignal_cfErr1Down   = eventWeight * scaleFactors[16] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+    f_weightsignal_cfErr2Up     = eventWeight * scaleFactors[17] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+    f_weightsignal_cfErr2Down   = eventWeight * scaleFactors[18] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+
 
 
 
     // yields
-    if(currentFinalState == fs_4e)    { yield_4e += eventWeight; }
-    if(currentFinalState == fs_4mu)   { yield_4mu += eventWeight; }
-    if(currentFinalState == fs_2e2mu) { yield_2e2mu += eventWeight; }
-    yield_4l += eventWeight; 
+    if(currentFinalState == fs_4e)    { yield_4e    += f_weightsignal_nominal; }
+    if(currentFinalState == fs_4mu)   { yield_4mu   += f_weightsignal_nominal; }
+    if(currentFinalState == fs_2e2mu) { yield_2e2mu += f_weightsignal_nominal; }
+    yield_4l += f_weightsignal_nominal; 
 
 
     
