@@ -408,7 +408,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
     }
 
 
-    if(inFile == "AllData" || inFile == "ZXbkg"){
+    if(inFile.Contains("AllData") || inFile.Contains("ZXbkg")){
       sum_eventsAfter_4lsel           = 1.;      
       sum_BTagSFAfter_4lsel           = 1.;
       sum_eventsAfter_4ljjsel         = 1.;      
@@ -660,8 +660,13 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
  
 
     // save event weight
-    f_weightsignal_nominal = eventWeight * scaleFactors[0] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut; // norm per sel 4ljjsel and masscut 
-
+    if(isDATA || isZX){ 
+      f_weightsignal_nominal = eventWeight;
+    }
+    else{
+      f_weightsignal_nominal = eventWeight * scaleFactors[0] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut; // norm per sel 4ljjsel and masscut
+    }
+ 
     // save event weight for BTagSF syst
     f_weightsignal_JESUp        = eventWeight * scaleFactors[1]  * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
     f_weightsignal_JESDown      = eventWeight * scaleFactors[2]  * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
@@ -723,29 +728,29 @@ void prepareNtupleMVA_2bjet()
   //  TString selection = "4lsel";
 
   // --- finalstate
-  //  TString finalstate = "fs4mu";
+  TString finalstate = "fs4mu";
   //  TString finalstate = "fs4e";
-  TString finalstate = "fs2e2mu";
+  //  TString finalstate = "fs2e2mu";
   
   // -- year
-  TString syear = "2016";
+  //  TString syear = "2016";
   //  TString syear = "2017";
-  //  TString syear = "2018";
+  TString syear = "2018";
 
   // --- lumi
-  float lumi = 35.8; //fb-1 2016
+  //  float lumi = 35.8; //fb-1 2016
   //  float lumi = 41.5; //fb-1 2017
-  //  float lumi = 59.7; //fb-1 2018
+  float lumi = 59.7; //fb-1 2018
   cout<<lumi<<endl;
 
 
-  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
+  //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
   //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
-  //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
+  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
   TString inputFileName[] = {
-    //"AllData", 
-    //"HH4lbb_Angela",
-    "HH4lbb_Ilirjan",
+    "AllData", 
+    "HH4lbb_Angela",
+    // "HH4lbb_Ilirjan",
     "ggH125",
     "VBFH125",
     "WplusH125",
@@ -753,8 +758,8 @@ void prepareNtupleMVA_2bjet()
     "ZH125",
     "bbH125",
     "ttH125",
-    //"ZZTo4lext2",
-    "ZZTo4l",
+    "ZZTo4lext2",
+    //"ZZTo4l",
     "ggTo4e_Contin_MCFM701",
     "ggTo4mu_Contin_MCFM701",
     "ggTo4tau_Contin_MCFM701",
