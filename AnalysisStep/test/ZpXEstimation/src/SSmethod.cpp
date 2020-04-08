@@ -308,9 +308,10 @@ void SSmethod::FillFRHistos( TString input_file_data_name )
       nb = fChain->GetEntry(jentry);
       nbytes += nb;
 
-		(fabs(LepLepId->at(2)) == 11) ? _total_events[Settings::ele]++ : _total_events[Settings::mu]++;
+	   (fabs(LepLepId->at(2)) == 11) ? _total_events[Settings::ele]++ : _total_events[Settings::mu]++;
 	   
-		if ( Z1Mass < 40. ) {(fabs(LepLepId->at(2)) == 11) ? _failZ1MassCut[Settings::ele]++ : _failZ1MassCut[Settings::mu]++; continue;}
+           if ( JetPt->size() < 2 ) {continue;}
+	   if ( Z1Mass < 40. ) {(fabs(LepLepId->at(2)) == 11) ? _failZ1MassCut[Settings::ele]++ : _failZ1MassCut[Settings::mu]++; continue;}
 	   if ( Z1Mass > 120. ) {(fabs(LepLepId->at(2)) == 11) ? _failZ1MassCut[Settings::ele]++ : _failZ1MassCut[Settings::mu]++; continue;}
 	   if ( (LepPt->at(0) > LepPt->at(1)) && (LepPt->at(0) < 20. || LepPt->at(1) < 10.) ) {(fabs(LepLepId->at(2)) == 11) ? _failLepPtCut[Settings::ele]++ : _failLepPtCut[Settings::mu]++; continue;}
 	   if ( (LepPt->at(1) > LepPt->at(0)) && (LepPt->at(1) < 20. || LepPt->at(0) < 10.) ) {(fabs(LepLepId->at(2)) == 11) ? _failLepPtCut[Settings::ele]++ : _failLepPtCut[Settings::mu]++; continue;}
