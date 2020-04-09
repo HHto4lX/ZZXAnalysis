@@ -133,7 +133,7 @@ void doHistos()
     "WWZ",
     "WZZ",
     "ZZZ",
-    "ZXbkg",
+    "ZXbkg_4ljjsel",
   };
   static size_t nDatasets = sizeof(datasets)/sizeof(datasets[0]);
   cout<< "number of input files: " << nDatasets<<endl;
@@ -145,18 +145,26 @@ void doHistos()
 
   // arrays for BTagSF norm
   float sum_eventsAfter_4lsel[nDatasets];            
-  float sum_BTagSFAfter_4lsel[nDatasets];            
+  float sum_BTagSFAfter_4lsel[nDatasets];
+  float sum_eventsAfter_4lsel_sidebands[nDatasets];            
+  float sum_BTagSFAfter_4lsel_sidebands[nDatasets];            
   float sum_eventsAfter_4ljjsel[nDatasets];         
   float sum_BTagSFAfter_4ljjsel[nDatasets];         
   float sum_eventsAfter_4ljjsel_masscut[nDatasets]; 
   float sum_BTagSFAfter_4ljjsel_masscut[nDatasets]; 
+  float sum_eventsAfter_4ljjsel_sidebands[nDatasets]; 
+  float sum_BTagSFAfter_4ljjsel_sidebands[nDatasets]; 
   for(int i=0; i<nDatasets; i++){
     sum_eventsAfter_4lsel[i] = 0.;           
     sum_BTagSFAfter_4lsel[i] = 0.;           
+    sum_eventsAfter_4lsel_sidebands[i] = 0.;            
+    sum_BTagSFAfter_4lsel_sidebands[i] = 0.;            
     sum_eventsAfter_4ljjsel[i] = 0.;        
     sum_BTagSFAfter_4ljjsel[i] = 0.;        
     sum_eventsAfter_4ljjsel_masscut[i] = 0.;
     sum_BTagSFAfter_4ljjsel_masscut[i] = 0.;
+    sum_eventsAfter_4ljjsel_sidebands[i] = 0.; 
+    sum_BTagSFAfter_4ljjsel_sidebands[i] = 0.; 
   }
 
 
@@ -361,6 +369,8 @@ void doHistos()
   TH1F* h1_pT4l_4lsel_sidebands[nProcesses][nFinalStates+1];
   // 4ljjsel
   TH1F* h1_m4l_4ljjsel  [nProcesses][nFinalStates+1]; 
+  TH1F* h1_MET_4ljjsel_sidebands [nProcesses][nFinalStates+1];
+  TH1F* h1_pT4l_4ljjsel_sidebands[nProcesses][nFinalStates+1];
   TH1F* h1_j1Eta_4ljjsel[nProcesses][nFinalStates+1];
   TH1F* h1_j2Eta_4ljjsel[nProcesses][nFinalStates+1];
   // (BDT input histos)
@@ -384,6 +394,10 @@ void doHistos()
       // 4ljjsel
       h1_m4l_4ljjsel  [pr][fs] = new TH1F("h1_m4l_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events/2 GeV", 65, 70., 200.);
       h1_m4l_4ljjsel  [pr][fs]->Sumw2(true);
+      h1_MET_4ljjsel_sidebands [pr][fs] = new TH1F("h1_MET_4ljjsel_sidebands_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";MET (GeV); Events/5 GeV", 40, 0., 200.);
+      h1_MET_4ljjsel_sidebands [pr][fs]->Sumw2(true);
+      h1_pT4l_4ljjsel_sidebands[pr][fs] = new TH1F("h1_pT4l_4ljjsel_sidebands_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";4 leptons pT (GeV); Events/2 GeV", 50, 0., 100.);
+      h1_pT4l_4ljjsel_sidebands[pr][fs]->Sumw2(true);
       h1_j1Eta_4ljjsel[pr][fs] = new TH1F("h1_j1Eta_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j1 #eta ; Events",56, -2.8, 2.8);
       h1_j1Eta_4ljjsel[pr][fs]->Sumw2(true);
       h1_j2Eta_4ljjsel[pr][fs] = new TH1F("h1_j2Eta_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j2 #eta ; Events",56, -2.8, 2.8);
@@ -448,7 +462,7 @@ void doHistos()
     if(datasets[d]=="WWZ" ||
        datasets[d]=="WZZ" ||
        datasets[d]=="ZZZ") currentProcess = VVV;
-    if(datasets[d]=="ZXbkg") currentProcess = ZXbkg;
+    if(datasets[d]=="ZXbkg_4ljjsel") currentProcess = ZXbkg;
     
 
     // select input file
@@ -531,13 +545,17 @@ void doHistos()
       }
 
 
-      if(datasets[d] == "AllData" || datasets[d] == "ZXbkg"){
-        sum_eventsAfter_4lsel[d]           = 1.;      
-	sum_BTagSFAfter_4lsel[d]           = 1.;
-        sum_eventsAfter_4ljjsel[d]         = 1.;      
-	sum_BTagSFAfter_4ljjsel[d]         = 1.;
-        sum_eventsAfter_4ljjsel_masscut[d] = 1.;      
-	sum_BTagSFAfter_4ljjsel_masscut[d] = 1.;
+      if(datasets[d] == "AllData" || datasets[d] == "ZXbkg_4ljjsel"){
+        sum_eventsAfter_4lsel[d]             = 1.;      
+	sum_BTagSFAfter_4lsel[d]             = 1.;
+        sum_eventsAfter_4lsel_sidebands[d]   = 1.; 
+        sum_BTagSFAfter_4lsel_sidebands[d]   = 1.; 
+        sum_eventsAfter_4ljjsel[d]           = 1.;      
+	sum_BTagSFAfter_4ljjsel[d]           = 1.;
+        sum_eventsAfter_4ljjsel_masscut[d]   = 1.;      
+	sum_BTagSFAfter_4ljjsel_masscut[d]   = 1.;
+        sum_eventsAfter_4ljjsel_sidebands[d] = 1.; 
+        sum_BTagSFAfter_4ljjsel_sidebands[d] = 1.; 
       }
       else{
 
@@ -549,36 +567,51 @@ void doHistos()
         sum_eventsAfter_4lsel[d] += 1.; 
         sum_BTagSFAfter_4lsel[d] += scaleFactors[0]; 
 
+        // total counters for BTagSF norm --- 4lsel sidebands
+        if(ZZMass < 115 || ZZMass > 135){
+          sum_eventsAfter_4lsel_sidebands[d] += 1.; 
+          sum_BTagSFAfter_4lsel_sidebands[d] += scaleFactors[0];
+        }
+
         // JETSELECTION
         // at least 2 jets in the acceptance
-        if (JetPt->size() < 2) continue;         
+        if(JetPt->size() < 2) continue;         
 
         // total counters for BTagSF norm --- 4ljjsel
         sum_eventsAfter_4ljjsel[d] += 1.; 
         sum_BTagSFAfter_4ljjsel[d] += scaleFactors[0]; 
 
-        // mass cut
-        if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
 
-        // total counters for BTagSF norm --- 4ljjsel mass cut
-        sum_eventsAfter_4ljjsel_masscut[d] += 1.; 
-        sum_BTagSFAfter_4ljjsel_masscut[d] += scaleFactors[0]; 
+        if(ZZMass >= 115 && ZZMass <= 135){
+          // total counters for BTagSF norm --- 4ljjsel mass cut
+          sum_eventsAfter_4ljjsel_masscut[d] += 1.; 
+          sum_BTagSFAfter_4ljjsel_masscut[d] += scaleFactors[0]; 
+        }
+        else{
+         // total counters for BTagSF norm --- 4ljjsel sidebands
+          sum_eventsAfter_4ljjsel_sidebands[d] += 1.; 
+          sum_BTagSFAfter_4ljjsel_sidebands[d] += scaleFactors[0]; 
+        }       
 
       }// end else
     
     } // end first loop over entries 
 
-    cout<<datasets[d]<<" "<<sum_eventsAfter_4lsel[d]<<" "<<sum_BTagSFAfter_4lsel[d]<<" "<<sum_eventsAfter_4ljjsel[d]<<" "<<sum_BTagSFAfter_4ljjsel[d]<<" "<<sum_eventsAfter_4ljjsel_masscut[d]<<" "<<sum_BTagSFAfter_4ljjsel_masscut[d]<<endl;
+    cout<<datasets[d]<<" "<<sum_eventsAfter_4lsel[d]<<" "<<sum_BTagSFAfter_4lsel[d]<<" "<<sum_eventsAfter_4lsel_sidebands[d]<<" "<<sum_BTagSFAfter_4lsel_sidebands[d]<<" "<<sum_eventsAfter_4ljjsel[d]<<" "<<sum_BTagSFAfter_4ljjsel[d]<<" "<<sum_eventsAfter_4ljjsel_masscut[d]<<" "<<sum_BTagSFAfter_4ljjsel_masscut[d]<<" "<<sum_eventsAfter_4ljjsel_sidebands[d]<<" "<<sum_BTagSFAfter_4ljjsel_sidebands[d]<<endl;
 
     // --- control for norm
     if( sum_eventsAfter_4lsel[d] == 0. || std::isnan(sum_eventsAfter_4lsel[d]) ){ sum_eventsAfter_4lsel[d] = 1.; }
     if( sum_BTagSFAfter_4lsel[d] == 0. || std::isnan(sum_BTagSFAfter_4lsel[d]) ){ sum_BTagSFAfter_4lsel[d] = 1.; }
+    if( sum_eventsAfter_4lsel_sidebands[d] == 0. || std::isnan(sum_eventsAfter_4lsel_sidebands[d]) ){ sum_eventsAfter_4lsel_sidebands[d] = 1.; }
+    if( sum_BTagSFAfter_4lsel_sidebands[d] == 0. || std::isnan(sum_BTagSFAfter_4lsel_sidebands[d]) ){ sum_BTagSFAfter_4lsel_sidebands[d] = 1.; }
     if( sum_eventsAfter_4ljjsel[d] == 0. || std::isnan(sum_eventsAfter_4ljjsel[d]) ){ sum_eventsAfter_4ljjsel[d] = 1.; }
     if( sum_BTagSFAfter_4ljjsel[d] == 0. || std::isnan(sum_BTagSFAfter_4ljjsel[d]) ){ sum_BTagSFAfter_4ljjsel[d] = 1.; }
     if( sum_eventsAfter_4ljjsel_masscut[d] == 0. || std::isnan(sum_eventsAfter_4ljjsel_masscut[d]) ){ sum_eventsAfter_4ljjsel_masscut[d] = 1.; }
     if( sum_BTagSFAfter_4ljjsel_masscut[d] == 0. || std::isnan(sum_BTagSFAfter_4ljjsel_masscut[d]) ){ sum_BTagSFAfter_4ljjsel_masscut[d] = 1.; }
+    if( sum_eventsAfter_4ljjsel_sidebands[d] == 0. || std::isnan(sum_eventsAfter_4ljjsel_sidebands[d]) ){ sum_eventsAfter_4ljjsel_sidebands[d] = 1.; }
+    if( sum_BTagSFAfter_4ljjsel_sidebands[d] == 0. || std::isnan(sum_BTagSFAfter_4ljjsel_sidebands[d]) ){ sum_BTagSFAfter_4ljjsel_sidebands[d] = 1.; }
 
-    cout<<datasets[d]<<" "<<sum_eventsAfter_4lsel[d]<<" "<<sum_BTagSFAfter_4lsel[d]<<" "<<sum_eventsAfter_4ljjsel[d]<<" "<<sum_BTagSFAfter_4ljjsel[d]<<" "<<sum_eventsAfter_4ljjsel_masscut[d]<<" "<<sum_BTagSFAfter_4ljjsel_masscut[d]<<endl;
+    cout<<datasets[d]<<" "<<sum_eventsAfter_4lsel[d]<<" "<<sum_BTagSFAfter_4lsel[d]<<" "<<sum_eventsAfter_4lsel_sidebands[d]<<" "<<sum_BTagSFAfter_4lsel_sidebands[d]<<" "<<sum_eventsAfter_4ljjsel[d]<<" "<<sum_BTagSFAfter_4ljjsel[d]<<" "<<sum_eventsAfter_4ljjsel_masscut[d]<<" "<<sum_BTagSFAfter_4ljjsel_masscut[d]<<" "<<sum_eventsAfter_4ljjsel_sidebands[d]<<" "<<sum_BTagSFAfter_4ljjsel_sidebands[d]<<endl;
     // --------------------------------------------------------
 
 
@@ -654,9 +687,9 @@ void doHistos()
       h1_m4l_4lsel[currentProcess][currentFinalState]->Fill(ZZMass, eventWeight *sum_eventsAfter_4lsel[d]/sum_BTagSFAfter_4lsel[d]);
       // (in 4l sidebands)
       if(ZZMass<115 || ZZMass>135){ 
-        h1_MET_4lsel_sidebands[currentProcess][currentFinalState]->Fill(PFMET, eventWeight *sum_eventsAfter_4lsel[d]/sum_BTagSFAfter_4lsel[d]);
+        h1_MET_4lsel_sidebands[currentProcess][currentFinalState]->Fill(PFMET, eventWeight *sum_eventsAfter_4lsel_sidebands[d]/sum_BTagSFAfter_4lsel_sidebands[d]);
         for(int i=0; i<LepPt->size(); i++){
-          h1_pT4l_4lsel_sidebands[currentProcess][currentFinalState]->Fill(LepPt->at(i), eventWeight *sum_eventsAfter_4lsel[d]/sum_BTagSFAfter_4lsel[d]);
+          h1_pT4l_4lsel_sidebands[currentProcess][currentFinalState]->Fill(LepPt->at(i), eventWeight *sum_eventsAfter_4lsel_sidebands[d]/sum_BTagSFAfter_4lsel_sidebands[d]);
         }
       }
 
@@ -724,35 +757,38 @@ void doHistos()
 
 
       // --- MASSCUT: mass cut: signal region
-      if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
+      if(ZZMass >= 115 && ZZMass <= 135){  // 115 < ZZMass < 135 GeV
 
+        // --- fill yields after 4ljj sel
+        hYields_4ljjsel[currentProcess][currentFinalState]->Fill(0.5, eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
+        // --- fill number of non weighted events selected after 4ljj sel
+        hEvents_4ljjsel[currentProcess][currentFinalState]->Fill(0.5, 1.);
+        
+        // --- fill histos after 4ljj sel
+        h1_j1Eta_4ljjsel[currentProcess][currentFinalState]->Fill(JetEta->at(dj1_), eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
+        h1_j2Eta_4ljjsel[currentProcess][currentFinalState]->Fill(JetEta->at(dj2_), eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
+        // (BDT input histos)
+        h1_j1btag_4ljjsel[currentProcess][currentFinalState]->Fill(JetBTagger->at(dj1_),eventWeight*sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
+        h1_j2btag_4ljjsel[currentProcess][currentFinalState]->Fill(JetBTagger->at(dj2_),eventWeight*sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
+        h1_j1pT_4ljjsel    [currentProcess][currentFinalState]->Fill(JetPt->at(dj1_), eventWeight*sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);  
+        h1_j2pT_4ljjsel    [currentProcess][currentFinalState]->Fill(JetPt->at(dj2_), eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
+        h1_MET_4ljjsel     [currentProcess][currentFinalState]->Fill(PFMET, eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
+        h1_DeltaRhh_4ljjsel[currentProcess][currentFinalState]->Fill(DeltaR, eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
+        h1_mbb_4ljjsel     [currentProcess][currentFinalState]->Fill(bbMass, eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
+    
+        //2D histo
+        h2_m4lvsmbb_4ljjsel[currentProcess][currentFinalState]->Fill(ZZMass, bbMass, eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
 
+      }
+      else{
 
+        // --- fill histos after 4ljj sel: sidebands
+        h1_MET_4ljjsel_sidebands[currentProcess][currentFinalState]->Fill(PFMET, eventWeight *sum_eventsAfter_4ljjsel_sidebands[d]/sum_BTagSFAfter_4ljjsel_sidebands[d]);
+        for(int i=0; i<LepPt->size(); i++){
+          h1_pT4l_4ljjsel_sidebands[currentProcess][currentFinalState]->Fill(LepPt->at(i), eventWeight *sum_eventsAfter_4ljjsel_sidebands[d]/sum_BTagSFAfter_4ljjsel_sidebands[d]);
+        }
 
-      // --- fill yields after 4ljj sel
-      hYields_4ljjsel[currentProcess][currentFinalState]->Fill(0.5, eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
-      // --- fill number of non weighted events selected after 4ljj sel
-      hEvents_4ljjsel[currentProcess][currentFinalState]->Fill(0.5, 1.);
-      
-
-      // --- fill histos after 4ljj sel
-      h1_j1Eta_4ljjsel[currentProcess][currentFinalState]->Fill(JetEta->at(dj1_), eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
-      h1_j2Eta_4ljjsel[currentProcess][currentFinalState]->Fill(JetEta->at(dj2_), eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
-      // (BDT input histos)
-      h1_j1btag_4ljjsel[currentProcess][currentFinalState]->Fill(JetBTagger->at(dj1_), eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
-      h1_j2btag_4ljjsel[currentProcess][currentFinalState]->Fill(JetBTagger->at(dj2_), eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
-      h1_j1pT_4ljjsel    [currentProcess][currentFinalState]->Fill(JetPt->at(dj1_), eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);  
-      h1_j2pT_4ljjsel    [currentProcess][currentFinalState]->Fill(JetPt->at(dj2_), eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
-      h1_MET_4ljjsel     [currentProcess][currentFinalState]->Fill(PFMET, eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
-      h1_DeltaRhh_4ljjsel[currentProcess][currentFinalState]->Fill(DeltaR, eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
-      h1_mbb_4ljjsel     [currentProcess][currentFinalState]->Fill(bbMass, eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
-
-      //2D histo
-      h2_m4lvsmbb_4ljjsel[currentProcess][currentFinalState]->Fill(ZZMass, bbMass, eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
-
-
-
-
+      }
 
 
     }//end loop over tree events
@@ -777,6 +813,8 @@ void doHistos()
       h1_m4l_4ljjsel  [pr][nFinalStates]->Add(h1_m4l_4ljjsel  [pr][fs]); 
       h1_j1Eta_4ljjsel[pr][nFinalStates]->Add(h1_j1Eta_4ljjsel[pr][fs]);
       h1_j2Eta_4ljjsel[pr][nFinalStates]->Add(h1_j2Eta_4ljjsel[pr][fs]);
+      h1_MET_4ljjsel_sidebands [pr][nFinalStates]->Add(h1_MET_4ljjsel_sidebands[pr][fs]);
+      h1_pT4l_4ljjsel_sidebands[pr][nFinalStates]->Add(h1_pT4l_4ljjsel_sidebands[pr][fs]);
       // (BDT input histos)
       h1_j1btag_4ljjsel  [pr][nFinalStates]->Add(h1_j1btag_4ljjsel  [pr][fs]);
       h1_j2btag_4ljjsel  [pr][nFinalStates]->Add(h1_j2btag_4ljjsel  [pr][fs]);
@@ -817,6 +855,8 @@ void doHistos()
       h1_m4l_4ljjsel  [pr][fs]->Write();
       h1_j1Eta_4ljjsel[pr][fs]->Write();
       h1_j2Eta_4ljjsel[pr][fs]->Write();
+      h1_MET_4ljjsel_sidebands [pr][fs]->Write();
+      h1_pT4l_4ljjsel_sidebands[pr][fs]->Write();
 
       h1_j1btag_4ljjsel  [pr][fs]->Write();     
       h1_j2btag_4ljjsel  [pr][fs]->Write();
@@ -1298,17 +1338,18 @@ void doPlots_4ljjsel(){
 
 
 
-  // retrieve yields histos from file
+  // retrieve histos from file
   TString inFileName = "f_histos_h1_" + sYear + ".root";     
   cout<<"Retrieving Data and MC histograms from file "<<inFileName<<" ..."<<endl;
   TFile* fInhistos = TFile::Open(inFileName);
   
   // --- take histos from file
-  // (BDT input histos)
-  Int_t nPlots = 2;
+  Int_t nPlots = 4;
   TString sPlots[] = {
     "m4l_4ljjsel",
     "mbb_4ljjsel",
+    "MET_4ljjsel_sidebands",
+    "pT4l_4ljjsel_sidebands",
   };
   TH1F* h1_4ljjsel[nPlots][nProcesses][nFinalStates+1];
   for(int pl=0; pl<nPlots; pl++){
@@ -1321,15 +1362,21 @@ void doPlots_4ljjsel(){
   }   
 
   // --- define canvas, hstack and pads for BDT input plots
-  TCanvas* c_4ljjsel     [nPlots][nFinalStates+1];
-  THStack* hs_4ljjsel    [nPlots][nFinalStates+1];
-  TLegend* leg_4ljjsel   [nPlots][nFinalStates+1];
+  TCanvas* c_4ljjsel      [nPlots][nFinalStates+1];
+  THStack* hs_4ljjsel     [nPlots][nFinalStates+1];
+  TPad*    pad1_4ljjsel   [nPlots][nFinalStates+1];
+  TLegend* leg_4ljjsel    [nPlots][nFinalStates+1];
+  TH1F*    hMCtot_4ljjsel [nPlots][nFinalStates+1];
+  TPad*    pad2_4ljjsel   [nPlots][nFinalStates+1];
+  TH1F*    rp_4ljjsel     [nPlots][nFinalStates+1];
+  TH1F*    hUncMC_4ljjsel [nPlots][nFinalStates+1];
+
   
   //4ljjsel plots
   for(int pl=0; pl<nPlots; pl++){
     for(int fs=0; fs<nFinalStates+1; fs++){
       // canvas
-      c_4ljjsel[pl][fs] = new TCanvas("c_"+sPlots[pl]+"_"+sFinalState[fs]+"_"+sYear,"c_"+sPlots[pl]+"_"+sFinalState[fs]+"_"+sYear,800,600);
+      c_4ljjsel[pl][fs] = new TCanvas("c_"+sPlots[pl]+"_"+sFinalState[fs]+"_"+sYear,"c_"+sPlots[pl]+"_"+sFinalState[fs]+"_"+sYear,800,800);
       // hstack
       hs_4ljjsel[pl][fs] = new THStack("hs_"+sPlots[pl]+"_"+sFinalState[fs],"");
       // VVV process
@@ -1379,11 +1426,15 @@ void doPlots_4ljjsel(){
       h1_4ljjsel[pl][Data][fs]->SetMarkerColor(kBlack);
       h1_4ljjsel[pl][Data][fs]->SetLineColor(kBlack);
       h1_4ljjsel[pl][Data][fs]->SetMarkerStyle(20);
-    
 
-      hs_4ljjsel[pl][fs]->SetMaximum(1.5*max(hs_4ljjsel[pl][fs]->GetMaximum(),h1_4ljjsel[pl][Data][fs]->GetMaximum()));
+      // --- upper plot pad
+      pad1_4ljjsel[pl][fs] = new TPad("pad1_"+sPlots[pl]+"_"+sFinalState[fs],"pad1_"+sPlots[pl]+"_"+sFinalState[fs], 0, 0.3, 1, 1.0);
+      pad1_4ljjsel[pl][fs]->Draw();
+      pad1_4ljjsel[pl][fs]->cd();
 
-    
+      hs_4ljjsel[pl][fs]->SetMaximum(10e04);
+      hs_4ljjsel[pl][fs]->SetMinimum(10e-04);
+        
       hs_4ljjsel[pl][fs]->Draw("histo");
       h1_4ljjsel[pl][HH][fs]->Draw("histosame");
       h1_4ljjsel[pl][Data][fs]->Draw("samepe");
@@ -1415,6 +1466,77 @@ void doPlots_4ljjsel(){
 
       c_4ljjsel[pl][fs]->Update();
 
+      pad1_4ljjsel[pl][fs]->SetLogy();
+
+      c_4ljjsel[pl][fs]->Update();
+
+      // --- tot hist for all MC
+      hMCtot_4ljjsel[pl][fs] = (TH1F*)h1_4ljjsel[pl][ggH][fs]->Clone("hMCtot_4ljjsel_"+sPlots[pl]+"_"+sFinalState[fs]);
+      hMCtot_4ljjsel[pl][fs]->Add(h1_4ljjsel[pl][VBF][fs]);
+      hMCtot_4ljjsel[pl][fs]->Add(h1_4ljjsel[pl][VH][fs]);
+      hMCtot_4ljjsel[pl][fs]->Add(h1_4ljjsel[pl][ttH][fs]);
+      hMCtot_4ljjsel[pl][fs]->Add(h1_4ljjsel[pl][bbH][fs]);
+      hMCtot_4ljjsel[pl][fs]->Add(h1_4ljjsel[pl][qqZZ][fs]);
+      hMCtot_4ljjsel[pl][fs]->Add(h1_4ljjsel[pl][ggZZ][fs]);
+      hMCtot_4ljjsel[pl][fs]->Add(h1_4ljjsel[pl][TTZ][fs]);
+      hMCtot_4ljjsel[pl][fs]->Add(h1_4ljjsel[pl][TTW][fs]);
+      hMCtot_4ljjsel[pl][fs]->Add(h1_4ljjsel[pl][VVV][fs]);
+
+      // --- lower pad plot
+      c_4ljjsel[pl][fs]->cd();
+      pad2_4ljjsel[pl][fs] = new TPad("pad2","pad2", 0, 0.05, 1, 0.3);
+      pad2_4ljjsel[pl][fs]->SetGridy();
+      pad2_4ljjsel[pl][fs]->Draw();
+      pad2_4ljjsel[pl][fs]->cd();
+
+      // --- define ratio plot
+      rp_4ljjsel[pl][fs] = (TH1F*)h1_4ljjsel[pl][Data][fs]->Clone("rp_4ljjsel_"+sPlots[pl]+"_"+sFinalState[fs]);
+      rp_4ljjsel[pl][fs]->SetLineColor(kBlack);
+      rp_4ljjsel[pl][fs]->SetMinimum(0.);
+      rp_4ljjsel[pl][fs]->SetMaximum(2.);
+      rp_4ljjsel[pl][fs]->SetStats(0);
+      rp_4ljjsel[pl][fs]->Divide(hMCtot_4ljjsel[pl][fs]); //divide histo rp/MC
+      rp_4ljjsel[pl][fs]->SetMarkerStyle(20);
+      rp_4ljjsel[pl][fs]->SetMarkerColor(kBlack);
+      rp_4ljjsel[pl][fs]->SetTitle("");
+
+      rp_4ljjsel[pl][fs]->SetYTitle("Data/MC");
+      rp_4ljjsel[pl][fs]->GetYaxis()->SetNdivisions(505);
+      rp_4ljjsel[pl][fs]->GetYaxis()->SetTitleSize(20);
+      rp_4ljjsel[pl][fs]->GetYaxis()->SetTitleFont(43);
+      rp_4ljjsel[pl][fs]->GetYaxis()->SetTitleOffset(1.4);
+      rp_4ljjsel[pl][fs]->GetYaxis()->SetLabelFont(43);
+      rp_4ljjsel[pl][fs]->GetYaxis()->SetLabelSize(15);
+
+      rp_4ljjsel[pl][fs]->GetXaxis()->SetTitleSize(20);
+      rp_4ljjsel[pl][fs]->GetXaxis()->SetTitleFont(43);
+      rp_4ljjsel[pl][fs]->GetXaxis()->SetTitleOffset(4.);
+      rp_4ljjsel[pl][fs]->GetXaxis()->SetLabelFont(43);
+      rp_4ljjsel[pl][fs]->GetXaxis()->SetLabelSize(15);
+
+      // --- define mc shadow unc plot
+      hUncMC_4ljjsel[pl][fs] = (TH1F*)hMCtot_4ljjsel[pl][fs]->Clone("hUncMC_4ljjsel_"+sPlots[pl]+"_"+sFinalState[fs]);
+      for(int xbin=1; xbin < hUncMC_4ljjsel[pl][fs]->GetXaxis()->GetNbins() + 1; xbin++){
+        float err = 0.;
+        if(hUncMC_4ljjsel[pl][fs]->GetBinContent(xbin) == 0) continue;
+        err = hUncMC_4ljjsel[pl][fs]->GetBinError(xbin) / hUncMC_4ljjsel[pl][fs]->GetBinContent(xbin);
+        hUncMC_4ljjsel[pl][fs]->SetBinContent(xbin, 1.);
+        hUncMC_4ljjsel[pl][fs]->SetBinError(xbin, err);
+      }
+      hUncMC_4ljjsel[pl][fs]->SetLineColor(1);
+      hUncMC_4ljjsel[pl][fs]->SetFillStyle(3005);
+      hUncMC_4ljjsel[pl][fs]->SetFillColor(kGray+3);
+      hUncMC_4ljjsel[pl][fs]->SetMarkerColor(1);
+      hUncMC_4ljjsel[pl][fs]->SetMarkerStyle(1);
+      hUncMC_4ljjsel[pl][fs]->SetTitle("");
+      hUncMC_4ljjsel[pl][fs]->SetStats(0);
+
+      // ---draw
+      rp_4ljjsel[pl][fs]->Draw("ep");
+      hUncMC_4ljjsel[pl][fs]->Draw("e2 same");
+
+      c_4ljjsel[pl][fs]->Update();
+
       // --- draw CMS and lumi text
       writeExtraText = true;
       extraText      = "Preliminary";
@@ -1423,7 +1545,7 @@ void doPlots_4ljjsel(){
       lumiTextSize   = 0.46;
       extraOverCmsTextSize = 0.75;
       relPosX = 0.12;
-      CMS_lumi(c_4ljjsel[pl][fs], 0, 0);
+      CMS_lumi(pad1_4ljjsel[pl][fs], 0, 0);
 
 
       c_4ljjsel[pl][fs]->SaveAs(outPath_4ljjselplots + "/" + c_4ljjsel[pl][fs]->GetName() + ".png");
