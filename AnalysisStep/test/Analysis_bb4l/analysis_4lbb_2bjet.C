@@ -69,6 +69,7 @@ TString sProcess[nProcesses] = {"Data", "HH", "ggH", "VBF", "VH", "ttH", "bbH", 
 
 
 
+
 //*************************
 //*** doHistos function ***
 //*************************
@@ -82,23 +83,33 @@ void doHistos()
   TString inFilePath;
   TString inDataPath;
   TString sYear;
+  Float_t rescale_ZX[nFinalStates];
   if(year==2016){
     lumi       = 35.8; //fb-1 2016
     sYear      = "2016";
     inFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
     inDataPath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
+    rescale_ZX[fs_4mu]   = 0.79; //FIXME
+    rescale_ZX[fs_4e]    = 1.40; //FIXME
+    rescale_ZX[fs_2e2mu] = 2.64; //FIXME:da levare
   }
   else if(year==2017){
     lumi       = 41.5; //fb-1 2017
     sYear      = "2017";
     inFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
     inDataPath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
+    rescale_ZX[fs_4mu]   = 1.48; //FIXME
+    rescale_ZX[fs_4e]    = 0.52; //FIXME
+    rescale_ZX[fs_2e2mu] = 2.00; //FIXME:da levare
   }
   else if(year==2018){
     lumi       = 59.7; //fb-1 2018
     sYear      = "2018";
     inFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
     inDataPath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
+    rescale_ZX[fs_4mu]   = 1.60; //FIXME
+    rescale_ZX[fs_4e]    = 0.72; //FIXME
+    rescale_ZX[fs_2e2mu] = 2.22; //FIXME:da levare
   }
   else{ 
     cout<<"wrong year selected!"<<endl;
@@ -794,6 +805,16 @@ void doHistos()
     }//end loop over tree events
 
   }//end loop over datasets
+
+
+  // --- RESCALE ZX HISTOS ---
+  // --- riscalo solo histo che disegno
+  for(int fs=0; fs<nFinalStates; fs++){
+    h1_m4l_4ljjsel           [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+    h1_MET_4ljjsel_sidebands [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+    h1_pT4l_4ljjsel_sidebands[ZXbkg][fs]->Scale(rescale_ZX[fs]);
+    h1_mbb_4ljjsel           [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+  }
 
 
   //---fill inclusive yields and histos
@@ -1753,6 +1774,6 @@ void analysis_4lbb_2bjet()
 
   doPlots_4ljjsel();
 
-  doPlots_4lsel();
+  //  doPlots_4lsel();
 
 }
