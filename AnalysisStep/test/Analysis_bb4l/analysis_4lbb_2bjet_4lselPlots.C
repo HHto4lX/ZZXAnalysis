@@ -48,8 +48,8 @@ using namespace std;
 #define REDOHISTOS 1
 
 //******************
-int year = 2016;
-//int year = 2017;
+//int year = 2016;
+int year = 2017;
 //int year = 2018;
 //******************
 
@@ -111,8 +111,8 @@ void doHistos()
   //  static int nDatasets = 22;
   TString datasets[] = {
     "AllData", 
-    //    "HH4lbb_Angela",
-    "HH4lbb_Ilirjan",
+    "HH4lbb_Angela",
+    //"HH4lbb_Ilirjan",
     "ggH125",
     "VBFH125",
     "WplusH125",
@@ -364,8 +364,8 @@ void doHistos()
     currentProcess = -1;
 
     if(datasets[d]=="AllData") currentProcess = Data;
-    //    if(datasets[d]=="HH4lbb_Angela") currentProcess = HH;
-    if(datasets[d]=="HH4lbb_Ilirjan") currentProcess = HH;
+    if(datasets[d]=="HH4lbb_Angela") currentProcess = HH;
+    //if(datasets[d]=="HH4lbb_Ilirjan") currentProcess = HH;
     if(datasets[d]=="ggH125") currentProcess = ggH;
     if(datasets[d]=="VBFH125") currentProcess = VBF;
     if(datasets[d]=="WplusH125" ||
@@ -635,7 +635,7 @@ void doHistos()
 //*********************************
 void doPlots_4lsel(){
 
- cout<<"do plots after 4ljj sel..."<<endl;
+ cout<<"do plots after 4l sel..."<<endl;
 
   //---input path
   TString sYear;
@@ -881,7 +881,7 @@ void doPlots_4lsel(){
 
 
 
-} // end function doPlots_4ljjsel
+} // end function doPlots_4lsel
 
 
 
