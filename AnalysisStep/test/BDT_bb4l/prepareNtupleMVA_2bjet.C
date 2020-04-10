@@ -223,6 +223,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   Short_t ZZsel;
   vector<Float_t> *LepEta = 0;
   vector<Float_t> *LepPt = 0;
+  vector<Float_t> *LepPhi = 0;
   Float_t ZZMass;
   Float_t Z1Mass;
   Float_t Z2Mass;
@@ -274,6 +275,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   inputTree->SetBranchAddress("ZZsel", &ZZsel);
   inputTree->SetBranchAddress("LepPt", &LepPt);
   inputTree->SetBranchAddress("LepEta", &LepEta);
+  inputTree->SetBranchAddress("LepPhi", &LepPhi);
   inputTree->SetBranchAddress("ZZMass", &ZZMass);  
   inputTree->SetBranchAddress("Z1Flav", &Z1Flav);
   inputTree->SetBranchAddress("Z2Flav", &Z2Flav);
@@ -320,6 +322,21 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   float f_bdiscjet2signal = -9999.;
   float f_deltarsignal    = -9999.;
   float f_METsignal       = -9999.;
+  // branches for tests
+  float f_lept1_eta  = -9999.;
+  float f_lept2_eta  = -9999.;
+  float f_lept3_eta  = -9999.;
+  float f_lept4_eta  = -9999.;
+  float f_lept1_phi  = -9999.;
+  float f_lept2_phi  = -9999.;
+  float f_lept3_phi  = -9999.;
+  float f_lept4_phi  = -9999.;
+  float f_etajet1    = -9999.;
+  float f_etajet2    = -9999.;
+  float f_phijet1    = -9999.;
+  float f_phijet2    = -9999.;
+  float f_deltaPhiHH = -9999.;
+  // branches for weights
   float f_weightsignal_nominal     = -9999.;
   float f_weightsignal_JESUp       = -9999.;
   float f_weightsignal_JESDown     = -9999.;
@@ -339,7 +356,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   float f_weightsignal_cfErr1Down  = -9999.;
   float f_weightsignal_cfErr2Up    = -9999.;
   float f_weightsignal_cfErr2Down  = -9999.;
-
+  // branches in piu'
   float f_Z1Mass = -9999.;
   float f_Z2Mass = -9999.;
   float f_ZZmass = -9999.;
@@ -366,6 +383,19 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   tnew->Branch("f_ZZmass",      &f_ZZmass); 
   tnew->Branch("f_bbmass",      &f_bbmass); 
   tnew->Branch("f_HHmass",      &f_HHmass); 
+  tnew->Branch("f_lept1_eta",   &f_lept1_eta);
+  tnew->Branch("f_lept2_eta",   &f_lept2_eta);
+  tnew->Branch("f_lept3_eta",   &f_lept3_eta);
+  tnew->Branch("f_lept4_eta",   &f_lept4_eta);
+  tnew->Branch("f_lept1_phi",   &f_lept1_phi);
+  tnew->Branch("f_lept2_phi",   &f_lept2_phi);
+  tnew->Branch("f_lept3_phi",   &f_lept3_phi);
+  tnew->Branch("f_lept4_phi",   &f_lept4_phi);
+  tnew->Branch("f_etajet1",     &f_etajet1);
+  tnew->Branch("f_etajet2",     &f_etajet2);
+  tnew->Branch("f_phijet1",     &f_phijet1);
+  tnew->Branch("f_phijet2",     &f_phijet2);
+  tnew->Branch("f_deltaPhiHH",  &f_deltaPhiHH);
   tnew->Branch("f_weightsignal_nominal",      &f_weightsignal_nominal     ); 
   tnew->Branch("f_weightsignal_JESUp",        &f_weightsignal_JESUp       ); 
   tnew->Branch("f_weightsignal_JESDown",      &f_weightsignal_JESDown     ); 
@@ -658,6 +688,22 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
     // save MET
     f_METsignal = PFMET;    
  
+    // save branches for tests
+    f_lept1_eta  = LepEta->at(0);
+    f_lept2_eta  = LepEta->at(1);
+    f_lept3_eta  = LepEta->at(2);
+    f_lept4_eta  = LepEta->at(3);
+    f_lept1_phi  = LepPhi->at(0);
+    f_lept2_phi  = LepPhi->at(1); 
+    f_lept3_phi  = LepPhi->at(2); 
+    f_lept4_phi  = LepPhi->at(3); 
+    f_etajet1    = JetEta->at(d1_maxbtag);
+    f_etajet2    = JetEta->at(d2_maxbtag);
+    f_phijet1    = JetPhi->at(d1_maxbtag);
+    f_phijet2    = JetPhi->at(d2_maxbtag);
+    f_deltaPhiHH = DeltaPhi;
+
+
 
     // save event weight
     if(isDATA || isZX){ 
@@ -733,24 +779,24 @@ void prepareNtupleMVA_2bjet()
   //  TString finalstate = "fs2e2mu";
   
   // -- year
-  //  TString syear = "2016";
+  TString syear = "2016";
   //  TString syear = "2017";
-  TString syear = "2018";
+  //  TString syear = "2018";
 
   // --- lumi
-  //  float lumi = 35.8; //fb-1 2016
+  float lumi = 35.8; //fb-1 2016
   //  float lumi = 41.5; //fb-1 2017
-  float lumi = 59.7; //fb-1 2018
+  //  float lumi = 59.7; //fb-1 2018
   cout<<lumi<<endl;
 
 
-  //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
+  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
   //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
-  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
+  //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
   TString inputFileName[] = {
     "AllData", 
-    "HH4lbb_Angela",
-    // "HH4lbb_Ilirjan",
+    // "HH4lbb_Angela",
+    "HH4lbb_Ilirjan",
     "ggH125",
     "VBFH125",
     "WplusH125",
@@ -758,8 +804,8 @@ void prepareNtupleMVA_2bjet()
     "ZH125",
     "bbH125",
     "ttH125",
-    "ZZTo4lext2",
-    //"ZZTo4l",
+    //"ZZTo4lext2",
+    "ZZTo4l",
     "ggTo4e_Contin_MCFM701",
     "ggTo4mu_Contin_MCFM701",
     "ggTo4tau_Contin_MCFM701",
