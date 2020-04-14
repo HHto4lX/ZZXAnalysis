@@ -46,7 +46,7 @@ int main( int argc, char *argv[] )
    ss->FillDataMCPlots(ZZ);
    ss->FillDataMCPlots(ttbar);
    ss->FillDataMCPlots(DY);
-   ss->SaveDataMCHistos("DataMC_SS_samples18.root");
+   ss->SaveDataMCHistos("DataMC_SS_samples2018.root");
 
    ///////////////////////////////////
    // Fill passing/failling histos  //
