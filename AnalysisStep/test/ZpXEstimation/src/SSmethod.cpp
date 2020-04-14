@@ -24,14 +24,14 @@ SSmethod::SSmethod():Tree()
    _s_final_state.push_back("2mu2e");
    _s_final_state.push_back("4l");
    
-   _s_category.push_back("UnTagged");
-   _s_category.push_back("VBF1jTagged");
-   _s_category.push_back("VBF2jTagged");
-   _s_category.push_back("VHLeptTagged");
-   _s_category.push_back("VHHadrTagged");
-   _s_category.push_back("ttHLeptTagged");
-   _s_category.push_back("ttHHadrTagged");
-   _s_category.push_back("VHMETTagged");
+   // _s_category.push_back("UnTagged");
+   // _s_category.push_back("VBF1jTagged");
+   // _s_category.push_back("VBF2jTagged");
+   // _s_category.push_back("VHLeptTagged");
+   // _s_category.push_back("VHHadrTagged");
+   // _s_category.push_back("ttHLeptTagged");
+   // _s_category.push_back("ttHHadrTagged");
+   // _s_category.push_back("VHMETTagged");
    _s_category.push_back("Inclusive");
    
    _s_region.push_back("ZLL");
@@ -113,27 +113,28 @@ void SSmethod::Calculate_SSOS_Ratio( TString input_file_data_name, TString input
          jetPgOverPq[j] = 1./JetQGLikelihood->at(j) - 1.;
       }
       
-		_current_category = categoryMor18(  nExtraLep,
-														 nExtraZ,
-														 nCleanedJetsPt30,
-														 nCleanedJetsPt30BTagged_bTagSF,
-														 jetQGL,
-														 p_JJQCD_SIG_ghg2_1_JHUGen_JECNominal,
-														 p_JQCD_SIG_ghg2_1_JHUGen_JECNominal,
-														 p_JJVBF_SIG_ghv1_1_JHUGen_JECNominal,
-														 p_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
-														 pAux_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
-														 p_HadWH_SIG_ghw1_1_JHUGen_JECNominal,
-														 p_HadZH_SIG_ghz1_1_JHUGen_JECNominal,
-														 p_HadWH_mavjj_JECNominal,
-														 p_HadWH_mavjj_true_JECNominal,
-														 p_HadZH_mavjj_JECNominal,
-														 p_HadZH_mavjj_true_JECNominal,
-														 jetPhi,
-														 ZZMass,
-														 PFMET,
-														 false,// Use VHMET category
-														 false);// Use QG tagging
+      _current_category = 0; // inclusive
+		// _current_category = categoryMor18(  nExtraLep,
+		// 												 nExtraZ,
+		// 												 nCleanedJetsPt30,
+		// 												 nCleanedJetsPt30BTagged_bTagSF,
+		// 												 jetQGL,
+		// 												 p_JJQCD_SIG_ghg2_1_JHUGen_JECNominal,
+		// 												 p_JQCD_SIG_ghg2_1_JHUGen_JECNominal,
+		// 												 p_JJVBF_SIG_ghv1_1_JHUGen_JECNominal,
+		// 												 p_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
+		// 												 pAux_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
+		// 												 p_HadWH_SIG_ghw1_1_JHUGen_JECNominal,
+		// 												 p_HadZH_SIG_ghz1_1_JHUGen_JECNominal,
+		// 												 p_HadWH_mavjj_JECNominal,
+		// 												 p_HadWH_mavjj_true_JECNominal,
+		// 												 p_HadZH_mavjj_JECNominal,
+		// 												 p_HadZH_mavjj_true_JECNominal,
+		// 												 jetPhi,
+		// 												 ZZMass,
+		// 												 PFMET,
+		// 												 false,// Use VHMET category
+		// 												 false);// Use QG tagging
       
       if ((test_bit(CRflag, CRZLLss))) _N_SS_events[_current_final_state][_current_category]+=1.0;
       if ((test_bit(CRflag, CRZLLos_2P2F)) || (test_bit(CRflag, CRZLLos_3P1F))) _N_OS_events[_current_final_state][_current_category]+=1.0;
@@ -174,27 +175,28 @@ void SSmethod::Calculate_SSOS_Ratio( TString input_file_data_name, TString input
             jetPgOverPq[j] = 1./JetQGLikelihood->at(j) - 1.;
          }
          
-		_current_category = categoryMor18(  nExtraLep,
-														 nExtraZ,
-														 nCleanedJetsPt30,
-														 nCleanedJetsPt30BTagged_bTagSF,
-														 jetQGL,
-														 p_JJQCD_SIG_ghg2_1_JHUGen_JECNominal,
-														 p_JQCD_SIG_ghg2_1_JHUGen_JECNominal,
-														 p_JJVBF_SIG_ghv1_1_JHUGen_JECNominal,
-														 p_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
-														 pAux_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
-														 p_HadWH_SIG_ghw1_1_JHUGen_JECNominal,
-														 p_HadZH_SIG_ghz1_1_JHUGen_JECNominal,
-														 p_HadWH_mavjj_JECNominal,
-														 p_HadWH_mavjj_true_JECNominal,
-														 p_HadZH_mavjj_JECNominal,
-														 p_HadZH_mavjj_true_JECNominal,
-														 jetPhi,
-														 ZZMass,
-														 PFMET,
-														 false,// Use VHMET category
-														 false);// Use QG tagging
+	 _current_category = 0; // inclusive
+		// _current_category = categoryMor18(  nExtraLep,
+		// 												 nExtraZ,
+		// 												 nCleanedJetsPt30,
+		// 												 nCleanedJetsPt30BTagged_bTagSF,
+		// 												 jetQGL,
+		// 												 p_JJQCD_SIG_ghg2_1_JHUGen_JECNominal,
+		// 												 p_JQCD_SIG_ghg2_1_JHUGen_JECNominal,
+		// 												 p_JJVBF_SIG_ghv1_1_JHUGen_JECNominal,
+		// 												 p_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
+		// 												 pAux_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
+		// 												 p_HadWH_SIG_ghw1_1_JHUGen_JECNominal,
+		// 												 p_HadZH_SIG_ghz1_1_JHUGen_JECNominal,
+		// 												 p_HadWH_mavjj_JECNominal,
+		// 												 p_HadWH_mavjj_true_JECNominal,
+		// 												 p_HadZH_mavjj_JECNominal,
+		// 												 p_HadZH_mavjj_true_JECNominal,
+		// 												 jetPhi,
+		// 												 ZZMass,
+		// 												 PFMET,
+		// 												 false,// Use VHMET category
+		// 												 false);// Use QG tagging
          
          _k_factor = calculate_K_factor(input_file_data_name);
          _event_weight = (_lumi * 1000 * xsec * _k_factor * overallEventWeight) / gen_sum_weights;
@@ -418,28 +420,29 @@ void SSmethod::FillDataMCPlots( TString input_file_data_name )
          jetQGL[j] = JetQGLikelihood->at(j);
          jetPgOverPq[j] = 1./JetQGLikelihood->at(j) - 1.;
       }
-      
-		_current_category = categoryMor18(  nExtraLep,
-														 nExtraZ,
-														 nCleanedJetsPt30,
-														 nCleanedJetsPt30BTagged_bTagSF,
-														 jetQGL,
-														 p_JJQCD_SIG_ghg2_1_JHUGen_JECNominal,
-														 p_JQCD_SIG_ghg2_1_JHUGen_JECNominal,
-														 p_JJVBF_SIG_ghv1_1_JHUGen_JECNominal,
-														 p_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
-														 pAux_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
-														 p_HadWH_SIG_ghw1_1_JHUGen_JECNominal,
-														 p_HadZH_SIG_ghz1_1_JHUGen_JECNominal,
-														 p_HadWH_mavjj_JECNominal,
-														 p_HadWH_mavjj_true_JECNominal,
-														 p_HadZH_mavjj_JECNominal,
-														 p_HadZH_mavjj_true_JECNominal,
-														 jetPhi,
-														 ZZMass,
-														 PFMET,
-														 false,// Use VHMET category
-														 false);// Use QG tagging
+
+      _current_category = 0; // inclusive
+		// _current_category = categoryMor18(  nExtraLep,
+		// 												 nExtraZ,
+		// 												 nCleanedJetsPt30,
+		// 												 nCleanedJetsPt30BTagged_bTagSF,
+		// 												 jetQGL,
+		// 												 p_JJQCD_SIG_ghg2_1_JHUGen_JECNominal,
+		// 												 p_JQCD_SIG_ghg2_1_JHUGen_JECNominal,
+		// 												 p_JJVBF_SIG_ghv1_1_JHUGen_JECNominal,
+		// 												 p_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
+		// 												 pAux_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
+		// 												 p_HadWH_SIG_ghw1_1_JHUGen_JECNominal,
+		// 												 p_HadZH_SIG_ghz1_1_JHUGen_JECNominal,
+		// 												 p_HadWH_mavjj_JECNominal,
+		// 												 p_HadWH_mavjj_true_JECNominal,
+		// 												 p_HadZH_mavjj_JECNominal,
+		// 												 p_HadZH_mavjj_true_JECNominal,
+		// 												 jetPhi,
+		// 												 ZZMass,
+		// 												 PFMET,
+		// 												 false,// Use VHMET category
+		// 												 false);// Use QG tagging
 
       
       _k_factor = calculate_K_factor(input_file_data_name);
@@ -498,27 +501,28 @@ void SSmethod::MakeHistogramsZX( TString input_file_data_name, TString  input_fi
          jetPgOverPq[j] = 1./JetQGLikelihood->at(j) - 1.;
       }
       
-		_current_category = categoryMor18(  nExtraLep,
-														 nExtraZ,
-														 nCleanedJetsPt30,
-														 nCleanedJetsPt30BTagged_bTagSF,
-														 jetQGL,
-														 p_JJQCD_SIG_ghg2_1_JHUGen_JECNominal,
-														 p_JQCD_SIG_ghg2_1_JHUGen_JECNominal,
-														 p_JJVBF_SIG_ghv1_1_JHUGen_JECNominal,
-														 p_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
-														 pAux_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
-														 p_HadWH_SIG_ghw1_1_JHUGen_JECNominal,
-														 p_HadZH_SIG_ghz1_1_JHUGen_JECNominal,
-														 p_HadWH_mavjj_JECNominal,
-														 p_HadWH_mavjj_true_JECNominal,
-														 p_HadZH_mavjj_JECNominal,
-														 p_HadZH_mavjj_true_JECNominal,
-														 jetPhi,
-														 ZZMass,
-														 PFMET,
-														 false,// Use VHMET category
-														 false);// Use QG tagging
+      _current_category = 0; //inclusive
+		// _current_category = categoryMor18(  nExtraLep,
+		// 												 nExtraZ,
+		// 												 nCleanedJetsPt30,
+		// 												 nCleanedJetsPt30BTagged_bTagSF,
+		// 												 jetQGL,
+		// 												 p_JJQCD_SIG_ghg2_1_JHUGen_JECNominal,
+		// 												 p_JQCD_SIG_ghg2_1_JHUGen_JECNominal,
+		// 												 p_JJVBF_SIG_ghv1_1_JHUGen_JECNominal,
+		// 												 p_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
+		// 												 pAux_JVBF_SIG_ghv1_1_JHUGen_JECNominal,
+		// 												 p_HadWH_SIG_ghw1_1_JHUGen_JECNominal,
+		// 												 p_HadZH_SIG_ghz1_1_JHUGen_JECNominal,
+		// 												 p_HadWH_mavjj_JECNominal,
+		// 												 p_HadWH_mavjj_true_JECNominal,
+		// 												 p_HadZH_mavjj_JECNominal,
+		// 												 p_HadZH_mavjj_true_JECNominal,
+		// 												 jetPhi,
+		// 												 ZZMass,
+		// 												 PFMET,
+		// 												 false,// Use VHMET category
+		// 												 false);// Use QG tagging
       
       
       _k_factor = calculate_K_factor(input_file_data_name);

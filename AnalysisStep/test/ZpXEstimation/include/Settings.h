@@ -42,15 +42,15 @@ public:
 
    enum _category
    {
-      untagged          = 0,
-      VBF_1j_tagged     = 1,
-      VBF_2j_tagged     = 2,
-      VH_lepton_tagged  = 3,
-      VH_hadron_tagged  = 4,
-      ttH_lepton_tagged = 5,
-      ttH_hadron_tagged = 6,
-      VH_MET_tagged     = 7,
-      inclusive         = 8,
+      /* untagged          = 0, */
+      /* VBF_1j_tagged     = 1, */
+      /* VBF_2j_tagged     = 2, */
+      /* VH_lepton_tagged  = 3, */
+      /* VH_hadron_tagged  = 4, */
+      /* ttH_lepton_tagged = 5, */
+      /* ttH_hadron_tagged = 6, */
+      /* VH_MET_tagged     = 7, */
+      inclusive         = 0,
       MAX_NUM_OF_CATEGORIES
    };
 
