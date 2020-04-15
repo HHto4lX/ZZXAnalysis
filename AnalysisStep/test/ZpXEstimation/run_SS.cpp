@@ -27,7 +27,8 @@ int main( int argc, char *argv[] )
    TString WZ      = path + "WZTo3LNuext1"   + file_name;
    TString ZZ      = path + "ZZTo4lext1"     + file_name;
    TString ttbar   = path + "TTTo2L2Nu"      + file_name;
-   TString DY      = path + "DYJetsToLL_M50" + file_name;
+   //   TString DY      = path + "DYJetsToLL_M50" + file_name;
+   TString DY      = "/eos/cms/store/group/phys_higgs/cmshzz4l/cjlst/RunIILegacy/200205_CutBased/MC_2018/DYJetsToLL_M50_LO/ZZ4lAnalysis.root";
 	
    bool SubtractWZ = true;
    bool Remove_NegBins_FR = true;
