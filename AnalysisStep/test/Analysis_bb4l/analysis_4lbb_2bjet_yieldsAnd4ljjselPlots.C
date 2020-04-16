@@ -83,33 +83,33 @@ void doHistos()
   TString inFilePath;
   TString inDataPath;
   TString sYear;
-  Float_t rescale_ZX[nFinalStates];
+  //  Float_t rescale_ZX[nFinalStates];
   if(year==2016){
     lumi       = 35.8; //fb-1 2016
     sYear      = "2016";
     inFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
     inDataPath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
-    rescale_ZX[fs_4mu]   = 0.79; //FIXME
-    rescale_ZX[fs_4e]    = 1.40; //FIXME
-    rescale_ZX[fs_2e2mu] = 2.64; //FIXME:da levare
+    // rescale_ZX[fs_4mu]   = 0.79; //FIXME
+    // rescale_ZX[fs_4e]    = 1.40; //FIXME
+    // rescale_ZX[fs_2e2mu] = 2.64; //FIXME:da levare
   }
   else if(year==2017){
     lumi       = 41.5; //fb-1 2017
     sYear      = "2017";
     inFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
     inDataPath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
-    rescale_ZX[fs_4mu]   = 1.48; //FIXME
-    rescale_ZX[fs_4e]    = 0.52; //FIXME
-    rescale_ZX[fs_2e2mu] = 2.00; //FIXME:da levare
+    // rescale_ZX[fs_4mu]   = 1.48; //FIXME
+    // rescale_ZX[fs_4e]    = 0.52; //FIXME
+    // rescale_ZX[fs_2e2mu] = 2.00; //FIXME:da levare
   }
   else if(year==2018){
     lumi       = 59.7; //fb-1 2018
     sYear      = "2018";
     inFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
     inDataPath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
-    rescale_ZX[fs_4mu]   = 1.60; //FIXME
-    rescale_ZX[fs_4e]    = 0.72; //FIXME
-    rescale_ZX[fs_2e2mu] = 2.22; //FIXME:da levare
+    // rescale_ZX[fs_4mu]   = 1.60; //FIXME
+    // rescale_ZX[fs_4e]    = 0.72; //FIXME
+    // rescale_ZX[fs_2e2mu] = 2.22; //FIXME:da levare
   }
   else{ 
     cout<<"wrong year selected!"<<endl;
@@ -155,27 +155,11 @@ void doHistos()
   cout<<endl;
 
   // arrays for BTagSF norm
-  float sum_eventsAfter_4lsel[nDatasets];            
-  float sum_BTagSFAfter_4lsel[nDatasets];
-  float sum_eventsAfter_4lsel_sidebands[nDatasets];            
-  float sum_BTagSFAfter_4lsel_sidebands[nDatasets];            
-  float sum_eventsAfter_4ljjsel[nDatasets];         
-  float sum_BTagSFAfter_4ljjsel[nDatasets];         
-  float sum_eventsAfter_4ljjsel_masscut[nDatasets]; 
-  float sum_BTagSFAfter_4ljjsel_masscut[nDatasets]; 
-  float sum_eventsAfter_4ljjsel_sidebands[nDatasets]; 
-  float sum_BTagSFAfter_4ljjsel_sidebands[nDatasets]; 
+  float sum_events[nDatasets];            
+  float sum_BTagSF[nDatasets];
   for(int i=0; i<nDatasets; i++){
-    sum_eventsAfter_4lsel[i] = 0.;           
-    sum_BTagSFAfter_4lsel[i] = 0.;           
-    sum_eventsAfter_4lsel_sidebands[i] = 0.;            
-    sum_BTagSFAfter_4lsel_sidebands[i] = 0.;            
-    sum_eventsAfter_4ljjsel[i] = 0.;        
-    sum_BTagSFAfter_4ljjsel[i] = 0.;        
-    sum_eventsAfter_4ljjsel_masscut[i] = 0.;
-    sum_BTagSFAfter_4ljjsel_masscut[i] = 0.;
-    sum_eventsAfter_4ljjsel_sidebands[i] = 0.; 
-    sum_BTagSFAfter_4ljjsel_sidebands[i] = 0.; 
+    sum_events[i] = 0.;           
+    sum_BTagSF[i] = 0.;           
   }
 
 
@@ -318,7 +302,6 @@ void doHistos()
   TFile* inputFile[nDatasets];
   TTree* inputTree[nDatasets];
   TH1F* hCounters[nDatasets];
-  Long64_t NGenEvt[nDatasets];
   Float_t gen_sumWeights[nDatasets];
   Float_t partialSampleWeight[nDatasets];
   Float_t weight; //ZX weight
@@ -494,14 +477,12 @@ void doHistos()
 
     if(currentProcess == ZXbkg){
       hCounters[d] = 0;
-      NGenEvt[d] = 0;
       gen_sumWeights[d] = 0.;
       partialSampleWeight[d] = 0;
       inputTree[d] = (TTree*)inputFile[d]->Get("candTree");
     }
     else{
       hCounters[d] = (TH1F*)inputFile[d]->Get("ZZTree/Counters");
-      NGenEvt[d] = (Long64_t)hCounters[d]->GetBinContent(1);
       gen_sumWeights[d] = (Long64_t)hCounters[d]->GetBinContent(40);
       partialSampleWeight[d] = lumi * 1000 / gen_sumWeights[d];
       inputTree[d] = (TTree*)inputFile[d]->Get("ZZTree/candTree");
@@ -566,16 +547,8 @@ void doHistos()
 
 
       if(datasets[d] == "AllData" || datasets[d] == "ZXbkg_4ljjsel"){
-        sum_eventsAfter_4lsel[d]             = 1.;      
-	sum_BTagSFAfter_4lsel[d]             = 1.;
-        sum_eventsAfter_4lsel_sidebands[d]   = 1.; 
-        sum_BTagSFAfter_4lsel_sidebands[d]   = 1.; 
-        sum_eventsAfter_4ljjsel[d]           = 1.;      
-	sum_BTagSFAfter_4ljjsel[d]           = 1.;
-        sum_eventsAfter_4ljjsel_masscut[d]   = 1.;      
-	sum_BTagSFAfter_4ljjsel_masscut[d]   = 1.;
-        sum_eventsAfter_4ljjsel_sidebands[d] = 1.; 
-        sum_BTagSFAfter_4ljjsel_sidebands[d] = 1.; 
+        sum_events[d] = 1.;      
+	sum_BTagSF[d] = 1.;
       }
       else{
 
@@ -584,54 +557,20 @@ void doHistos()
         scaleFactors = evalEventSF( int(JetPt->size()), JetHadronFlavour, JetEta, JetPt, JetBTagger, CSVreader, CSVreaderJESUp, CSVreaderJESDown, CSVreaderHFUp, CSVreaderHFDown, CSVreaderLFUp, CSVreaderLFDown, CSVreaderhfstats1Up, CSVreaderhfstats1Down, CSVreaderhfstats2Up, CSVreaderhfstats2Down, CSVreaderlfstats1Up, CSVreaderlfstats1Down, CSVreaderlfstats2Up, CSVreaderlfstats2Down, CSVreadercfErr1Up, CSVreadercfErr1Down, CSVreadercfErr2Up, CSVreadercfErr2Down );
 
         // total counters for BTagSF norm --- 4lsel
-        sum_eventsAfter_4lsel[d] += 1.; 
-        sum_BTagSFAfter_4lsel[d] += scaleFactors[0]; 
-
-        // total counters for BTagSF norm --- 4lsel sidebands
-        if(ZZMass < 115 || ZZMass > 135){
-          sum_eventsAfter_4lsel_sidebands[d] += 1.; 
-          sum_BTagSFAfter_4lsel_sidebands[d] += scaleFactors[0];
-        }
-
-        // JETSELECTION
-        // at least 2 jets in the acceptance
-        if(JetPt->size() < 2) continue;         
-
-        // total counters for BTagSF norm --- 4ljjsel
-        sum_eventsAfter_4ljjsel[d] += 1.; 
-        sum_BTagSFAfter_4ljjsel[d] += scaleFactors[0]; 
-
-
-        if(ZZMass >= 115 && ZZMass <= 135){
-          // total counters for BTagSF norm --- 4ljjsel mass cut
-          sum_eventsAfter_4ljjsel_masscut[d] += 1.; 
-          sum_BTagSFAfter_4ljjsel_masscut[d] += scaleFactors[0]; 
-        }
-        else{
-         // total counters for BTagSF norm --- 4ljjsel sidebands
-          sum_eventsAfter_4ljjsel_sidebands[d] += 1.; 
-          sum_BTagSFAfter_4ljjsel_sidebands[d] += scaleFactors[0]; 
-        }       
+        sum_events[d] += 1.; 
+        sum_BTagSF[d] += scaleFactors[0]; 
 
       }// end else
     
     } // end first loop over entries 
 
-    cout<<datasets[d]<<" "<<sum_eventsAfter_4lsel[d]<<" "<<sum_BTagSFAfter_4lsel[d]<<" "<<sum_eventsAfter_4lsel_sidebands[d]<<" "<<sum_BTagSFAfter_4lsel_sidebands[d]<<" "<<sum_eventsAfter_4ljjsel[d]<<" "<<sum_BTagSFAfter_4ljjsel[d]<<" "<<sum_eventsAfter_4ljjsel_masscut[d]<<" "<<sum_BTagSFAfter_4ljjsel_masscut[d]<<" "<<sum_eventsAfter_4ljjsel_sidebands[d]<<" "<<sum_BTagSFAfter_4ljjsel_sidebands[d]<<endl;
+    cout<<datasets[d]<<" "<<sum_events[d]<<" "<<sum_BTagSF[d]<<endl;
 
     // --- control for norm
-    if( sum_eventsAfter_4lsel[d] == 0. || std::isnan(sum_eventsAfter_4lsel[d]) ){ sum_eventsAfter_4lsel[d] = 1.; }
-    if( sum_BTagSFAfter_4lsel[d] == 0. || std::isnan(sum_BTagSFAfter_4lsel[d]) ){ sum_BTagSFAfter_4lsel[d] = 1.; }
-    if( sum_eventsAfter_4lsel_sidebands[d] == 0. || std::isnan(sum_eventsAfter_4lsel_sidebands[d]) ){ sum_eventsAfter_4lsel_sidebands[d] = 1.; }
-    if( sum_BTagSFAfter_4lsel_sidebands[d] == 0. || std::isnan(sum_BTagSFAfter_4lsel_sidebands[d]) ){ sum_BTagSFAfter_4lsel_sidebands[d] = 1.; }
-    if( sum_eventsAfter_4ljjsel[d] == 0. || std::isnan(sum_eventsAfter_4ljjsel[d]) ){ sum_eventsAfter_4ljjsel[d] = 1.; }
-    if( sum_BTagSFAfter_4ljjsel[d] == 0. || std::isnan(sum_BTagSFAfter_4ljjsel[d]) ){ sum_BTagSFAfter_4ljjsel[d] = 1.; }
-    if( sum_eventsAfter_4ljjsel_masscut[d] == 0. || std::isnan(sum_eventsAfter_4ljjsel_masscut[d]) ){ sum_eventsAfter_4ljjsel_masscut[d] = 1.; }
-    if( sum_BTagSFAfter_4ljjsel_masscut[d] == 0. || std::isnan(sum_BTagSFAfter_4ljjsel_masscut[d]) ){ sum_BTagSFAfter_4ljjsel_masscut[d] = 1.; }
-    if( sum_eventsAfter_4ljjsel_sidebands[d] == 0. || std::isnan(sum_eventsAfter_4ljjsel_sidebands[d]) ){ sum_eventsAfter_4ljjsel_sidebands[d] = 1.; }
-    if( sum_BTagSFAfter_4ljjsel_sidebands[d] == 0. || std::isnan(sum_BTagSFAfter_4ljjsel_sidebands[d]) ){ sum_BTagSFAfter_4ljjsel_sidebands[d] = 1.; }
+    if( sum_events[d] == 0. || std::isnan(sum_events[d]) ){ sum_events[d] = 1.; }
+    if( sum_BTagSF[d] == 0. || std::isnan(sum_BTagSF[d]) ){ sum_BTagSF[d] = 1.; }
 
-    cout<<datasets[d]<<" "<<sum_eventsAfter_4lsel[d]<<" "<<sum_BTagSFAfter_4lsel[d]<<" "<<sum_eventsAfter_4lsel_sidebands[d]<<" "<<sum_BTagSFAfter_4lsel_sidebands[d]<<" "<<sum_eventsAfter_4ljjsel[d]<<" "<<sum_BTagSFAfter_4ljjsel[d]<<" "<<sum_eventsAfter_4ljjsel_masscut[d]<<" "<<sum_BTagSFAfter_4ljjsel_masscut[d]<<" "<<sum_eventsAfter_4ljjsel_sidebands[d]<<" "<<sum_BTagSFAfter_4ljjsel_sidebands[d]<<endl;
+    cout<<datasets[d]<<" "<<sum_events[d]<<" "<<sum_BTagSF[d]<<endl;
     // --------------------------------------------------------
 
 
@@ -666,7 +605,9 @@ void doHistos()
 
       // --- event weights
       Double_t eventWeight = 1.;
-      if(currentProcess != Data && currentProcess != ZXbkg) eventWeight = partialSampleWeight[d] *xsec *kfactor *overallEventWeight *L1prefiringWeight *scaleFactors[0];
+      if(currentProcess != Data && currentProcess != ZXbkg){
+        eventWeight = partialSampleWeight[d] *xsec *kfactor *overallEventWeight *L1prefiringWeight *scaleFactors[0] *sum_events[d]/sum_BTagSF[d];
+      }
       if(currentProcess == ZXbkg) eventWeight = weight; //ZX weight
 
 
@@ -706,7 +647,7 @@ void doHistos()
 
 
       // --- fill yields after 4l sel
-      hYields_4lsel[currentProcess][currentFinalState]->Fill(0.5, eventWeight *sum_eventsAfter_4lsel[d]/sum_BTagSFAfter_4lsel[d]);
+      hYields_4lsel[currentProcess][currentFinalState]->Fill(0.5, eventWeight);
 
       // --- fill number of non weighted events selected after 4l sel
       hEvents_4lsel[currentProcess][currentFinalState]->Fill(0.5, 1.);
@@ -760,7 +701,7 @@ void doHistos()
 
 
       // --- fill histos after 4ljj sel (no mass cut)
-      h1_m4l_4ljjsel  [currentProcess][currentFinalState]->Fill(ZZMass, eventWeight *sum_eventsAfter_4ljjsel[d]/sum_BTagSFAfter_4ljjsel[d]);
+      h1_m4l_4ljjsel  [currentProcess][currentFinalState]->Fill(ZZMass, eventWeight);
 
 
 
@@ -768,40 +709,40 @@ void doHistos()
       if(ZZMass >= 115 && ZZMass <= 135){  // 115 < ZZMass < 135 GeV
 
         // --- fill yields after 4ljj sel
-        hYields_4ljjsel[currentProcess][currentFinalState]->Fill(0.5, eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
+        hYields_4ljjsel[currentProcess][currentFinalState]->Fill(0.5, eventWeight);
         // --- fill number of non weighted events selected after 4ljj sel
         hEvents_4ljjsel[currentProcess][currentFinalState]->Fill(0.5, 1.);
         
         // --- fill histos after 4ljj sel
         // (BDT input histos)
         for(int i=0; i<LepPt->size(); i++){
-          h1_pT4l_4ljjsel[currentProcess][currentFinalState]->Fill(LepPt->at(i), eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
+          h1_pT4l_4ljjsel[currentProcess][currentFinalState]->Fill(LepPt->at(i), eventWeight);
         }
-        h1_j1btag_4ljjsel[currentProcess][currentFinalState]->Fill(JetBTagger->at(dj1_),eventWeight*sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
-        h1_j2btag_4ljjsel[currentProcess][currentFinalState]->Fill(JetBTagger->at(dj2_),eventWeight*sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
-        h1_j1pT_4ljjsel    [currentProcess][currentFinalState]->Fill(JetPt->at(dj1_), eventWeight*sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);  
-        h1_j2pT_4ljjsel    [currentProcess][currentFinalState]->Fill(JetPt->at(dj2_), eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
-        h1_MET_4ljjsel     [currentProcess][currentFinalState]->Fill(PFMET, eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
-        h1_DeltaRhh_4ljjsel[currentProcess][currentFinalState]->Fill(DeltaR, eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
-        h1_mbb_4ljjsel     [currentProcess][currentFinalState]->Fill(bbMass, eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
+        h1_j1btag_4ljjsel  [currentProcess][currentFinalState]->Fill(JetBTagger->at(dj1_), eventWeight);
+        h1_j2btag_4ljjsel  [currentProcess][currentFinalState]->Fill(JetBTagger->at(dj2_), eventWeight);
+        h1_j1pT_4ljjsel    [currentProcess][currentFinalState]->Fill(JetPt->at(dj1_),      eventWeight);  
+        h1_j2pT_4ljjsel    [currentProcess][currentFinalState]->Fill(JetPt->at(dj2_),      eventWeight);
+        h1_MET_4ljjsel     [currentProcess][currentFinalState]->Fill(PFMET,                eventWeight);
+        h1_DeltaRhh_4ljjsel[currentProcess][currentFinalState]->Fill(DeltaR,               eventWeight);
+        h1_mbb_4ljjsel     [currentProcess][currentFinalState]->Fill(bbMass,               eventWeight);
     
         //2D histo
-        h2_m4lvsmbb_4ljjsel[currentProcess][currentFinalState]->Fill(ZZMass, bbMass, eventWeight *sum_eventsAfter_4ljjsel_masscut[d]/sum_BTagSFAfter_4ljjsel_masscut[d]);
+        h2_m4lvsmbb_4ljjsel[currentProcess][currentFinalState]->Fill(ZZMass, bbMass, eventWeight);
 
       }
       else{
 
         // --- fill histos after 4ljj sel: sidebands
         for(int i=0; i<LepPt->size(); i++){
-          h1_pT4l_4ljjsel_sidebands[currentProcess][currentFinalState]->Fill(LepPt->at(i), eventWeight *sum_eventsAfter_4ljjsel_sidebands[d]/sum_BTagSFAfter_4ljjsel_sidebands[d]);
+          h1_pT4l_4ljjsel_sidebands[currentProcess][currentFinalState]->Fill(LepPt->at(i), eventWeight);
         }
-        h1_j1btag_4ljjsel_sidebands[currentProcess][currentFinalState]->Fill(JetBTagger->at(dj1_),eventWeight*sum_eventsAfter_4ljjsel_sidebands[d]/sum_BTagSFAfter_4ljjsel_sidebands[d]);
-        h1_j2btag_4ljjsel_sidebands[currentProcess][currentFinalState]->Fill(JetBTagger->at(dj2_),eventWeight*sum_eventsAfter_4ljjsel_sidebands[d]/sum_BTagSFAfter_4ljjsel_sidebands[d]);
-        h1_j1pT_4ljjsel_sidebands[currentProcess][currentFinalState]->Fill(JetPt->at(dj1_), eventWeight*sum_eventsAfter_4ljjsel_sidebands[d]/sum_BTagSFAfter_4ljjsel_sidebands[d]);  
-        h1_j2pT_4ljjsel_sidebands[currentProcess][currentFinalState]->Fill(JetPt->at(dj2_), eventWeight *sum_eventsAfter_4ljjsel_sidebands[d]/sum_BTagSFAfter_4ljjsel_sidebands[d]);
-        h1_MET_4ljjsel_sidebands[currentProcess][currentFinalState]->Fill(PFMET, eventWeight *sum_eventsAfter_4ljjsel_sidebands[d]/sum_BTagSFAfter_4ljjsel_sidebands[d]);
-        h1_DeltaRhh_4ljjsel_sidebands[currentProcess][currentFinalState]->Fill(DeltaR, eventWeight *sum_eventsAfter_4ljjsel_sidebands[d]/sum_BTagSFAfter_4ljjsel_sidebands[d]);
-        h1_mbb_4ljjsel_sidebands[currentProcess][currentFinalState]->Fill(bbMass, eventWeight *sum_eventsAfter_4ljjsel_sidebands[d]/sum_BTagSFAfter_4ljjsel_sidebands[d]);
+        h1_j1btag_4ljjsel_sidebands  [currentProcess][currentFinalState]->Fill(JetBTagger->at(dj1_), eventWeight);
+        h1_j2btag_4ljjsel_sidebands  [currentProcess][currentFinalState]->Fill(JetBTagger->at(dj2_), eventWeight);
+        h1_j1pT_4ljjsel_sidebands    [currentProcess][currentFinalState]->Fill(JetPt->at(dj1_),      eventWeight);  
+        h1_j2pT_4ljjsel_sidebands    [currentProcess][currentFinalState]->Fill(JetPt->at(dj2_),      eventWeight);
+        h1_MET_4ljjsel_sidebands     [currentProcess][currentFinalState]->Fill(PFMET,                eventWeight);
+        h1_DeltaRhh_4ljjsel_sidebands[currentProcess][currentFinalState]->Fill(DeltaR,               eventWeight);
+        h1_mbb_4ljjsel_sidebands     [currentProcess][currentFinalState]->Fill(bbMass,               eventWeight);
 
       } //end else (sidebands)
 
@@ -811,30 +752,30 @@ void doHistos()
   }//end loop over datasets
 
 
-  // --- RESCALE ZX HISTOS ---
-  // --- riscalo solo histo che disegno
-  for(int fs=0; fs<nFinalStates; fs++){
-    // // fullmass range
-    // h1_m4l_4ljjsel           [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    // // sidebands
-    // h1_pT4l_4ljjsel_sidebands    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    // h1_j1btag_4ljjsel_sidebands  [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    // h1_j2btag_4ljjsel_sidebands  [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    // h1_j1pT_4ljjsel_sidebands    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    // h1_j2pT_4ljjsel_sidebands    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    // h1_MET_4ljjsel_sidebands     [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    // h1_DeltaRhh_4ljjsel_sidebands[ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    // h1_mbb_4ljjsel_sidebands     [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    // (BDT input)
-    h1_pT4l_4ljjsel    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    h1_j1btag_4ljjsel  [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    h1_j2btag_4ljjsel  [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    h1_j1pT_4ljjsel    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    h1_j2pT_4ljjsel    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    h1_MET_4ljjsel     [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    h1_DeltaRhh_4ljjsel[ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    h1_mbb_4ljjsel     [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-  }
+  // // --- RESCALE ZX HISTOS ---
+  // // --- riscalo solo histo che disegno
+  // for(int fs=0; fs<nFinalStates; fs++){
+  //   // // fullmass range
+  //   // h1_m4l_4ljjsel           [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+  //   // // sidebands
+  //   // h1_pT4l_4ljjsel_sidebands    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+  //   // h1_j1btag_4ljjsel_sidebands  [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+  //   // h1_j2btag_4ljjsel_sidebands  [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+  //   // h1_j1pT_4ljjsel_sidebands    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+  //   // h1_j2pT_4ljjsel_sidebands    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+  //   // h1_MET_4ljjsel_sidebands     [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+  //   // h1_DeltaRhh_4ljjsel_sidebands[ZXbkg][fs]->Scale(rescale_ZX[fs]);
+  //   // h1_mbb_4ljjsel_sidebands     [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+  //   // (BDT input)
+  //   h1_pT4l_4ljjsel    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+  //   h1_j1btag_4ljjsel  [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+  //   h1_j2btag_4ljjsel  [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+  //   h1_j1pT_4ljjsel    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+  //   h1_j2pT_4ljjsel    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+  //   h1_MET_4ljjsel     [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+  //   h1_DeltaRhh_4ljjsel[ZXbkg][fs]->Scale(rescale_ZX[fs]);
+  //   h1_mbb_4ljjsel     [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+  // }
 
 
   //---fill inclusive yields and histos
