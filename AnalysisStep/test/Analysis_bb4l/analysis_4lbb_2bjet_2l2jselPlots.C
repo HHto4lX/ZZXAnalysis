@@ -298,10 +298,10 @@ void doHistos()
   TH1F* h1_mjj_2l2jsel         [nProcesses];
   TH1F* h1_j1btag_2l2jsel      [nProcesses];
   TH1F* h1_j2btag_2l2jsel      [nProcesses];
-  TH1F* h1_j1pT_20-200_2l2jsel [nProcesses];
-  TH1F* h1_j2pT_20-200_2l2jsel [nProcesses];
-  TH1F* h1_j1pT_20-1200_2l2jsel[nProcesses];
-  TH1F* h1_j2pT_20-1200_2l2jsel[nProcesses];
+  TH1F* h1_j1pT_20_200_2l2jsel [nProcesses];
+  TH1F* h1_j2pT_20_200_2l2jsel [nProcesses];
+  TH1F* h1_j1pT_20_1200_2l2jsel[nProcesses];
+  TH1F* h1_j2pT_20_1200_2l2jsel[nProcesses];
 
 
   
@@ -315,14 +315,14 @@ void doHistos()
     h1_j1btag_2l2jsel      [pr]->Sumw2(true);
     h1_j2btag_2l2jsel      [pr] = new TH1F("h1_j2btag_2l2jsel_"+sProcess[pr]+"_"+sYear,";j2 DeepCSV; Events/0.04", 25, 0., 1.);
     h1_j2btag_2l2jsel      [pr]->Sumw2(true);
-    h1_j1pT_20-200_2l2jsel [pr] = new TH1F("h1_j1pT_20-200_2l2jsel_"+sProcess[pr]+"_"+sYear,";j1 pT(GeV); Events/5 GeV", 36, 20., 200.);
-    h1_j1pT_20-200_2l2jsel [pr]->Sumw2(true);
-    h1_j2pT_20-200_2l2jsel [pr] = new TH1F("h1_j2pT_20-200_2l2jsel_"+sProcess[pr]+"_"+sYear,";j2 pT(GeV); Events/5 GeV", 36, 20., 200.);
-    h1_j2pT_20-200_2l2jsel [pr]->Sumw2(true);
-    h1_j1pT_20-1200_2l2jsel[pr] = new TH1F("h1_j1pT_20-1200_2l2jsel_"+sProcess[pr]+"_"+sYear,";j1 pT(GeV); Events/10 GeV", 118, 20., 1200.);
-    h1_j1pT_20-1200_2l2jsel[pr]->Sumw2(true);
-    h1_j2pT_20-1200_2l2jsel[pr] = new TH1F("h1_j2pT_20-1200_2l2jsel_"+sProcess[pr]+"_"+sYear,";j2 pT(GeV); Events/10 GeV", 118, 20., 1200.);
-    h1_j2pT_20-1200_2l2jsel[pr]->Sumw2(true);
+    h1_j1pT_20_200_2l2jsel [pr] = new TH1F("h1_j1pT_20_200_2l2jsel_"+sProcess[pr]+"_"+sYear,";j1 pT(GeV); Events/5 GeV", 36, 20., 200.);
+    h1_j1pT_20_200_2l2jsel [pr]->Sumw2(true);
+    h1_j2pT_20_200_2l2jsel [pr] = new TH1F("h1_j2pT_20_200_2l2jsel_"+sProcess[pr]+"_"+sYear,";j2 pT(GeV); Events/5 GeV", 36, 20., 200.);
+    h1_j2pT_20_200_2l2jsel [pr]->Sumw2(true);
+    h1_j1pT_20_1200_2l2jsel[pr] = new TH1F("h1_j1pT_20_1200_2l2jsel_"+sProcess[pr]+"_"+sYear,";j1 pT(GeV); Events/10 GeV", 118, 20., 1200.);
+    h1_j1pT_20_1200_2l2jsel[pr]->Sumw2(true);
+    h1_j2pT_20_1200_2l2jsel[pr] = new TH1F("h1_j2pT_20_1200_2l2jsel_"+sProcess[pr]+"_"+sYear,";j2 pT(GeV); Events/10 GeV", 118, 20., 1200.);
+    h1_j2pT_20_1200_2l2jsel[pr]->Sumw2(true);
   }
 
   
@@ -479,12 +479,15 @@ void doHistos()
 
       
       // --- fill histos
-      h1_j1btag_2l2jsel[currentProcess]->Fill(JetBTagger->at(dj1_), eventWeight);
-      h1_j2btag_2l2jsel[currentProcess]->Fill(JetBTagger->at(dj2_), eventWeight);
-      h1_j1pT_2l2jsel  [currentProcess]->Fill(JetPt->at(dj1_),      eventWeight); 
-      h1_j2pT_2l2jsel  [currentProcess]->Fill(JetPt->at(dj2_),      eventWeight);
-      h1_mjj_2l2jsel   [currentProcess]->Fill(bbMass,               eventWeight);
-      h1_mll_2l2jsel   [currentProcess]->Fill(ZMass,                eventWeight);
+      h1_mjj_2l2jsel         [currentProcess]->Fill(bbMass,               eventWeight);
+      h1_mll_2l2jsel         [currentProcess]->Fill(ZMass,                eventWeight);
+      h1_j1btag_2l2jsel      [currentProcess]->Fill(JetBTagger->at(dj1_), eventWeight);
+      h1_j2btag_2l2jsel      [currentProcess]->Fill(JetBTagger->at(dj2_), eventWeight);
+      h1_j1pT_20_200_2l2jsel [currentProcess]->Fill(JetPt->at(dj1_),      eventWeight); 
+      h1_j2pT_20_200_2l2jsel [currentProcess]->Fill(JetPt->at(dj2_),      eventWeight);
+      h1_j1pT_20_1200_2l2jsel[currentProcess]->Fill(JetPt->at(dj1_),      eventWeight); 
+      h1_j2pT_20_1200_2l2jsel[currentProcess]->Fill(JetPt->at(dj2_),      eventWeight);
+
     
 
 
@@ -502,12 +505,14 @@ void doHistos()
   TFile* fout_1Dhistos = new TFile(fout_1Dhistos_name, "recreate");
   fout_1Dhistos->cd();
   for(int pr=0; pr<nProcesses; pr++){
-    h1_j1btag_2l2jsel[pr]->Write();
-    h1_j2btag_2l2jsel[pr]->Write();
-    h1_j1pT_2l2jsel  [pr]->Write();
-    h1_j2pT_2l2jsel  [pr]->Write();
-    h1_mjj_2l2jsel   [pr]->Write();
-    h1_mll_2l2jsel   [pr]->Write();
+    h1_mjj_2l2jsel         [pr]->Write();
+    h1_mll_2l2jsel         [pr]->Write();
+    h1_j1btag_2l2jsel      [pr]->Write();
+    h1_j2btag_2l2jsel      [pr]->Write();
+    h1_j1pT_20_200_2l2jsel [pr]->Write();
+    h1_j2pT_20_200_2l2jsel [pr]->Write();
+    h1_j1pT_20_1200_2l2jsel[pr]->Write();
+    h1_j2pT_20_1200_2l2jsel[pr]->Write();
   }
   fout_1Dhistos->Close();
     
@@ -561,10 +566,10 @@ void doPlots_2l2jsel(){
     "mjj_2l2jsel",
     "j1btag_2l2jsel",
     "j2btag_2l2jsel",
-    "j1pT_20-200_2l2jsel",
-    "j2pT_20-200_2l2jsel",
-    "j1pT_20-1200_2l2jsel",
-    "j2pT_20-1200_2l2jsel",
+    "j1pT_20_200_2l2jsel",
+    "j2pT_20_200_2l2jsel",
+    "j1pT_20_1200_2l2jsel",
+    "j2pT_20_1200_2l2jsel",
   };
   TH1F* h1_2l2jsel[nPlots][nProcesses];
   for(int pl=0; pl<nPlots; pl++){
