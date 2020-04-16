@@ -33,10 +33,10 @@
 #include "TLorentzVector.h"
 
 
-// // includes for btag SF
-// #include "BTagCalibrationStandalone.h"
-// #include "BTagCalibrationStandalone.cpp"
-// #include "evalEventSF.C"
+// includes for btag SF
+#include "BTagCalibrationStandalone.h"
+#include "BTagCalibrationStandalone.cpp"
+#include "evalEventSF.C"
 
 
 #include "CMS_lumi.C"
@@ -121,146 +121,146 @@ void doHistos()
   }
   cout<<endl;
 
-  // // arrays for BTagSF norm
-  // float sum_eventsAfter_2l2jsel[nDatasets];            
-  // float sum_BTagSFAfter_2l2jsel[nDatasets];
-  // for(int i=0; i<nDatasets; i++){
-  //   sum_eventsAfter_2l2jsel[i] = 0.;           
-  //   sum_BTagSFAfter_2l2jsel[i] = 0.;            
-  // }
+  // arrays for BTagSF norm
+  float sum_events[nDatasets];            
+  float sum_BTagSF[nDatasets];
+  for(int i=0; i<nDatasets; i++){
+    sum_events[i] = 0.;           
+    sum_BTagSF[i] = 0.;            
+  }
 
 
 
-  // ///////////// SET UP B-TAG CALIBRATION ///////////////
+  ///////////// SET UP B-TAG CALIBRATION ///////////////
     
-  // // set up calibration + reader
-  // cout << "Loading the .csv file..." << endl;
+  // set up calibration + reader
+  cout << "Loading the .csv file..." << endl;
     
-  // std::string inputCSVfile = "";
-  // if(year==2016)     { inputCSVfile = "../../data/BTagging/DeepCSV_2016LegacySF_V1.csv"; }
-  // else if(year==2017){ inputCSVfile = "../../data/BTagging/DeepCSV_94XSF_V5_B_F.csv"; }
-  // else if(year==2018){ inputCSVfile = "../../data/BTagging/DeepCSV_102XSF_V1.csv"; }
-  // std::string measType            = "iterativefit";
-  // std::string sysType             = "central";
-  // std::string sysTypeJESUp        = "up_jes";
-  // std::string sysTypeJESDown      = "down_jes";
-  // std::string sysTypeHFUp         = "up_hf";
-  // std::string sysTypeHFDown       = "down_hf";
-  // std::string sysTypeLFUp         = "up_lf";
-  // std::string sysTypeLFDown       = "down_lf";
-  // std::string sysTypehfstats1Up   = "up_hfstats1";
-  // std::string sysTypehfstats1Down = "down_hfstats1";
-  // std::string sysTypehfstats2Up   = "up_hfstats2";
-  // std::string sysTypehfstats2Down = "down_hfstats2";
-  // std::string sysTypelfstats1Up   = "up_lfstats1";
-  // std::string sysTypelfstats1Down = "down_lfstats1";
-  // std::string sysTypelfstats2Up   = "up_lfstats2";
-  // std::string sysTypelfstats2Down = "down_lfstats2";
-  // std::string sysTypecfErr1Up     = "up_cferr1";
-  // std::string sysTypecfErr1Down   = "down_cferr1";
-  // std::string sysTypecfErr2Up     = "up_cferr2";
-  // std::string sysTypecfErr2Down   = "down_cferr2";
+  std::string inputCSVfile = "";
+  if(year==2016)     { inputCSVfile = "../../data/BTagging/DeepCSV_2016LegacySF_V1.csv"; }
+  else if(year==2017){ inputCSVfile = "../../data/BTagging/DeepCSV_94XSF_V5_B_F.csv"; }
+  else if(year==2018){ inputCSVfile = "../../data/BTagging/DeepCSV_102XSF_V1.csv"; }
+  std::string measType            = "iterativefit";
+  std::string sysType             = "central";
+  std::string sysTypeJESUp        = "up_jes";
+  std::string sysTypeJESDown      = "down_jes";
+  std::string sysTypeHFUp         = "up_hf";
+  std::string sysTypeHFDown       = "down_hf";
+  std::string sysTypeLFUp         = "up_lf";
+  std::string sysTypeLFDown       = "down_lf";
+  std::string sysTypehfstats1Up   = "up_hfstats1";
+  std::string sysTypehfstats1Down = "down_hfstats1";
+  std::string sysTypehfstats2Up   = "up_hfstats2";
+  std::string sysTypehfstats2Down = "down_hfstats2";
+  std::string sysTypelfstats1Up   = "up_lfstats1";
+  std::string sysTypelfstats1Down = "down_lfstats1";
+  std::string sysTypelfstats2Up   = "up_lfstats2";
+  std::string sysTypelfstats2Down = "down_lfstats2";
+  std::string sysTypecfErr1Up     = "up_cferr1";
+  std::string sysTypecfErr1Down   = "down_cferr1";
+  std::string sysTypecfErr2Up     = "up_cferr2";
+  std::string sysTypecfErr2Down   = "down_cferr2";
     
-  // BTagCalibration calib("csvv2", inputCSVfile);
-  // //nominal
-  // BTagCalibrationReader CSVreader(BTagEntry::OP_RESHAPING, sysType);       
-  // CSVreader.load(calib, BTagEntry::FLAV_B, measType);
-  // CSVreader.load(calib, BTagEntry::FLAV_C, measType);
-  // CSVreader.load(calib, BTagEntry::FLAV_UDSG, measType);
-  // //up_jes shift
-  // BTagCalibrationReader CSVreaderJESUp(BTagEntry::OP_RESHAPING, sysTypeJESUp);       
-  // CSVreaderJESUp.load(calib, BTagEntry::FLAV_B, measType);
-  // CSVreaderJESUp.load(calib, BTagEntry::FLAV_C, measType);
-  // CSVreaderJESUp.load(calib, BTagEntry::FLAV_UDSG, measType);
-  // //down_jes shift
-  // BTagCalibrationReader CSVreaderJESDown(BTagEntry::OP_RESHAPING, sysTypeJESDown);       
-  // CSVreaderJESDown.load(calib, BTagEntry::FLAV_B, measType);
-  // CSVreaderJESDown.load(calib, BTagEntry::FLAV_C, measType);
-  // CSVreaderJESDown.load(calib, BTagEntry::FLAV_UDSG, measType);
-  // //up_hf shift
-  // BTagCalibrationReader CSVreaderHFUp(BTagEntry::OP_RESHAPING, sysTypeHFUp);       
-  // CSVreaderHFUp.load(calib, BTagEntry::FLAV_B, measType);
-  // CSVreaderHFUp.load(calib, BTagEntry::FLAV_C, measType);
-  // CSVreaderHFUp.load(calib, BTagEntry::FLAV_UDSG, measType);
-  // //down_hf shift
-  // BTagCalibrationReader CSVreaderHFDown(BTagEntry::OP_RESHAPING, sysTypeHFDown);       
-  // CSVreaderHFDown.load(calib, BTagEntry::FLAV_B, measType);
-  // CSVreaderHFDown.load(calib, BTagEntry::FLAV_C, measType);
-  // CSVreaderHFDown.load(calib, BTagEntry::FLAV_UDSG, measType);
-  // //up_lf shift
-  // BTagCalibrationReader CSVreaderLFUp(BTagEntry::OP_RESHAPING, sysTypeLFUp);       
-  // CSVreaderLFUp.load(calib, BTagEntry::FLAV_B, measType);
-  // CSVreaderLFUp.load(calib, BTagEntry::FLAV_C, measType);
-  // CSVreaderLFUp.load(calib, BTagEntry::FLAV_UDSG, measType);
-  // //down_lf shift
-  // BTagCalibrationReader CSVreaderLFDown(BTagEntry::OP_RESHAPING, sysTypeLFDown);       
-  // CSVreaderLFDown.load(calib, BTagEntry::FLAV_B, measType);
-  // CSVreaderLFDown.load(calib, BTagEntry::FLAV_C, measType);
-  // CSVreaderLFDown.load(calib, BTagEntry::FLAV_UDSG, measType);
-  // //up_hfstats1 shift
-  // BTagCalibrationReader CSVreaderhfstats1Up(BTagEntry::OP_RESHAPING, sysTypehfstats1Up);       
-  // CSVreaderhfstats1Up.load(calib, BTagEntry::FLAV_B, measType);
-  // CSVreaderhfstats1Up.load(calib, BTagEntry::FLAV_C, measType);
-  // CSVreaderhfstats1Up.load(calib, BTagEntry::FLAV_UDSG, measType);
-  // //down_hfstats1 shift
-  // BTagCalibrationReader CSVreaderhfstats1Down(BTagEntry::OP_RESHAPING, sysTypehfstats1Down);       
-  // CSVreaderhfstats1Down.load(calib, BTagEntry::FLAV_B, measType);
-  // CSVreaderhfstats1Down.load(calib, BTagEntry::FLAV_C, measType);
-  // CSVreaderhfstats1Down.load(calib, BTagEntry::FLAV_UDSG, measType);
-  // //up_lfstats2 shift
-  // BTagCalibrationReader CSVreaderhfstats2Up(BTagEntry::OP_RESHAPING, sysTypehfstats2Up);       
-  // CSVreaderhfstats2Up.load(calib, BTagEntry::FLAV_B, measType);
-  // CSVreaderhfstats2Up.load(calib, BTagEntry::FLAV_C, measType);
-  // CSVreaderhfstats2Up.load(calib, BTagEntry::FLAV_UDSG, measType);
-  // //down_lfstats2 shift
-  // BTagCalibrationReader CSVreaderhfstats2Down(BTagEntry::OP_RESHAPING, sysTypehfstats2Down);       
-  // CSVreaderhfstats2Down.load(calib, BTagEntry::FLAV_B, measType);
-  // CSVreaderhfstats2Down.load(calib, BTagEntry::FLAV_C, measType);
-  // CSVreaderhfstats2Down.load(calib, BTagEntry::FLAV_UDSG, measType);
-  // //up_lfstats1 shift
-  // BTagCalibrationReader CSVreaderlfstats1Up(BTagEntry::OP_RESHAPING, sysTypelfstats1Up);       
-  // CSVreaderlfstats1Up.load(calib, BTagEntry::FLAV_B, measType);
-  // CSVreaderlfstats1Up.load(calib, BTagEntry::FLAV_C, measType);
-  // CSVreaderlfstats1Up.load(calib, BTagEntry::FLAV_UDSG, measType);
-  // //down_lfstats1 shift
-  // BTagCalibrationReader CSVreaderlfstats1Down(BTagEntry::OP_RESHAPING, sysTypelfstats1Down);       
-  // CSVreaderlfstats1Down.load(calib, BTagEntry::FLAV_B, measType);
-  // CSVreaderlfstats1Down.load(calib, BTagEntry::FLAV_C, measType);
-  // CSVreaderlfstats1Down.load(calib, BTagEntry::FLAV_UDSG, measType);
-  // //up_lfstats2 shift
-  // BTagCalibrationReader CSVreaderlfstats2Up(BTagEntry::OP_RESHAPING, sysTypelfstats2Up);       
-  // CSVreaderlfstats2Up.load(calib, BTagEntry::FLAV_B, measType);
-  // CSVreaderlfstats2Up.load(calib, BTagEntry::FLAV_C, measType);
-  // CSVreaderlfstats2Up.load(calib, BTagEntry::FLAV_UDSG, measType);
-  // //down_lfstats2 shift
-  // BTagCalibrationReader CSVreaderlfstats2Down(BTagEntry::OP_RESHAPING, sysTypelfstats2Down);       
-  // CSVreaderlfstats2Down.load(calib, BTagEntry::FLAV_B, measType);
-  // CSVreaderlfstats2Down.load(calib, BTagEntry::FLAV_C, measType);
-  // CSVreaderlfstats2Down.load(calib, BTagEntry::FLAV_UDSG, measType);
-  // //up_cferr1 shift
-  // BTagCalibrationReader CSVreadercfErr1Up(BTagEntry::OP_RESHAPING, sysTypecfErr1Up);       
-  // CSVreadercfErr1Up.load(calib, BTagEntry::FLAV_B, measType);
-  // CSVreadercfErr1Up.load(calib, BTagEntry::FLAV_C, measType);
-  // CSVreadercfErr1Up.load(calib, BTagEntry::FLAV_UDSG, measType);
-  // //down_cferr1 shift
-  // BTagCalibrationReader CSVreadercfErr1Down(BTagEntry::OP_RESHAPING, sysTypecfErr1Down);       
-  // CSVreadercfErr1Down.load(calib, BTagEntry::FLAV_B, measType);
-  // CSVreadercfErr1Down.load(calib, BTagEntry::FLAV_C, measType);
-  // CSVreadercfErr1Down.load(calib, BTagEntry::FLAV_UDSG, measType);
-  // //up_cferr2 shift
-  // BTagCalibrationReader CSVreadercfErr2Up(BTagEntry::OP_RESHAPING, sysTypecfErr2Up);       
-  // CSVreadercfErr2Up.load(calib, BTagEntry::FLAV_B, measType);
-  // CSVreadercfErr2Up.load(calib, BTagEntry::FLAV_C, measType);
-  // CSVreadercfErr2Up.load(calib, BTagEntry::FLAV_UDSG, measType);
-  // //down_cferr2 shift
-  // BTagCalibrationReader CSVreadercfErr2Down(BTagEntry::OP_RESHAPING, sysTypecfErr2Down);       
-  // CSVreadercfErr2Down.load(calib, BTagEntry::FLAV_B, measType);
-  // CSVreadercfErr2Down.load(calib, BTagEntry::FLAV_C, measType);
-  // CSVreadercfErr2Down.load(calib, BTagEntry::FLAV_UDSG, measType);
+  BTagCalibration calib("csvv2", inputCSVfile);
+  //nominal
+  BTagCalibrationReader CSVreader(BTagEntry::OP_RESHAPING, sysType);       
+  CSVreader.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreader.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreader.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //up_jes shift
+  BTagCalibrationReader CSVreaderJESUp(BTagEntry::OP_RESHAPING, sysTypeJESUp);       
+  CSVreaderJESUp.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderJESUp.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderJESUp.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //down_jes shift
+  BTagCalibrationReader CSVreaderJESDown(BTagEntry::OP_RESHAPING, sysTypeJESDown);       
+  CSVreaderJESDown.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderJESDown.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderJESDown.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //up_hf shift
+  BTagCalibrationReader CSVreaderHFUp(BTagEntry::OP_RESHAPING, sysTypeHFUp);       
+  CSVreaderHFUp.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderHFUp.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderHFUp.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //down_hf shift
+  BTagCalibrationReader CSVreaderHFDown(BTagEntry::OP_RESHAPING, sysTypeHFDown);       
+  CSVreaderHFDown.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderHFDown.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderHFDown.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //up_lf shift
+  BTagCalibrationReader CSVreaderLFUp(BTagEntry::OP_RESHAPING, sysTypeLFUp);       
+  CSVreaderLFUp.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderLFUp.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderLFUp.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //down_lf shift
+  BTagCalibrationReader CSVreaderLFDown(BTagEntry::OP_RESHAPING, sysTypeLFDown);       
+  CSVreaderLFDown.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderLFDown.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderLFDown.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //up_hfstats1 shift
+  BTagCalibrationReader CSVreaderhfstats1Up(BTagEntry::OP_RESHAPING, sysTypehfstats1Up);       
+  CSVreaderhfstats1Up.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderhfstats1Up.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderhfstats1Up.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //down_hfstats1 shift
+  BTagCalibrationReader CSVreaderhfstats1Down(BTagEntry::OP_RESHAPING, sysTypehfstats1Down);       
+  CSVreaderhfstats1Down.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderhfstats1Down.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderhfstats1Down.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //up_lfstats2 shift
+  BTagCalibrationReader CSVreaderhfstats2Up(BTagEntry::OP_RESHAPING, sysTypehfstats2Up);       
+  CSVreaderhfstats2Up.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderhfstats2Up.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderhfstats2Up.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //down_lfstats2 shift
+  BTagCalibrationReader CSVreaderhfstats2Down(BTagEntry::OP_RESHAPING, sysTypehfstats2Down);       
+  CSVreaderhfstats2Down.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderhfstats2Down.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderhfstats2Down.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //up_lfstats1 shift
+  BTagCalibrationReader CSVreaderlfstats1Up(BTagEntry::OP_RESHAPING, sysTypelfstats1Up);       
+  CSVreaderlfstats1Up.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderlfstats1Up.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderlfstats1Up.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //down_lfstats1 shift
+  BTagCalibrationReader CSVreaderlfstats1Down(BTagEntry::OP_RESHAPING, sysTypelfstats1Down);       
+  CSVreaderlfstats1Down.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderlfstats1Down.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderlfstats1Down.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //up_lfstats2 shift
+  BTagCalibrationReader CSVreaderlfstats2Up(BTagEntry::OP_RESHAPING, sysTypelfstats2Up);       
+  CSVreaderlfstats2Up.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderlfstats2Up.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderlfstats2Up.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //down_lfstats2 shift
+  BTagCalibrationReader CSVreaderlfstats2Down(BTagEntry::OP_RESHAPING, sysTypelfstats2Down);       
+  CSVreaderlfstats2Down.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreaderlfstats2Down.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreaderlfstats2Down.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //up_cferr1 shift
+  BTagCalibrationReader CSVreadercfErr1Up(BTagEntry::OP_RESHAPING, sysTypecfErr1Up);       
+  CSVreadercfErr1Up.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreadercfErr1Up.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreadercfErr1Up.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //down_cferr1 shift
+  BTagCalibrationReader CSVreadercfErr1Down(BTagEntry::OP_RESHAPING, sysTypecfErr1Down);       
+  CSVreadercfErr1Down.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreadercfErr1Down.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreadercfErr1Down.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //up_cferr2 shift
+  BTagCalibrationReader CSVreadercfErr2Up(BTagEntry::OP_RESHAPING, sysTypecfErr2Up);       
+  CSVreadercfErr2Up.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreadercfErr2Up.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreadercfErr2Up.load(calib, BTagEntry::FLAV_UDSG, measType);
+  //down_cferr2 shift
+  BTagCalibrationReader CSVreadercfErr2Down(BTagEntry::OP_RESHAPING, sysTypecfErr2Down);       
+  CSVreadercfErr2Down.load(calib, BTagEntry::FLAV_B, measType);
+  CSVreadercfErr2Down.load(calib, BTagEntry::FLAV_C, measType);
+  CSVreadercfErr2Down.load(calib, BTagEntry::FLAV_UDSG, measType);
     
-  // cout << "Input CSV weight file = " << inputCSVfile << "; measurementType = " << measType << ";" << endl;
+  cout << "Input CSV weight file = " << inputCSVfile << "; measurementType = " << measType << ";" << endl;
 
-  // ///////////////////////////
+  ///////////////////////////
 
 
 
@@ -269,7 +269,6 @@ void doHistos()
   TFile* inputFile[nDatasets];
   TTree* inputTree[nDatasets];
   TH1F* hCounters[nDatasets];
-  Long64_t NGenEvt[nDatasets];
   Float_t gen_sumWeights[nDatasets];
   Float_t partialSampleWeight[nDatasets];
   Float_t weight; //ZX weight
@@ -295,29 +294,35 @@ void doHistos()
 
   // define 1D histos
   // 2l2jsel
-  TH1F* h1_mll_2l2jsel   [nProcesses];
-  TH1F* h1_mjj_2l2jsel   [nProcesses];
-  TH1F* h1_j1btag_2l2jsel[nProcesses];
-  TH1F* h1_j2btag_2l2jsel[nProcesses];
-  TH1F* h1_j1pT_2l2jsel  [nProcesses];
-  TH1F* h1_j2pT_2l2jsel  [nProcesses];
+  TH1F* h1_mll_2l2jsel         [nProcesses];
+  TH1F* h1_mjj_2l2jsel         [nProcesses];
+  TH1F* h1_j1btag_2l2jsel      [nProcesses];
+  TH1F* h1_j2btag_2l2jsel      [nProcesses];
+  TH1F* h1_j1pT_20-200_2l2jsel [nProcesses];
+  TH1F* h1_j2pT_20-200_2l2jsel [nProcesses];
+  TH1F* h1_j1pT_20-1200_2l2jsel[nProcesses];
+  TH1F* h1_j2pT_20-1200_2l2jsel[nProcesses];
 
 
   
   for(int pr=0; pr<nProcesses; pr++){
 
-    h1_mll_2l2jsel   [pr] = new TH1F("h1_mll_2l2jsel_"+sProcess[pr]+"_"+sYear,";m_{ll}; Events/1 GeV", 60, 60., 120.);
-    h1_mll_2l2jsel   [pr]->Sumw2(true);
-    h1_mjj_2l2jsel   [pr] = new TH1F("h1_mjj_2l2jsel_"+sProcess[pr]+"_"+sYear,";m_{jj} (GeV); Events/5 GeV", 40, 0., 200.); 
-    h1_mjj_2l2jsel   [pr]->Sumw2(true);
-    h1_j1btag_2l2jsel[pr] = new TH1F("h1_j1btag_2l2jsel_"+sProcess[pr]+"_"+sYear,";j1 DeepCSV; Events/0.04", 25, 0., 1.);
-    h1_j1btag_2l2jsel[pr]->Sumw2(true);
-    h1_j2btag_2l2jsel[pr] = new TH1F("h1_j2btag_2l2jsel_"+sProcess[pr]+"_"+sYear,";j2 DeepCSV; Events/0.04", 25, 0., 1.);
-    h1_j2btag_2l2jsel[pr]->Sumw2(true);
-    h1_j1pT_2l2jsel  [pr] = new TH1F("h1_j1pT_2l2jsel_"+sProcess[pr]+"_"+sYear,";j1 pT(GeV); Events/5 GeV", 36, 20., 200.);
-    h1_j1pT_2l2jsel  [pr]->Sumw2(true);
-    h1_j2pT_2l2jsel  [pr] = new TH1F("h1_j2pT_2l2jsel_"+sProcess[pr]+"_"+sYear,";j2 pT(GeV); Events/5 GeV", 36, 20., 200.);
-    h1_j2pT_2l2jsel  [pr]->Sumw2(true);
+    h1_mll_2l2jsel         [pr] = new TH1F("h1_mll_2l2jsel_"+sProcess[pr]+"_"+sYear,";m_{ll}; Events/1 GeV", 60, 60., 120.);
+    h1_mll_2l2jsel         [pr]->Sumw2(true);
+    h1_mjj_2l2jsel         [pr] = new TH1F("h1_mjj_2l2jsel_"+sProcess[pr]+"_"+sYear,";m_{jj} (GeV); Events/5 GeV", 40, 0., 200.); 
+    h1_mjj_2l2jsel         [pr]->Sumw2(true);
+    h1_j1btag_2l2jsel      [pr] = new TH1F("h1_j1btag_2l2jsel_"+sProcess[pr]+"_"+sYear,";j1 DeepCSV; Events/0.04", 25, 0., 1.);
+    h1_j1btag_2l2jsel      [pr]->Sumw2(true);
+    h1_j2btag_2l2jsel      [pr] = new TH1F("h1_j2btag_2l2jsel_"+sProcess[pr]+"_"+sYear,";j2 DeepCSV; Events/0.04", 25, 0., 1.);
+    h1_j2btag_2l2jsel      [pr]->Sumw2(true);
+    h1_j1pT_20-200_2l2jsel [pr] = new TH1F("h1_j1pT_20-200_2l2jsel_"+sProcess[pr]+"_"+sYear,";j1 pT(GeV); Events/5 GeV", 36, 20., 200.);
+    h1_j1pT_20-200_2l2jsel [pr]->Sumw2(true);
+    h1_j2pT_20-200_2l2jsel [pr] = new TH1F("h1_j2pT_20-200_2l2jsel_"+sProcess[pr]+"_"+sYear,";j2 pT(GeV); Events/5 GeV", 36, 20., 200.);
+    h1_j2pT_20-200_2l2jsel [pr]->Sumw2(true);
+    h1_j1pT_20-1200_2l2jsel[pr] = new TH1F("h1_j1pT_20-1200_2l2jsel_"+sProcess[pr]+"_"+sYear,";j1 pT(GeV); Events/10 GeV", 118, 20., 1200.);
+    h1_j1pT_20-1200_2l2jsel[pr]->Sumw2(true);
+    h1_j2pT_20-1200_2l2jsel[pr] = new TH1F("h1_j2pT_20-1200_2l2jsel_"+sProcess[pr]+"_"+sYear,";j2 pT(GeV); Events/10 GeV", 118, 20., 1200.);
+    h1_j2pT_20-1200_2l2jsel[pr]->Sumw2(true);
   }
 
   
@@ -349,9 +354,8 @@ void doHistos()
     inputFile[d] = TFile::Open(inputFileName);
 
 
-    hCounters[d] = (TH1F*)inputFile[d]->Get("ZZTree/Counters");
-    NGenEvt[d] = (Long64_t)hCounters[d]->GetBinContent(1);
-    gen_sumWeights[d] = (Long64_t)hCounters[d]->GetBinContent(40);
+    hCounters[d] = (TH1F*)inputFile[d]->Get("ZTree/Counters");
+    gen_sumWeights[d] = (Long64_t)hCounters[d]->GetBinContent(1);
     partialSampleWeight[d] = lumi * 1000 / gen_sumWeights[d];
     inputTree[d] = (TTree*)inputFile[d]->Get("ZTree/candTree");
 
@@ -377,45 +381,45 @@ void doHistos()
     inputTree[d]->SetBranchAddress("JetHadronFlavour",  &JetHadronFlavour);
 
 
-    // // --------------------------------------------------------
-    // // --- first loop over input tree to get norm for BtagSF
-    // Long64_t entries1 = inputTree[d]->GetEntries();    
-    // cout<<"First loop over input files to get norm for BTagSF ..."<<endl;
-    // cout<<"Processing file: "<< datasets[d] << " (" << entries1 <<" entries) ..."<< endl;    
-    // for(Long64_t z=0; z<entries1; z++){
+    // --------------------------------------------------------
+    // --- first loop over input tree to get norm for BtagSF
+    Long64_t entries1 = inputTree[d]->GetEntries();    
+    cout<<"First loop over input files to get norm for BTagSF ..."<<endl;
+    cout<<"Processing file: "<< datasets[d] << " (" << entries1 <<" entries) ..."<< endl;    
+    for(Long64_t z=0; z<entries1; z++){
 
-    //   inputTree[d]->GetEntry(z);
+      inputTree[d]->GetEntry(z);
   
-    //   if( Zsel < 0 ) continue;
+      if( Zsel < 0 ) continue;
 
 
-    //   if(datasets[d] == "AllData"){
-    //     sum_eventsAfter_2l2jsel[d] = 1.;      
-    // 	sum_BTagSFAfter_2l2jsel[d] = 1.;
-    //   }
-    //   else{
+      if(datasets[d] == "AllData"){
+        sum_events[d] = 1.;
+    	sum_BTagSF[d] = 1.;
+      }
+      else{
 
-    //     // compute SF
-    //     double * scaleFactors;
-    //     scaleFactors = evalEventSF( int(JetPt->size()), JetHadronFlavour, JetEta, JetPt, JetBTagger, CSVreader, CSVreaderJESUp, CSVreaderJESDown, CSVreaderHFUp, CSVreaderHFDown, CSVreaderLFUp, CSVreaderLFDown, CSVreaderhfstats1Up, CSVreaderhfstats1Down, CSVreaderhfstats2Up, CSVreaderhfstats2Down, CSVreaderlfstats1Up, CSVreaderlfstats1Down, CSVreaderlfstats2Up, CSVreaderlfstats2Down, CSVreadercfErr1Up, CSVreadercfErr1Down, CSVreadercfErr2Up, CSVreadercfErr2Down );
+        // compute SF
+        double * scaleFactors;
+        scaleFactors = evalEventSF( int(JetPt->size()), JetHadronFlavour, JetEta, JetPt, JetBTagger, CSVreader, CSVreaderJESUp, CSVreaderJESDown, CSVreaderHFUp, CSVreaderHFDown, CSVreaderLFUp, CSVreaderLFDown, CSVreaderhfstats1Up, CSVreaderhfstats1Down, CSVreaderhfstats2Up, CSVreaderhfstats2Down, CSVreaderlfstats1Up, CSVreaderlfstats1Down, CSVreaderlfstats2Up, CSVreaderlfstats2Down, CSVreadercfErr1Up, CSVreadercfErr1Down, CSVreadercfErr2Up, CSVreadercfErr2Down );
 
-    //     // total counters for BTagSF norm --- 2l2jsel
-    //     sum_eventsAfter_2l2jsel[d] += 1.; 
-    //     sum_BTagSFAfter_2l2jsel[d] += scaleFactors[0]; 
+        // total counters for BTagSF norm --- 2l2jsel
+        sum_events[d] += 1.; 
+        sum_BTagSF[d] += scaleFactors[0]; 
 
-    //   }// end else
+      }// end else
     
-    // } // end first loop over entries 
+    } // end first loop over entries 
 
-    // cout<<datasets[d]<<" "<<sum_eventsAfter_2l2jsel[d]<<" "<<sum_BTagSFAfter_2l2jsel[d]<<endl;
+    cout<<datasets[d]<<" "<<sum_events[d]<<" "<<sum_BTagSF[d]<<endl;
 
-    // // --- control for norm
-    // if( sum_eventsAfter_2l2jsel[d] == 0. || std::isnan(sum_eventsAfter_2l2jsel[d]) ){ sum_eventsAfter_2l2jsel[d] = 1.; }
-    // if( sum_BTagSFAfter_2l2jsel[d] == 0. || std::isnan(sum_BTagSFAfter_2l2jsel[d]) ){ sum_BTagSFAfter_2l2jsel[d] = 1.; }
+    // --- control for norm
+    if( sum_events[d] == 0. || std::isnan(sum_events[d]) ){ sum_events[d] = 1.; }
+    if( sum_BTagSF[d] == 0. || std::isnan(sum_BTagSF[d]) ){ sum_BTagSF[d] = 1.; }
 
  
-    // cout<<datasets[d]<<" "<<sum_eventsAfter_2l2jsel[d]<<" "<<sum_BTagSFAfter_2l2jsel[d]<<endl;
-    // // --------------------------------------------------------
+    cout<<datasets[d]<<" "<<sum_events[d]<<" "<<sum_BTagSF[d]<<endl;
+    // --------------------------------------------------------
 
 
     // --- second loop over input tree to do all the rest
@@ -430,15 +434,15 @@ void doHistos()
       if( Zsel < 0 ) continue;
 
       
-      // // compute SF
-      // double * scaleFactors;
-      // if(currentProcess != Data){
-      //   scaleFactors = evalEventSF( int(JetPt->size()), JetHadronFlavour, JetEta, JetPt, JetBTagger, CSVreader, CSVreaderJESUp, CSVreaderJESDown, CSVreaderHFUp, CSVreaderHFDown, CSVreaderLFUp, CSVreaderLFDown, CSVreaderhfstats1Up, CSVreaderhfstats1Down, CSVreaderhfstats2Up, CSVreaderhfstats2Down, CSVreaderlfstats1Up, CSVreaderlfstats1Down, CSVreaderlfstats2Up, CSVreaderlfstats2Down, CSVreadercfErr1Up, CSVreadercfErr1Down, CSVreadercfErr2Up, CSVreadercfErr2Down );
-      // }
+      // compute SF
+      double * scaleFactors;
+      if(currentProcess != Data){
+        scaleFactors = evalEventSF( int(JetPt->size()), JetHadronFlavour, JetEta, JetPt, JetBTagger, CSVreader, CSVreaderJESUp, CSVreaderJESDown, CSVreaderHFUp, CSVreaderHFDown, CSVreaderLFUp, CSVreaderLFDown, CSVreaderhfstats1Up, CSVreaderhfstats1Down, CSVreaderhfstats2Up, CSVreaderhfstats2Down, CSVreaderlfstats1Up, CSVreaderlfstats1Down, CSVreaderlfstats2Up, CSVreaderlfstats2Down, CSVreadercfErr1Up, CSVreadercfErr1Down, CSVreadercfErr2Up, CSVreadercfErr2Down );
+      }
 
       // --- event weights
       Double_t eventWeight = 1.;
-      if(currentProcess != Data) eventWeight = partialSampleWeight[d] *xsec *overallEventWeight *L1prefiringWeight;// *scaleFactors[0];
+      if(currentProcess != Data) eventWeight = partialSampleWeight[d] *xsec *overallEventWeight *L1prefiringWeight *scaleFactors[0] *sum_events[d] /sum_BTagSF[d];
 
       
       //JETSELECTION--------------------------------------------------  
@@ -475,12 +479,12 @@ void doHistos()
 
       
       // --- fill histos
-      h1_j1btag_2l2jsel[currentProcess]->Fill(JetBTagger->at(dj1_), eventWeight);  //*sum_eventsAfter_2l2jsel[d]/sum_BTagSFAfter_2l2jsel[d]
-      h1_j2btag_2l2jsel[currentProcess]->Fill(JetBTagger->at(dj2_), eventWeight);  //*sum_eventsAfter_2l2jsel[d]/sum_BTagSFAfter_2l2jsel[d]
-      h1_j1pT_2l2jsel  [currentProcess]->Fill(JetPt->at(dj1_),      eventWeight);  //*sum_eventsAfter_2l2jsel[d]/sum_BTagSFAfter_2l2jsel[d] 
-      h1_j2pT_2l2jsel  [currentProcess]->Fill(JetPt->at(dj2_),      eventWeight);  //*sum_eventsAfter_2l2jsel[d]/sum_BTagSFAfter_2l2jsel[d]
-      h1_mjj_2l2jsel   [currentProcess]->Fill(bbMass,               eventWeight);  //*sum_eventsAfter_2l2jsel[d]/sum_BTagSFAfter_2l2jsel[d]
-      h1_mll_2l2jsel   [currentProcess]->Fill(ZMass,                eventWeight);  //*sum_eventsAfter_2l2jsel[d]/sum_BTagSFAfter_2l2jsel[d]
+      h1_j1btag_2l2jsel[currentProcess]->Fill(JetBTagger->at(dj1_), eventWeight);
+      h1_j2btag_2l2jsel[currentProcess]->Fill(JetBTagger->at(dj2_), eventWeight);
+      h1_j1pT_2l2jsel  [currentProcess]->Fill(JetPt->at(dj1_),      eventWeight); 
+      h1_j2pT_2l2jsel  [currentProcess]->Fill(JetPt->at(dj2_),      eventWeight);
+      h1_mjj_2l2jsel   [currentProcess]->Fill(bbMass,               eventWeight);
+      h1_mll_2l2jsel   [currentProcess]->Fill(ZMass,                eventWeight);
     
 
 
@@ -557,8 +561,10 @@ void doPlots_2l2jsel(){
     "mjj_2l2jsel",
     "j1btag_2l2jsel",
     "j2btag_2l2jsel",
-    "j1pT_2l2jsel",
-    "j2pT_2l2jsel",
+    "j1pT_20-200_2l2jsel",
+    "j2pT_20-200_2l2jsel",
+    "j1pT_20-1200_2l2jsel",
+    "j2pT_20-1200_2l2jsel",
   };
   TH1F* h1_2l2jsel[nPlots][nProcesses];
   for(int pl=0; pl<nPlots; pl++){
