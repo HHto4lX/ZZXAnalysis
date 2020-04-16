@@ -145,15 +145,11 @@ void doHistos()
   cout<<endl;
 
   // arrays for BTagSF norm
-  float sum_eventsAfter_4lsel[nDatasets];            
-  float sum_BTagSFAfter_4lsel[nDatasets];
-  float sum_eventsAfter_4lsel_sidebands[nDatasets];            
-  float sum_BTagSFAfter_4lsel_sidebands[nDatasets];            
+  float sum_events[nDatasets];            
+  float sum_BTagSF[nDatasets];
   for(int i=0; i<nDatasets; i++){
-    sum_eventsAfter_4lsel[i] = 0.;           
-    sum_BTagSFAfter_4lsel[i] = 0.;           
-    sum_eventsAfter_4lsel_sidebands[i] = 0.;            
-    sum_BTagSFAfter_4lsel_sidebands[i] = 0.;            
+    sum_events[i] = 0.;           
+    sum_BTagSF[i] = 0.;
   }
 
 
@@ -296,7 +292,6 @@ void doHistos()
   TFile* inputFile[nDatasets];
   TTree* inputTree[nDatasets];
   TH1F* hCounters[nDatasets];
-  Long64_t NGenEvt[nDatasets];
   Float_t gen_sumWeights[nDatasets];
   Float_t partialSampleWeight[nDatasets];
   Float_t weight; //ZX weight
@@ -399,14 +394,12 @@ void doHistos()
 
     if(currentProcess == ZXbkg){
       hCounters[d] = 0;
-      NGenEvt[d] = 0;
       gen_sumWeights[d] = 0.;
       partialSampleWeight[d] = 0;
       inputTree[d] = (TTree*)inputFile[d]->Get("candTree");
     }
     else{
       hCounters[d] = (TH1F*)inputFile[d]->Get("ZZTree/Counters");
-      NGenEvt[d] = (Long64_t)hCounters[d]->GetBinContent(1);
       gen_sumWeights[d] = (Long64_t)hCounters[d]->GetBinContent(40);
       partialSampleWeight[d] = lumi * 1000 / gen_sumWeights[d];
       inputTree[d] = (TTree*)inputFile[d]->Get("ZZTree/candTree");
@@ -471,10 +464,8 @@ void doHistos()
 
 
       if(datasets[d] == "AllData" || datasets[d] == "ZXbkg_4lsel"){
-        sum_eventsAfter_4lsel[d]             = 1.;      
-	sum_BTagSFAfter_4lsel[d]             = 1.;
-        sum_eventsAfter_4lsel_sidebands[d]   = 1.; 
-        sum_BTagSFAfter_4lsel_sidebands[d]   = 1.; 
+        sum_events[d] = 1.;
+        sum_BTagSF[d] = 1.;
       }
       else{
 
@@ -483,29 +474,20 @@ void doHistos()
         scaleFactors = evalEventSF( int(JetPt->size()), JetHadronFlavour, JetEta, JetPt, JetBTagger, CSVreader, CSVreaderJESUp, CSVreaderJESDown, CSVreaderHFUp, CSVreaderHFDown, CSVreaderLFUp, CSVreaderLFDown, CSVreaderhfstats1Up, CSVreaderhfstats1Down, CSVreaderhfstats2Up, CSVreaderhfstats2Down, CSVreaderlfstats1Up, CSVreaderlfstats1Down, CSVreaderlfstats2Up, CSVreaderlfstats2Down, CSVreadercfErr1Up, CSVreadercfErr1Down, CSVreadercfErr2Up, CSVreadercfErr2Down );
 
         // total counters for BTagSF norm --- 4lsel
-        sum_eventsAfter_4lsel[d] += 1.; 
-        sum_BTagSFAfter_4lsel[d] += scaleFactors[0]; 
-
-        // total counters for BTagSF norm --- 4lsel sidebands
-        if(ZZMass < 115 || ZZMass > 135){
-          sum_eventsAfter_4lsel_sidebands[d] += 1.; 
-          sum_BTagSFAfter_4lsel_sidebands[d] += scaleFactors[0];
-        }
+        sum_events[d] += 1.; 
+        sum_BTagSF[d] += scaleFactors[0]; 
 
       }// end else
     
     } // end first loop over entries 
 
-    cout<<datasets[d]<<" "<<sum_eventsAfter_4lsel[d]<<" "<<sum_BTagSFAfter_4lsel[d]<<" "<<sum_eventsAfter_4lsel_sidebands[d]<<" "<<sum_BTagSFAfter_4lsel_sidebands[d]<<endl;
+    cout<<datasets[d]<<" "<<sum_events[d]<<" "<<sum_BTagSF[d]<<endl;
 
     // --- control for norm
-    if( sum_eventsAfter_4lsel[d] == 0. || std::isnan(sum_eventsAfter_4lsel[d]) ){ sum_eventsAfter_4lsel[d] = 1.; }
-    if( sum_BTagSFAfter_4lsel[d] == 0. || std::isnan(sum_BTagSFAfter_4lsel[d]) ){ sum_BTagSFAfter_4lsel[d] = 1.; }
-    if( sum_eventsAfter_4lsel_sidebands[d] == 0. || std::isnan(sum_eventsAfter_4lsel_sidebands[d]) ){ sum_eventsAfter_4lsel_sidebands[d] = 1.; }
-    if( sum_BTagSFAfter_4lsel_sidebands[d] == 0. || std::isnan(sum_BTagSFAfter_4lsel_sidebands[d]) ){ sum_BTagSFAfter_4lsel_sidebands[d] = 1.; }
-
+    if( sum_events[d] == 0. || std::isnan(sum_events[d]) ){ sum_events[d] = 1.; }
+    if( sum_BTagSF[d] == 0. || std::isnan(sum_BTagSF[d]) ){ sum_BTagSF[d] = 1.; }
  
-    cout<<datasets[d]<<" "<<sum_eventsAfter_4lsel[d]<<" "<<sum_BTagSFAfter_4lsel[d]<<" "<<sum_eventsAfter_4lsel_sidebands[d]<<" "<<sum_BTagSFAfter_4lsel_sidebands[d]<<endl;
+    cout<<datasets[d]<<" "<<sum_events[d]<<" "<<sum_BTagSF[d]<<endl;
     // --------------------------------------------------------
 
 
@@ -540,7 +522,9 @@ void doHistos()
 
       // --- event weights
       Double_t eventWeight = 1.;
-      if(currentProcess != Data && currentProcess != ZXbkg) eventWeight = partialSampleWeight[d] *xsec *kfactor *overallEventWeight *L1prefiringWeight *scaleFactors[0];
+      if(currentProcess != Data && currentProcess != ZXbkg){
+        eventWeight = partialSampleWeight[d] *xsec *kfactor *overallEventWeight *L1prefiringWeight *scaleFactors[0] *sum_events[d]/sum_BTagSF[d];
+      }
       if(currentProcess == ZXbkg) eventWeight = weight; //ZX weight
 
 
@@ -578,12 +562,12 @@ void doHistos()
 
 
       // --- fill histos 4l sel
-      h1_m4l_4lsel[currentProcess][currentFinalState]->Fill(ZZMass, eventWeight *sum_eventsAfter_4lsel[d]/sum_BTagSFAfter_4lsel[d]);
+      h1_m4l_4lsel[currentProcess][currentFinalState]->Fill(ZZMass, eventWeight);
       // (in 4l sidebands)
       if(ZZMass<115 || ZZMass>135){ 
-        h1_MET_4lsel_sidebands[currentProcess][currentFinalState]->Fill(PFMET, eventWeight *sum_eventsAfter_4lsel_sidebands[d]/sum_BTagSFAfter_4lsel_sidebands[d]);
+        h1_MET_4lsel_sidebands[currentProcess][currentFinalState]->Fill(PFMET, eventWeight);
         for(int i=0; i<LepPt->size(); i++){
-          h1_pT4l_4lsel_sidebands[currentProcess][currentFinalState]->Fill(LepPt->at(i), eventWeight *sum_eventsAfter_4lsel_sidebands[d]/sum_BTagSFAfter_4lsel_sidebands[d]);
+          h1_pT4l_4lsel_sidebands[currentProcess][currentFinalState]->Fill(LepPt->at(i), eventWeight);
         }
       }
 
