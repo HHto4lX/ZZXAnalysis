@@ -383,21 +383,19 @@ void doHistos()
 
     // --------------------------------------------------------
     // --- first loop over input tree to get norm for BtagSF
-    Long64_t entries1 = inputTree[d]->GetEntries();    
     cout<<"First loop over input files to get norm for BTagSF ..."<<endl;
-    cout<<"Processing file: "<< datasets[d] << " (" << entries1 <<" entries) ..."<< endl;    
-    for(Long64_t z=0; z<entries1; z++){
+    if(datasets[d] == "AllData"){
+      sum_events[d] = 1.;
+      sum_BTagSF[d] = 1.;
+    }
+    else{
+      Long64_t entries1 = inputTree[d]->GetEntries();    
+      cout<<"Processing file: "<< datasets[d] << " (" << entries1 <<" entries) ..."<< endl;    
+      for(Long64_t z=0; z<entries1; z++){
 
-      inputTree[d]->GetEntry(z);
+        inputTree[d]->GetEntry(z);
   
-      if( Zsel < 0 ) continue;
-
-
-      if(datasets[d] == "AllData"){
-        sum_events[d] = 1.;
-    	sum_BTagSF[d] = 1.;
-      }
-      else{
+        if( Zsel < 0 ) continue;
 
         // compute SF
         double * scaleFactors;
@@ -406,10 +404,9 @@ void doHistos()
         // total counters for BTagSF norm --- 2l2jsel
         sum_events[d] += 1.; 
         sum_BTagSF[d] += scaleFactors[0]; 
-
-      }// end else
     
-    } // end first loop over entries 
+      } // end first loop over entries 
+    }// end else
 
     cout<<datasets[d]<<" "<<sum_events[d]<<" "<<sum_BTagSF[d]<<endl;
 
