@@ -58,12 +58,9 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
 
   
   // arrays for BTagSF norm
-  float sum_eventsAfter_4lsel = 0.;            
-  float sum_BTagSFAfter_4lsel = 0.;            
-  float sum_eventsAfter_4ljjsel = 0.;         
-  float sum_BTagSFAfter_4ljjsel = 0.;         
-  float sum_eventsAfter_4ljjsel_masscut = 0.; 
-  float sum_BTagSFAfter_4ljjsel_masscut = 0.; 
+  float sum_events = 0.;            
+  float sum_BTagSF = 0.;            
+
 
   ///////////// SET UP B-TAG CALIBRATION ///////////////
     
@@ -392,70 +389,45 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   
   // --------------------------------------------------------
   // --- first loop over input tree to get norm for BtagSF
-  Long64_t entries1 = inputTree->GetEntries();    
-  cout<<"First loop over input files to get norm for BTagSF ..."<<endl;
-  cout<<"Processing file: "<< inFile << " (" << entries1 <<" entries) ..."<< endl;    
-  for(Long64_t z=0; z<entries1; z++){
+  if(inFile == "AllData" || inFile == "ZXbkg"){
+    sum_events = 1.;      
+    sum_BTagSF = 1.;
+  }
+  else{
+    Long64_t entries1 = inputTree->GetEntries();    
+    cout<<"First loop over input files to get norm for BTagSF ..."<<endl;
+    cout<<"Processing file: "<< inFile << " (" << entries1 <<" entries) ..."<< endl;    
+    for(Long64_t z=0; z<entries1; z++){
 
-    inputTree->GetEntry(z);
+      inputTree->GetEntry(z);
   
-    if( !(ZZsel>=0) ) continue;
+      if( !(ZZsel>=0) ) continue;
 
-    // 4l selection
-    if(LepEta->size() != 4){
-      cout << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; stored leptons: "<< LepEta->size() << endl;
-      continue;
-    }
+      // 4l selection
+      if(LepEta->size() != 4){
+        cout << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; stored leptons: "<< LepEta->size() << endl;
+        continue;
+      }
 
-
-    if(inFile == "AllData" || inFile == "ZXbkg"){
-      sum_eventsAfter_4lsel           = 1.;      
-      sum_BTagSFAfter_4lsel           = 1.;
-      sum_eventsAfter_4ljjsel         = 1.;      
-      sum_BTagSFAfter_4ljjsel         = 1.;
-      sum_eventsAfter_4ljjsel_masscut = 1.;      
-      sum_BTagSFAfter_4ljjsel_masscut = 1.;
-    }
-    else{
 
       // compute SF
       double * scaleFactors;
       scaleFactors = evalEventSF( int(JetPt->size()), JetHadronFlavour, JetEta, JetPt, JetBTagger, CSVreader, CSVreaderJESUp, CSVreaderJESDown, CSVreaderHFUp, CSVreaderHFDown, CSVreaderLFUp, CSVreaderLFDown, CSVreaderhfstats1Up, CSVreaderhfstats1Down, CSVreaderhfstats2Up, CSVreaderhfstats2Down, CSVreaderlfstats1Up, CSVreaderlfstats1Down, CSVreaderlfstats2Up, CSVreaderlfstats2Down, CSVreadercfErr1Up, CSVreadercfErr1Down, CSVreadercfErr2Up, CSVreadercfErr2Down );
 
-      // total counters for BTagSF norm --- 4lsel
-      sum_eventsAfter_4lsel += 1.; 
-      sum_BTagSFAfter_4lsel += scaleFactors[0]; 
-
-      // JETSELECTION
-      // at least 2 jets in the acceptance
-      if (JetPt->size() < 2) continue;         
-
-      // total counters for BTagSF norm --- 4ljjsel
-      sum_eventsAfter_4ljjsel += 1.; 
-      sum_BTagSFAfter_4ljjsel += scaleFactors[0]; 
-
-      // mass cut
-      if(ZZMass < 115 || ZZMass > 135) continue; // 115 < ZZMass < 135 GeV
-
-      // total counters for BTagSF norm --- 4ljjsel mass cut
-      sum_eventsAfter_4ljjsel_masscut += 1.; 
-      sum_BTagSFAfter_4ljjsel_masscut += scaleFactors[0]; 
-
-    }// end else
+      // total counters for BTagSF norm
+      sum_events += 1.; 
+      sum_BTagSF += scaleFactors[0]; 
     
-  } // end first loop over entries 
+    } // end first loop over entries 
+  }// end else
 
-  cout<<inFile<<" "<<sum_eventsAfter_4lsel<<" "<<sum_BTagSFAfter_4lsel<<" "<<sum_eventsAfter_4ljjsel<<" "<<sum_BTagSFAfter_4ljjsel<<" "<<sum_eventsAfter_4ljjsel_masscut<<" "<<sum_BTagSFAfter_4ljjsel_masscut<<endl;
+  cout<<inFile<<" "<<sum_events<<" "<<sum_BTagSF<<endl;
 
   // --- control for norm
-  if( sum_eventsAfter_4lsel == 0. || std::isnan(sum_eventsAfter_4lsel) ){ sum_eventsAfter_4lsel = 1.; }
-  if( sum_BTagSFAfter_4lsel == 0. || std::isnan(sum_BTagSFAfter_4lsel) ){ sum_BTagSFAfter_4lsel = 1.; }
-  if( sum_eventsAfter_4ljjsel == 0. || std::isnan(sum_eventsAfter_4ljjsel) ){ sum_eventsAfter_4ljjsel = 1.; }
-  if( sum_BTagSFAfter_4ljjsel == 0. || std::isnan(sum_BTagSFAfter_4ljjsel) ){ sum_BTagSFAfter_4ljjsel = 1.; }
-  if( sum_eventsAfter_4ljjsel_masscut == 0. || std::isnan(sum_eventsAfter_4ljjsel_masscut) ){ sum_eventsAfter_4ljjsel_masscut = 1.; }
-  if( sum_BTagSFAfter_4ljjsel_masscut == 0. || std::isnan(sum_BTagSFAfter_4ljjsel_masscut) ){ sum_BTagSFAfter_4ljjsel_masscut = 1.; }
+  if( sum_events == 0. || std::isnan(sum_events) ){ sum_events = 1.; }
+  if( sum_BTagSF == 0. || std::isnan(sum_BTagSF) ){ sum_BTagSF = 1.; }
 
-  cout<<inFile<<" "<<sum_eventsAfter_4lsel<<" "<<sum_BTagSFAfter_4lsel<<" "<<sum_eventsAfter_4ljjsel<<" "<<sum_BTagSFAfter_4ljjsel<<" "<<sum_eventsAfter_4ljjsel_masscut<<" "<<sum_BTagSFAfter_4ljjsel_masscut<<endl;
+  cout<<inFile<<" "<<sum_events<<" "<<sum_BTagSF<<endl;
   // --------------------------------------------------------
   
 
@@ -561,6 +533,9 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
       // mass cut: side bands
       if(ZZMass >= 115 && ZZMass <= 135) continue; // ZZMass < 115 or ZZMass > 135 GeV
     }
+    else if(massRegion == "fullmass"){
+      // fullmass
+    }
     else cerr<<"wrong mass region!"<<endl;
  
 
@@ -660,27 +635,27 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
  
 
     // save event weight
-    f_weightsignal_nominal = eventWeight * scaleFactors[0] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut; // norm per sel 4ljjsel and masscut 
+    f_weightsignal_nominal = eventWeight * scaleFactors[0] * sum_events/sum_BTagSF; 
 
     // save event weight for BTagSF syst
-    f_weightsignal_JESUp        = eventWeight * scaleFactors[1]  * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
-    f_weightsignal_JESDown      = eventWeight * scaleFactors[2]  * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
-    f_weightsignal_HFUp         = eventWeight * scaleFactors[3]  * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
-    f_weightsignal_HFDown       = eventWeight * scaleFactors[4]  * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
-    f_weightsignal_LFUp         = eventWeight * scaleFactors[5]  * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
-    f_weightsignal_LFDown       = eventWeight * scaleFactors[6]  * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
-    f_weightsignal_hfstats1Up   = eventWeight * scaleFactors[7]  * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
-    f_weightsignal_hfstats1Down = eventWeight * scaleFactors[8]  * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
-    f_weightsignal_hfstats2Up   = eventWeight * scaleFactors[9]  * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
-    f_weightsignal_hfstats2Down = eventWeight * scaleFactors[10] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
-    f_weightsignal_lfstats1Up   = eventWeight * scaleFactors[11] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
-    f_weightsignal_lfstats1Down = eventWeight * scaleFactors[12] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
-    f_weightsignal_lfstats2Up   = eventWeight * scaleFactors[13] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
-    f_weightsignal_lfstats2Down = eventWeight * scaleFactors[14] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
-    f_weightsignal_cfErr1Up     = eventWeight * scaleFactors[15] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
-    f_weightsignal_cfErr1Down   = eventWeight * scaleFactors[16] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
-    f_weightsignal_cfErr2Up     = eventWeight * scaleFactors[17] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
-    f_weightsignal_cfErr2Down   = eventWeight * scaleFactors[18] * sum_eventsAfter_4ljjsel_masscut/sum_BTagSFAfter_4ljjsel_masscut;
+    f_weightsignal_JESUp        = eventWeight * scaleFactors[1]  * sum_events/sum_BTagSF;
+    f_weightsignal_JESDown      = eventWeight * scaleFactors[2]  * sum_events/sum_BTagSF;
+    f_weightsignal_HFUp         = eventWeight * scaleFactors[3]  * sum_events/sum_BTagSF;
+    f_weightsignal_HFDown       = eventWeight * scaleFactors[4]  * sum_events/sum_BTagSF;
+    f_weightsignal_LFUp         = eventWeight * scaleFactors[5]  * sum_events/sum_BTagSF;
+    f_weightsignal_LFDown       = eventWeight * scaleFactors[6]  * sum_events/sum_BTagSF;
+    f_weightsignal_hfstats1Up   = eventWeight * scaleFactors[7]  * sum_events/sum_BTagSF;
+    f_weightsignal_hfstats1Down = eventWeight * scaleFactors[8]  * sum_events/sum_BTagSF;
+    f_weightsignal_hfstats2Up   = eventWeight * scaleFactors[9]  * sum_events/sum_BTagSF;
+    f_weightsignal_hfstats2Down = eventWeight * scaleFactors[10] * sum_events/sum_BTagSF;
+    f_weightsignal_lfstats1Up   = eventWeight * scaleFactors[11] * sum_events/sum_BTagSF;
+    f_weightsignal_lfstats1Down = eventWeight * scaleFactors[12] * sum_events/sum_BTagSF;
+    f_weightsignal_lfstats2Up   = eventWeight * scaleFactors[13] * sum_events/sum_BTagSF;
+    f_weightsignal_lfstats2Down = eventWeight * scaleFactors[14] * sum_events/sum_BTagSF;
+    f_weightsignal_cfErr1Up     = eventWeight * scaleFactors[15] * sum_events/sum_BTagSF;
+    f_weightsignal_cfErr1Down   = eventWeight * scaleFactors[16] * sum_events/sum_BTagSF;
+    f_weightsignal_cfErr2Up     = eventWeight * scaleFactors[17] * sum_events/sum_BTagSF;
+    f_weightsignal_cfErr2Down   = eventWeight * scaleFactors[18] * sum_events/sum_BTagSF;
 
 
 
@@ -717,6 +692,7 @@ void prepareNtupleMVA_2bjet_JERUp()
   // --- mass region
   TString massRegion = "SR";
   //  TString massRegion = "sidebands";
+  //  TString massRegion = "fullmass";
 
   // --- selection
   TString selection = "4ljjsel";
