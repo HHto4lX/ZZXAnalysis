@@ -48,9 +48,9 @@ using namespace std;
 #define REDOHISTOS 1
 
 //******************
-int year = 2016;
+//int year = 2016;
 //int year = 2017;
-//int year = 2018;
+int year = 2018;
 //******************
 
 
@@ -121,8 +121,8 @@ void doHistos()
   //  static int nDatasets = 22;
   TString datasets[] = {
     "AllData", 
-    //    "HH4lbb_Angela",
-    "HH4lbb_Ilirjan",
+    "HH4lbb_Angela",
+    //    "HH4lbb_Ilirjan",
     "ggH125",
     "VBFH125",
     "WplusH125",
@@ -131,8 +131,8 @@ void doHistos()
     "bbH125",
     "ttH125",
     //"ZZTo4lamcatnlo",
-    //"ZZTo4lext2",
-    "ZZTo4l",
+    "ZZTo4lext2",
+    //"ZZTo4l",
     "ggTo4e_Contin_MCFM701",
     "ggTo4mu_Contin_MCFM701",
     "ggTo4tau_Contin_MCFM701",
@@ -144,7 +144,7 @@ void doHistos()
     "WWZ",
     "WZZ",
     "ZZZ",
-    "ZXbkg_4ljjsel",
+    "ZXbkg_4lsel",
   };
   static size_t nDatasets = sizeof(datasets)/sizeof(datasets[0]);
   cout<< "number of input files: " << nDatasets<<endl;
@@ -442,7 +442,7 @@ void doHistos()
     currentProcess = -1;
 
     if(datasets[d]=="AllData") currentProcess = Data;
-    //    if(datasets[d]=="HH4lbb_Angela") currentProcess = HH;
+    if(datasets[d]=="HH4lbb_Angela") currentProcess = HH;
     if(datasets[d]=="HH4lbb_Ilirjan") currentProcess = HH;
     if(datasets[d]=="ggH125") currentProcess = ggH;
     if(datasets[d]=="VBFH125") currentProcess = VBF;
@@ -452,8 +452,8 @@ void doHistos()
     if(datasets[d]=="ttH125") currentProcess = ttH;
     if(datasets[d]=="bbH125") currentProcess = bbH;
     //    if(datasets[d]=="ZZTo4lamcatnlo") currentProcess = qqZZ;
-    //    if(datasets[d]=="ZZTo4lext2") currentProcess = qqZZ;
-    if(datasets[d]=="ZZTo4l") currentProcess = qqZZ;
+    if(datasets[d]=="ZZTo4lext2") currentProcess = qqZZ;
+    //    if(datasets[d]=="ZZTo4l") currentProcess = qqZZ;
     if(datasets[d]=="ggTo4e_Contin_MCFM701" ||
        datasets[d]=="ggTo4mu_Contin_MCFM701" ||
        datasets[d]=="ggTo4tau_Contin_MCFM701" ||
@@ -465,7 +465,7 @@ void doHistos()
     if(datasets[d]=="WWZ" ||
        datasets[d]=="WZZ" ||
        datasets[d]=="ZZZ") currentProcess = VVV;
-    if(datasets[d]=="ZXbkg_4ljjsel") currentProcess = ZXbkg;
+    if(datasets[d]=="ZXbkg_4lsel") currentProcess = ZXbkg;
     
 
     // select input file
@@ -530,27 +530,26 @@ void doHistos()
 
     // --------------------------------------------------------
     // --- first loop over input tree to get norm for BtagSF
-    Long64_t entries1 = inputTree[d]->GetEntries();    
     cout<<"First loop over input files to get norm for BTagSF ..."<<endl;
-    cout<<"Processing file: "<< datasets[d] << " (" << entries1 <<" entries) ..."<< endl;    
-    for(Long64_t z=0; z<entries1; z++){
+    if(currentProcess == Data || currentProcess == ZXbkg){
+      sum_events[d] = 1.;      
+      sum_BTagSF[d] = 1.;
+    }
+    else{
+      Long64_t entries1 = inputTree[d]->GetEntries();    
+      cout<<"Processing file: "<< datasets[d] << " (" << entries1 <<" entries) ..."<< endl;    
+      for(Long64_t z=0; z<entries1; z++){
 
-      inputTree[d]->GetEntry(z);
+        inputTree[d]->GetEntry(z);
   
-      if( !(ZZsel>=0) ) continue;
+        if( !(ZZsel>=0) ) continue;
 
-      // 4l selection
-      if(LepEta->size() != 4){
-	cout << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; stored leptons: "<< LepEta->size() << endl;
-	continue;
-      }
+        // 4l selection
+        if(LepEta->size() != 4){
+          cout << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; stored leptons: "<< LepEta->size() << endl;
+	  continue;
+        }
 
-
-      if(datasets[d] == "AllData" || datasets[d] == "ZXbkg_4ljjsel"){
-        sum_events[d] = 1.;      
-	sum_BTagSF[d] = 1.;
-      }
-      else{
 
         // compute SF
         double * scaleFactors;
@@ -560,9 +559,9 @@ void doHistos()
         sum_events[d] += 1.; 
         sum_BTagSF[d] += scaleFactors[0]; 
 
-      }// end else
     
-    } // end first loop over entries 
+      } // end first loop over entries 
+    }// end else
 
     cout<<datasets[d]<<" "<<sum_events[d]<<" "<<sum_BTagSF[d]<<endl;
 
