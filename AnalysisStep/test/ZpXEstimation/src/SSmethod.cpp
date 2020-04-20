@@ -113,6 +113,7 @@ void SSmethod::Calculate_SSOS_Ratio( TString input_file_data_name, TString input
          jetPgOverPq[j] = 1./JetQGLikelihood->at(j) - 1.;
       }
       
+      if(JetPt->size() < 2) continue; // 4ljjsel
       _current_category = 0; // inclusive
 		// _current_category = categoryMor18(  nExtraLep,
 		// 												 nExtraZ,
@@ -175,6 +176,7 @@ void SSmethod::Calculate_SSOS_Ratio( TString input_file_data_name, TString input
             jetPgOverPq[j] = 1./JetQGLikelihood->at(j) - 1.;
          }
          
+         if(JetPt->size() < 2) continue; // 4ljjsel
 	 _current_category = 0; // inclusive
 		// _current_category = categoryMor18(  nExtraLep,
 		// 												 nExtraZ,
@@ -285,6 +287,7 @@ void SSmethod::FillFRHistos( TString input_file_data_name )
 
    // Define some counters for control print out
 	Int_t _total_events[num_of_final_states];
+	Int_t _failjjrequestCut[num_of_final_states]; //4ljjsel
 	Int_t _failZ1MassCut[num_of_final_states];
 	Int_t _failLepPtCut[num_of_final_states];
 	Int_t _failSIPCut[num_of_final_states];
@@ -295,6 +298,7 @@ void SSmethod::FillFRHistos( TString input_file_data_name )
 	for (int i_fs = 0; i_fs < num_of_final_states; i_fs++)
 	{
 		_total_events[i_fs] = 0.;
+                _failjjrequestCut[i_fs] = 0.; //4ljjsel
 		_failZ1MassCut[i_fs] = 0.;
 		_failLepPtCut[i_fs] = 0.;
 		_failSIPCut[i_fs] = 0.;
@@ -312,7 +316,7 @@ void SSmethod::FillFRHistos( TString input_file_data_name )
 
 	   (fabs(LepLepId->at(2)) == 11) ? _total_events[Settings::ele]++ : _total_events[Settings::mu]++;
 	   
-	   //           if ( JetPt->size() < 2 ) {continue;}
+           if ( JetPt->size() < 2 ) {(fabs(LepLepId->at(2)) == 11) ? _failjjrequestCut[Settings::ele]++ : _failjjrequestCut[Settings::mu]++; continue;} // 4ljjsel
 	   if ( Z1Mass < 40. ) {(fabs(LepLepId->at(2)) == 11) ? _failZ1MassCut[Settings::ele]++ : _failZ1MassCut[Settings::mu]++; continue;}
 	   if ( Z1Mass > 120. ) {(fabs(LepLepId->at(2)) == 11) ? _failZ1MassCut[Settings::ele]++ : _failZ1MassCut[Settings::mu]++; continue;}
 	   if ( (LepPt->at(0) > LepPt->at(1)) && (LepPt->at(0) < 20. || LepPt->at(1) < 10.) ) {(fabs(LepLepId->at(2)) == 11) ? _failLepPtCut[Settings::ele]++ : _failLepPtCut[Settings::mu]++; continue;}
@@ -348,6 +352,7 @@ void SSmethod::FillFRHistos( TString input_file_data_name )
 		cout << "[INFO] Control printout for electrons in Z+L control region." << endl;
 		cout << "========================================================================================" << endl;
 		cout << "[INFO] Total number of events in Z+L control region = " << _total_events[Settings::ele] << endl;
+                cout << "[INFO] Events after 2 jets requirement = " << _total_events[Settings::ele] - _failjjrequestCut[Settings::ele] << endl; //4ljjsel
 		cout << "[INFO] Events after 40 < Z1 < 120 GeV cut  = " << _total_events[Settings::ele] - _failZ1MassCut[Settings::ele] << endl;
 		cout << "[INFO] Events after LepPt > 20,10 GeV cut  = " << _total_events[Settings::ele] - _failZ1MassCut[Settings::ele] - _failLepPtCut[Settings::ele] << endl;
 		cout << "[INFO] Events after SIP < 4 cut  = " << _total_events[Settings::ele] - _failZ1MassCut[Settings::ele] - _failLepPtCut[Settings::ele] - _failSIPCut[Settings::ele] << endl;
@@ -363,6 +368,7 @@ void SSmethod::FillFRHistos( TString input_file_data_name )
 		cout << "[INFO] Control printout for muons in Z+L control region." << endl;
 		cout << "========================================================================================" << endl;
 		cout << "[INFO] Total number of events in Z+L control region = " << _total_events[Settings::mu] << endl;
+                cout << "[INFO] Events after 2 jets requirement = " << _total_events[Settings::mu] - _failjjrequestCut[Settings::mu] << endl; //4ljjsel
 		cout << "[INFO] Events after 40 < Z1 < 120 GeV cut  = " << _total_events[Settings::mu] - _failZ1MassCut[Settings::mu] << endl;
 		cout << "[INFO] Events after LepPt > 20,10 GeV cut  = " << _total_events[Settings::mu] - _failZ1MassCut[Settings::mu] - _failLepPtCut[Settings::mu] << endl;
 		cout << "[INFO] Events after SIP < 4 cut  = " << _total_events[Settings::mu] - _failZ1MassCut[Settings::mu] - _failLepPtCut[Settings::mu] - _failSIPCut[Settings::mu] << endl;
@@ -421,6 +427,7 @@ void SSmethod::FillDataMCPlots( TString input_file_data_name )
          jetPgOverPq[j] = 1./JetQGLikelihood->at(j) - 1.;
       }
 
+      if(JetPt->size() < 2) continue; //4ljjsel
       _current_category = 0; // inclusive
 		// _current_category = categoryMor18(  nExtraLep,
 		// 												 nExtraZ,
@@ -487,7 +494,8 @@ void SSmethod::MakeHistogramsZX( TString input_file_data_name, TString  input_fi
       
       if ( !CRflag ) continue;
       if ( !test_bit(CRflag, CRZLLss) ) continue;
-		if ( ZZMass < 70. ) continue;
+      if ( ZZMass < 70. ) continue;
+
       
       _current_final_state = FindFinalState();
       
@@ -500,7 +508,8 @@ void SSmethod::MakeHistogramsZX( TString input_file_data_name, TString  input_fi
          jetQGL[j] = JetQGLikelihood->at(j);
          jetPgOverPq[j] = 1./JetQGLikelihood->at(j) - 1.;
       }
-      
+
+      if ( JetPt->size() < 2 ) continue;  //4ljjsel
       _current_category = 0; //inclusive
 		// _current_category = categoryMor18(  nExtraLep,
 		// 												 nExtraZ,
