@@ -50,21 +50,21 @@ int main( int argc, char *argv[] )
    ss->FillDataMCPlots(ZZ);
    ss->FillDataMCPlots(ttbar);
    ss->FillDataMCPlots(DY);
-   ss->SaveDataMCHistos("DataMC_SS_samples2016_4ljjsel.root");
+   ss->SaveDataMCHistos("DataMC_SS_samples2016_4lsel.root");
 
    ///////////////////////////////////
    // Fill passing/failling histos  //
    ///////////////////////////////////
    ss->FillFRHistos(Data);
    ss->FillFRHistos(WZ);
-   ss->SaveFRHistos("Histos_SS_samples2016_4ljjsel.root", SubtractWZ, Remove_NegBins_FR);
+   ss->SaveFRHistos("Histos_SS_samples2016_4lsel.root", SubtractWZ, Remove_NegBins_FR);
 
    ///////////////////////////////////
    // Calculate fake rates          //
    ///////////////////////////////////
-   ss->GetFRHistos("Histos_SS_samples2016_4ljjsel.root");
+   ss->GetFRHistos("Histos_SS_samples2016_4lsel.root");
    ss->Set_pT_binning(8, pT_bins);
-   ss->ProduceFakeRates("FakeRates_SS_samples2016_4ljjsel.root", Data);
+   ss->ProduceFakeRates("FakeRates_SS_samples2016_4lsel.root", Data);
 
    ///////////////////////////////////
    // Calculate OS/SS ratios        //
@@ -74,19 +74,19 @@ int main( int argc, char *argv[] )
    ///////////////////////////////////
    // Fill ZX contributions histos  //
    ///////////////////////////////////
-   ss->MakeHistogramsZX(Data, "FakeRates_SS_samples2016_4ljjsel.root");
-   ss->SaveZXHistos("ZXHistos_SS_samples2016_4ljjsel.root");
+   ss->MakeHistogramsZX(Data, "FakeRates_SS_samples2016_4lsel.root");
+   ss->SaveZXHistos("ZXHistos_SS_samples2016_4lsel.root");
 
    ///////////////////////////////////
    // Plot control plots            //
    ///////////////////////////////////
-   ss->GetDataMCHistos("DataMC_SS_samples2016_4ljjsel.root");
+   ss->GetDataMCHistos("DataMC_SS_samples2016_4lsel.root");
    ss->PlotDataMC( "M4l", "Plots" );
 
    ///////////////////////////////////
    // Plot and fit Z+X              //
    ///////////////////////////////////
-   ss->GetZXHistos("ZXHistos_SS_samples2016_4ljjsel.root");
+   ss->GetZXHistos("ZXHistos_SS_samples2016_4lsel.root");
    ss->PlotZX("M4l", "Plots");
    ss->FitZX("M4l", "Plots");
 	
