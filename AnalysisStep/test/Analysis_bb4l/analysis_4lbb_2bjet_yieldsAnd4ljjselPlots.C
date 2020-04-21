@@ -83,33 +83,33 @@ void doHistos()
   TString inFilePath;
   TString inDataPath;
   TString sYear;
-  //  Float_t rescale_ZX[nFinalStates];
+  Float_t rescale_ZX[nFinalStates];
   if(year==2016){
     lumi       = 35.8; //fb-1 2016
     sYear      = "2016";
     inFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
     inDataPath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
-    // rescale_ZX[fs_4mu]   = 0.79; //FIXME
-    // rescale_ZX[fs_4e]    = 1.40; //FIXME
-    // rescale_ZX[fs_2e2mu] = 2.64; //FIXME:da levare
+    rescale_ZX[fs_4mu]   = 0.79; //FIXME
+    rescale_ZX[fs_4e]    = 1.40; //FIXME
+    rescale_ZX[fs_2e2mu] = 2.64; //FIXME:da levare
   }
   else if(year==2017){
     lumi       = 41.5; //fb-1 2017
     sYear      = "2017";
     inFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
     inDataPath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
-    // rescale_ZX[fs_4mu]   = 1.48; //FIXME
-    // rescale_ZX[fs_4e]    = 0.52; //FIXME
-    // rescale_ZX[fs_2e2mu] = 2.00; //FIXME:da levare
+    rescale_ZX[fs_4mu]   = 1.48; //FIXME
+    rescale_ZX[fs_4e]    = 0.52; //FIXME
+    rescale_ZX[fs_2e2mu] = 2.00; //FIXME:da levare
   }
   else if(year==2018){
     lumi       = 59.7; //fb-1 2018
     sYear      = "2018";
     inFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
     inDataPath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
-    // rescale_ZX[fs_4mu]   = 1.60; //FIXME
-    // rescale_ZX[fs_4e]    = 0.72; //FIXME
-    // rescale_ZX[fs_2e2mu] = 2.22; //FIXME:da levare
+    rescale_ZX[fs_4mu]   = 1.60; //FIXME
+    rescale_ZX[fs_4e]    = 0.72; //FIXME
+    rescale_ZX[fs_2e2mu] = 2.22; //FIXME:da levare
   }
   else{ 
     cout<<"wrong year selected!"<<endl;
@@ -144,6 +144,7 @@ void doHistos()
     "WWZ",
     "WZZ",
     "ZZZ",
+    //"ZXbkg_4ljjsel",
     "ZXbkg_4lsel",
   };
   static size_t nDatasets = sizeof(datasets)/sizeof(datasets[0]);
@@ -383,7 +384,7 @@ void doHistos()
     for(int fs=0; fs<nFinalStates+1; fs++){
       // --- 4ljjsel
       // fullmass range
-      h1_m4l_4ljjsel  [pr][fs] = new TH1F("h1_m4l_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events/2 GeV", 65, 70., 200.);
+      h1_m4l_4ljjsel  [pr][fs] = new TH1F("h1_m4l_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events/4 GeV", 33, 70., 202.);
       h1_m4l_4ljjsel  [pr][fs]->Sumw2(true);
       // sidebands
       h1_pT4l_4ljjsel_sidebands[pr][fs] = new TH1F("h1_pT4l_4ljjsel_sidebands_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";4 leptons pT (GeV); Events/2 GeV", 50, 0., 100.);
@@ -465,6 +466,7 @@ void doHistos()
     if(datasets[d]=="WWZ" ||
        datasets[d]=="WZZ" ||
        datasets[d]=="ZZZ") currentProcess = VVV;
+    //if(datasets[d]=="ZXbkg_4ljjsel") currentProcess = ZXbkg;
     if(datasets[d]=="ZXbkg_4lsel") currentProcess = ZXbkg;
     
 
@@ -751,30 +753,30 @@ void doHistos()
   }//end loop over datasets
 
 
-  // // --- RESCALE ZX HISTOS ---
-  // // --- riscalo solo histo che disegno
-  // for(int fs=0; fs<nFinalStates; fs++){
-  //   // // fullmass range
-  //   // h1_m4l_4ljjsel           [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-  //   // // sidebands
-  //   // h1_pT4l_4ljjsel_sidebands    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-  //   // h1_j1btag_4ljjsel_sidebands  [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-  //   // h1_j2btag_4ljjsel_sidebands  [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-  //   // h1_j1pT_4ljjsel_sidebands    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-  //   // h1_j2pT_4ljjsel_sidebands    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-  //   // h1_MET_4ljjsel_sidebands     [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-  //   // h1_DeltaRhh_4ljjsel_sidebands[ZXbkg][fs]->Scale(rescale_ZX[fs]);
-  //   // h1_mbb_4ljjsel_sidebands     [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-  //   // (BDT input)
-  //   h1_pT4l_4ljjsel    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-  //   h1_j1btag_4ljjsel  [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-  //   h1_j2btag_4ljjsel  [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-  //   h1_j1pT_4ljjsel    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-  //   h1_j2pT_4ljjsel    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-  //   h1_MET_4ljjsel     [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-  //   h1_DeltaRhh_4ljjsel[ZXbkg][fs]->Scale(rescale_ZX[fs]);
-  //   h1_mbb_4ljjsel     [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-  // }
+  // --- RESCALE ZX HISTOS ---
+  // --- riscalo solo histo che disegno
+  for(int fs=0; fs<nFinalStates; fs++){
+    // // fullmass range
+    // h1_m4l_4ljjsel           [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+    // // sidebands
+    // h1_pT4l_4ljjsel_sidebands    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+    // h1_j1btag_4ljjsel_sidebands  [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+    // h1_j2btag_4ljjsel_sidebands  [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+    // h1_j1pT_4ljjsel_sidebands    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+    // h1_j2pT_4ljjsel_sidebands    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+    // h1_MET_4ljjsel_sidebands     [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+    // h1_DeltaRhh_4ljjsel_sidebands[ZXbkg][fs]->Scale(rescale_ZX[fs]);
+    // h1_mbb_4ljjsel_sidebands     [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+    // (BDT input)
+    h1_pT4l_4ljjsel    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+    h1_j1btag_4ljjsel  [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+    h1_j2btag_4ljjsel  [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+    h1_j1pT_4ljjsel    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+    h1_j2pT_4ljjsel    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+    h1_MET_4ljjsel     [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+    h1_DeltaRhh_4ljjsel[ZXbkg][fs]->Scale(rescale_ZX[fs]);
+    h1_mbb_4ljjsel     [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+  }
 
 
   //---fill inclusive yields and histos
