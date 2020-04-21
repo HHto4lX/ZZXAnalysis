@@ -49,8 +49,8 @@ using namespace std;
 
 //******************
 //int year = 2016;
-//int year = 2017;
-int year = 2018;
+int year = 2017;
+//int year = 2018;
 //******************
 
 
@@ -397,6 +397,9 @@ void doHistos()
   
         if( Zsel < 0 ) continue;
 
+        //JETSELECTION--------------------------------------------------  
+        if (JetPt->size() < 2) continue;   
+
         // compute SF
         double * scaleFactors;
         scaleFactors = evalEventSF( int(JetPt->size()), JetHadronFlavour, JetEta, JetPt, JetBTagger, CSVreader, CSVreaderJESUp, CSVreaderJESDown, CSVreaderHFUp, CSVreaderHFDown, CSVreaderLFUp, CSVreaderLFDown, CSVreaderhfstats1Up, CSVreaderhfstats1Down, CSVreaderhfstats2Up, CSVreaderhfstats2Down, CSVreaderlfstats1Up, CSVreaderlfstats1Down, CSVreaderlfstats2Up, CSVreaderlfstats2Down, CSVreadercfErr1Up, CSVreadercfErr1Down, CSVreadercfErr2Up, CSVreadercfErr2Down );
@@ -430,6 +433,12 @@ void doHistos()
   
       if( Zsel < 0 ) continue;
 
+
+
+      //JETSELECTION--------------------------------------------------  
+      // at least 2 jets in the acceptance
+      if (JetPt->size() < 2) continue;   
+
       
       // compute SF
       double * scaleFactors;
@@ -442,9 +451,7 @@ void doHistos()
       if(currentProcess != Data) eventWeight = partialSampleWeight[d] *xsec *overallEventWeight *L1prefiringWeight *scaleFactors[0] *sum_events[d] /sum_BTagSF[d];
 
       
-      //JETSELECTION--------------------------------------------------  
-      // at least 2 jets in the acceptance
-      if (JetPt->size() < 2) continue;   
+
           
       // index of jet with max btagger value (j1)
       int dj1_ = distance( JetBTagger->begin(), max_element(JetBTagger->begin(), JetBTagger->end()));
@@ -557,7 +564,7 @@ void doPlots_2l2jsel(){
   TFile* fInhistos = TFile::Open(inFileName);
   
   // --- take histos from file
-  Int_t nPlots = 6;
+  Int_t nPlots = 8;
   TString sPlots[] = {
     "mll_2l2jsel",
     "mjj_2l2jsel",
