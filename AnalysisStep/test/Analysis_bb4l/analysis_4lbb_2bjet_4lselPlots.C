@@ -338,11 +338,11 @@ void doHistos()
   for(int pr=0; pr<nProcesses; pr++){
     for(int fs=0; fs<nFinalStates+1; fs++){
       // 4lsel
-      h1_m4l_4lsel    [pr][fs] = new TH1F("h1_m4l_4lsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events/2 GeV", 65, 70., 200.);
+      h1_m4l_4lsel    [pr][fs] = new TH1F("h1_m4l_4lsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events/4 GeV", 33, 70., 202.);
       h1_m4l_4lsel    [pr][fs]->Sumw2(true);
       h1_MET_4lsel_sidebands [pr][fs] = new TH1F("h1_MET_4lsel_sidebands_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";MET (GeV); Events/5 GeV", 40, 0., 200.);
       h1_MET_4lsel_sidebands [pr][fs]->Sumw2(true);
-      h1_pT4l_4lsel_sidebands[pr][fs] = new TH1F("h1_pT4l_4lsel_sidebands_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";4 leptons pT (GeV); Events/2 GeV", 50, 0., 100.);
+      h1_pT4l_4lsel_sidebands[pr][fs] = new TH1F("h1_pT4l_4lsel_sidebands_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";4 leptons pT (GeV); Events/4 GeV", 25, 0., 100.);
       h1_pT4l_4lsel_sidebands[pr][fs]->Sumw2(true);
     }
   }
@@ -447,27 +447,26 @@ void doHistos()
 
     // --------------------------------------------------------
     // --- first loop over input tree to get norm for BtagSF
-    Long64_t entries1 = inputTree[d]->GetEntries();    
-    cout<<"First loop over input files to get norm for BTagSF ..."<<endl;
-    cout<<"Processing file: "<< datasets[d] << " (" << entries1 <<" entries) ..."<< endl;    
-    for(Long64_t z=0; z<entries1; z++){
+    if(currentProcess == Data || currentProcess == ZXbkg){
+      sum_events[d] = 1.;
+      sum_BTagSF[d] = 1.;
+    }
+    else{
+      Long64_t entries1 = inputTree[d]->GetEntries();    
+      cout<<"First loop over input files to get norm for BTagSF ..."<<endl;
+      cout<<"Processing file: "<< datasets[d] << " (" << entries1 <<" entries) ..."<< endl;    
+      for(Long64_t z=0; z<entries1; z++){
 
-      inputTree[d]->GetEntry(z);
+        inputTree[d]->GetEntry(z);
   
-      if( !(ZZsel>=0) ) continue;
+        if( !(ZZsel>=0) ) continue;
 
-      // 4l selection
-      if(LepEta->size() != 4){
-	cout << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; stored leptons: "<< LepEta->size() << endl;
-	continue;
-      }
+        // 4l selection
+        if(LepEta->size() != 4){
+	  cout << "error in event " << nRun << ":" << nLumi << ":" << nEvent << "; stored leptons: "<< LepEta->size() << endl;
+	  continue;
+        }
 
-
-      if(datasets[d] == "AllData" || datasets[d] == "ZXbkg_4lsel"){
-        sum_events[d] = 1.;
-        sum_BTagSF[d] = 1.;
-      }
-      else{
 
         // compute SF
         double * scaleFactors;
@@ -477,9 +476,9 @@ void doHistos()
         sum_events[d] += 1.; 
         sum_BTagSF[d] += scaleFactors[0]; 
 
-      }// end else
     
-    } // end first loop over entries 
+      } // end first loop over entries 
+    }// end else
 
     cout<<datasets[d]<<" "<<sum_events[d]<<" "<<sum_BTagSF[d]<<endl;
 
