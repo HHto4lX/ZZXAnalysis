@@ -48,8 +48,8 @@ using namespace std;
 #define REDOHISTOS 1
 
 //******************
-//int year = 2016;
-int year = 2017;
+int year = 2016;
+//int year = 2017;
 //int year = 2018;
 //******************
 
@@ -111,8 +111,8 @@ void doHistos()
   //  static int nDatasets = 22;
   TString datasets[] = {
     "AllData", 
-    "HH4lbb_Angela",
-    //"HH4lbb_Ilirjan",
+    //"HH4lbb_Angela",
+    "HH4lbb_Ilirjan",
     "ggH125",
     "VBFH125",
     "WplusH125",
@@ -359,8 +359,8 @@ void doHistos()
     currentProcess = -1;
 
     if(datasets[d]=="AllData") currentProcess = Data;
-    if(datasets[d]=="HH4lbb_Angela") currentProcess = HH;
-    //if(datasets[d]=="HH4lbb_Ilirjan") currentProcess = HH;
+    //if(datasets[d]=="HH4lbb_Angela") currentProcess = HH;
+    if(datasets[d]=="HH4lbb_Ilirjan") currentProcess = HH;
     if(datasets[d]=="ggH125") currentProcess = ggH;
     if(datasets[d]=="VBFH125") currentProcess = VBF;
     if(datasets[d]=="WplusH125" ||
