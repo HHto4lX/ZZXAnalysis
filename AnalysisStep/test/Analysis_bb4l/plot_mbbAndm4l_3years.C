@@ -190,8 +190,16 @@ void doPlots(){
     pad1_4ljjsel[pl]->Draw();
     pad1_4ljjsel[pl]->cd();
 
-    hs_4ljjsel[pl]->SetMaximum(10e04);
-    hs_4ljjsel[pl]->SetMinimum(10e-04);
+    // hs_4ljjsel[pl]->SetMaximum(10e04);
+    // hs_4ljjsel[pl]->SetMinimum(10e-04);
+
+    if(sPlots[pl] == "mbb_4ljjsel"){
+      hs_4ljjsel[pl]->SetMaximum(10.);
+    }
+    else if(sPlots[pl] == "m4l_4ljjsel"){
+      hs_4ljjsel[pl]->SetMaximum(60.);
+    }
+
       
     hs_4ljjsel[pl]->Draw("histo");
     h1_4ljjsel[pl][HH]->Draw("histosame");
@@ -224,7 +232,7 @@ void doPlots(){
 
     c_4ljjsel[pl]->Update();
 
-    pad1_4ljjsel[pl]->SetLogy();
+    //    pad1_4ljjsel[pl]->SetLogy();
 
     c_4ljjsel[pl]->Update();
 
