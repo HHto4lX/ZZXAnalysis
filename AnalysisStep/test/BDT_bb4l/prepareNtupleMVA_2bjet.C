@@ -568,77 +568,77 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
 
 
 
-    //JETSELECTION---------------------------------------------------
-    // at least 2 jets in the acceptance
-    if (JetPt->size() < 2) continue; 
-    // cout<<JetPt->size()<<" "<<JetPt_JESUp->size()<<" "<<JetPt_JESDown->size()<<" "<<JetPt_JERUp->size()<<" "<<JetPt_JERDown->size()<<endl;
-    // for(int i=0; i<JetPt->size(); i++){
-    //   cout<<JetPt->at(i)<<" "<<JetPt_JESUp->at(i)<<" "<<JetPt_JESDown->at(i)<<" "<<JetPt_JERUp->at(i)<<" "<<JetPt_JERDown->at(i)<<endl;
-    // }
+    // //JETSELECTION---------------------------------------------------
+    // // at least 2 jets in the acceptance
+    // if (JetPt->size() < 2) continue; 
+    // // cout<<JetPt->size()<<" "<<JetPt_JESUp->size()<<" "<<JetPt_JESDown->size()<<" "<<JetPt_JERUp->size()<<" "<<JetPt_JERDown->size()<<endl;
+    // // for(int i=0; i<JetPt->size(); i++){
+    // //   cout<<JetPt->at(i)<<" "<<JetPt_JESUp->at(i)<<" "<<JetPt_JESDown->at(i)<<" "<<JetPt_JERUp->at(i)<<" "<<JetPt_JERDown->at(i)<<endl;
+    // // }
 
 
         
 
-    // get and save vector with max btagger value
-    f_bdiscjet1signal = *max_element(JetBTagger->begin(), JetBTagger->end());
+    // // get and save vector with max btagger value
+    // f_bdiscjet1signal = *max_element(JetBTagger->begin(), JetBTagger->end());
 
-    // get and save btagger value of the second jet (the one with second max btag)
-    int d1_maxbtag = distance( JetBTagger->begin(), max_element(JetBTagger->begin(), JetBTagger->end()));
+    // // get and save btagger value of the second jet (the one with second max btag)
+    // int d1_maxbtag = distance( JetBTagger->begin(), max_element(JetBTagger->begin(), JetBTagger->end()));
 
-    float maxJetBtag = -9999.;
-    int d2_maxbtag = -9999;
-    for(UInt_t i=0; i<JetBTagger->size(); i++){
+    // float maxJetBtag = -9999.;
+    // int d2_maxbtag = -9999;
+    // for(UInt_t i=0; i<JetBTagger->size(); i++){
 
-      if(i == d1_maxbtag) continue;
-      float temp = JetBTagger->at(i);
-      if (temp > maxJetBtag){
-        maxJetBtag = temp;
-        d2_maxbtag = i;
-      }
-    }
-    // save btagger value of the second jet (the one with second max btag)
-    f_bdiscjet2signal = JetBTagger->at(d2_maxbtag);
+    //   if(i == d1_maxbtag) continue;
+    //   float temp = JetBTagger->at(i);
+    //   if (temp > maxJetBtag){
+    //     maxJetBtag = temp;
+    //     d2_maxbtag = i;
+    //   }
+    // }
+    // // save btagger value of the second jet (the one with second max btag)
+    // f_bdiscjet2signal = JetBTagger->at(d2_maxbtag);
 
-    // save jet pT
-    f_ptjet1 = JetPt->at(d1_maxbtag);
-    f_ptjet2 = JetPt->at(d2_maxbtag);
-
-
-    // build 2 jets tlorentzvectors
-    TLorentzVector tlzvec_j1_;
-    tlzvec_j1_.SetPtEtaPhiM(JetPt->at(d1_maxbtag), JetEta->at(d1_maxbtag), JetPhi->at(d1_maxbtag), JetMass->at(d1_maxbtag));
-    TLorentzVector tlzvec_j2_;
-    tlzvec_j2_.SetPtEtaPhiM(JetPt->at(d2_maxbtag), JetEta->at(d2_maxbtag), JetPhi->at(d2_maxbtag), JetMass->at(d2_maxbtag));
+    // // save jet pT
+    // f_ptjet1 = JetPt->at(d1_maxbtag);
+    // f_ptjet2 = JetPt->at(d2_maxbtag);
 
 
-    // build H->bb tlorentzvector
-    TLorentzVector Hbb_Vec = tlzvec_j1_ + tlzvec_j2_;
+    // // build 2 jets tlorentzvectors
+    // TLorentzVector tlzvec_j1_;
+    // tlzvec_j1_.SetPtEtaPhiM(JetPt->at(d1_maxbtag), JetEta->at(d1_maxbtag), JetPhi->at(d1_maxbtag), JetMass->at(d1_maxbtag));
+    // TLorentzVector tlzvec_j2_;
+    // tlzvec_j2_.SetPtEtaPhiM(JetPt->at(d2_maxbtag), JetEta->at(d2_maxbtag), JetPhi->at(d2_maxbtag), JetMass->at(d2_maxbtag));
 
-    // build H-H DeltaR
-    float DeltaPhi = ZZPhi - Hbb_Vec.Phi();
-    if( fabs(DeltaPhi) > acos(-1) ) { DeltaPhi = (2*acos(-1)) - fabs(DeltaPhi); }
-    float DeltaEta = ZZEta - Hbb_Vec.Eta();
-    float DeltaR = sqrt( DeltaPhi*DeltaPhi + DeltaEta*DeltaEta );
 
-    // save DeltaR
-    f_deltarsignal = DeltaR;
+    // // build H->bb tlorentzvector
+    // TLorentzVector Hbb_Vec = tlzvec_j1_ + tlzvec_j2_;
+
+    // // build H-H DeltaR
+    // float DeltaPhi = ZZPhi - Hbb_Vec.Phi();
+    // if( fabs(DeltaPhi) > acos(-1) ) { DeltaPhi = (2*acos(-1)) - fabs(DeltaPhi); }
+    // float DeltaEta = ZZEta - Hbb_Vec.Eta();
+    // float DeltaR = sqrt( DeltaPhi*DeltaPhi + DeltaEta*DeltaEta );
+
+    // // save DeltaR
+    // f_deltarsignal = DeltaR;
   
 
 
-    // build HZZ tlorentzvector
-    TLorentzVector HZZ_Vec;
-    HZZ_Vec.SetPtEtaPhiM(ZZPt, ZZEta, ZZPhi, ZZMass);
+    // // build HZZ tlorentzvector
+    // TLorentzVector HZZ_Vec;
+    // HZZ_Vec.SetPtEtaPhiM(ZZPt, ZZEta, ZZPhi, ZZMass);
   
-    // build HH tlorentzvector
-    TLorentzVector HH_Vec = HZZ_Vec + Hbb_Vec;
+    // // build HH tlorentzvector
+    // TLorentzVector HH_Vec = HZZ_Vec + Hbb_Vec;
 
 
-    // save bb and HH masses
-    f_bbmass = Hbb_Vec.M();
-    f_HHmass = HH_Vec.M();
+    // // save bb and HH masses
+    // f_bbmass = Hbb_Vec.M();
+    // f_HHmass = HH_Vec.M();
 
-    // save jet jet inv mass
-    f_massjetjet = Hbb_Vec.M();
+    // // save jet jet inv mass
+    // f_massjetjet = Hbb_Vec.M();
 
     //JETSELECTION---------------------------------------------------
 
@@ -669,11 +669,11 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
     f_lept2_phi  = LepPhi->at(1); 
     f_lept3_phi  = LepPhi->at(2); 
     f_lept4_phi  = LepPhi->at(3); 
-    f_etajet1    = JetEta->at(d1_maxbtag);
-    f_etajet2    = JetEta->at(d2_maxbtag);
-    f_phijet1    = JetPhi->at(d1_maxbtag);
-    f_phijet2    = JetPhi->at(d2_maxbtag);
-    f_deltaPhiHH = DeltaPhi;
+    // f_etajet1    = JetEta->at(d1_maxbtag);
+    // f_etajet2    = JetEta->at(d2_maxbtag);
+    // f_phijet1    = JetPhi->at(d1_maxbtag);
+    // f_phijet2    = JetPhi->at(d2_maxbtag);
+    // f_deltaPhiHH = DeltaPhi;
 
 
 
@@ -739,17 +739,17 @@ void prepareNtupleMVA_2bjet()
 {
   // --- mass region
   //  TString massRegion = "SR";
-  //  TString massRegion = "sidebands";
-  TString massRegion = "fullmass";
+  TString massRegion = "sidebands";
+  //  TString massRegion = "fullmass";
 
   // --- selection
-  TString selection = "4ljjsel";
-  //  TString selection = "4lsel";
+  //  TString selection = "4ljjsel";
+  TString selection = "4lsel";
 
   // --- finalstate
-  TString finalstate = "fs4mu";
+  //  TString finalstate = "fs4mu";
   //  TString finalstate = "fs4e";
-  //  TString finalstate = "fs2e2mu";
+  TString finalstate = "fs2e2mu";
   
   // -- year
   //  TString syear = "2016";
@@ -791,6 +791,8 @@ void prepareNtupleMVA_2bjet()
     "WZZ",
     "ZZZ",
     //"ZXbkg",
+    "DYJetsToLL_M50",
+    "TTTo2L2Nu",
   };
 
 
