@@ -49,8 +49,8 @@ using namespace std;
 
 //******************
 //int year = 2016;
-int year = 2017;
-//int year = 2018;
+//int year = 2017;
+int year = 2018;
 //******************
 
 
@@ -131,8 +131,8 @@ void doHistos()
     "bbH125",
     "ttH125",
     //"ZZTo4lamcatnlo",
-    //"ZZTo4lext2",
-    "ZZTo4l",
+    "ZZTo4lext2",
+    //"ZZTo4l",
     "ggTo4e_Contin_MCFM701",
     "ggTo4mu_Contin_MCFM701",
     "ggTo4tau_Contin_MCFM701",
@@ -456,8 +456,8 @@ void doHistos()
     if(datasets[d]=="ttH125") currentProcess = ttH;
     if(datasets[d]=="bbH125") currentProcess = bbH;
     //    if(datasets[d]=="ZZTo4lamcatnlo") currentProcess = qqZZ;
-    //    if(datasets[d]=="ZZTo4lext2") currentProcess = qqZZ;
-    if(datasets[d]=="ZZTo4l") currentProcess = qqZZ;
+    if(datasets[d]=="ZZTo4lext2") currentProcess = qqZZ;
+    //if(datasets[d]=="ZZTo4l") currentProcess = qqZZ;
     if(datasets[d]=="ggTo4e_Contin_MCFM701" ||
        datasets[d]=="ggTo4mu_Contin_MCFM701" ||
        datasets[d]=="ggTo4tau_Contin_MCFM701" ||
@@ -469,7 +469,7 @@ void doHistos()
     if(datasets[d]=="WWZ" ||
        datasets[d]=="WZZ" ||
        datasets[d]=="ZZZ") currentProcess = VVV;
-    //if(datasets[d]=="ZXbkg_4ljjsel") currentProcess = ZXbkg;
+    //    if(datasets[d]=="ZXbkg_4ljjsel") currentProcess = ZXbkg;
     if(datasets[d]=="ZXbkg_4lsel") currentProcess = ZXbkg;
     
 
@@ -764,15 +764,15 @@ void doHistos()
   for(int fs=0; fs<nFinalStates; fs++){
     // // fullmass range
     // h1_m4l_4ljjsel           [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    // // sidebands
-    // h1_pT4l_4ljjsel_sidebands    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    // h1_j1btag_4ljjsel_sidebands  [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    // h1_j2btag_4ljjsel_sidebands  [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    // h1_j1pT_4ljjsel_sidebands    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    // h1_j2pT_4ljjsel_sidebands    [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    // h1_MET_4ljjsel_sidebands     [ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    // h1_DeltaRhh_4ljjsel_sidebands[ZXbkg][fs]->Scale(rescale_ZX[fs]);
-    // h1_mbb_4ljjsel_sidebands     [ZXbkg][fs]->Scale(rescale_ZX[fs]);
+    // sidebands
+    h1_pT4l_4ljjsel_sidebands    [ZXbkg][fs]->Scale(2.);
+    h1_j1btag_4ljjsel_sidebands  [ZXbkg][fs]->Scale(2.);
+    h1_j2btag_4ljjsel_sidebands  [ZXbkg][fs]->Scale(2.);
+    h1_j1pT_4ljjsel_sidebands    [ZXbkg][fs]->Scale(2.);
+    h1_j2pT_4ljjsel_sidebands    [ZXbkg][fs]->Scale(2.);
+    h1_MET_4ljjsel_sidebands     [ZXbkg][fs]->Scale(2.);
+    h1_DeltaRhh_4ljjsel_sidebands[ZXbkg][fs]->Scale(2.);
+    h1_mbb_4ljjsel_sidebands     [ZXbkg][fs]->Scale(2.);
     // (BDT input)
     h1_pT4l_4ljjsel    [ZXbkg][fs]->Scale(rescale_ZX[fs] / h1_pT4l_4ljjsel    [ZXbkg][fs]->Integral());
     h1_j1btag_4ljjsel  [ZXbkg][fs]->Scale(rescale_ZX[fs] / h1_j1btag_4ljjsel  [ZXbkg][fs]->Integral());
