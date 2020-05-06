@@ -344,6 +344,7 @@ void doHistos()
   TH1F* hYields_4ljjsel[nProcesses][nFinalStates+1];
   TH1F* hEvents_4lsel  [nProcesses][nFinalStates+1];
   TH1F* hEvents_4ljjsel[nProcesses][nFinalStates+1];
+  TH1F* hYields_4ljjsel_sidebands[nProcesses][nFinalStates+1];
   for(int pr=0; pr<nProcesses; pr++){
     for(int fs=0; fs<nFinalStates+1; fs++){
       hYields_4lsel  [pr][fs] = new TH1F("hYields_4lsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,"",1,0.,1.);
@@ -354,6 +355,8 @@ void doHistos()
       hEvents_4lsel  [pr][fs]->Sumw2(true);
       hEvents_4ljjsel[pr][fs] = new TH1F("hEvents_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,"",1,0.,1.);
       hEvents_4ljjsel[pr][fs]->Sumw2(true);
+      hYields_4ljjsel_sidebands[pr][fs] = new TH1F("hYields_4ljjsel_sidebands_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,"",1,0.,1.);
+      hYields_4ljjsel_sidebands[pr][fs]->Sumw2(true);
     }
   }
 
@@ -733,6 +736,9 @@ void doHistos()
       }
       else{
 
+        // --- fill yields in the sidebands
+        hYields_4ljjsel_sidebands[currentProcess][currentFinalState]->Fill(0.5, eventWeight);
+
         // --- fill histos after 4ljj sel: sidebands
         for(int i=0; i<LepPt->size(); i++){
           h1_pT4l_4ljjsel_sidebands[currentProcess][currentFinalState]->Fill(LepPt->at(i), eventWeight);
@@ -786,6 +792,7 @@ void doHistos()
       hYields_4ljjsel [pr][nFinalStates]->Add(hYields_4ljjsel [pr][fs]);
       hEvents_4lsel   [pr][nFinalStates]->Add(hEvents_4lsel   [pr][fs]);
       hEvents_4ljjsel [pr][nFinalStates]->Add(hEvents_4ljjsel [pr][fs]);
+      hYields_4ljjsel_sidebands[pr][nFinalStates]->Add(hYields_4ljjsel_sidebands[pr][fs]);
 
       // (h1 histos)
       // 4ljjsel
@@ -824,6 +831,7 @@ void doHistos()
       hYields_4ljjsel[pr][fs]->Write();
       hEvents_4lsel  [pr][fs]->Write();
       hEvents_4ljjsel[pr][fs]->Write();
+      hYields_4ljjsel_sidebands[pr][fs]->Write();
     }
   }
   fout_yields->Close();
@@ -901,6 +909,7 @@ void printYields_forSync(){
   Float_t yield_4ljjsel [nProcesses][nFinalStates+1];
   Float_t nEvent_4lsel  [nProcesses][nFinalStates+1];
   Float_t nEvent_4ljjsel[nProcesses][nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebands[nProcesses][nFinalStates+1];
   for(int pr=0; pr<nProcesses; pr++){
     for(int fs=0; fs<nFinalStates+1; fs++){
       hTemp0 = (TH1F*)fInYields->Get("hYields_4lsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear);
@@ -911,34 +920,36 @@ void printYields_forSync(){
       nEvent_4lsel[pr][fs] = hTemp2->GetBinContent(1);  
       hTemp3 = (TH1F*)fInYields->Get("hEvents_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear);
       nEvent_4ljjsel[pr][fs] = hTemp3->GetBinContent(1);  
+
+      yield_4ljjsel_sidebands[pr][fs] = (TH1F*)fInYields->Get("hYields_4ljjsel_sidebands_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear);
     }
   }
 
 
-  // **********************************************
-  // *** PRINT NUMBER OF EVENTS SEL (no weight) ***
-  // **********************************************
-  // --- print number of event selected after 4l sel for sync (no weight)
-  cout<<"print number of event selected after 4l sel for sync (no weight) ... "<<endl; 
-  ofstream f_events4lsel_sync;
-  TString f_events4lsel_sync_name = "nEvents_4lsel_perSync_"+ sYear + ".txt";
-  f_events4lsel_sync.open(f_events4lsel_sync_name);
-  f_events4lsel_sync<<"|Final state |signal HH |ttZ |ttH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |others(=VVV+VH+TTW) |Z+X |"<<endl;
-  for(int fs=0; fs<nFinalStates+1; fs++){
-    f_events4lsel_sync<<"|"<<sFinalState[fs]<<" |"<<nEvent_4lsel[HH][fs]<<" |"<<nEvent_4lsel[TTZ][fs]<<" |"<<nEvent_4lsel[ttH][fs]<<" |"<<nEvent_4lsel[qqZZ][fs]+nEvent_4lsel[ggZZ][fs]<<" |"<<nEvent_4lsel[ggH][fs]+nEvent_4lsel[VBF][fs]<<" |"<<nEvent_4lsel[VVV][fs]+nEvent_4lsel[VH][fs]+nEvent_4lsel[TTW][fs]<<" |"<<nEvent_4lsel[ZXbkg][fs]<<" |"<<endl;
-  }
-  f_events4lsel_sync.close();
+  // // **********************************************
+  // // *** PRINT NUMBER OF EVENTS SEL (no weight) ***
+  // // **********************************************
+  // // --- print number of event selected after 4l sel for sync (no weight)
+  // cout<<"print number of event selected after 4l sel for sync (no weight) ... "<<endl; 
+  // ofstream f_events4lsel_sync;
+  // TString f_events4lsel_sync_name = "nEvents_4lsel_perSync_"+ sYear + ".txt";
+  // f_events4lsel_sync.open(f_events4lsel_sync_name);
+  // f_events4lsel_sync<<"|Final state |signal HH |ttZ |ttH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  // for(int fs=0; fs<nFinalStates+1; fs++){
+  //   f_events4lsel_sync<<"|"<<sFinalState[fs]<<" |"<<nEvent_4lsel[HH][fs]<<" |"<<nEvent_4lsel[TTZ][fs]<<" |"<<nEvent_4lsel[ttH][fs]<<" |"<<nEvent_4lsel[qqZZ][fs]+nEvent_4lsel[ggZZ][fs]<<" |"<<nEvent_4lsel[ggH][fs]+nEvent_4lsel[VBF][fs]<<" |"<<nEvent_4lsel[VVV][fs]+nEvent_4lsel[VH][fs]+nEvent_4lsel[TTW][fs]<<" |"<<nEvent_4lsel[ZXbkg][fs]<<" |"<<endl;
+  // }
+  // f_events4lsel_sync.close();
 
-  // --- print number of event selected after 4ljj sel for sync (no weight)
-  cout<<"print number of event selected after 4ljj sel for sync (no weight) ... "<<endl; 
-  ofstream f_events4ljjsel_sync;
-  TString f_events4ljjsel_sync_name = "nEvents_4ljjsel_perSync_"+ sYear + ".txt";
-  f_events4ljjsel_sync.open(f_events4ljjsel_sync_name);
-  f_events4ljjsel_sync<<"|Final state |signal HH |ttZ |ttH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |others(=VVV+VH+TTW) |Z+X |"<<endl;
-  for(int fs=0; fs<nFinalStates+1; fs++){
-    f_events4ljjsel_sync<<"|"<<sFinalState[fs]<<" |"<<nEvent_4ljjsel[HH][fs]<<" |"<<nEvent_4ljjsel[TTZ][fs]<<" |"<<nEvent_4ljjsel[ttH][fs]<<" |"<<nEvent_4ljjsel[qqZZ][fs]+nEvent_4ljjsel[ggZZ][fs]<<" |"<<nEvent_4ljjsel[ggH][fs]+nEvent_4ljjsel[VBF][fs]<<" |"<<nEvent_4ljjsel[VVV][fs]+nEvent_4ljjsel[VH][fs]+nEvent_4ljjsel[TTW][fs]<<" |"<<nEvent_4ljjsel[ZXbkg][fs]<<" |"<<endl;
-  }
-  f_events4ljjsel_sync.close();
+  // // --- print number of event selected after 4ljj sel for sync (no weight)
+  // cout<<"print number of event selected after 4ljj sel for sync (no weight) ... "<<endl; 
+  // ofstream f_events4ljjsel_sync;
+  // TString f_events4ljjsel_sync_name = "nEvents_4ljjsel_perSync_"+ sYear + ".txt";
+  // f_events4ljjsel_sync.open(f_events4ljjsel_sync_name);
+  // f_events4ljjsel_sync<<"|Final state |signal HH |ttZ |ttH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  // for(int fs=0; fs<nFinalStates+1; fs++){
+  //   f_events4ljjsel_sync<<"|"<<sFinalState[fs]<<" |"<<nEvent_4ljjsel[HH][fs]<<" |"<<nEvent_4ljjsel[TTZ][fs]<<" |"<<nEvent_4ljjsel[ttH][fs]<<" |"<<nEvent_4ljjsel[qqZZ][fs]+nEvent_4ljjsel[ggZZ][fs]<<" |"<<nEvent_4ljjsel[ggH][fs]+nEvent_4ljjsel[VBF][fs]<<" |"<<nEvent_4ljjsel[VVV][fs]+nEvent_4ljjsel[VH][fs]+nEvent_4ljjsel[TTW][fs]<<" |"<<nEvent_4ljjsel[ZXbkg][fs]<<" |"<<endl;
+  // }
+  // f_events4ljjsel_sync.close();
 
 
 
@@ -989,6 +1000,117 @@ void printYields_forSync(){
     f_yields4ljjsel_process<<"|"<<sProcess[pr]<<" |"<<yield_4ljjsel[pr][fs_4mu]<<" |"<<yield_4ljjsel[pr][fs_4e]<<" |"<<yield_4ljjsel[pr][fs_2e2mu]<<" |"<<endl;
   }
   f_yields4ljjsel_process.close();
+
+
+
+  // ******************************
+  // *** PRINT YIELDS SIDEBANDS ***
+  // ******************************
+  // --- print yields after 4ljj sel in sidebands 
+  cout<<"print yields after 4ljj sel in sidebands ... "<<endl;
+  ofstream f_yields4ljjsel_sidebands;
+  TString f_yields4ljjsel_sidebands_name = "yields4ljjsel_sidebands_"+ sYear + ".txt";
+
+  TH1F* yield_4ljjsel_sidebands_ZZ[nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebands_Higgs[nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebands_others[nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebands_tot_Ange[nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebands_SMHiggs[nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebands_TTV[nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebands_tot_Ale[nFinalStates+1];
+
+  f_yields4ljjsel_sidebands.open(f_yields4ljjsel_sidebands_name); 
+
+  // print yields in Angela style
+  f_yields4ljjsel_sidebands<<"|Final state |signal HH |ttZ |ttH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |others(=VVV+VH+TTW) |Z+X |Sum bkg |Data |"<<endl;
+  for(int fs=0; fs<nFinalStates+1; fs++){
+    // add histos
+    // ZZ
+    yield_4ljjsel_sidebands_ZZ[fs] = (TH1F*)yield_4ljjsel_sidebands[qqZZ][fs]->Clone("hYields_4ljjsel_sidebands_ZZ_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebands_ZZ[fs]->Add(yield_4ljjsel_sidebands[ggZZ][fs]); 
+    // Higgs
+    yield_4ljjsel_sidebands_Higgs[fs] = (TH1F*)yield_4ljjsel_sidebands[ggH][fs]->Clone("hYields_4ljjsel_sidebands_Higgs_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebands_Higgs[fs]->Add(yield_4ljjsel_sidebands[VBF][fs]);
+    // others
+    yield_4ljjsel_sidebands_others[fs] = (TH1F*)yield_4ljjsel_sidebands[VVV][fs]->Clone("hYields_4ljjsel_sidebands_others_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebands_others[fs]->Add(yield_4ljjsel_sidebands[VH][fs]);
+    yield_4ljjsel_sidebands_others[fs]->Add(yield_4ljjsel_sidebands[TTW][fs]);
+    // tot histo
+    yield_4ljjsel_sidebands_tot_Ange[fs] = (TH1F*)yield_4ljjsel_sidebands[TTZ][fs]->Clone("hYields_4ljjsel_sidebands_totAnge_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebands_tot_Ange[fs]->Add(yield_4ljjsel_sidebands[ttH][fs]);
+    yield_4ljjsel_sidebands_tot_Ange[fs]->Add(yield_4ljjsel_sidebands[qqZZ][fs]);
+    yield_4ljjsel_sidebands_tot_Ange[fs]->Add(yield_4ljjsel_sidebands[ggZZ][fs]);
+    yield_4ljjsel_sidebands_tot_Ange[fs]->Add(yield_4ljjsel_sidebands[ggH][fs]);
+    yield_4ljjsel_sidebands_tot_Ange[fs]->Add(yield_4ljjsel_sidebands[VBF][fs]);
+    yield_4ljjsel_sidebands_tot_Ange[fs]->Add(yield_4ljjsel_sidebands[VVV][fs]);
+    yield_4ljjsel_sidebands_tot_Ange[fs]->Add(yield_4ljjsel_sidebands[VH][fs]);
+    yield_4ljjsel_sidebands_tot_Ange[fs]->Add(yield_4ljjsel_sidebands[TTW][fs]);
+    yield_4ljjsel_sidebands_tot_Ange[fs]->Add(yield_4ljjsel_sidebands[ZXbkg][fs]);
+
+    // print
+    f_yields4ljjsel_sidebands<<" |"<<sFinalState[fs]
+			     <<" |"<<yield_4ljjsel_sidebands[HH][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands[HH][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebands[TTZ][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands[TTZ][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebands[ttH][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands[ttH][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebands_ZZ[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands_ZZ[fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebands_Higgs[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands_Higgs[fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebands_others[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands_others[fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebands[ZXbkg][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands[ZXbkg][fs]->GetBinError(1)
+                             <<" |"<<yield_4ljjsel_sidebands_tot_Ange[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands_tot_Ange[fs]->GetBinError(1)
+                             <<" |"<<yield_4ljjsel_sidebands[Data][fs]->GetBinContent(1)
+                             <<" |"<<endl;
+  }
+
+
+
+
+  f_yields4ljjsel_sidebands<<" "<<endl;
+  f_yields4ljjsel_sidebands<<" "<<endl;
+  f_yields4ljjsel_sidebands<<" "<<endl;
+  f_yields4ljjsel_sidebands<<" "<<endl;
+
+  // print yields in Ale style
+  f_yields4ljjsel_sidebands<<"|Final state |signal HH |SM Higgs |qqZZ |ggZZ |TTV |Z+X |VVV |sum all bkg |Data |"<<endl;
+  for(int fs=0; fs<nFinalStates+1; fs++){
+    // add histos
+    // SM Higgs
+    yield_4ljjsel_sidebands_SMHiggs[fs] = (TH1F*)yield_4ljjsel_sidebands[ggH][fs]->Clone("hYields_4ljjsel_sidebands_SMHiggs_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebands_SMHiggs[fs]->Add(yield_4ljjsel_sidebands[VBF][fs]);
+    yield_4ljjsel_sidebands_SMHiggs[fs]->Add(yield_4ljjsel_sidebands[VH][fs]);
+    yield_4ljjsel_sidebands_SMHiggs[fs]->Add(yield_4ljjsel_sidebands[ttH][fs]);
+    yield_4ljjsel_sidebands_SMHiggs[fs]->Add(yield_4ljjsel_sidebands[bbH][fs]);
+    // TTV
+    yield_4ljjsel_sidebands_TTV[fs] = (TH1F*)yield_4ljjsel_sidebands[TTZ][fs]->Clone("hYields_4ljjsel_sidebands_TTV_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebands_TTV[fs]->Add(yield_4ljjsel_sidebands[TTW][fs]);
+    // tot histo
+    yield_4ljjsel_sidebands_tot_Ale[fs] = (TH1F*)yield_4ljjsel_sidebands[ggH][fs]->Clone("hYields_4ljjsel_sidebands_totAle_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebands_tot_Ale[fs]->Add(yield_4ljjsel_sidebands[VBF][fs]);
+    yield_4ljjsel_sidebands_tot_Ale[fs]->Add(yield_4ljjsel_sidebands[VH][fs]);
+    yield_4ljjsel_sidebands_tot_Ale[fs]->Add(yield_4ljjsel_sidebands[ttH][fs]);
+    yield_4ljjsel_sidebands_tot_Ale[fs]->Add(yield_4ljjsel_sidebands[bbH][fs]);
+    yield_4ljjsel_sidebands_tot_Ale[fs]->Add(yield_4ljjsel_sidebands[qqZZ][fs]);
+    yield_4ljjsel_sidebands_tot_Ale[fs]->Add(yield_4ljjsel_sidebands[ggZZ][fs]);
+    yield_4ljjsel_sidebands_tot_Ale[fs]->Add(yield_4ljjsel_sidebands[TTZ][fs]);
+    yield_4ljjsel_sidebands_tot_Ale[fs]->Add(yield_4ljjsel_sidebands[TTW][fs]);
+    yield_4ljjsel_sidebands_tot_Ale[fs]->Add(yield_4ljjsel_sidebands[ZXbkg][fs]);
+    yield_4ljjsel_sidebands_tot_Ale[fs]->Add(yield_4ljjsel_sidebands[VVV][fs]);
+
+
+    f_yields4ljjsel_sidebands<<" |"<<sFinalState[fs]
+			     <<" |"<<yield_4ljjsel_sidebands[HH][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands[HH][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebands_SMHiggs[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands_SMHiggs[fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebands[qqZZ][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands[qqZZ][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebands[ggZZ][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands[ggZZ][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebands_TTV[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands_TTV[fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebands[ZXbkg][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands[ZXbkg][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebands[VVV][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands[VVV][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebands_tot_Ale[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands_tot_Ale[fs]->GetBinError(1)
+                             <<" |"<<yield_4ljjsel_sidebands[Data][fs]->GetBinContent(1)
+                             <<" |"<<endl;
+  }
+  f_yields4ljjsel_sidebands.close();
+  
+
 
 }// end function printyields_forSync
 
@@ -1237,7 +1359,7 @@ void doPlots_inputBDT(){
       rp_BDTinput_4ljjsel[bdtIn][fs]->SetMarkerColor(kBlack);
       rp_BDTinput_4ljjsel[bdtIn][fs]->SetTitle("");
 
-      rp_BDTinput_4ljjsel[bdtIn][fs]->SetYTitle("Data/MC");
+      rp_BDTinput_4ljjsel[bdtIn][fs]->SetYTitle("Data/#Sigma bkg");
       rp_BDTinput_4ljjsel[bdtIn][fs]->GetYaxis()->SetNdivisions(505);
       rp_BDTinput_4ljjsel[bdtIn][fs]->GetYaxis()->SetTitleSize(20);
       rp_BDTinput_4ljjsel[bdtIn][fs]->GetYaxis()->SetTitleFont(43);
@@ -1497,7 +1619,7 @@ void doPlots_inputBDT_withZX(){
       rp_BDTinput_4ljjsel[bdtIn][fs]->SetMarkerColor(kBlack);
       rp_BDTinput_4ljjsel[bdtIn][fs]->SetTitle("");
 
-      rp_BDTinput_4ljjsel[bdtIn][fs]->SetYTitle("Data/MC");
+      rp_BDTinput_4ljjsel[bdtIn][fs]->SetYTitle("Data/#Sigma bkg");
       rp_BDTinput_4ljjsel[bdtIn][fs]->GetYaxis()->SetNdivisions(505);
       rp_BDTinput_4ljjsel[bdtIn][fs]->GetYaxis()->SetTitleSize(20);
       rp_BDTinput_4ljjsel[bdtIn][fs]->GetYaxis()->SetTitleFont(43);
@@ -1758,7 +1880,7 @@ void doPlots_4ljjsel(){
       rp_4ljjsel[pl][fs]->SetMarkerColor(kBlack);
       rp_4ljjsel[pl][fs]->SetTitle("");
 
-      rp_4ljjsel[pl][fs]->SetYTitle("Data/MC");
+      rp_4ljjsel[pl][fs]->SetYTitle("Data/#Sigma bkg");
       rp_4ljjsel[pl][fs]->GetYaxis()->SetNdivisions(505);
       rp_4ljjsel[pl][fs]->GetYaxis()->SetTitleSize(20);
       rp_4ljjsel[pl][fs]->GetYaxis()->SetTitleFont(43);
