@@ -48,8 +48,8 @@ using namespace std;
 #define REDOHISTOS 1
 
 //******************
-int year = 2016;
-//int year = 2017;
+//int year = 2016;
+int year = 2017;
 //int year = 2018;
 //******************
 
@@ -121,8 +121,8 @@ void doHistos()
   //  static int nDatasets = 22;
   TString datasets[] = {
     "AllData", 
-    //    "HH4lbb_Angela",
-    "HH4lbb_Ilirjan",
+    "HH4lbb_Angela",
+    //"HH4lbb_Ilirjan",
     "ggH125",
     "VBFH125",
     "WplusH125",
@@ -446,8 +446,8 @@ void doHistos()
     currentProcess = -1;
 
     if(datasets[d]=="AllData") currentProcess = Data;
-    //    if(datasets[d]=="HH4lbb_Angela") currentProcess = HH;
-    if(datasets[d]=="HH4lbb_Ilirjan") currentProcess = HH;
+    if(datasets[d]=="HH4lbb_Angela") currentProcess = HH;
+    //    if(datasets[d]=="HH4lbb_Ilirjan") currentProcess = HH;
     if(datasets[d]=="ggH125") currentProcess = ggH;
     if(datasets[d]=="VBFH125") currentProcess = VBF;
     if(datasets[d]=="WplusH125" ||
@@ -1057,7 +1057,7 @@ void printYields_forSync(){
 			     <<" |"<<yield_4ljjsel_sidebands_others[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands_others[fs]->GetBinError(1)
 			     <<" |"<<yield_4ljjsel_sidebands[ZXbkg][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands[ZXbkg][fs]->GetBinError(1)
                              <<" |"<<yield_4ljjsel_sidebands_tot_Ange[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands_tot_Ange[fs]->GetBinError(1)
-                             <<" |"<<yield_4ljjsel_sidebands[Data][fs]->GetBinContent(1)
+                             <<" |"<<yield_4ljjsel_sidebands[Data][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands[Data][fs]->GetBinError(1)
                              <<" |"<<endl;
   }
 
@@ -1105,7 +1105,7 @@ void printYields_forSync(){
 			     <<" |"<<yield_4ljjsel_sidebands[ZXbkg][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands[ZXbkg][fs]->GetBinError(1)
 			     <<" |"<<yield_4ljjsel_sidebands[VVV][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands[VVV][fs]->GetBinError(1)
 			     <<" |"<<yield_4ljjsel_sidebands_tot_Ale[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands_tot_Ale[fs]->GetBinError(1)
-                             <<" |"<<yield_4ljjsel_sidebands[Data][fs]->GetBinContent(1)
+                             <<" |"<<yield_4ljjsel_sidebands[Data][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebands[Data][fs]->GetBinError(1)
                              <<" |"<<endl;
   }
   f_yields4ljjsel_sidebands.close();
@@ -1955,7 +1955,7 @@ void analysis_4lbb_2bjet_yieldsAnd4ljjselPlots()
 
   printYields_forSync();
 
-  printYields_forCards();
+  //  printYields_forCards();
 
   doPlots_inputBDT();
 
