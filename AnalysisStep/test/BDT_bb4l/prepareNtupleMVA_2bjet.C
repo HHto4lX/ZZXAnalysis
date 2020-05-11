@@ -747,9 +747,9 @@ void prepareNtupleMVA_2bjet()
   //  TString selection = "4lsel";
 
   // --- finalstate
-  //  TString finalstate = "fs4mu";
+  TString finalstate = "fs4mu";
   //  TString finalstate = "fs4e";
-  TString finalstate = "fs2e2mu";
+  //  TString finalstate = "fs2e2mu";
   
   // -- year
   //  TString syear = "2016";
@@ -769,7 +769,7 @@ void prepareNtupleMVA_2bjet()
   TString inputFileName[] = {
     // "AllData", 
     // "HH4lbb_Angela",
-    // //"HH4lbb_Ilirjan",
+    "HH4lbb_Ilirjan",
     // "ggH125",
     // "VBFH125",
     // "WplusH125",
@@ -790,7 +790,7 @@ void prepareNtupleMVA_2bjet()
     // "WWZ",
     // "WZZ",
     // "ZZZ",
-    "ZXbkg_4ljjsel",
+    // "ZXbkg_4ljjsel",
     // "DYJetsToLL_M50",
     // "TTTo2L2Nu",
   };
