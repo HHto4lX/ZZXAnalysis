@@ -218,7 +218,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   Short_t ZZsel;
   vector<Float_t> *LepEta = 0;
   vector<Float_t> *LepPt = 0;
-  vector<Float_t> *LepPhi = 0;
+  //  vector<Float_t> *LepPhi = 0;
   Float_t ZZMass;
   Float_t Z1Mass;
   Float_t Z2Mass;
@@ -235,10 +235,10 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   vector<Float_t> *JetHadronFlavour = 0;
   Float_t PFMET;
 
-  vector<Float_t> *JetPt_JESUp = 0;
-  vector<Float_t> *JetPt_JESDown = 0;
-  vector<Float_t> *JetPt_JERUp = 0;
-  vector<Float_t> *JetPt_JERDown = 0;
+  // vector<Float_t> *JetPt_JESUp = 0;
+  // vector<Float_t> *JetPt_JESDown = 0;
+  // vector<Float_t> *JetPt_JERUp = 0;
+  // vector<Float_t> *JetPt_JERDown = 0;
 
   Float_t yield_4e = 0.;
   Float_t yield_4mu = 0.;
@@ -269,7 +269,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   inputTree->SetBranchAddress("ZZsel", &ZZsel);
   inputTree->SetBranchAddress("LepPt", &LepPt);
   inputTree->SetBranchAddress("LepEta", &LepEta);
-  inputTree->SetBranchAddress("LepPhi", &LepPhi);
+  //  inputTree->SetBranchAddress("LepPhi", &LepPhi);
   inputTree->SetBranchAddress("ZZMass", &ZZMass);  
   inputTree->SetBranchAddress("Z1Flav", &Z1Flav);
   inputTree->SetBranchAddress("Z2Flav", &Z2Flav);
@@ -279,10 +279,10 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   inputTree->SetBranchAddress("ZZEta", &ZZEta);
   inputTree->SetBranchAddress("ZZPhi", &ZZPhi);
   inputTree->SetBranchAddress("JetPt", &JetPt);
-  inputTree->SetBranchAddress("JetPt_JESUp", &JetPt_JESUp);
-  inputTree->SetBranchAddress("JetPt_JESDown", &JetPt_JESDown);
-  inputTree->SetBranchAddress("JetPt_JERUp", &JetPt_JERUp);
-  inputTree->SetBranchAddress("JetPt_JERDown", &JetPt_JERDown);
+  // inputTree->SetBranchAddress("JetPt_JESUp", &JetPt_JESUp);
+  // inputTree->SetBranchAddress("JetPt_JESDown", &JetPt_JESDown);
+  // inputTree->SetBranchAddress("JetPt_JERUp", &JetPt_JERUp);
+  // inputTree->SetBranchAddress("JetPt_JERDown", &JetPt_JERDown);
   inputTree->SetBranchAddress("JetEta", &JetEta);
   inputTree->SetBranchAddress("JetMass", &JetMass);
   inputTree->SetBranchAddress("JetPhi",  &JetPhi);
@@ -568,79 +568,79 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
 
 
 
-    // //JETSELECTION---------------------------------------------------
-    // // at least 2 jets in the acceptance
-    // if (JetPt->size() < 2) continue; 
-    // // cout<<JetPt->size()<<" "<<JetPt_JESUp->size()<<" "<<JetPt_JESDown->size()<<" "<<JetPt_JERUp->size()<<" "<<JetPt_JERDown->size()<<endl;
-    // // for(int i=0; i<JetPt->size(); i++){
-    // //   cout<<JetPt->at(i)<<" "<<JetPt_JESUp->at(i)<<" "<<JetPt_JESDown->at(i)<<" "<<JetPt_JERUp->at(i)<<" "<<JetPt_JERDown->at(i)<<endl;
-    // // }
+    //JETSELECTION---------------------------------------------------
+    // at least 2 jets in the acceptance
+    if (JetPt->size() < 2) continue; 
+    // cout<<JetPt->size()<<" "<<JetPt_JESUp->size()<<" "<<JetPt_JESDown->size()<<" "<<JetPt_JERUp->size()<<" "<<JetPt_JERDown->size()<<endl;
+    // for(int i=0; i<JetPt->size(); i++){
+    //   cout<<JetPt->at(i)<<" "<<JetPt_JESUp->at(i)<<" "<<JetPt_JESDown->at(i)<<" "<<JetPt_JERUp->at(i)<<" "<<JetPt_JERDown->at(i)<<endl;
+    // }
 
 
         
 
-    // // get and save vector with max btagger value
-    // f_bdiscjet1signal = *max_element(JetBTagger->begin(), JetBTagger->end());
+    // get and save vector with max btagger value
+    f_bdiscjet1signal = *max_element(JetBTagger->begin(), JetBTagger->end());
 
-    // // get and save btagger value of the second jet (the one with second max btag)
-    // int d1_maxbtag = distance( JetBTagger->begin(), max_element(JetBTagger->begin(), JetBTagger->end()));
+    // get and save btagger value of the second jet (the one with second max btag)
+    int d1_maxbtag = distance( JetBTagger->begin(), max_element(JetBTagger->begin(), JetBTagger->end()));
 
-    // float maxJetBtag = -9999.;
-    // int d2_maxbtag = -9999;
-    // for(UInt_t i=0; i<JetBTagger->size(); i++){
+    float maxJetBtag = -9999.;
+    int d2_maxbtag = -9999;
+    for(UInt_t i=0; i<JetBTagger->size(); i++){
 
-    //   if(i == d1_maxbtag) continue;
-    //   float temp = JetBTagger->at(i);
-    //   if (temp > maxJetBtag){
-    //     maxJetBtag = temp;
-    //     d2_maxbtag = i;
-    //   }
-    // }
-    // // save btagger value of the second jet (the one with second max btag)
-    // f_bdiscjet2signal = JetBTagger->at(d2_maxbtag);
+      if(i == d1_maxbtag) continue;
+      float temp = JetBTagger->at(i);
+      if (temp > maxJetBtag){
+        maxJetBtag = temp;
+        d2_maxbtag = i;
+      }
+    }
+    // save btagger value of the second jet (the one with second max btag)
+    f_bdiscjet2signal = JetBTagger->at(d2_maxbtag);
 
-    // // save jet pT
-    // f_ptjet1 = JetPt->at(d1_maxbtag);
-    // f_ptjet2 = JetPt->at(d2_maxbtag);
-
-
-    // // build 2 jets tlorentzvectors
-    // TLorentzVector tlzvec_j1_;
-    // tlzvec_j1_.SetPtEtaPhiM(JetPt->at(d1_maxbtag), JetEta->at(d1_maxbtag), JetPhi->at(d1_maxbtag), JetMass->at(d1_maxbtag));
-    // TLorentzVector tlzvec_j2_;
-    // tlzvec_j2_.SetPtEtaPhiM(JetPt->at(d2_maxbtag), JetEta->at(d2_maxbtag), JetPhi->at(d2_maxbtag), JetMass->at(d2_maxbtag));
+    // save jet pT
+    f_ptjet1 = JetPt->at(d1_maxbtag);
+    f_ptjet2 = JetPt->at(d2_maxbtag);
 
 
-    // // build H->bb tlorentzvector
-    // TLorentzVector Hbb_Vec = tlzvec_j1_ + tlzvec_j2_;
+    // build 2 jets tlorentzvectors
+    TLorentzVector tlzvec_j1_;
+    tlzvec_j1_.SetPtEtaPhiM(JetPt->at(d1_maxbtag), JetEta->at(d1_maxbtag), JetPhi->at(d1_maxbtag), JetMass->at(d1_maxbtag));
+    TLorentzVector tlzvec_j2_;
+    tlzvec_j2_.SetPtEtaPhiM(JetPt->at(d2_maxbtag), JetEta->at(d2_maxbtag), JetPhi->at(d2_maxbtag), JetMass->at(d2_maxbtag));
 
-    // // build H-H DeltaR
-    // float DeltaPhi = ZZPhi - Hbb_Vec.Phi();
-    // if( fabs(DeltaPhi) > acos(-1) ) { DeltaPhi = (2*acos(-1)) - fabs(DeltaPhi); }
-    // float DeltaEta = ZZEta - Hbb_Vec.Eta();
-    // float DeltaR = sqrt( DeltaPhi*DeltaPhi + DeltaEta*DeltaEta );
 
-    // // save DeltaR
-    // f_deltarsignal = DeltaR;
+    // build H->bb tlorentzvector
+    TLorentzVector Hbb_Vec = tlzvec_j1_ + tlzvec_j2_;
+
+    // build H-H DeltaR
+    float DeltaPhi = ZZPhi - Hbb_Vec.Phi();
+    if( fabs(DeltaPhi) > acos(-1) ) { DeltaPhi = (2*acos(-1)) - fabs(DeltaPhi); }
+    float DeltaEta = ZZEta - Hbb_Vec.Eta();
+    float DeltaR = sqrt( DeltaPhi*DeltaPhi + DeltaEta*DeltaEta );
+
+    // save DeltaR
+    f_deltarsignal = DeltaR;
   
 
 
-    // // build HZZ tlorentzvector
-    // TLorentzVector HZZ_Vec;
-    // HZZ_Vec.SetPtEtaPhiM(ZZPt, ZZEta, ZZPhi, ZZMass);
+    // build HZZ tlorentzvector
+    TLorentzVector HZZ_Vec;
+    HZZ_Vec.SetPtEtaPhiM(ZZPt, ZZEta, ZZPhi, ZZMass);
   
-    // // build HH tlorentzvector
-    // TLorentzVector HH_Vec = HZZ_Vec + Hbb_Vec;
+    // build HH tlorentzvector
+    TLorentzVector HH_Vec = HZZ_Vec + Hbb_Vec;
 
 
-    // // save bb and HH masses
-    // f_bbmass = Hbb_Vec.M();
-    // f_HHmass = HH_Vec.M();
+    // save bb and HH masses
+    f_bbmass = Hbb_Vec.M();
+    f_HHmass = HH_Vec.M();
 
-    // // save jet jet inv mass
-    // f_massjetjet = Hbb_Vec.M();
+    // save jet jet inv mass
+    f_massjetjet = Hbb_Vec.M();
 
-    //JETSELECTION---------------------------------------------------
+    // JETSELECTION---------------------------------------------------
 
 
 
@@ -665,15 +665,15 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
     f_lept2_eta  = LepEta->at(1);
     f_lept3_eta  = LepEta->at(2);
     f_lept4_eta  = LepEta->at(3);
-    f_lept1_phi  = LepPhi->at(0);
-    f_lept2_phi  = LepPhi->at(1); 
-    f_lept3_phi  = LepPhi->at(2); 
-    f_lept4_phi  = LepPhi->at(3); 
-    // f_etajet1    = JetEta->at(d1_maxbtag);
-    // f_etajet2    = JetEta->at(d2_maxbtag);
-    // f_phijet1    = JetPhi->at(d1_maxbtag);
-    // f_phijet2    = JetPhi->at(d2_maxbtag);
-    // f_deltaPhiHH = DeltaPhi;
+    // f_lept1_phi  = LepPhi->at(0);
+    // f_lept2_phi  = LepPhi->at(1); 
+    // f_lept3_phi  = LepPhi->at(2); 
+    // f_lept4_phi  = LepPhi->at(3); 
+    f_etajet1    = JetEta->at(d1_maxbtag);
+    f_etajet2    = JetEta->at(d2_maxbtag);
+    f_phijet1    = JetPhi->at(d1_maxbtag);
+    f_phijet2    = JetPhi->at(d2_maxbtag);
+    f_deltaPhiHH = DeltaPhi;
 
 
 
@@ -738,13 +738,13 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
 void prepareNtupleMVA_2bjet()
 {
   // --- mass region
-  //  TString massRegion = "SR";
-  TString massRegion = "sidebands";
+  TString massRegion = "SR";
+  //  TString massRegion = "sidebands";
   //  TString massRegion = "fullmass";
 
   // --- selection
-  //  TString selection = "4ljjsel";
-  TString selection = "4lsel";
+  TString selection = "4ljjsel";
+  //  TString selection = "4lsel";
 
   // --- finalstate
   //  TString finalstate = "fs4mu";
@@ -767,32 +767,32 @@ void prepareNtupleMVA_2bjet()
   //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
   TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
   TString inputFileName[] = {
-    "AllData", 
-    "HH4lbb_Angela",
-    //"HH4lbb_Ilirjan",
-    "ggH125",
-    "VBFH125",
-    "WplusH125",
-    "WminusH125",
-    "ZH125",
-    "bbH125",
-    "ttH125",
-    "ZZTo4lext2",
-    //"ZZTo4l",
-    "ggTo4e_Contin_MCFM701",
-    "ggTo4mu_Contin_MCFM701",
-    "ggTo4tau_Contin_MCFM701",
-    "ggTo2e2mu_Contin_MCFM701",
-    "ggTo2e2tau_Contin_MCFM701",
-    "ggTo2mu2tau_Contin_MCFM701",
-    "TTZToLLNuNu_M10",
-    "TTWJetsToLNu",
-    "WWZ",
-    "WZZ",
-    "ZZZ",
-    //"ZXbkg",
-    "DYJetsToLL_M50",
-    "TTTo2L2Nu",
+    // "AllData", 
+    // "HH4lbb_Angela",
+    // //"HH4lbb_Ilirjan",
+    // "ggH125",
+    // "VBFH125",
+    // "WplusH125",
+    // "WminusH125",
+    // "ZH125",
+    // "bbH125",
+    // "ttH125",
+    // "ZZTo4lext2",
+    // //"ZZTo4l",
+    // "ggTo4e_Contin_MCFM701",
+    // "ggTo4mu_Contin_MCFM701",
+    // "ggTo4tau_Contin_MCFM701",
+    // "ggTo2e2mu_Contin_MCFM701",
+    // "ggTo2e2tau_Contin_MCFM701",
+    // "ggTo2mu2tau_Contin_MCFM701",
+    // "TTZToLLNuNu_M10",
+    // "TTWJetsToLNu",
+    // "WWZ",
+    // "WZZ",
+    // "ZZZ",
+    "ZXbkg_4ljjsel",
+    // "DYJetsToLL_M50",
+    // "TTTo2L2Nu",
   };
 
 
