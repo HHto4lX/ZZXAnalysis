@@ -46,7 +46,7 @@ void printTreeContent(){
   vector<Short_t> *JetPUID = 0;
 
   inputFile = TFile::Open("ZZXAnalysis.root");
-  inputTree = (TTree*)inputFile->Get("ZZTree/candTree");
+  inputTree = (TTree*)inputFile->Get("ZTree/candTree");
 
   inputTree->SetBranchAddress("RunNumber", &nRun);
   inputTree->SetBranchAddress("EventNumber", &nEvent);
