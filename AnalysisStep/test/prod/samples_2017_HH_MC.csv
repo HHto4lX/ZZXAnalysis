@@ -1,7 +1,7 @@
 identifier,process,crossSection=-1,BR=1,execute=True,dataset,prefix,pattern,splitLevel,::variables,::pyFragments,comment
 
 ### See comment field,,,,,,,,,,,
-###,,,,,,,,,,,xsec values are in pb; BR(HH4lbb)=2*BR(H4l)*BR(Hbb); BR(H4l) contains only decay into electrons and muons 
+###,,,,,,,,,,,xsec values are in pb; BR(HH4lbb)=2*BR(H4l)*BR(Hbb); BR(H4l) contains decay into electrons, muons and taus 
 
 
 ###,,,,,,,,,,,SM sample
