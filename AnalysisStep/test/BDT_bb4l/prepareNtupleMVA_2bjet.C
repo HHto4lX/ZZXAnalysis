@@ -235,6 +235,18 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   vector<Float_t> *JetHadronFlavour = 0;
   Float_t PFMET;
 
+  Float_t LHEweight_QCDscale_muR1_muF1;
+  Float_t LHEweight_QCDscale_muR1_muF2;
+  Float_t LHEweight_QCDscale_muR1_muF0p5;
+  Float_t LHEweight_QCDscale_muR2_muF1;
+  Float_t LHEweight_QCDscale_muR2_muF2;
+  Float_t LHEweight_QCDscale_muR2_muF0p5;
+  Float_t LHEweight_QCDscale_muR0p5_muF1;
+  Float_t LHEweight_QCDscale_muR0p5_muF2;
+  Float_t LHEweight_QCDscale_muR0p5_muF0p5;
+  Float_t LHEweight_PDFVariation_Up;
+  Float_t LHEweight_PDFVariation_Dn;
+
   // vector<Float_t> *JetPt_JESUp = 0;
   // vector<Float_t> *JetPt_JESDown = 0;
   // vector<Float_t> *JetPt_JERUp = 0;
@@ -302,6 +314,19 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
     inputTree->SetBranchAddress("KFactor_QCD_qqZZ_M", &KFactor_QCD_qqZZ_M);
     inputTree->SetBranchAddress("KFactor_QCD_qqZZ_Pt", &KFactor_QCD_qqZZ_Pt);
   }
+  inputTree->SetBranchAddress("LHEweight_QCDscale_muR1_muF1",     &LHEweight_QCDscale_muR1_muF1);
+  inputTree->SetBranchAddress("LHEweight_QCDscale_muR1_muF2",     &LHEweight_QCDscale_muR1_muF2);
+  inputTree->SetBranchAddress("LHEweight_QCDscale_muR1_muF0p5",   &LHEweight_QCDscale_muR1_muF0p5);
+  inputTree->SetBranchAddress("LHEweight_QCDscale_muR2_muF1",     &LHEweight_QCDscale_muR2_muF1);
+  inputTree->SetBranchAddress("LHEweight_QCDscale_muR2_muF2",     &LHEweight_QCDscale_muR2_muF2);
+  inputTree->SetBranchAddress("LHEweight_QCDscale_muR2_muF0p5",   &LHEweight_QCDscale_muR2_muF0p5);
+  inputTree->SetBranchAddress("LHEweight_QCDscale_muR0p5_muF1",   &LHEweight_QCDscale_muR0p5_muF1);
+  inputTree->SetBranchAddress("LHEweight_QCDscale_muR0p5_muF2",   &LHEweight_QCDscale_muR0p5_muF2);
+  inputTree->SetBranchAddress("LHEweight_QCDscale_muR0p5_muF0p5", &LHEweight_QCDscale_muR0p5_muF0p5);
+  inputTree->SetBranchAddress("LHEweight_PDFVariation_Up",        &LHEweight_PDFVariation_Up);
+  inputTree->SetBranchAddress("LHEweight_PDFVariation_Dn",        &LHEweight_PDFVariation_Dn);
+  
+
 
   
   //output file 
@@ -350,6 +375,18 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   float f_weightsignal_cfErr1Down  = -9999.;
   float f_weightsignal_cfErr2Up    = -9999.;
   float f_weightsignal_cfErr2Down  = -9999.;
+  // branches for QCD and PDF scale
+  Float_t f_LHEweight_QCDscale_muR1_muF1     = -9999.;
+  Float_t f_LHEweight_QCDscale_muR1_muF2     = -9999.;
+  Float_t f_LHEweight_QCDscale_muR1_muF0p5   = -9999.;
+  Float_t f_LHEweight_QCDscale_muR2_muF1     = -9999.;
+  Float_t f_LHEweight_QCDscale_muR2_muF2     = -9999.;
+  Float_t f_LHEweight_QCDscale_muR2_muF0p5   = -9999.;
+  Float_t f_LHEweight_QCDscale_muR0p5_muF1   = -9999.;
+  Float_t f_LHEweight_QCDscale_muR0p5_muF2   = -9999.;
+  Float_t f_LHEweight_QCDscale_muR0p5_muF0p5 = -9999.;
+  Float_t f_LHEweight_PDFVariation_Up        = -9999.;
+  Float_t f_LHEweight_PDFVariation_Dn        = -9999.;
   // branches in piu'
   float f_Z1Mass = -9999.;
   float f_Z2Mass = -9999.;
@@ -409,6 +446,17 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   tnew->Branch("f_weightsignal_cfErr1Down",   &f_weightsignal_cfErr1Down  ); 
   tnew->Branch("f_weightsignal_cfErr2Up",     &f_weightsignal_cfErr2Up    ); 
   tnew->Branch("f_weightsignal_cfErr2Down",   &f_weightsignal_cfErr2Down  ); 
+  tnew->Branch("f_LHEweight_QCDscale_muR1_muF1",     &f_LHEweight_QCDscale_muR1_muF1);
+  tnew->Branch("f_LHEweight_QCDscale_muR1_muF2",     &f_LHEweight_QCDscale_muR1_muF2);    
+  tnew->Branch("f_LHEweight_QCDscale_muR1_muF0p5",   &f_LHEweight_QCDscale_muR1_muF0p5);  
+  tnew->Branch("f_LHEweight_QCDscale_muR2_muF1",     &f_LHEweight_QCDscale_muR2_muF1);
+  tnew->Branch("f_LHEweight_QCDscale_muR2_muF2",     &f_LHEweight_QCDscale_muR2_muF2);
+  tnew->Branch("f_LHEweight_QCDscale_muR2_muF0p5",   &f_LHEweight_QCDscale_muR2_muF0p5);
+  tnew->Branch("f_LHEweight_QCDscale_muR0p5_muF1",   &f_LHEweight_QCDscale_muR0p5_muF1);
+  tnew->Branch("f_LHEweight_QCDscale_muR0p5_muF2",   &f_LHEweight_QCDscale_muR0p5_muF2);
+  tnew->Branch("f_LHEweight_QCDscale_muR0p5_muF0p5", &f_LHEweight_QCDscale_muR0p5_muF0p5);
+  tnew->Branch("f_LHEweight_PDFVariation_Up",        &f_LHEweight_PDFVariation_Up);
+  tnew->Branch("f_LHEweight_PDFVariation_Dn",        &f_LHEweight_PDFVariation_Dn);
 
 
   int currentFinalState;
@@ -705,6 +753,18 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
     f_weightsignal_cfErr2Up     = eventWeight * scaleFactors[17] * sum_events/sum_BTagSF;
     f_weightsignal_cfErr2Down   = eventWeight * scaleFactors[18] * sum_events/sum_BTagSF;
 
+    // save branches for QCD and PDF scale syst
+    f_LHEweight_QCDscale_muR1_muF1     = LHEweight_QCDscale_muR1_muF1;    
+    f_LHEweight_QCDscale_muR1_muF2     = LHEweight_QCDscale_muR1_muF2; 
+    f_LHEweight_QCDscale_muR1_muF0p5   = LHEweight_QCDscale_muR1_muF0p5;
+    f_LHEweight_QCDscale_muR2_muF1     = LHEweight_QCDscale_muR2_muF1;
+    f_LHEweight_QCDscale_muR2_muF2     = LHEweight_QCDscale_muR2_muF2;
+    f_LHEweight_QCDscale_muR2_muF0p5   = LHEweight_QCDscale_muR2_muF0p5;
+    f_LHEweight_QCDscale_muR0p5_muF1   = LHEweight_QCDscale_muR0p5_muF1;
+    f_LHEweight_QCDscale_muR0p5_muF2   = LHEweight_QCDscale_muR0p5_muF2;
+    f_LHEweight_QCDscale_muR0p5_muF0p5 = LHEweight_QCDscale_muR0p5_muF0p5;
+    f_LHEweight_PDFVariation_Up        = LHEweight_PDFVariation_Up;
+    f_LHEweight_PDFVariation_Dn        = LHEweight_PDFVariation_Dn;
 
 
 
@@ -747,31 +807,31 @@ void prepareNtupleMVA_2bjet()
   //  TString selection = "4lsel";
 
   // --- finalstate
-  //  TString finalstate = "fs4mu";
+  TString finalstate = "fs4mu";
   //  TString finalstate = "fs4e";
-  TString finalstate = "fs2e2mu";
+  //  TString finalstate = "fs2e2mu";
   
   // -- year
-  //  TString syear = "2016";
-  TString syear = "2017";
+  TString syear = "2016";
+  //  TString syear = "2017";
   //  TString syear = "2018";
 
   // --- lumi
-  //  float lumi = 35.8; //fb-1 2016
-  float lumi = 41.5; //fb-1 2017
+  float lumi = 35.8; //fb-1 2016
+  //  float lumi = 41.5; //fb-1 2017
   //  float lumi = 59.7; //fb-1 2018
   cout<<lumi<<endl;
 
 
-  //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
-  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
+  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
+  //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
   //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
   TString inputFileName[] = {
     // "AllData", 
     // "HH4lbb_Angela",
     //  "HH4lbb_Ilirjan",
-    // "ggH125",
-    "ggH125minlo",
+    "ggH125",
+    // "ggH125minlo",
     // "VBFH125",
     // "WplusH125",
     // "WminusH125",
