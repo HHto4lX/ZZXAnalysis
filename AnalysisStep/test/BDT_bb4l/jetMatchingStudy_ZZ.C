@@ -34,12 +34,12 @@ using namespace std;
 
 // ---------------------------------------
 // --- sampleType
-//TString sampleType = "GGH";
-TString sampleType = "GGZZ";
+TString sampleType = "GGH";
+//TString sampleType = "GGZZ";
 // ---------------------------------------
 // --- massRegion
-//TString massRegion = "SR";
-TString massRegion = "fullmass";
+TString massRegion = "SR";
+//TString massRegion = "fullmass";
 // ---------------------------------------
 
 
@@ -51,13 +51,13 @@ void jetMatchingStudy_ZZ(){
   // -------------------------------------------
   // datasets
   TString datasets[] = {
-    //  "ggH125",  // ggH
-    "ggTo4e_Contin_MCFM701",
-    "ggTo4mu_Contin_MCFM701",
-    "ggTo4tau_Contin_MCFM701",
-    "ggTo2e2mu_Contin_MCFM701",
-    "ggTo2e2tau_Contin_MCFM701",
-    "ggTo2mu2tau_Contin_MCFM701",
+    "ggH125",  // ggH
+    // "ggTo4e_Contin_MCFM701",
+    // "ggTo4mu_Contin_MCFM701",
+    // "ggTo4tau_Contin_MCFM701",
+    // "ggTo2e2mu_Contin_MCFM701",
+    // "ggTo2e2tau_Contin_MCFM701",
+    // "ggTo2mu2tau_Contin_MCFM701",
    };
 
   static size_t nDatasets = sizeof(datasets)/sizeof(datasets[0]);
@@ -116,6 +116,8 @@ void jetMatchingStudy_ZZ(){
   // histos
   TH1F* h_matches_Method2 = new TH1F("h_matches_Method2","reco-GEN jet matches;# reco jet with GEN match;eff", 3,-0.5,2.5);
   TH1F* h_bbmass_Method2 = new TH1F("h_bbmass_Method2", ";bbMass;events", 50, 0., 500.); h_bbmass_Method2->Sumw2(true);  
+  TH1F* h_j1btag_Method2 = new TH1F("h_j1btag_Method2", ";j1 DeepCSV;events", 25, 0., 1.); h_j1btag_Method2->Sumw2(true);  
+  TH1F* h_j2btag_Method2 = new TH1F("h_j2btag_Method2", ";j2 DeepCSV;events", 25, 0., 1.); h_j2btag_Method2->Sumw2(true);  
   TH1F* h_weights2 = new TH1F("h_weights2","",100,-0.0001,0.0008);
   
 
@@ -257,7 +259,7 @@ void jetMatchingStudy_ZZ(){
         // find match between 1st reco jets and GEN jets
         bool bool_match1_Method2 = false;
         for(UInt_t pr = 0; pr<prunedGenPartEta->size(); pr++){
-          if (fabs(prunedGenPartID->at(pr)) == 5 && prunedGenMotherID->at(pr) == 25){     // check that GEN particle is b quark and mother of b quark is Higgs
+          if (fabs(prunedGenPartID->at(pr)) == 5 ){     // check that GEN particle is b quark and mother of b quark is Higgs
    
             float deltaPhi1 = JetPhi->at(d1_Method2) - prunedGenPartPhi->at(pr);
             if(fabs(deltaPhi1) > acos(-1)){ deltaPhi1 = (2*acos(-1)) - fabs(deltaPhi1); }
@@ -272,7 +274,7 @@ void jetMatchingStudy_ZZ(){
         // find match between 2nd reco jets and GEN jets
         bool bool_match2_Method2 = false;
         for(UInt_t pr = 0; pr<prunedGenPartEta->size(); pr++){
-          if (fabs(prunedGenPartID->at(pr)) == 5 && prunedGenMotherID->at(pr) == 25){     // check that GEN particle is b quark and mother of b quark is Higgs
+          if (fabs(prunedGenPartID->at(pr)) == 5 ){     // check that GEN particle is b quark and mother of b quark is Higgs
    
             float deltaPhi2 = JetPhi->at(d2_Method2) - prunedGenPartPhi->at(pr);
             if(fabs(deltaPhi2) > acos(-1)){ deltaPhi2 = (2*acos(-1)) - fabs(deltaPhi2); }
@@ -302,6 +304,8 @@ void jetMatchingStudy_ZZ(){
         TLorentzVector Hbb_vec_Method2 = tlzvec_j1_ + tlzvec_j2_;
         h_bbmass_Method2->Fill(Hbb_vec_Method2.M(), eventWeight);
         h_weights2->Fill(eventWeight);
+        h_j1btag_Method2->Fill(JetBTagger->at(d1_Method2), eventWeight);
+        h_j2btag_Method2->Fill(JetBTagger->at(d2_Method2), eventWeight);
       } 
       // --- end jet selection METHOD2: 2 high btagger jets
       // ----------------------------------------------
@@ -382,9 +386,19 @@ void jetMatchingStudy_ZZ(){
 
   c_Massbb->SaveAs("bbMass_" + sampleType + "_" + massRegion + ".png");
 
+  // j1btagger
+  TCanvas* c_j1btagger = new TCanvas();
+  c_j1btagger->cd();
+  h_j1btag_Method2->SetLineColor(kRed);
+  h_j1btag_Method2->Draw("hist");
+  c_j1btagger->SaveAs("btaggerj1_" + sampleType + "_" + massRegion + ".png");
 
-
-
+  // j2btagger
+  TCanvas* c_j2btagger = new TCanvas();
+  c_j2btagger->cd();
+  h_j2btag_Method2->SetLineColor(kRed);
+  h_j2btag_Method2->Draw("hist");
+  c_j2btagger->SaveAs("btaggerj2_" + sampleType + "_" + massRegion + ".png");
 
   //weights
   TCanvas* c_weights = new TCanvas();
