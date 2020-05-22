@@ -45,7 +45,7 @@
 
 using namespace std;
 
-#define REDOHISTOS 1
+#define REDOHISTOS 0
 
 //******************
 //int year = 2016;
@@ -345,6 +345,8 @@ void doHistos()
   TH1F* hEvents_4lsel  [nProcesses][nFinalStates+1];
   TH1F* hEvents_4ljjsel[nProcesses][nFinalStates+1];
   TH1F* hYields_4ljjsel_sidebands[nProcesses][nFinalStates+1];
+  TH1F* hYields_4ljjsel_sidebandSX[nProcesses][nFinalStates+1];
+  TH1F* hYields_4ljjsel_sidebandDX[nProcesses][nFinalStates+1];
   for(int pr=0; pr<nProcesses; pr++){
     for(int fs=0; fs<nFinalStates+1; fs++){
       hYields_4lsel  [pr][fs] = new TH1F("hYields_4lsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,"",1,0.,1.);
@@ -357,6 +359,10 @@ void doHistos()
       hEvents_4ljjsel[pr][fs]->Sumw2(true);
       hYields_4ljjsel_sidebands[pr][fs] = new TH1F("hYields_4ljjsel_sidebands_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,"",1,0.,1.);
       hYields_4ljjsel_sidebands[pr][fs]->Sumw2(true);
+      hYields_4ljjsel_sidebandSX[pr][fs] = new TH1F("hYields_4ljjsel_sidebandSX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,"",1,0.,1.);
+      hYields_4ljjsel_sidebandSX[pr][fs]->Sumw2(true);
+      hYields_4ljjsel_sidebandDX[pr][fs] = new TH1F("hYields_4ljjsel_sidebandDX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,"",1,0.,1.);
+      hYields_4ljjsel_sidebandDX[pr][fs]->Sumw2(true);
     }
   }
 
@@ -373,6 +379,26 @@ void doHistos()
   TH1F* h1_MET_4ljjsel_sidebands     [nProcesses][nFinalStates+1];
   TH1F* h1_DeltaRhh_4ljjsel_sidebands[nProcesses][nFinalStates+1];
   TH1F* h1_mbb_4ljjsel_sidebands     [nProcesses][nFinalStates+1];
+  // sidebandSX: m4l in 95-115 GeV
+  TH1F* h1_m4l_4ljjsel_sidebandSX     [nProcesses][nFinalStates+1]; 
+  TH1F* h1_pT4l_4ljjsel_sidebandSX    [nProcesses][nFinalStates+1];
+  TH1F* h1_j1btag_4ljjsel_sidebandSX  [nProcesses][nFinalStates+1];
+  TH1F* h1_j2btag_4ljjsel_sidebandSX  [nProcesses][nFinalStates+1];
+  TH1F* h1_j1pT_4ljjsel_sidebandSX    [nProcesses][nFinalStates+1];
+  TH1F* h1_j2pT_4ljjsel_sidebandSX    [nProcesses][nFinalStates+1];
+  TH1F* h1_MET_4ljjsel_sidebandSX     [nProcesses][nFinalStates+1];
+  TH1F* h1_DeltaRhh_4ljjsel_sidebandSX[nProcesses][nFinalStates+1];
+  TH1F* h1_mbb_4ljjsel_sidebandSX     [nProcesses][nFinalStates+1];
+  // sidebandDX: m4l in 135-170 GeV
+  TH1F* h1_m4l_4ljjsel_sidebandDX     [nProcesses][nFinalStates+1];
+  TH1F* h1_pT4l_4ljjsel_sidebandDX    [nProcesses][nFinalStates+1];
+  TH1F* h1_j1btag_4ljjsel_sidebandDX  [nProcesses][nFinalStates+1];
+  TH1F* h1_j2btag_4ljjsel_sidebandDX  [nProcesses][nFinalStates+1];
+  TH1F* h1_j1pT_4ljjsel_sidebandDX    [nProcesses][nFinalStates+1];
+  TH1F* h1_j2pT_4ljjsel_sidebandDX    [nProcesses][nFinalStates+1];
+  TH1F* h1_MET_4ljjsel_sidebandDX     [nProcesses][nFinalStates+1];
+  TH1F* h1_DeltaRhh_4ljjsel_sidebandDX[nProcesses][nFinalStates+1];
+  TH1F* h1_mbb_4ljjsel_sidebandDX     [nProcesses][nFinalStates+1];
   // mass cut plots: (BDT input histos)
   TH1F* h1_pT4l_4ljjsel    [nProcesses][nFinalStates+1];
   TH1F* h1_j1btag_4ljjsel  [nProcesses][nFinalStates+1];
@@ -390,7 +416,7 @@ void doHistos()
       h1_m4l_4ljjsel  [pr][fs] = new TH1F("h1_m4l_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events/4 GeV", 33, 70., 202.);
       h1_m4l_4ljjsel  [pr][fs]->Sumw2(true);
       // sidebands
-      h1_pT4l_4ljjsel_sidebands[pr][fs] = new TH1F("h1_pT4l_4ljjsel_sidebands_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";4 leptons pT (GeV); Events/2 GeV", 50, 0., 100.);
+      h1_pT4l_4ljjsel_sidebands    [pr][fs] = new TH1F("h1_pT4l_4ljjsel_sidebands_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";4 leptons pT (GeV); Events/2 GeV", 50, 0., 100.);
       h1_pT4l_4ljjsel_sidebands    [pr][fs]->Sumw2(true);
       h1_j1btag_4ljjsel_sidebands  [pr][fs] = new TH1F("h1_j1btag_4ljjsel_sidebands_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j1 DeepCSV; Events/0.04", 25, 0., 1.);
       h1_j1btag_4ljjsel_sidebands  [pr][fs]->Sumw2(true);
@@ -406,6 +432,47 @@ void doHistos()
       h1_DeltaRhh_4ljjsel_sidebands[pr][fs]->Sumw2(true);
       h1_mbb_4ljjsel_sidebands     [pr][fs] = new TH1F("h1_mbb_4ljjsel_sidebands_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{jj} (GeV); Events/5 GeV", 40, 0., 200.);
       h1_mbb_4ljjsel_sidebands     [pr][fs]->Sumw2(true);
+
+      // sidebandSX
+      h1_m4l_4ljjsel_sidebandSX     [pr][fs] = new TH1F("h1_m4l_4ljjsel_sidebandSX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events/4 GeV", 5, 95., 115.);
+      h1_m4l_4ljjsel_sidebandSX     [pr][fs]->Sumw2(true);
+      h1_pT4l_4ljjsel_sidebandSX    [pr][fs] = new TH1F("h1_pT4l_4ljjsel_sidebandSX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";4 leptons pT (GeV); Events/2 GeV", 50, 0., 100.);
+      h1_pT4l_4ljjsel_sidebandSX    [pr][fs]->Sumw2(true);
+      h1_j1btag_4ljjsel_sidebandSX  [pr][fs] = new TH1F("h1_j1btag_4ljjsel_sidebandSX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j1 DeepCSV; Events/0.04", 25, 0., 1.);
+      h1_j1btag_4ljjsel_sidebandSX  [pr][fs]->Sumw2(true);
+      h1_j2btag_4ljjsel_sidebandSX  [pr][fs] = new TH1F("h1_j2btag_4ljjsel_sidebandSX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j2 DeepCSV; Events/0.04", 25, 0., 1.);
+      h1_j2btag_4ljjsel_sidebandSX  [pr][fs]->Sumw2(true);
+      h1_j1pT_4ljjsel_sidebandSX    [pr][fs] = new TH1F("h1_j1pT_4ljjsel_sidebandSX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j1 pT(GeV); Events/5 GeV", 40, 0., 200.);
+      h1_j1pT_4ljjsel_sidebandSX    [pr][fs]->Sumw2(true);
+      h1_j2pT_4ljjsel_sidebandSX    [pr][fs] = new TH1F("h1_j2pT_4ljjsel_sidebandSX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j2 pT(GeV); Events/5 GeV", 40, 0., 200.);
+      h1_j2pT_4ljjsel_sidebandSX    [pr][fs]->Sumw2(true);
+      h1_MET_4ljjsel_sidebandSX     [pr][fs] = new TH1F("h1_MET_4ljjsel_sidebandSX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";MET (GeV); Events/5 GeV", 40, 0., 200.);
+      h1_MET_4ljjsel_sidebandSX     [pr][fs]->Sumw2(true);
+      h1_DeltaRhh_4ljjsel_sidebandSX[pr][fs] = new TH1F("h1_DeltaRhh_4ljjsel_sidebandSX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";Delta R H4l-Hbb; Events/0.4 ", 25, 0., 10.);
+      h1_DeltaRhh_4ljjsel_sidebandSX[pr][fs]->Sumw2(true);
+      h1_mbb_4ljjsel_sidebandSX     [pr][fs] = new TH1F("h1_mbb_4ljjsel_sidebandSX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{jj} (GeV); Events/5 GeV", 40, 0., 200.);
+      h1_mbb_4ljjsel_sidebandSX     [pr][fs]->Sumw2(true);
+
+      // sidebandDX
+      h1_m4l_4ljjsel_sidebandDX     [pr][fs] = new TH1F("h1_m4l_4ljjsel_sidebandDX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events/4 GeV", 9, 135., 171.);
+      h1_m4l_4ljjsel_sidebandDX     [pr][fs]->Sumw2(true);
+      h1_pT4l_4ljjsel_sidebandDX    [pr][fs] = new TH1F("h1_pT4l_4ljjsel_sidebandDX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";4 leptons pT (GeV); Events/2 GeV", 50, 0., 100.);
+      h1_pT4l_4ljjsel_sidebandDX    [pr][fs]->Sumw2(true);
+      h1_j1btag_4ljjsel_sidebandDX  [pr][fs] = new TH1F("h1_j1btag_4ljjsel_sidebandDX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j1 DeepCSV; Events/0.04", 25, 0., 1.);
+      h1_j1btag_4ljjsel_sidebandDX  [pr][fs]->Sumw2(true);
+      h1_j2btag_4ljjsel_sidebandDX  [pr][fs] = new TH1F("h1_j2btag_4ljjsel_sidebandDX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j2 DeepCSV; Events/0.04", 25, 0., 1.);
+      h1_j2btag_4ljjsel_sidebandDX  [pr][fs]->Sumw2(true);
+      h1_j1pT_4ljjsel_sidebandDX    [pr][fs] = new TH1F("h1_j1pT_4ljjsel_sidebandDX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j1 pT(GeV); Events/5 GeV", 40, 0., 200.);
+      h1_j1pT_4ljjsel_sidebandDX    [pr][fs]->Sumw2(true);
+      h1_j2pT_4ljjsel_sidebandDX    [pr][fs] = new TH1F("h1_j2pT_4ljjsel_sidebandDX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";j2 pT(GeV); Events/5 GeV", 40, 0., 200.);
+      h1_j2pT_4ljjsel_sidebandDX    [pr][fs]->Sumw2(true);
+      h1_MET_4ljjsel_sidebandDX     [pr][fs] = new TH1F("h1_MET_4ljjsel_sidebandDX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";MET (GeV); Events/5 GeV", 40, 0., 200.);
+      h1_MET_4ljjsel_sidebandDX     [pr][fs]->Sumw2(true);
+      h1_DeltaRhh_4ljjsel_sidebandDX[pr][fs] = new TH1F("h1_DeltaRhh_4ljjsel_sidebandDX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";Delta R H4l-Hbb; Events/0.4 ", 25, 0., 10.);
+      h1_DeltaRhh_4ljjsel_sidebandDX[pr][fs]->Sumw2(true);
+      h1_mbb_4ljjsel_sidebandDX     [pr][fs] = new TH1F("h1_mbb_4ljjsel_sidebandDX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{jj} (GeV); Events/5 GeV", 40, 0., 200.);
+      h1_mbb_4ljjsel_sidebandDX     [pr][fs]->Sumw2(true);
+
 
       //BDT input histos
       h1_pT4l_4ljjsel    [pr][fs] = new TH1F("h1_pT4l_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";4 leptons pT (GeV); Events/2 GeV", 50, 0., 100.);
@@ -753,6 +820,48 @@ void doHistos()
 
       } //end else (sidebands)
 
+      // --- sidebandSX
+      if(ZZMass >= 95 && ZZMass <= 115){
+
+	// --- fill yields in sidebandSX
+        hYields_4ljjsel_sidebandSX[currentProcess][currentFinalState]->Fill(0.5, eventWeight);
+
+        // --- fill histos after 4ljj sel: sidebandSX
+        for(int i=0; i<LepPt->size(); i++){
+          h1_pT4l_4ljjsel_sidebandSX[currentProcess][currentFinalState]->Fill(LepPt->at(i), eventWeight);
+        }
+        h1_m4l_4ljjsel_sidebandSX     [currentProcess][currentFinalState]->Fill(ZZMass,               eventWeight);
+        h1_j1btag_4ljjsel_sidebandSX  [currentProcess][currentFinalState]->Fill(JetBTagger->at(dj1_), eventWeight);
+        h1_j2btag_4ljjsel_sidebandSX  [currentProcess][currentFinalState]->Fill(JetBTagger->at(dj2_), eventWeight);
+        h1_j1pT_4ljjsel_sidebandSX    [currentProcess][currentFinalState]->Fill(JetPt->at(dj1_),      eventWeight);  
+        h1_j2pT_4ljjsel_sidebandSX    [currentProcess][currentFinalState]->Fill(JetPt->at(dj2_),      eventWeight);
+        h1_MET_4ljjsel_sidebandSX     [currentProcess][currentFinalState]->Fill(PFMET,                eventWeight);
+        h1_DeltaRhh_4ljjsel_sidebandSX[currentProcess][currentFinalState]->Fill(DeltaR,               eventWeight);
+        h1_mbb_4ljjsel_sidebandSX     [currentProcess][currentFinalState]->Fill(bbMass,               eventWeight);
+
+      } // end sidebandSX
+
+      // --- sidebandDX
+      if(ZZMass >= 135 && ZZMass <= 170){
+
+	// --- fill yields in sidebandDX
+        hYields_4ljjsel_sidebandDX[currentProcess][currentFinalState]->Fill(0.5, eventWeight);
+
+        // --- fill histos after 4ljj sel: sidebandDX
+        for(int i=0; i<LepPt->size(); i++){
+          h1_pT4l_4ljjsel_sidebandDX[currentProcess][currentFinalState]->Fill(LepPt->at(i), eventWeight);
+        }
+        h1_m4l_4ljjsel_sidebandDX     [currentProcess][currentFinalState]->Fill(ZZMass,               eventWeight);
+        h1_j1btag_4ljjsel_sidebandDX  [currentProcess][currentFinalState]->Fill(JetBTagger->at(dj1_), eventWeight);
+        h1_j2btag_4ljjsel_sidebandDX  [currentProcess][currentFinalState]->Fill(JetBTagger->at(dj2_), eventWeight);
+        h1_j1pT_4ljjsel_sidebandDX    [currentProcess][currentFinalState]->Fill(JetPt->at(dj1_),      eventWeight);  
+        h1_j2pT_4ljjsel_sidebandDX    [currentProcess][currentFinalState]->Fill(JetPt->at(dj2_),      eventWeight);
+        h1_MET_4ljjsel_sidebandDX     [currentProcess][currentFinalState]->Fill(PFMET,                eventWeight);
+        h1_DeltaRhh_4ljjsel_sidebandDX[currentProcess][currentFinalState]->Fill(DeltaR,               eventWeight);
+        h1_mbb_4ljjsel_sidebandDX     [currentProcess][currentFinalState]->Fill(bbMass,               eventWeight);
+
+      } // end sidebandDX
+
 
     }//end loop over tree events
 
@@ -773,6 +882,26 @@ void doHistos()
     h1_MET_4ljjsel_sidebands     [ZXbkg][fs]->Scale(2.);
     h1_DeltaRhh_4ljjsel_sidebands[ZXbkg][fs]->Scale(2.);
     h1_mbb_4ljjsel_sidebands     [ZXbkg][fs]->Scale(2.);
+    // sidebandSX
+    h1_pT4l_4ljjsel_sidebandSX    [ZXbkg][fs]->Scale(2.);
+    h1_m4l_4ljjsel_sidebandSX     [ZXbkg][fs]->Scale(2.);
+    h1_j1btag_4ljjsel_sidebandSX  [ZXbkg][fs]->Scale(2.);
+    h1_j2btag_4ljjsel_sidebandSX  [ZXbkg][fs]->Scale(2.);
+    h1_j1pT_4ljjsel_sidebandSX    [ZXbkg][fs]->Scale(2.);
+    h1_j2pT_4ljjsel_sidebandSX    [ZXbkg][fs]->Scale(2.);
+    h1_MET_4ljjsel_sidebandSX     [ZXbkg][fs]->Scale(2.);
+    h1_DeltaRhh_4ljjsel_sidebandSX[ZXbkg][fs]->Scale(2.);
+    h1_mbb_4ljjsel_sidebandSX     [ZXbkg][fs]->Scale(2.);
+    // sidebandDX
+    h1_pT4l_4ljjsel_sidebandDX    [ZXbkg][fs]->Scale(2.);
+    h1_m4l_4ljjsel_sidebandDX     [ZXbkg][fs]->Scale(2.);
+    h1_j1btag_4ljjsel_sidebandDX  [ZXbkg][fs]->Scale(2.);
+    h1_j2btag_4ljjsel_sidebandDX  [ZXbkg][fs]->Scale(2.);
+    h1_j1pT_4ljjsel_sidebandDX    [ZXbkg][fs]->Scale(2.);
+    h1_j2pT_4ljjsel_sidebandDX    [ZXbkg][fs]->Scale(2.);
+    h1_MET_4ljjsel_sidebandDX     [ZXbkg][fs]->Scale(2.);
+    h1_DeltaRhh_4ljjsel_sidebandDX[ZXbkg][fs]->Scale(2.);
+    h1_mbb_4ljjsel_sidebandDX     [ZXbkg][fs]->Scale(2.);
     // (BDT input)
     h1_pT4l_4ljjsel    [ZXbkg][fs]->Scale(rescale_ZX[fs] / h1_pT4l_4ljjsel    [ZXbkg][fs]->Integral());
     h1_j1btag_4ljjsel  [ZXbkg][fs]->Scale(rescale_ZX[fs] / h1_j1btag_4ljjsel  [ZXbkg][fs]->Integral());
@@ -792,14 +921,15 @@ void doHistos()
       hYields_4ljjsel [pr][nFinalStates]->Add(hYields_4ljjsel [pr][fs]);
       hEvents_4lsel   [pr][nFinalStates]->Add(hEvents_4lsel   [pr][fs]);
       hEvents_4ljjsel [pr][nFinalStates]->Add(hEvents_4ljjsel [pr][fs]);
-      hYields_4ljjsel_sidebands[pr][nFinalStates]->Add(hYields_4ljjsel_sidebands[pr][fs]);
+      hYields_4ljjsel_sidebands [pr][nFinalStates]->Add(hYields_4ljjsel_sidebands [pr][fs]);
+      hYields_4ljjsel_sidebandSX[pr][nFinalStates]->Add(hYields_4ljjsel_sidebandSX[pr][fs]);
+      hYields_4ljjsel_sidebandDX[pr][nFinalStates]->Add(hYields_4ljjsel_sidebandDX[pr][fs]);
 
       // (h1 histos)
       // 4ljjsel
       // fullmass range
       h1_m4l_4ljjsel  [pr][nFinalStates]->Add(h1_m4l_4ljjsel  [pr][fs]); 
       // sidebands
-      h1_pT4l_4ljjsel_sidebands    [pr][nFinalStates]->Add(h1_pT4l_4ljjsel_sidebands    [pr][fs]);
       h1_pT4l_4ljjsel_sidebands    [pr][nFinalStates]->Add(h1_pT4l_4ljjsel_sidebands    [pr][fs]);
       h1_j1btag_4ljjsel_sidebands  [pr][nFinalStates]->Add(h1_j1btag_4ljjsel_sidebands  [pr][fs]);
       h1_j2btag_4ljjsel_sidebands  [pr][nFinalStates]->Add(h1_j2btag_4ljjsel_sidebands  [pr][fs]);
@@ -808,6 +938,26 @@ void doHistos()
       h1_MET_4ljjsel_sidebands     [pr][nFinalStates]->Add(h1_MET_4ljjsel_sidebands     [pr][fs]);
       h1_DeltaRhh_4ljjsel_sidebands[pr][nFinalStates]->Add(h1_DeltaRhh_4ljjsel_sidebands[pr][fs]);
       h1_mbb_4ljjsel_sidebands     [pr][nFinalStates]->Add(h1_mbb_4ljjsel_sidebands     [pr][fs]);
+      // sidebandSX
+      h1_m4l_4ljjsel_sidebandSX     [pr][nFinalStates]->Add(h1_m4l_4ljjsel_sidebandSX     [pr][fs]);
+      h1_pT4l_4ljjsel_sidebandSX    [pr][nFinalStates]->Add(h1_pT4l_4ljjsel_sidebandSX    [pr][fs]);
+      h1_j1btag_4ljjsel_sidebandSX  [pr][nFinalStates]->Add(h1_j1btag_4ljjsel_sidebandSX  [pr][fs]);
+      h1_j2btag_4ljjsel_sidebandSX  [pr][nFinalStates]->Add(h1_j2btag_4ljjsel_sidebandSX  [pr][fs]);
+      h1_j1pT_4ljjsel_sidebandSX    [pr][nFinalStates]->Add(h1_j1pT_4ljjsel_sidebandSX    [pr][fs]);
+      h1_j2pT_4ljjsel_sidebandSX    [pr][nFinalStates]->Add(h1_j2pT_4ljjsel_sidebandSX    [pr][fs]);
+      h1_MET_4ljjsel_sidebandSX     [pr][nFinalStates]->Add(h1_MET_4ljjsel_sidebandSX     [pr][fs]);
+      h1_DeltaRhh_4ljjsel_sidebandSX[pr][nFinalStates]->Add(h1_DeltaRhh_4ljjsel_sidebandSX[pr][fs]);
+      h1_mbb_4ljjsel_sidebandSX     [pr][nFinalStates]->Add(h1_mbb_4ljjsel_sidebandSX     [pr][fs]);
+      // sidebandDX
+      h1_m4l_4ljjsel_sidebandDX     [pr][nFinalStates]->Add(h1_m4l_4ljjsel_sidebandDX     [pr][fs]);
+      h1_pT4l_4ljjsel_sidebandDX    [pr][nFinalStates]->Add(h1_pT4l_4ljjsel_sidebandDX    [pr][fs]);
+      h1_j1btag_4ljjsel_sidebandDX  [pr][nFinalStates]->Add(h1_j1btag_4ljjsel_sidebandDX  [pr][fs]);
+      h1_j2btag_4ljjsel_sidebandDX  [pr][nFinalStates]->Add(h1_j2btag_4ljjsel_sidebandDX  [pr][fs]);
+      h1_j1pT_4ljjsel_sidebandDX    [pr][nFinalStates]->Add(h1_j1pT_4ljjsel_sidebandDX    [pr][fs]);
+      h1_j2pT_4ljjsel_sidebandDX    [pr][nFinalStates]->Add(h1_j2pT_4ljjsel_sidebandDX    [pr][fs]);
+      h1_MET_4ljjsel_sidebandDX     [pr][nFinalStates]->Add(h1_MET_4ljjsel_sidebandDX     [pr][fs]);
+      h1_DeltaRhh_4ljjsel_sidebandDX[pr][nFinalStates]->Add(h1_DeltaRhh_4ljjsel_sidebandDX[pr][fs]);
+      h1_mbb_4ljjsel_sidebandDX     [pr][nFinalStates]->Add(h1_mbb_4ljjsel_sidebandDX     [pr][fs]);
       // (BDT input histos)
       h1_pT4l_4ljjsel    [pr][nFinalStates]->Add(h1_pT4l_4ljjsel    [pr][fs]);
       h1_j1btag_4ljjsel  [pr][nFinalStates]->Add(h1_j1btag_4ljjsel  [pr][fs]);
@@ -831,7 +981,9 @@ void doHistos()
       hYields_4ljjsel[pr][fs]->Write();
       hEvents_4lsel  [pr][fs]->Write();
       hEvents_4ljjsel[pr][fs]->Write();
-      hYields_4ljjsel_sidebands[pr][fs]->Write();
+      hYields_4ljjsel_sidebands [pr][fs]->Write();
+      hYields_4ljjsel_sidebandSX[pr][fs]->Write();
+      hYields_4ljjsel_sidebandDX[pr][fs]->Write();
     }
   }
   fout_yields->Close();
@@ -854,6 +1006,26 @@ void doHistos()
       h1_MET_4ljjsel_sidebands     [pr][fs]->Write();
       h1_DeltaRhh_4ljjsel_sidebands[pr][fs]->Write();
       h1_mbb_4ljjsel_sidebands     [pr][fs]->Write();     
+      // sidebandSX
+      h1_m4l_4ljjsel_sidebandSX     [pr][fs]->Write();
+      h1_pT4l_4ljjsel_sidebandSX    [pr][fs]->Write();
+      h1_j1btag_4ljjsel_sidebandSX  [pr][fs]->Write();     
+      h1_j2btag_4ljjsel_sidebandSX  [pr][fs]->Write();
+      h1_j1pT_4ljjsel_sidebandSX    [pr][fs]->Write();
+      h1_j2pT_4ljjsel_sidebandSX    [pr][fs]->Write();
+      h1_MET_4ljjsel_sidebandSX     [pr][fs]->Write();
+      h1_DeltaRhh_4ljjsel_sidebandSX[pr][fs]->Write();
+      h1_mbb_4ljjsel_sidebandSX     [pr][fs]->Write();     
+      // sidebandDX
+      h1_m4l_4ljjsel_sidebandDX     [pr][fs]->Write();
+      h1_pT4l_4ljjsel_sidebandDX    [pr][fs]->Write();
+      h1_j1btag_4ljjsel_sidebandDX  [pr][fs]->Write();     
+      h1_j2btag_4ljjsel_sidebandDX  [pr][fs]->Write();
+      h1_j1pT_4ljjsel_sidebandDX    [pr][fs]->Write();
+      h1_j2pT_4ljjsel_sidebandDX    [pr][fs]->Write();
+      h1_MET_4ljjsel_sidebandDX     [pr][fs]->Write();
+      h1_DeltaRhh_4ljjsel_sidebandDX[pr][fs]->Write();
+      h1_mbb_4ljjsel_sidebandDX     [pr][fs]->Write();     
       // mass cut: BDT input
       h1_pT4l_4ljjsel    [pr][fs]->Write();
       h1_j1btag_4ljjsel  [pr][fs]->Write();     
@@ -910,6 +1082,8 @@ void printYields_forSync(){
   Float_t nEvent_4lsel  [nProcesses][nFinalStates+1];
   Float_t nEvent_4ljjsel[nProcesses][nFinalStates+1];
   TH1F* yield_4ljjsel_sidebands[nProcesses][nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebandSX[nProcesses][nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebandDX[nProcesses][nFinalStates+1];
   for(int pr=0; pr<nProcesses; pr++){
     for(int fs=0; fs<nFinalStates+1; fs++){
       hTemp0 = (TH1F*)fInYields->Get("hYields_4lsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear);
@@ -921,7 +1095,9 @@ void printYields_forSync(){
       hTemp3 = (TH1F*)fInYields->Get("hEvents_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear);
       nEvent_4ljjsel[pr][fs] = hTemp3->GetBinContent(1);  
 
-      yield_4ljjsel_sidebands[pr][fs] = (TH1F*)fInYields->Get("hYields_4ljjsel_sidebands_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear);
+      yield_4ljjsel_sidebands[pr][fs]  = (TH1F*)fInYields->Get("hYields_4ljjsel_sidebands_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear);
+      yield_4ljjsel_sidebandSX[pr][fs] = (TH1F*)fInYields->Get("hYields_4ljjsel_sidebandSX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear);
+      yield_4ljjsel_sidebandDX[pr][fs] = (TH1F*)fInYields->Get("hYields_4ljjsel_sidebandDX_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear);
     }
   }
 
@@ -1110,6 +1286,226 @@ void printYields_forSync(){
   }
   f_yields4ljjsel_sidebands.close();
   
+
+
+
+  // *******************************
+  // *** PRINT YIELDS SIDEBANDSX ***
+  // *******************************
+  // --- print yields after 4ljj sel in sidebandSX 
+  cout<<"print yields after 4ljj sel in sidebandSX ... "<<endl;
+  ofstream f_yields4ljjsel_sidebandSX;
+  TString f_yields4ljjsel_sidebandSX_name = "yields4ljjsel_sidebandSX_"+ sYear + ".txt";
+
+  TH1F* yield_4ljjsel_sidebandSX_ZZ[nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebandSX_Higgs[nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebandSX_others[nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebandSX_tot_Ange[nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebandSX_SMHiggs[nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebandSX_TTV[nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebandSX_tot_Ale[nFinalStates+1];
+
+  f_yields4ljjsel_sidebandSX.open(f_yields4ljjsel_sidebandSX_name); 
+
+  // print yields in Angela style
+  f_yields4ljjsel_sidebandSX<<"|Final state |signal HH |ttZ |ttH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |others(=VVV+VH+TTW) |Z+X |Sum bkg |Data |"<<endl;
+  for(int fs=0; fs<nFinalStates+1; fs++){
+    // add histos
+    // ZZ
+    yield_4ljjsel_sidebandSX_ZZ[fs] = (TH1F*)yield_4ljjsel_sidebandSX[qqZZ][fs]->Clone("hYields_4ljjsel_sidebandSX_ZZ_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebandSX_ZZ[fs]->Add(yield_4ljjsel_sidebandSX[ggZZ][fs]); 
+    // Higgs
+    yield_4ljjsel_sidebandSX_Higgs[fs] = (TH1F*)yield_4ljjsel_sidebandSX[ggH][fs]->Clone("hYields_4ljjsel_sidebandSX_Higgs_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebandSX_Higgs[fs]->Add(yield_4ljjsel_sidebandSX[VBF][fs]);
+    // others
+    yield_4ljjsel_sidebandSX_others[fs] = (TH1F*)yield_4ljjsel_sidebandSX[VVV][fs]->Clone("hYields_4ljjsel_sidebandSX_others_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebandSX_others[fs]->Add(yield_4ljjsel_sidebandSX[VH][fs]);
+    yield_4ljjsel_sidebandSX_others[fs]->Add(yield_4ljjsel_sidebandSX[TTW][fs]);
+    // tot histo
+    yield_4ljjsel_sidebandSX_tot_Ange[fs] = (TH1F*)yield_4ljjsel_sidebandSX[TTZ][fs]->Clone("hYields_4ljjsel_sidebandSX_totAnge_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebandSX_tot_Ange[fs]->Add(yield_4ljjsel_sidebandSX[ttH][fs]);
+    yield_4ljjsel_sidebandSX_tot_Ange[fs]->Add(yield_4ljjsel_sidebandSX[qqZZ][fs]);
+    yield_4ljjsel_sidebandSX_tot_Ange[fs]->Add(yield_4ljjsel_sidebandSX[ggZZ][fs]);
+    yield_4ljjsel_sidebandSX_tot_Ange[fs]->Add(yield_4ljjsel_sidebandSX[ggH][fs]);
+    yield_4ljjsel_sidebandSX_tot_Ange[fs]->Add(yield_4ljjsel_sidebandSX[VBF][fs]);
+    yield_4ljjsel_sidebandSX_tot_Ange[fs]->Add(yield_4ljjsel_sidebandSX[VVV][fs]);
+    yield_4ljjsel_sidebandSX_tot_Ange[fs]->Add(yield_4ljjsel_sidebandSX[VH][fs]);
+    yield_4ljjsel_sidebandSX_tot_Ange[fs]->Add(yield_4ljjsel_sidebandSX[TTW][fs]);
+    yield_4ljjsel_sidebandSX_tot_Ange[fs]->Add(yield_4ljjsel_sidebandSX[ZXbkg][fs]);
+
+    // print
+    f_yields4ljjsel_sidebandSX<<" |"<<sFinalState[fs]
+			     <<" |"<<yield_4ljjsel_sidebandSX[HH][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandSX[HH][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandSX[TTZ][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandSX[TTZ][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandSX[ttH][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandSX[ttH][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandSX_ZZ[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandSX_ZZ[fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandSX_Higgs[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandSX_Higgs[fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandSX_others[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandSX_others[fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandSX[ZXbkg][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandSX[ZXbkg][fs]->GetBinError(1)
+                             <<" |"<<yield_4ljjsel_sidebandSX_tot_Ange[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandSX_tot_Ange[fs]->GetBinError(1)
+                             <<" |"<<yield_4ljjsel_sidebandSX[Data][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandSX[Data][fs]->GetBinError(1)
+                             <<" |"<<endl;
+  }
+
+
+
+
+  f_yields4ljjsel_sidebandSX<<" "<<endl;
+  f_yields4ljjsel_sidebandSX<<" "<<endl;
+  f_yields4ljjsel_sidebandSX<<" "<<endl;
+  f_yields4ljjsel_sidebandSX<<" "<<endl;
+
+  // print yields in Ale style
+  f_yields4ljjsel_sidebandSX<<"|Final state |signal HH |SM Higgs |qqZZ |ggZZ |TTV |Z+X |VVV |sum all bkg |Data |"<<endl;
+  for(int fs=0; fs<nFinalStates+1; fs++){
+    // add histos
+    // SM Higgs
+    yield_4ljjsel_sidebandSX_SMHiggs[fs] = (TH1F*)yield_4ljjsel_sidebandSX[ggH][fs]->Clone("hYields_4ljjsel_sidebandSX_SMHiggs_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebandSX_SMHiggs[fs]->Add(yield_4ljjsel_sidebandSX[VBF][fs]);
+    yield_4ljjsel_sidebandSX_SMHiggs[fs]->Add(yield_4ljjsel_sidebandSX[VH][fs]);
+    yield_4ljjsel_sidebandSX_SMHiggs[fs]->Add(yield_4ljjsel_sidebandSX[ttH][fs]);
+    yield_4ljjsel_sidebandSX_SMHiggs[fs]->Add(yield_4ljjsel_sidebandSX[bbH][fs]);
+    // TTV
+    yield_4ljjsel_sidebandSX_TTV[fs] = (TH1F*)yield_4ljjsel_sidebandSX[TTZ][fs]->Clone("hYields_4ljjsel_sidebandSX_TTV_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebandSX_TTV[fs]->Add(yield_4ljjsel_sidebandSX[TTW][fs]);
+    // tot histo
+    yield_4ljjsel_sidebandSX_tot_Ale[fs] = (TH1F*)yield_4ljjsel_sidebandSX[ggH][fs]->Clone("hYields_4ljjsel_sidebandSX_totAle_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebandSX_tot_Ale[fs]->Add(yield_4ljjsel_sidebandSX[VBF][fs]);
+    yield_4ljjsel_sidebandSX_tot_Ale[fs]->Add(yield_4ljjsel_sidebandSX[VH][fs]);
+    yield_4ljjsel_sidebandSX_tot_Ale[fs]->Add(yield_4ljjsel_sidebandSX[ttH][fs]);
+    yield_4ljjsel_sidebandSX_tot_Ale[fs]->Add(yield_4ljjsel_sidebandSX[bbH][fs]);
+    yield_4ljjsel_sidebandSX_tot_Ale[fs]->Add(yield_4ljjsel_sidebandSX[qqZZ][fs]);
+    yield_4ljjsel_sidebandSX_tot_Ale[fs]->Add(yield_4ljjsel_sidebandSX[ggZZ][fs]);
+    yield_4ljjsel_sidebandSX_tot_Ale[fs]->Add(yield_4ljjsel_sidebandSX[TTZ][fs]);
+    yield_4ljjsel_sidebandSX_tot_Ale[fs]->Add(yield_4ljjsel_sidebandSX[TTW][fs]);
+    yield_4ljjsel_sidebandSX_tot_Ale[fs]->Add(yield_4ljjsel_sidebandSX[ZXbkg][fs]);
+    yield_4ljjsel_sidebandSX_tot_Ale[fs]->Add(yield_4ljjsel_sidebandSX[VVV][fs]);
+
+
+    f_yields4ljjsel_sidebandSX<<" |"<<sFinalState[fs]
+			     <<" |"<<yield_4ljjsel_sidebandSX[HH][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandSX[HH][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandSX_SMHiggs[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandSX_SMHiggs[fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandSX[qqZZ][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandSX[qqZZ][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandSX[ggZZ][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandSX[ggZZ][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandSX_TTV[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandSX_TTV[fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandSX[ZXbkg][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandSX[ZXbkg][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandSX[VVV][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandSX[VVV][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandSX_tot_Ale[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandSX_tot_Ale[fs]->GetBinError(1)
+                             <<" |"<<yield_4ljjsel_sidebandSX[Data][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandSX[Data][fs]->GetBinError(1)
+                             <<" |"<<endl;
+  }
+  f_yields4ljjsel_sidebandSX.close();
+
+
+
+
+  // *******************************
+  // *** PRINT YIELDS SIDEBANDDX ***
+  // *******************************
+  // --- print yields after 4ljj sel in sidebandDX 
+  cout<<"print yields after 4ljj sel in sidebandDX ... "<<endl;
+  ofstream f_yields4ljjsel_sidebandDX;
+  TString f_yields4ljjsel_sidebandDX_name = "yields4ljjsel_sidebandDX_"+ sYear + ".txt";
+
+  TH1F* yield_4ljjsel_sidebandDX_ZZ[nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebandDX_Higgs[nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebandDX_others[nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebandDX_tot_Ange[nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebandDX_SMHiggs[nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebandDX_TTV[nFinalStates+1];
+  TH1F* yield_4ljjsel_sidebandDX_tot_Ale[nFinalStates+1];
+
+  f_yields4ljjsel_sidebandDX.open(f_yields4ljjsel_sidebandDX_name); 
+
+  // print yields in Angela style
+  f_yields4ljjsel_sidebandDX<<"|Final state |signal HH |ttZ |ttH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |others(=VVV+VH+TTW) |Z+X |Sum bkg |Data |"<<endl;
+  for(int fs=0; fs<nFinalStates+1; fs++){
+    // add histos
+    // ZZ
+    yield_4ljjsel_sidebandDX_ZZ[fs] = (TH1F*)yield_4ljjsel_sidebandDX[qqZZ][fs]->Clone("hYields_4ljjsel_sidebandDX_ZZ_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebandDX_ZZ[fs]->Add(yield_4ljjsel_sidebandDX[ggZZ][fs]); 
+    // Higgs
+    yield_4ljjsel_sidebandDX_Higgs[fs] = (TH1F*)yield_4ljjsel_sidebandDX[ggH][fs]->Clone("hYields_4ljjsel_sidebandDX_Higgs_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebandDX_Higgs[fs]->Add(yield_4ljjsel_sidebandDX[VBF][fs]);
+    // others
+    yield_4ljjsel_sidebandDX_others[fs] = (TH1F*)yield_4ljjsel_sidebandDX[VVV][fs]->Clone("hYields_4ljjsel_sidebandDX_others_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebandDX_others[fs]->Add(yield_4ljjsel_sidebandDX[VH][fs]);
+    yield_4ljjsel_sidebandDX_others[fs]->Add(yield_4ljjsel_sidebandDX[TTW][fs]);
+    // tot histo
+    yield_4ljjsel_sidebandDX_tot_Ange[fs] = (TH1F*)yield_4ljjsel_sidebandDX[TTZ][fs]->Clone("hYields_4ljjsel_sidebandDX_totAnge_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebandDX_tot_Ange[fs]->Add(yield_4ljjsel_sidebandDX[ttH][fs]);
+    yield_4ljjsel_sidebandDX_tot_Ange[fs]->Add(yield_4ljjsel_sidebandDX[qqZZ][fs]);
+    yield_4ljjsel_sidebandDX_tot_Ange[fs]->Add(yield_4ljjsel_sidebandDX[ggZZ][fs]);
+    yield_4ljjsel_sidebandDX_tot_Ange[fs]->Add(yield_4ljjsel_sidebandDX[ggH][fs]);
+    yield_4ljjsel_sidebandDX_tot_Ange[fs]->Add(yield_4ljjsel_sidebandDX[VBF][fs]);
+    yield_4ljjsel_sidebandDX_tot_Ange[fs]->Add(yield_4ljjsel_sidebandDX[VVV][fs]);
+    yield_4ljjsel_sidebandDX_tot_Ange[fs]->Add(yield_4ljjsel_sidebandDX[VH][fs]);
+    yield_4ljjsel_sidebandDX_tot_Ange[fs]->Add(yield_4ljjsel_sidebandDX[TTW][fs]);
+    yield_4ljjsel_sidebandDX_tot_Ange[fs]->Add(yield_4ljjsel_sidebandDX[ZXbkg][fs]);
+
+    // print
+    f_yields4ljjsel_sidebandDX<<" |"<<sFinalState[fs]
+			     <<" |"<<yield_4ljjsel_sidebandDX[HH][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandDX[HH][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandDX[TTZ][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandDX[TTZ][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandDX[ttH][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandDX[ttH][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandDX_ZZ[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandDX_ZZ[fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandDX_Higgs[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandDX_Higgs[fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandDX_others[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandDX_others[fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandDX[ZXbkg][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandDX[ZXbkg][fs]->GetBinError(1)
+                             <<" |"<<yield_4ljjsel_sidebandDX_tot_Ange[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandDX_tot_Ange[fs]->GetBinError(1)
+                             <<" |"<<yield_4ljjsel_sidebandDX[Data][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandDX[Data][fs]->GetBinError(1)
+                             <<" |"<<endl;
+  }
+
+
+
+
+  f_yields4ljjsel_sidebandDX<<" "<<endl;
+  f_yields4ljjsel_sidebandDX<<" "<<endl;
+  f_yields4ljjsel_sidebandDX<<" "<<endl;
+  f_yields4ljjsel_sidebandDX<<" "<<endl;
+
+  // print yields in Ale style
+  f_yields4ljjsel_sidebandDX<<"|Final state |signal HH |SM Higgs |qqZZ |ggZZ |TTV |Z+X |VVV |sum all bkg |Data |"<<endl;
+  for(int fs=0; fs<nFinalStates+1; fs++){
+    // add histos
+    // SM Higgs
+    yield_4ljjsel_sidebandDX_SMHiggs[fs] = (TH1F*)yield_4ljjsel_sidebandDX[ggH][fs]->Clone("hYields_4ljjsel_sidebandDX_SMHiggs_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebandDX_SMHiggs[fs]->Add(yield_4ljjsel_sidebandDX[VBF][fs]);
+    yield_4ljjsel_sidebandDX_SMHiggs[fs]->Add(yield_4ljjsel_sidebandDX[VH][fs]);
+    yield_4ljjsel_sidebandDX_SMHiggs[fs]->Add(yield_4ljjsel_sidebandDX[ttH][fs]);
+    yield_4ljjsel_sidebandDX_SMHiggs[fs]->Add(yield_4ljjsel_sidebandDX[bbH][fs]);
+    // TTV
+    yield_4ljjsel_sidebandDX_TTV[fs] = (TH1F*)yield_4ljjsel_sidebandDX[TTZ][fs]->Clone("hYields_4ljjsel_sidebandDX_TTV_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebandDX_TTV[fs]->Add(yield_4ljjsel_sidebandDX[TTW][fs]);
+    // tot histo
+    yield_4ljjsel_sidebandDX_tot_Ale[fs] = (TH1F*)yield_4ljjsel_sidebandDX[ggH][fs]->Clone("hYields_4ljjsel_sidebandDX_totAle_"+sFinalState[fs]+"_"+sYear);
+    yield_4ljjsel_sidebandDX_tot_Ale[fs]->Add(yield_4ljjsel_sidebandDX[VBF][fs]);
+    yield_4ljjsel_sidebandDX_tot_Ale[fs]->Add(yield_4ljjsel_sidebandDX[VH][fs]);
+    yield_4ljjsel_sidebandDX_tot_Ale[fs]->Add(yield_4ljjsel_sidebandDX[ttH][fs]);
+    yield_4ljjsel_sidebandDX_tot_Ale[fs]->Add(yield_4ljjsel_sidebandDX[bbH][fs]);
+    yield_4ljjsel_sidebandDX_tot_Ale[fs]->Add(yield_4ljjsel_sidebandDX[qqZZ][fs]);
+    yield_4ljjsel_sidebandDX_tot_Ale[fs]->Add(yield_4ljjsel_sidebandDX[ggZZ][fs]);
+    yield_4ljjsel_sidebandDX_tot_Ale[fs]->Add(yield_4ljjsel_sidebandDX[TTZ][fs]);
+    yield_4ljjsel_sidebandDX_tot_Ale[fs]->Add(yield_4ljjsel_sidebandDX[TTW][fs]);
+    yield_4ljjsel_sidebandDX_tot_Ale[fs]->Add(yield_4ljjsel_sidebandDX[ZXbkg][fs]);
+    yield_4ljjsel_sidebandDX_tot_Ale[fs]->Add(yield_4ljjsel_sidebandDX[VVV][fs]);
+
+
+    f_yields4ljjsel_sidebandDX<<" |"<<sFinalState[fs]
+			     <<" |"<<yield_4ljjsel_sidebandDX[HH][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandDX[HH][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandDX_SMHiggs[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandDX_SMHiggs[fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandDX[qqZZ][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandDX[qqZZ][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandDX[ggZZ][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandDX[ggZZ][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandDX_TTV[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandDX_TTV[fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandDX[ZXbkg][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandDX[ZXbkg][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandDX[VVV][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandDX[VVV][fs]->GetBinError(1)
+			     <<" |"<<yield_4ljjsel_sidebandDX_tot_Ale[fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandDX_tot_Ale[fs]->GetBinError(1)
+                             <<" |"<<yield_4ljjsel_sidebandDX[Data][fs]->GetBinContent(1)<<" +- "<<yield_4ljjsel_sidebandDX[Data][fs]->GetBinError(1)
+                             <<" |"<<endl;
+  }
+  f_yields4ljjsel_sidebandDX.close();
+    
 
 
 }// end function printyields_forSync
@@ -1942,6 +2338,530 @@ void doPlots_4ljjsel(){
 
 
 
+//*******************************************
+//*** doPlots_4ljjsel_sidebandSX function ***
+//*******************************************
+void doPlots_4ljjsel_sidebandSX(){
+
+ cout<<"do plots after 4ljj sel in sidebandSX..."<<endl;
+
+  //---input path
+  TString sYear;
+  TString lumiText;
+  if(year==2016){
+      sYear    = "2016";
+      lumiText = "35.8 fb^{-1}";
+  }
+  else if(year==2017){
+      sYear    = "2017";
+      lumiText = "41.5 fb^{-1}";
+  }
+  else if(year==2018){
+      sYear    = "2018";
+      lumiText = "59.7 fb^{-1}";
+  }
+  else cout<<"wrong year selected!"<<endl;
+  cout<<"Year chosen: "<<year<<endl;
+
+
+  TString outPath_4ljjsel_sidebandSX_plots = "plots_4ljjsel_sidebandSX_" + sYear;
+  cout<<"creating output dir "<<outPath_4ljjsel_sidebandSX_plots<<" ... "<<endl;
+  gSystem->Exec(("mkdir -p "+string(outPath_4ljjsel_sidebandSX_plots)).c_str()); // create output dir
+
+
+
+  // retrieve histos from file
+  TString inFileName = "f_histos_h1_4ljjsel_" + sYear + ".root";     
+  cout<<"Retrieving Data and MC histograms from file "<<inFileName<<" ..."<<endl;
+  TFile* fInhistos = TFile::Open(inFileName);
+  
+  // --- take histos from file
+  Int_t nPlots_sidebandSX = 9;
+  TString sPlots_sidebandSX[] = {
+    "m4l_4ljjsel_sidebandSX",
+    "pT4l_4ljjsel_sidebandSX",
+    "j1btag_4ljjsel_sidebandSX",
+    "j2btag_4ljjsel_sidebandSX",
+    "j1pT_4ljjsel_sidebandSX",
+    "j2pT_4ljjsel_sidebandSX",
+    "MET_4ljjsel_sidebandSX",    
+    "DeltaRhh_4ljjsel_sidebandSX",
+    "mbb_4ljjsel_sidebandSX",
+  };
+  TH1F* h1_4ljjsel_sidebandSX[nPlots_sidebandSX][nProcesses][nFinalStates+1];
+  for(int pl=0; pl<nPlots_sidebandSX; pl++){
+    for(int pr=0; pr<nProcesses; pr++){
+      for(int fs=0; fs<nFinalStates+1; fs++){
+        h1_4ljjsel_sidebandSX[pl][pr][fs] = (TH1F*)fInhistos->Get("h1_"+sPlots_sidebandSX[pl]+"_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear);
+        cout<<h1_4ljjsel_sidebandSX[pl][pr][fs]->GetName()<<endl;
+      }
+    }
+  }   
+
+  // --- define canvas, hstack and pads for BDT input plots
+  TCanvas* c_4ljjsel_sidebandSX      [nPlots_sidebandSX][nFinalStates+1];
+  THStack* hs_4ljjsel_sidebandSX     [nPlots_sidebandSX][nFinalStates+1];
+  TPad*    pad1_4ljjsel_sidebandSX   [nPlots_sidebandSX][nFinalStates+1];
+  TLegend* leg_4ljjsel_sidebandSX    [nPlots_sidebandSX][nFinalStates+1];
+  TH1F*    hMCtot_4ljjsel_sidebandSX [nPlots_sidebandSX][nFinalStates+1];
+  TPad*    pad2_4ljjsel_sidebandSX   [nPlots_sidebandSX][nFinalStates+1];
+  TH1F*    rp_4ljjsel_sidebandSX     [nPlots_sidebandSX][nFinalStates+1];
+  TH1F*    hUncMC_4ljjsel_sidebandSX [nPlots_sidebandSX][nFinalStates+1];
+
+  
+  //4ljjsel plots
+  for(int pl=0; pl<nPlots_sidebandSX; pl++){
+    for(int fs=0; fs<nFinalStates+1; fs++){
+      // canvas
+      c_4ljjsel_sidebandSX[pl][fs] = new TCanvas("c_"+sPlots_sidebandSX[pl]+"_"+sFinalState[fs]+"_"+sYear,"c_"+sPlots_sidebandSX[pl]+"_"+sFinalState[fs]+"_"+sYear,800,800);
+      // hstack
+      hs_4ljjsel_sidebandSX[pl][fs] = new THStack("hs_"+sPlots_sidebandSX[pl]+"_"+sFinalState[fs],"");
+      // VVV process
+      h1_4ljjsel_sidebandSX[pl][VVV][fs]->SetFillColor(kGreen-3);
+      h1_4ljjsel_sidebandSX[pl][VVV][fs]->SetLineColor(kGreen-1);
+      hs_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][VVV][fs]); //add to hs
+      // Z+X process
+      h1_4ljjsel_sidebandSX[pl][ZXbkg][fs]->SetFillColor(kGreen+3);
+      h1_4ljjsel_sidebandSX[pl][ZXbkg][fs]->SetLineColor(kGreen+4);
+      hs_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][ZXbkg][fs]); //add to hs
+      // TTV process: TTW + TTV
+      h1_4ljjsel_sidebandSX[pl][TTW][fs]->SetFillColor(kBlue+3);
+      h1_4ljjsel_sidebandSX[pl][TTW][fs]->SetLineColor(kBlue+3);
+      hs_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][TTW][fs]); //add to hs
+      h1_4ljjsel_sidebandSX[pl][TTZ][fs]->SetFillColor(kBlue+3);
+      h1_4ljjsel_sidebandSX[pl][TTZ][fs]->SetLineColor(kBlue+3);
+      hs_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][TTZ][fs]); //add to hs
+      // ggZZ process
+      h1_4ljjsel_sidebandSX[pl][ggZZ][fs]->SetFillColor(kAzure-3);
+      h1_4ljjsel_sidebandSX[pl][ggZZ][fs]->SetLineColor(kBlue+2);
+      hs_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][ggZZ][fs]); //add to hs
+      // qqZZ process
+      h1_4ljjsel_sidebandSX[pl][qqZZ][fs]->SetFillColor(kAzure+6);
+      h1_4ljjsel_sidebandSX[pl][qqZZ][fs]->SetLineColor(kAzure-6);
+      hs_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][qqZZ][fs]); //add to hs
+      // SM Higgs processes: ggH + VBF + VH + ttH + bbH
+      h1_4ljjsel_sidebandSX[pl][ggH][fs]->SetFillColor(kViolet+6);
+      h1_4ljjsel_sidebandSX[pl][ggH][fs]->SetLineColor(kViolet+6);
+      hs_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][ggH][fs]); //add to hs
+      h1_4ljjsel_sidebandSX[pl][VBF][fs]->SetFillColor(kViolet+6);
+      h1_4ljjsel_sidebandSX[pl][VBF][fs]->SetLineColor(kViolet+6);
+      hs_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][VBF][fs]); //add to hs
+      h1_4ljjsel_sidebandSX[pl][VH][fs]->SetFillColor(kViolet+6);
+      h1_4ljjsel_sidebandSX[pl][VH][fs]->SetLineColor(kViolet+6);
+      hs_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][VH][fs]); //add to hs
+      h1_4ljjsel_sidebandSX[pl][ttH][fs]->SetFillColor(kViolet+6);
+      h1_4ljjsel_sidebandSX[pl][ttH][fs]->SetLineColor(kViolet+6);
+      hs_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][ttH][fs]); //add to hs
+      h1_4ljjsel_sidebandSX[pl][bbH][fs]->SetFillColor(kViolet+6);
+      h1_4ljjsel_sidebandSX[pl][bbH][fs]->SetLineColor(kViolet+6);
+      hs_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][bbH][fs]); //add to hs
+      // HH signal
+      h1_4ljjsel_sidebandSX[pl][HH][fs]->SetLineColor(kRed);
+      h1_4ljjsel_sidebandSX[pl][HH][fs]->SetLineWidth(2);
+      h1_4ljjsel_sidebandSX[pl][HH][fs]->Scale(100.);
+      // data
+      h1_4ljjsel_sidebandSX[pl][Data][fs]->SetMarkerColor(kBlack);
+      h1_4ljjsel_sidebandSX[pl][Data][fs]->SetLineColor(kBlack);
+      h1_4ljjsel_sidebandSX[pl][Data][fs]->SetMarkerStyle(20);
+
+      // --- upper plot pad
+      pad1_4ljjsel_sidebandSX[pl][fs] = new TPad("pad1_"+sPlots_sidebandSX[pl]+"_"+sFinalState[fs],"pad1_"+sPlots_sidebandSX[pl]+"_"+sFinalState[fs], 0, 0.3, 1, 1.0);
+      pad1_4ljjsel_sidebandSX[pl][fs]->Draw();
+      pad1_4ljjsel_sidebandSX[pl][fs]->cd();
+
+      hs_4ljjsel_sidebandSX[pl][fs]->SetMaximum(10e04);
+      hs_4ljjsel_sidebandSX[pl][fs]->SetMinimum(10e-04);
+        
+      hs_4ljjsel_sidebandSX[pl][fs]->Draw("histo");
+      h1_4ljjsel_sidebandSX[pl][HH][fs]->Draw("histosame");
+      h1_4ljjsel_sidebandSX[pl][Data][fs]->Draw("samepe");
+
+      hs_4ljjsel_sidebandSX[pl][fs]->GetXaxis()->SetLabelFont(43);
+      hs_4ljjsel_sidebandSX[pl][fs]->GetXaxis()->SetLabelSize(15);
+      hs_4ljjsel_sidebandSX[pl][fs]->GetXaxis()->SetTitle(h1_4ljjsel_sidebandSX[pl][HH][fs]->GetXaxis()->GetTitle());
+      hs_4ljjsel_sidebandSX[pl][fs]->GetYaxis()->SetTitleSize(20);
+      hs_4ljjsel_sidebandSX[pl][fs]->GetYaxis()->SetTitleFont(43);
+      hs_4ljjsel_sidebandSX[pl][fs]->GetYaxis()->SetTitleOffset(1.4);
+      hs_4ljjsel_sidebandSX[pl][fs]->GetYaxis()->SetLabelFont(43);
+      hs_4ljjsel_sidebandSX[pl][fs]->GetYaxis()->SetLabelSize(15);
+      hs_4ljjsel_sidebandSX[pl][fs]->GetYaxis()->SetTitle(h1_4ljjsel_sidebandSX[pl][HH][fs]->GetYaxis()->GetTitle());
+
+      // --- legend
+      leg_4ljjsel_sidebandSX[pl][fs] = new TLegend(0.78,0.61,0.94,0.87);
+      leg_4ljjsel_sidebandSX[pl][fs]->AddEntry(h1_4ljjsel_sidebandSX[pl][Data][fs], "Data",          "lp");
+      leg_4ljjsel_sidebandSX[pl][fs]->AddEntry(h1_4ljjsel_sidebandSX[pl][HH][fs],   "HH->4lbb x100", "f");
+      leg_4ljjsel_sidebandSX[pl][fs]->AddEntry(h1_4ljjsel_sidebandSX[pl][ggH][fs],  "SM Higgs",      "f");
+      leg_4ljjsel_sidebandSX[pl][fs]->AddEntry(h1_4ljjsel_sidebandSX[pl][qqZZ][fs], "qq->ZZ",        "f");
+      leg_4ljjsel_sidebandSX[pl][fs]->AddEntry(h1_4ljjsel_sidebandSX[pl][ggZZ][fs], "gg->ZZ",        "f");
+      leg_4ljjsel_sidebandSX[pl][fs]->AddEntry(h1_4ljjsel_sidebandSX[pl][TTZ][fs],  "TTV; V=Z,W",    "f");
+      leg_4ljjsel_sidebandSX[pl][fs]->AddEntry(h1_4ljjsel_sidebandSX[pl][ZXbkg][fs],"Z+X",           "f");
+      leg_4ljjsel_sidebandSX[pl][fs]->AddEntry(h1_4ljjsel_sidebandSX[pl][VVV][fs],  "VVV; V=Z,W",    "f");
+      leg_4ljjsel_sidebandSX[pl][fs]->SetFillColor(kWhite);
+      leg_4ljjsel_sidebandSX[pl][fs]->SetLineColor(kBlack);
+      leg_4ljjsel_sidebandSX[pl][fs]->SetTextFont(43);
+      leg_4ljjsel_sidebandSX[pl][fs]->Draw();
+
+      c_4ljjsel_sidebandSX[pl][fs]->Update();
+
+      pad1_4ljjsel_sidebandSX[pl][fs]->SetLogy();
+
+      c_4ljjsel_sidebandSX[pl][fs]->Update();
+
+      // --- tot hist for all MC
+      hMCtot_4ljjsel_sidebandSX[pl][fs] = (TH1F*)h1_4ljjsel_sidebandSX[pl][ggH][fs]->Clone("hMCtot_4ljjsel_"+sPlots_sidebandSX[pl]+"_"+sFinalState[fs]);
+      hMCtot_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][VBF][fs]);
+      hMCtot_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][VH][fs]);
+      hMCtot_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][ttH][fs]);
+      hMCtot_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][bbH][fs]);
+      hMCtot_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][qqZZ][fs]);
+      hMCtot_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][ggZZ][fs]);
+      hMCtot_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][TTZ][fs]);
+      hMCtot_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][TTW][fs]);
+      hMCtot_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][ZXbkg][fs]);
+      hMCtot_4ljjsel_sidebandSX[pl][fs]->Add(h1_4ljjsel_sidebandSX[pl][VVV][fs]);
+
+      // --- lower pad plot
+      c_4ljjsel_sidebandSX[pl][fs]->cd();
+      pad2_4ljjsel_sidebandSX[pl][fs] = new TPad("pad2","pad2", 0, 0.05, 1, 0.3);
+      pad2_4ljjsel_sidebandSX[pl][fs]->SetGridy();
+      pad2_4ljjsel_sidebandSX[pl][fs]->Draw();
+      pad2_4ljjsel_sidebandSX[pl][fs]->cd();
+
+      // --- define ratio plot
+      rp_4ljjsel_sidebandSX[pl][fs] = (TH1F*)h1_4ljjsel_sidebandSX[pl][Data][fs]->Clone("rp_4ljjsel_"+sPlots_sidebandSX[pl]+"_"+sFinalState[fs]);
+      rp_4ljjsel_sidebandSX[pl][fs]->SetLineColor(kBlack);
+      rp_4ljjsel_sidebandSX[pl][fs]->SetMinimum(0.);
+      rp_4ljjsel_sidebandSX[pl][fs]->SetMaximum(2.);
+      rp_4ljjsel_sidebandSX[pl][fs]->SetStats(0);
+      rp_4ljjsel_sidebandSX[pl][fs]->Divide(hMCtot_4ljjsel_sidebandSX[pl][fs]); //divide histo rp/MC
+      rp_4ljjsel_sidebandSX[pl][fs]->SetMarkerStyle(20);
+      rp_4ljjsel_sidebandSX[pl][fs]->SetMarkerColor(kBlack);
+      rp_4ljjsel_sidebandSX[pl][fs]->SetTitle("");
+
+      rp_4ljjsel_sidebandSX[pl][fs]->SetYTitle("Data/#Sigma bkg");
+      rp_4ljjsel_sidebandSX[pl][fs]->GetYaxis()->SetNdivisions(505);
+      rp_4ljjsel_sidebandSX[pl][fs]->GetYaxis()->SetTitleSize(20);
+      rp_4ljjsel_sidebandSX[pl][fs]->GetYaxis()->SetTitleFont(43);
+      rp_4ljjsel_sidebandSX[pl][fs]->GetYaxis()->SetTitleOffset(1.4);
+      rp_4ljjsel_sidebandSX[pl][fs]->GetYaxis()->SetLabelFont(43);
+      rp_4ljjsel_sidebandSX[pl][fs]->GetYaxis()->SetLabelSize(15);
+
+      rp_4ljjsel_sidebandSX[pl][fs]->GetXaxis()->SetTitleSize(20);
+      rp_4ljjsel_sidebandSX[pl][fs]->GetXaxis()->SetTitleFont(43);
+      rp_4ljjsel_sidebandSX[pl][fs]->GetXaxis()->SetTitleOffset(4.);
+      rp_4ljjsel_sidebandSX[pl][fs]->GetXaxis()->SetLabelFont(43);
+      rp_4ljjsel_sidebandSX[pl][fs]->GetXaxis()->SetLabelSize(15);
+
+      // --- define mc shadow unc plot
+      hUncMC_4ljjsel_sidebandSX[pl][fs] = (TH1F*)hMCtot_4ljjsel_sidebandSX[pl][fs]->Clone("hUncMC_4ljjsel_"+sPlots_sidebandSX[pl]+"_"+sFinalState[fs]);
+      for(int xbin=1; xbin < hUncMC_4ljjsel_sidebandSX[pl][fs]->GetXaxis()->GetNbins() + 1; xbin++){
+        float err = 0.;
+        if(hUncMC_4ljjsel_sidebandSX[pl][fs]->GetBinContent(xbin) == 0) continue;
+        err = hUncMC_4ljjsel_sidebandSX[pl][fs]->GetBinError(xbin) / hUncMC_4ljjsel_sidebandSX[pl][fs]->GetBinContent(xbin);
+        hUncMC_4ljjsel_sidebandSX[pl][fs]->SetBinContent(xbin, 1.);
+        hUncMC_4ljjsel_sidebandSX[pl][fs]->SetBinError(xbin, err);
+      }
+      hUncMC_4ljjsel_sidebandSX[pl][fs]->SetLineColor(1);
+      hUncMC_4ljjsel_sidebandSX[pl][fs]->SetFillStyle(3005);
+      hUncMC_4ljjsel_sidebandSX[pl][fs]->SetFillColor(kGray+3);
+      hUncMC_4ljjsel_sidebandSX[pl][fs]->SetMarkerColor(1);
+      hUncMC_4ljjsel_sidebandSX[pl][fs]->SetMarkerStyle(1);
+      hUncMC_4ljjsel_sidebandSX[pl][fs]->SetTitle("");
+      hUncMC_4ljjsel_sidebandSX[pl][fs]->SetStats(0);
+
+      // ---draw
+      rp_4ljjsel_sidebandSX[pl][fs]->Draw("ep");
+      hUncMC_4ljjsel_sidebandSX[pl][fs]->Draw("e2 same");
+
+      c_4ljjsel_sidebandSX[pl][fs]->Update();
+
+      // --- draw CMS and lumi text
+      writeExtraText = true;
+      extraText      = "Preliminary";
+      lumi_sqrtS     = lumiText + " (13 TeV)";
+      cmsTextSize    = 0.6;
+      lumiTextSize   = 0.46;
+      extraOverCmsTextSize = 0.75;
+      relPosX = 0.12;
+      CMS_lumi(pad1_4ljjsel_sidebandSX[pl][fs], 0, 0);
+
+
+      c_4ljjsel_sidebandSX[pl][fs]->SaveAs(outPath_4ljjsel_sidebandSX_plots + "/" + c_4ljjsel_sidebandSX[pl][fs]->GetName() + ".png");
+      c_4ljjsel_sidebandSX[pl][fs]->SaveAs(outPath_4ljjsel_sidebandSX_plots + "/" + c_4ljjsel_sidebandSX[pl][fs]->GetName() + ".pdf");
+      
+
+    }
+  }
+
+
+
+} // end function doPlots_4ljjsel_sidebandSX
+
+
+
+
+
+//*******************************************
+//*** doPlots_4ljjsel_sidebandDX function ***
+//*******************************************
+void doPlots_4ljjsel_sidebandDX(){
+
+ cout<<"do plots after 4ljj sel in sidebandDX..."<<endl;
+
+  //---input path
+  TString sYear;
+  TString lumiText;
+  if(year==2016){
+      sYear    = "2016";
+      lumiText = "35.8 fb^{-1}";
+  }
+  else if(year==2017){
+      sYear    = "2017";
+      lumiText = "41.5 fb^{-1}";
+  }
+  else if(year==2018){
+      sYear    = "2018";
+      lumiText = "59.7 fb^{-1}";
+  }
+  else cout<<"wrong year selected!"<<endl;
+  cout<<"Year chosen: "<<year<<endl;
+
+
+  TString outPath_4ljjsel_sidebandDX_plots = "plots_4ljjsel_sidebandDX_" + sYear;
+  cout<<"creating output dir "<<outPath_4ljjsel_sidebandDX_plots<<" ... "<<endl;
+  gSystem->Exec(("mkdir -p "+string(outPath_4ljjsel_sidebandDX_plots)).c_str()); // create output dir
+
+
+
+  // retrieve histos from file
+  TString inFileName = "f_histos_h1_4ljjsel_" + sYear + ".root";     
+  cout<<"Retrieving Data and MC histograms from file "<<inFileName<<" ..."<<endl;
+  TFile* fInhistos = TFile::Open(inFileName);
+  
+  // --- take histos from file
+  Int_t nPlots_sidebandDX = 9;
+  TString sPlots_sidebandDX[] = {
+    "m4l_4ljjsel_sidebandDX",
+    "pT4l_4ljjsel_sidebandDX",
+    "j1btag_4ljjsel_sidebandDX",
+    "j2btag_4ljjsel_sidebandDX",
+    "j1pT_4ljjsel_sidebandDX",
+    "j2pT_4ljjsel_sidebandDX",
+    "MET_4ljjsel_sidebandDX",    
+    "DeltaRhh_4ljjsel_sidebandDX",
+    "mbb_4ljjsel_sidebandDX",
+  };
+  TH1F* h1_4ljjsel_sidebandDX[nPlots_sidebandDX][nProcesses][nFinalStates+1];
+  for(int pl=0; pl<nPlots_sidebandDX; pl++){
+    for(int pr=0; pr<nProcesses; pr++){
+      for(int fs=0; fs<nFinalStates+1; fs++){
+        h1_4ljjsel_sidebandDX[pl][pr][fs] = (TH1F*)fInhistos->Get("h1_"+sPlots_sidebandDX[pl]+"_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear);
+        cout<<h1_4ljjsel_sidebandDX[pl][pr][fs]->GetName()<<endl;
+      }
+    }
+  }   
+
+  // --- define canvas, hstack and pads for BDT input plots
+  TCanvas* c_4ljjsel_sidebandDX      [nPlots_sidebandDX][nFinalStates+1];
+  THStack* hs_4ljjsel_sidebandDX     [nPlots_sidebandDX][nFinalStates+1];
+  TPad*    pad1_4ljjsel_sidebandDX   [nPlots_sidebandDX][nFinalStates+1];
+  TLegend* leg_4ljjsel_sidebandDX    [nPlots_sidebandDX][nFinalStates+1];
+  TH1F*    hMCtot_4ljjsel_sidebandDX [nPlots_sidebandDX][nFinalStates+1];
+  TPad*    pad2_4ljjsel_sidebandDX   [nPlots_sidebandDX][nFinalStates+1];
+  TH1F*    rp_4ljjsel_sidebandDX     [nPlots_sidebandDX][nFinalStates+1];
+  TH1F*    hUncMC_4ljjsel_sidebandDX [nPlots_sidebandDX][nFinalStates+1];
+
+  
+  //4ljjsel plots
+  for(int pl=0; pl<nPlots_sidebandDX; pl++){
+    for(int fs=0; fs<nFinalStates+1; fs++){
+      // canvas
+      c_4ljjsel_sidebandDX[pl][fs] = new TCanvas("c_"+sPlots_sidebandDX[pl]+"_"+sFinalState[fs]+"_"+sYear,"c_"+sPlots_sidebandDX[pl]+"_"+sFinalState[fs]+"_"+sYear,800,800);
+      // hstack
+      hs_4ljjsel_sidebandDX[pl][fs] = new THStack("hs_"+sPlots_sidebandDX[pl]+"_"+sFinalState[fs],"");
+      // VVV process
+      h1_4ljjsel_sidebandDX[pl][VVV][fs]->SetFillColor(kGreen-3);
+      h1_4ljjsel_sidebandDX[pl][VVV][fs]->SetLineColor(kGreen-1);
+      hs_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][VVV][fs]); //add to hs
+      // Z+X process
+      h1_4ljjsel_sidebandDX[pl][ZXbkg][fs]->SetFillColor(kGreen+3);
+      h1_4ljjsel_sidebandDX[pl][ZXbkg][fs]->SetLineColor(kGreen+4);
+      hs_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][ZXbkg][fs]); //add to hs
+      // TTV process: TTW + TTV
+      h1_4ljjsel_sidebandDX[pl][TTW][fs]->SetFillColor(kBlue+3);
+      h1_4ljjsel_sidebandDX[pl][TTW][fs]->SetLineColor(kBlue+3);
+      hs_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][TTW][fs]); //add to hs
+      h1_4ljjsel_sidebandDX[pl][TTZ][fs]->SetFillColor(kBlue+3);
+      h1_4ljjsel_sidebandDX[pl][TTZ][fs]->SetLineColor(kBlue+3);
+      hs_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][TTZ][fs]); //add to hs
+      // ggZZ process
+      h1_4ljjsel_sidebandDX[pl][ggZZ][fs]->SetFillColor(kAzure-3);
+      h1_4ljjsel_sidebandDX[pl][ggZZ][fs]->SetLineColor(kBlue+2);
+      hs_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][ggZZ][fs]); //add to hs
+      // qqZZ process
+      h1_4ljjsel_sidebandDX[pl][qqZZ][fs]->SetFillColor(kAzure+6);
+      h1_4ljjsel_sidebandDX[pl][qqZZ][fs]->SetLineColor(kAzure-6);
+      hs_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][qqZZ][fs]); //add to hs
+      // SM Higgs processes: ggH + VBF + VH + ttH + bbH
+      h1_4ljjsel_sidebandDX[pl][ggH][fs]->SetFillColor(kViolet+6);
+      h1_4ljjsel_sidebandDX[pl][ggH][fs]->SetLineColor(kViolet+6);
+      hs_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][ggH][fs]); //add to hs
+      h1_4ljjsel_sidebandDX[pl][VBF][fs]->SetFillColor(kViolet+6);
+      h1_4ljjsel_sidebandDX[pl][VBF][fs]->SetLineColor(kViolet+6);
+      hs_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][VBF][fs]); //add to hs
+      h1_4ljjsel_sidebandDX[pl][VH][fs]->SetFillColor(kViolet+6);
+      h1_4ljjsel_sidebandDX[pl][VH][fs]->SetLineColor(kViolet+6);
+      hs_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][VH][fs]); //add to hs
+      h1_4ljjsel_sidebandDX[pl][ttH][fs]->SetFillColor(kViolet+6);
+      h1_4ljjsel_sidebandDX[pl][ttH][fs]->SetLineColor(kViolet+6);
+      hs_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][ttH][fs]); //add to hs
+      h1_4ljjsel_sidebandDX[pl][bbH][fs]->SetFillColor(kViolet+6);
+      h1_4ljjsel_sidebandDX[pl][bbH][fs]->SetLineColor(kViolet+6);
+      hs_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][bbH][fs]); //add to hs
+      // HH signal
+      h1_4ljjsel_sidebandDX[pl][HH][fs]->SetLineColor(kRed);
+      h1_4ljjsel_sidebandDX[pl][HH][fs]->SetLineWidth(2);
+      h1_4ljjsel_sidebandDX[pl][HH][fs]->Scale(100.);
+      // data
+      h1_4ljjsel_sidebandDX[pl][Data][fs]->SetMarkerColor(kBlack);
+      h1_4ljjsel_sidebandDX[pl][Data][fs]->SetLineColor(kBlack);
+      h1_4ljjsel_sidebandDX[pl][Data][fs]->SetMarkerStyle(20);
+
+      // --- upper plot pad
+      pad1_4ljjsel_sidebandDX[pl][fs] = new TPad("pad1_"+sPlots_sidebandDX[pl]+"_"+sFinalState[fs],"pad1_"+sPlots_sidebandDX[pl]+"_"+sFinalState[fs], 0, 0.3, 1, 1.0);
+      pad1_4ljjsel_sidebandDX[pl][fs]->Draw();
+      pad1_4ljjsel_sidebandDX[pl][fs]->cd();
+
+      hs_4ljjsel_sidebandDX[pl][fs]->SetMaximum(10e04);
+      hs_4ljjsel_sidebandDX[pl][fs]->SetMinimum(10e-04);
+        
+      hs_4ljjsel_sidebandDX[pl][fs]->Draw("histo");
+      h1_4ljjsel_sidebandDX[pl][HH][fs]->Draw("histosame");
+      h1_4ljjsel_sidebandDX[pl][Data][fs]->Draw("samepe");
+
+      hs_4ljjsel_sidebandDX[pl][fs]->GetXaxis()->SetLabelFont(43);
+      hs_4ljjsel_sidebandDX[pl][fs]->GetXaxis()->SetLabelSize(15);
+      hs_4ljjsel_sidebandDX[pl][fs]->GetXaxis()->SetTitle(h1_4ljjsel_sidebandDX[pl][HH][fs]->GetXaxis()->GetTitle());
+      hs_4ljjsel_sidebandDX[pl][fs]->GetYaxis()->SetTitleSize(20);
+      hs_4ljjsel_sidebandDX[pl][fs]->GetYaxis()->SetTitleFont(43);
+      hs_4ljjsel_sidebandDX[pl][fs]->GetYaxis()->SetTitleOffset(1.4);
+      hs_4ljjsel_sidebandDX[pl][fs]->GetYaxis()->SetLabelFont(43);
+      hs_4ljjsel_sidebandDX[pl][fs]->GetYaxis()->SetLabelSize(15);
+      hs_4ljjsel_sidebandDX[pl][fs]->GetYaxis()->SetTitle(h1_4ljjsel_sidebandDX[pl][HH][fs]->GetYaxis()->GetTitle());
+
+      // --- legend
+      leg_4ljjsel_sidebandDX[pl][fs] = new TLegend(0.78,0.61,0.94,0.87);
+      leg_4ljjsel_sidebandDX[pl][fs]->AddEntry(h1_4ljjsel_sidebandDX[pl][Data][fs], "Data",          "lp");
+      leg_4ljjsel_sidebandDX[pl][fs]->AddEntry(h1_4ljjsel_sidebandDX[pl][HH][fs],   "HH->4lbb x100", "f");
+      leg_4ljjsel_sidebandDX[pl][fs]->AddEntry(h1_4ljjsel_sidebandDX[pl][ggH][fs],  "SM Higgs",      "f");
+      leg_4ljjsel_sidebandDX[pl][fs]->AddEntry(h1_4ljjsel_sidebandDX[pl][qqZZ][fs], "qq->ZZ",        "f");
+      leg_4ljjsel_sidebandDX[pl][fs]->AddEntry(h1_4ljjsel_sidebandDX[pl][ggZZ][fs], "gg->ZZ",        "f");
+      leg_4ljjsel_sidebandDX[pl][fs]->AddEntry(h1_4ljjsel_sidebandDX[pl][TTZ][fs],  "TTV; V=Z,W",    "f");
+      leg_4ljjsel_sidebandDX[pl][fs]->AddEntry(h1_4ljjsel_sidebandDX[pl][ZXbkg][fs],"Z+X",           "f");
+      leg_4ljjsel_sidebandDX[pl][fs]->AddEntry(h1_4ljjsel_sidebandDX[pl][VVV][fs],  "VVV; V=Z,W",    "f");
+      leg_4ljjsel_sidebandDX[pl][fs]->SetFillColor(kWhite);
+      leg_4ljjsel_sidebandDX[pl][fs]->SetLineColor(kBlack);
+      leg_4ljjsel_sidebandDX[pl][fs]->SetTextFont(43);
+      leg_4ljjsel_sidebandDX[pl][fs]->Draw();
+
+      c_4ljjsel_sidebandDX[pl][fs]->Update();
+
+      pad1_4ljjsel_sidebandDX[pl][fs]->SetLogy();
+
+      c_4ljjsel_sidebandDX[pl][fs]->Update();
+
+      // --- tot hist for all MC
+      hMCtot_4ljjsel_sidebandDX[pl][fs] = (TH1F*)h1_4ljjsel_sidebandDX[pl][ggH][fs]->Clone("hMCtot_4ljjsel_"+sPlots_sidebandDX[pl]+"_"+sFinalState[fs]);
+      hMCtot_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][VBF][fs]);
+      hMCtot_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][VH][fs]);
+      hMCtot_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][ttH][fs]);
+      hMCtot_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][bbH][fs]);
+      hMCtot_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][qqZZ][fs]);
+      hMCtot_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][ggZZ][fs]);
+      hMCtot_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][TTZ][fs]);
+      hMCtot_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][TTW][fs]);
+      hMCtot_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][ZXbkg][fs]);
+      hMCtot_4ljjsel_sidebandDX[pl][fs]->Add(h1_4ljjsel_sidebandDX[pl][VVV][fs]);
+
+      // --- lower pad plot
+      c_4ljjsel_sidebandDX[pl][fs]->cd();
+      pad2_4ljjsel_sidebandDX[pl][fs] = new TPad("pad2","pad2", 0, 0.05, 1, 0.3);
+      pad2_4ljjsel_sidebandDX[pl][fs]->SetGridy();
+      pad2_4ljjsel_sidebandDX[pl][fs]->Draw();
+      pad2_4ljjsel_sidebandDX[pl][fs]->cd();
+
+      // --- define ratio plot
+      rp_4ljjsel_sidebandDX[pl][fs] = (TH1F*)h1_4ljjsel_sidebandDX[pl][Data][fs]->Clone("rp_4ljjsel_"+sPlots_sidebandDX[pl]+"_"+sFinalState[fs]);
+      rp_4ljjsel_sidebandDX[pl][fs]->SetLineColor(kBlack);
+      rp_4ljjsel_sidebandDX[pl][fs]->SetMinimum(0.);
+      rp_4ljjsel_sidebandDX[pl][fs]->SetMaximum(2.);
+      rp_4ljjsel_sidebandDX[pl][fs]->SetStats(0);
+      rp_4ljjsel_sidebandDX[pl][fs]->Divide(hMCtot_4ljjsel_sidebandDX[pl][fs]); //divide histo rp/MC
+      rp_4ljjsel_sidebandDX[pl][fs]->SetMarkerStyle(20);
+      rp_4ljjsel_sidebandDX[pl][fs]->SetMarkerColor(kBlack);
+      rp_4ljjsel_sidebandDX[pl][fs]->SetTitle("");
+
+      rp_4ljjsel_sidebandDX[pl][fs]->SetYTitle("Data/#Sigma bkg");
+      rp_4ljjsel_sidebandDX[pl][fs]->GetYaxis()->SetNdivisions(505);
+      rp_4ljjsel_sidebandDX[pl][fs]->GetYaxis()->SetTitleSize(20);
+      rp_4ljjsel_sidebandDX[pl][fs]->GetYaxis()->SetTitleFont(43);
+      rp_4ljjsel_sidebandDX[pl][fs]->GetYaxis()->SetTitleOffset(1.4);
+      rp_4ljjsel_sidebandDX[pl][fs]->GetYaxis()->SetLabelFont(43);
+      rp_4ljjsel_sidebandDX[pl][fs]->GetYaxis()->SetLabelSize(15);
+
+      rp_4ljjsel_sidebandDX[pl][fs]->GetXaxis()->SetTitleSize(20);
+      rp_4ljjsel_sidebandDX[pl][fs]->GetXaxis()->SetTitleFont(43);
+      rp_4ljjsel_sidebandDX[pl][fs]->GetXaxis()->SetTitleOffset(4.);
+      rp_4ljjsel_sidebandDX[pl][fs]->GetXaxis()->SetLabelFont(43);
+      rp_4ljjsel_sidebandDX[pl][fs]->GetXaxis()->SetLabelSize(15);
+
+      // --- define mc shadow unc plot
+      hUncMC_4ljjsel_sidebandDX[pl][fs] = (TH1F*)hMCtot_4ljjsel_sidebandDX[pl][fs]->Clone("hUncMC_4ljjsel_"+sPlots_sidebandDX[pl]+"_"+sFinalState[fs]);
+      for(int xbin=1; xbin < hUncMC_4ljjsel_sidebandDX[pl][fs]->GetXaxis()->GetNbins() + 1; xbin++){
+        float err = 0.;
+        if(hUncMC_4ljjsel_sidebandDX[pl][fs]->GetBinContent(xbin) == 0) continue;
+        err = hUncMC_4ljjsel_sidebandDX[pl][fs]->GetBinError(xbin) / hUncMC_4ljjsel_sidebandDX[pl][fs]->GetBinContent(xbin);
+        hUncMC_4ljjsel_sidebandDX[pl][fs]->SetBinContent(xbin, 1.);
+        hUncMC_4ljjsel_sidebandDX[pl][fs]->SetBinError(xbin, err);
+      }
+      hUncMC_4ljjsel_sidebandDX[pl][fs]->SetLineColor(1);
+      hUncMC_4ljjsel_sidebandDX[pl][fs]->SetFillStyle(3005);
+      hUncMC_4ljjsel_sidebandDX[pl][fs]->SetFillColor(kGray+3);
+      hUncMC_4ljjsel_sidebandDX[pl][fs]->SetMarkerColor(1);
+      hUncMC_4ljjsel_sidebandDX[pl][fs]->SetMarkerStyle(1);
+      hUncMC_4ljjsel_sidebandDX[pl][fs]->SetTitle("");
+      hUncMC_4ljjsel_sidebandDX[pl][fs]->SetStats(0);
+
+      // ---draw
+      rp_4ljjsel_sidebandDX[pl][fs]->Draw("ep");
+      hUncMC_4ljjsel_sidebandDX[pl][fs]->Draw("e2 same");
+
+      c_4ljjsel_sidebandDX[pl][fs]->Update();
+
+      // --- draw CMS and lumi text
+      writeExtraText = true;
+      extraText      = "Preliminary";
+      lumi_sqrtS     = lumiText + " (13 TeV)";
+      cmsTextSize    = 0.6;
+      lumiTextSize   = 0.46;
+      extraOverCmsTextSize = 0.75;
+      relPosX = 0.12;
+      CMS_lumi(pad1_4ljjsel_sidebandDX[pl][fs], 0, 0);
+
+
+      c_4ljjsel_sidebandDX[pl][fs]->SaveAs(outPath_4ljjsel_sidebandDX_plots + "/" + c_4ljjsel_sidebandDX[pl][fs]->GetName() + ".png");
+      c_4ljjsel_sidebandDX[pl][fs]->SaveAs(outPath_4ljjsel_sidebandDX_plots + "/" + c_4ljjsel_sidebandDX[pl][fs]->GetName() + ".pdf");
+      
+
+    }
+  }
+
+
+
+} // end function doPlots_4ljjsel_sidebandDX
+
+
+
 
 
 //*********************
@@ -1962,5 +2882,9 @@ void analysis_4lbb_2bjet_yieldsAnd4ljjselPlots()
   doPlots_inputBDT_withZX();
 
   doPlots_4ljjsel();
+
+  doPlots_4ljjsel_sidebandSX();
+
+  doPlots_4ljjsel_sidebandDX();
 
 }
