@@ -394,6 +394,8 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   float f_ZZmass = -9999.;
   float f_bbmass = -9999.;
   float f_HHmass = -9999.;
+  float f_HadronFlavourjet1 = -9999.;
+  float f_HadronFlavourjet2 = -9999.;
 
 
   TFile *f = new TFile(outFile,"recreate");
@@ -428,6 +430,8 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   tnew->Branch("f_phijet1",     &f_phijet1);
   tnew->Branch("f_phijet2",     &f_phijet2);
   tnew->Branch("f_deltaPhiHH",  &f_deltaPhiHH);
+  tnew->Branch("f_HadronFlavourjet1", &f_HadronFlavourjet1);
+  tnew->Branch("f_HadronFlavourjet2", &f_HadronFlavourjet2);
   tnew->Branch("f_weightsignal_nominal",      &f_weightsignal_nominal     ); 
   tnew->Branch("f_weightsignal_JESUp",        &f_weightsignal_JESUp       ); 
   tnew->Branch("f_weightsignal_JESDown",      &f_weightsignal_JESDown     ); 
@@ -652,6 +656,10 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
     f_ptjet1 = JetPt->at(d1_maxbtag);
     f_ptjet2 = JetPt->at(d2_maxbtag);
 
+    // save jet hadronflavour
+    f_HadronFlavourjet1 = JetHadronFlavour->at(d1_maxbtag);
+    f_HadronFlavourjet2 = JetHadronFlavour->at(d2_maxbtag);
+
 
     // build 2 jets tlorentzvectors
     TLorentzVector tlzvec_j1_;
@@ -808,50 +816,50 @@ void prepareNtupleMVA_2bjet()
   //  TString selection = "4lsel";
 
   // --- finalstate
-  //  TString finalstate = "fs4mu";
+  TString finalstate = "fs4mu";
   //  TString finalstate = "fs4e";
-  TString finalstate = "fs2e2mu";
+  //  TString finalstate = "fs2e2mu";
   
   // -- year
-  //  TString syear = "2016";
+  TString syear = "2016";
   //  TString syear = "2017";
-  TString syear = "2018";
+  //  TString syear = "2018";
 
   // --- lumi
-  //  float lumi = 35.8; //fb-1 2016
+  float lumi = 35.8; //fb-1 2016
   //  float lumi = 41.5; //fb-1 2017
-  float lumi = 59.7; //fb-1 2018
+  //  float lumi = 59.7; //fb-1 2018
   cout<<lumi<<endl;
 
 
-  //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
+  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
   //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
-  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
+  //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
   TString inputFileName[] = {
     // "AllData", 
     // "HH4lbb_Angela",
     // "HH4lbb_Ilirjan",
-    // "ggH125",
+    "ggH125",
     // "ggH125minlo",
-    // "VBFH125",
-    // "WplusH125",
-    // "WminusH125",
-    // "ZH125",
-    // "bbH125",
-    // "ttH125",
+    "VBFH125",
+    "WplusH125",
+    "WminusH125",
+    "ZH125",
+    "bbH125",
+    "ttH125",
     // "ZZTo4lext2",
-    // //"ZZTo4l",
-    // "ggTo4e_Contin_MCFM701",
-    // "ggTo4mu_Contin_MCFM701",
-    // "ggTo4tau_Contin_MCFM701",
-    // "ggTo2e2mu_Contin_MCFM701",
-    // "ggTo2e2tau_Contin_MCFM701",
-    // "ggTo2mu2tau_Contin_MCFM701",
-    "TTZToLLNuNu_M10",
-    "TTWJetsToLNu",
-    "WWZ",
-    "WZZ",
-    "ZZZ",
+    "ZZTo4l",
+    "ggTo4e_Contin_MCFM701",
+    "ggTo4mu_Contin_MCFM701",
+    "ggTo4tau_Contin_MCFM701",
+    "ggTo2e2mu_Contin_MCFM701",
+    "ggTo2e2tau_Contin_MCFM701",
+    "ggTo2mu2tau_Contin_MCFM701",
+    // "TTZToLLNuNu_M10",
+    // "TTWJetsToLNu",
+    // "WWZ",
+    // "WZZ",
+    // "ZZZ",
     // "ZXbkg_4ljjsel",
     // "DYJetsToLL_M50",
     // "TTTo2L2Nu",
