@@ -1126,6 +1126,7 @@ process.tauSequence=cms.Sequence(process.rerunMvaIsolationSequence + process.New
 
 from RecoJets.JetProducers.PileupJetIDParams_cfi import full_80x_chs
 from RecoJets.JetProducers.PileupJetIDCutParams_cfi import full_80x_chs_wp
+from RecoJets.JetProducers.PileupJetID_cfi import _chsalgos_94x, _chsalgos_102x
 
 process.load("CondCore.CondDB.CondDB_cfi")
 
@@ -1136,8 +1137,14 @@ process.pileupJetIdUpdated = process.pileupJetId.clone(
     jets=cms.InputTag("slimmedJets"),
     inputIsCorrected=False,
     applyJec=True,
-    vertexes=cms.InputTag("offlineSlimmedPrimaryVertices")
+    vertexes=cms.InputTag("offlineSlimmedPrimaryVertices"),
+    algos = cms.VPSet()
     )
+if(LEPTON_SETUP == 2017) :
+    process.pileupJetIdUpdated.algos = cms.VPSet(_chsalgos_94x) # for 2017
+elif(LEPTON_SETUP == 2018) :
+    process.pileupJetIdUpdated.algos = cms.VPSet(_chsalgos_102x) # for 2018
+
 
 ### q/g likelihood
 qgDatabaseVersion = 'cmssw8020_v2'
