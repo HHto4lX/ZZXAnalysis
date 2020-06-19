@@ -247,7 +247,21 @@ namespace {
   std::vector<float> JetAxis2;
   std::vector<float> JetMult;
   std::vector<float> JetPtD;
-  std::vector<float> JetSigma ;
+  std::vector<float> JetSigma; // jes_unc
+  // jes splitted unc
+  std::vector<float> JetSigma_Total;
+  std::vector<float> JetSigma_Abs;
+  std::vector<float> JetSigma_Abs_YEAR;
+  std::vector<float> JetSigma_BBEC1;
+  std::vector<float> JetSigma_BBEC1_YEAR;
+  std::vector<float> JetSigma_EC2;
+  std::vector<float> JetSigma_EC2_YEAR;
+  std::vector<float> JetSigma_FlavQCD;
+  std::vector<float> JetSigma_HF;
+  std::vector<float> JetSigma_HF_YEAR;
+  std::vector<float> JetSigma_RelBal;
+  std::vector<float> JetSigma_RelSample_YEAR;
+  // ---
   std::vector<short> JetHadronFlavour;
   std::vector<short> JetPartonFlavour;
 
@@ -261,6 +275,32 @@ namespace {
 
   std::vector<float> JetJESUp ;
   std::vector<float> JetJESDown ;
+
+  std::vector<float> JetJESUp_Total;
+  std::vector<float> JetJESUp_Abs;
+  std::vector<float> JetJESUp_Abs_YEAR;
+  std::vector<float> JetJESUp_BBEC1;
+  std::vector<float> JetJESUp_BBEC1_YEAR;
+  std::vector<float> JetJESUp_EC2;
+  std::vector<float> JetJESUp_EC2_YEAR;
+  std::vector<float> JetJESUp_FlavQCD;
+  std::vector<float> JetJESUp_HF;
+  std::vector<float> JetJESUp_HF_YEAR;
+  std::vector<float> JetJESUp_RelBal;
+  std::vector<float> JetJESUp_RelSample_YEAR;
+
+  std::vector<float> JetJESDown_Total;
+  std::vector<float> JetJESDown_Abs;
+  std::vector<float> JetJESDown_Abs_YEAR;
+  std::vector<float> JetJESDown_BBEC1;
+  std::vector<float> JetJESDown_BBEC1_YEAR;
+  std::vector<float> JetJESDown_EC2;
+  std::vector<float> JetJESDown_EC2_YEAR;
+  std::vector<float> JetJESDown_FlavQCD;
+  std::vector<float> JetJESDown_HF;
+  std::vector<float> JetJESDown_HF_YEAR;
+  std::vector<float> JetJESDown_RelBal;
+  std::vector<float> JetJESDown_RelSample_YEAR;
 
   std::vector<float> JetJERUp ;
   std::vector<float> JetJERDown ;
@@ -1444,13 +1484,52 @@ void HH4lXNtupleMaker::FillJet(const pat::Jet& jet)
    }
    JetSigma .push_back(jet.userFloat("jes_unc"));
 
+   JetSigma_Total          .push_back(jet.userFloat("jes_unc_split_Total"));
+   JetSigma_Abs            .push_back(jet.userFloat("jes_unc_split_Abs"));
+   JetSigma_Abs_YEAR       .push_back(jet.userFloat("jes_unc_split_Abs_YEAR"));
+   JetSigma_BBEC1          .push_back(jet.userFloat("jes_unc_split_BBEC1"));
+   JetSigma_BBEC1_YEAR     .push_back(jet.userFloat("jes_unc_split_BBEC1_YEAR"));
+   JetSigma_EC2            .push_back(jet.userFloat("jes_unc_split_EC2"));
+   JetSigma_EC2_YEAR       .push_back(jet.userFloat("jes_unc_split_EC2_YEAR"));
+   JetSigma_FlavQCD        .push_back(jet.userFloat("jes_unc_split_FlavQCD"));
+   JetSigma_HF             .push_back(jet.userFloat("jes_unc_split_HF"));
+   JetSigma_HF_YEAR        .push_back(jet.userFloat("jes_unc_split_HF_YEAR"));
+   JetSigma_RelBal         .push_back(jet.userFloat("jes_unc_split_RelBal"));
+   JetSigma_RelSample_YEAR .push_back(jet.userFloat("jes_unc_split_RelSample_YEAR"));
+
    JetRawPt  .push_back( jet.userFloat("RawPt"));
    JetPtJEC_noJER .push_back( jet.userFloat("pt_JEC_noJER"));
    
-   JetJESUp .push_back(jet.userFloat("pt_jesup"));
+   JetJESUp   .push_back(jet.userFloat("pt_jesup"));
    JetJESDown .push_back(jet.userFloat("pt_jesdn"));
 
-   JetJERUp .push_back(jet.userFloat("pt_jerup"));
+   JetJESUp_Total          .push_back(jet.userFloat("pt_jesup_split_Total"));
+   JetJESUp_Abs            .push_back(jet.userFloat("pt_jesup_split_Abs"));
+   JetJESUp_Abs_YEAR       .push_back(jet.userFloat("pt_jesup_split_Abs_YEAR"));
+   JetJESUp_BBEC1          .push_back(jet.userFloat("pt_jesup_split_BBEC1"));
+   JetJESUp_BBEC1_YEAR     .push_back(jet.userFloat("pt_jesup_split_BBEC1_YEAR"));
+   JetJESUp_EC2            .push_back(jet.userFloat("pt_jesup_split_EC2"));
+   JetJESUp_EC2_YEAR       .push_back(jet.userFloat("pt_jesup_split_EC2_YEAR"));
+   JetJESUp_FlavQCD        .push_back(jet.userFloat("pt_jesup_split_FlavQCD"));
+   JetJESUp_HF             .push_back(jet.userFloat("pt_jesup_split_HF"));
+   JetJESUp_HF_YEAR        .push_back(jet.userFloat("pt_jesup_split_HF_YEAR"));
+   JetJESUp_RelBal         .push_back(jet.userFloat("pt_jesup_split_RelBal"));
+   JetJESUp_RelSample_YEAR .push_back(jet.userFloat("pt_jesup_split_RelSample_YEAR"));
+
+   JetJESDown_Total          .push_back(jet.userFloat("pt_jesdn_split_Total"));
+   JetJESDown_Abs            .push_back(jet.userFloat("pt_jesdn_split_Abs"));
+   JetJESDown_Abs_YEAR       .push_back(jet.userFloat("pt_jesdn_split_Abs_YEAR"));
+   JetJESDown_BBEC1          .push_back(jet.userFloat("pt_jesdn_split_BBEC1"));
+   JetJESDown_BBEC1_YEAR     .push_back(jet.userFloat("pt_jesdn_split_BBEC1_YEAR"));
+   JetJESDown_EC2            .push_back(jet.userFloat("pt_jesdn_split_EC2"));
+   JetJESDown_EC2_YEAR       .push_back(jet.userFloat("pt_jesdn_split_EC2_YEAR"));
+   JetJESDown_FlavQCD        .push_back(jet.userFloat("pt_jesdn_split_FlavQCD"));
+   JetJESDown_HF             .push_back(jet.userFloat("pt_jesdn_split_HF"));
+   JetJESDown_HF_YEAR        .push_back(jet.userFloat("pt_jesdn_split_HF_YEAR"));
+   JetJESDown_RelBal         .push_back(jet.userFloat("pt_jesdn_split_RelBal"));
+   JetJESDown_RelSample_YEAR .push_back(jet.userFloat("pt_jesdn_split_RelSample_YEAR"));
+
+   JetJERUp   .push_back(jet.userFloat("pt_jerup"));
    JetJERDown .push_back(jet.userFloat("pt_jerdn"));
 
    JetID.push_back(jet.userFloat("JetID"));
@@ -2652,6 +2731,20 @@ void HH4lXNtupleMaker::BookAllBranches(){
     myTree->Book("JetPtD",JetPtD, failedTreeLevel >= fullFailedTree);
   }
   myTree->Book("JetSigma",JetSigma, failedTreeLevel >= fullFailedTree);
+
+  myTree->Book("JetSigma_Total",         JetSigma_Total,          failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetSigma_Abs",           JetSigma_Abs,            failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetSigma_Abs_YEAR",      JetSigma_Abs_YEAR,       failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetSigma_BBEC1",         JetSigma_BBEC1,          failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetSigma_BBEC1_YEAR",    JetSigma_BBEC1_YEAR,     failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetSigma_EC2",           JetSigma_EC2,            failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetSigma_EC2_YEAR",      JetSigma_EC2_YEAR,       failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetSigma_FlavQCD",       JetSigma_FlavQCD,        failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetSigma_HF",            JetSigma_HF,             failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetSigma_HF_YEAR",       JetSigma_HF_YEAR,        failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetSigma_RelBal",        JetSigma_RelBal,         failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetSigma_RelSample_YEAR",JetSigma_RelSample_YEAR, failedTreeLevel >= fullFailedTree);
+
   myTree->Book("JetHadronFlavour",JetHadronFlavour, failedTreeLevel >= fullFailedTree);
   myTree->Book("JetPartonFlavour",JetPartonFlavour, failedTreeLevel >= fullFailedTree);
 
@@ -2660,6 +2753,32 @@ void HH4lXNtupleMaker::BookAllBranches(){
   
   myTree->Book("JetPt_JESUp",JetJESUp, failedTreeLevel >= fullFailedTree);
   myTree->Book("JetPt_JESDown",JetJESDown, failedTreeLevel >= fullFailedTree);
+
+  myTree->Book("JetPt_JESUp_Total",JetJESUp_Total, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESUp_Abs",JetJESUp_Abs, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESUp_Abs_YEAR",JetJESUp_Abs_YEAR, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESUp_BBEC1",JetJESUp_BBEC1, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESUp_BBEC1_YEAR",JetJESUp_BBEC1_YEAR, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESUp_EC2",JetJESUp_EC2, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESUp_EC2_YEAR",JetJESUp_EC2_YEAR, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESUp_FlavQCD",JetJESUp_FlavQCD, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESUp_HF",JetJESUp_HF, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESUp_HF_YEAR",JetJESUp_HF_YEAR, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESUp_RelBal",JetJESUp_RelBal, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESUp_RelSample_YEAR",JetJESUp_RelSample_YEAR, failedTreeLevel >= fullFailedTree);
+
+  myTree->Book("JetPt_JESDown_Total",JetJESDown_Total, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESDown_Abs",JetJESDown_Abs, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESDown_Abs_YEAR",JetJESDown_Abs_YEAR, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESDown_BBEC1",JetJESDown_BBEC1, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESDown_BBEC1_YEAR",JetJESDown_BBEC1_YEAR, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESDown_EC2",JetJESDown_EC2, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESDown_EC2_YEAR",JetJESDown_EC2_YEAR, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESDown_FlavQCD",JetJESDown_FlavQCD, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESDown_HF",JetJESDown_HF, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESDown_HF_YEAR",JetJESDown_HF_YEAR, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESDown_RelBal",JetJESDown_RelBal, failedTreeLevel >= fullFailedTree);
+  myTree->Book("JetPt_JESDown_RelSample_YEAR",JetJESDown_RelSample_YEAR, failedTreeLevel >= fullFailedTree);
    
   myTree->Book("JetPt_JERUp",JetJERUp, failedTreeLevel >= fullFailedTree);
   myTree->Book("JetPt_JERDown",JetJERDown, failedTreeLevel >= fullFailedTree);
