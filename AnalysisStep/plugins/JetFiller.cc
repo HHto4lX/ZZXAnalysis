@@ -5,6 +5,7 @@
 #include <FWCore/Framework/interface/ESHandle.h>
 #include <FWCore/Framework/interface/EventSetup.h>
 #include <FWCore/Utilities/interface/EDMException.h>
+#include "FWCore/ParameterSet/interface/FileInPath.h"
 
 #include <DataFormats/PatCandidates/interface/Jet.h>
 #include <CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h>
@@ -119,11 +120,77 @@ JetFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   Handle<edm::ValueMap<float> > ptDHandle; 
   iEvent.getByToken(ptDToken, ptDHandle);
 
-  //--- JEC uncertanties 
+
+  //--- JEC uncertanties (part 1) - No splitting
+  // JetCorrectorParametersCollection refers to the JEC file read from db in MasterPy/ZZ4lAnalysis.py
   ESHandle<JetCorrectorParametersCollection> JetCorParColl;
   iSetup.get<JetCorrectionsRecord>().get(jecType,JetCorParColl);
   JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
   JetCorrectionUncertainty jecUnc(JetCorPar);
+
+  // JEC uncertainty (Part 2) - 11 Splitted sources
+  // Run 2 reduced set of uncertainties from here: https://twiki.cern.ch/twiki/bin/viewauth/CMS/JECUncertaintySources#Run_2_reduced_set_of_uncertainty
+  // List of uncertainties: ['Absolute', 'Absolute_201*', 'BBEC1', 'BBEC1_201*', 'EC2', 'EC2_201*', 'FlavorQCD', 'HF', 'HF_201*', 'RelativeBal', 'RelativeSample_201*'] + 'Total'
+  std::string jecUncFile_;
+  std::vector<string> uncSources {};
+  if(applyJEC_ && isMC_ && setup == 2016){
+    edm::FileInPath jecUncFile("ZZXAnalysis/AnalysisStep/data/JetUncertaintySources/Regrouped_Summer16_07Aug2017_V11_MC_UncertaintySources_AK4PFchs.txt");
+    jecUncFile_ = jecUncFile.fullPath();
+    uncSources.push_back("Total"); 
+    uncSources.push_back("Absolute"); 
+    uncSources.push_back("Absolute_2016");
+    uncSources.push_back("BBEC1");
+    uncSources.push_back("BBEC1_2016");
+    uncSources.push_back("EC2"); 
+    uncSources.push_back("EC2_2016");
+    uncSources.push_back("FlavorQCD");
+    uncSources.push_back("HF"); 
+    uncSources.push_back("HF_2016");
+    uncSources.push_back("RelativeBal");
+    uncSources.push_back("RelativeSample_2016");
+  }
+  else if(applyJEC_ && isMC_ && setup == 2017){      
+    edm::FileInPath jecUncFile("ZZXAnalysis/AnalysisStep/data/JetUncertaintySources/Regrouped_Fall17_17Nov2017_V32_MC_UncertaintySources_AK4PFchs.txt");
+    jecUncFile_ = jecUncFile.fullPath();    
+    uncSources.push_back("Total"); 
+    uncSources.push_back("Absolute"); 
+    uncSources.push_back("Absolute_2017");
+    uncSources.push_back("BBEC1"); 
+    uncSources.push_back("BBEC1_2017");
+    uncSources.push_back("EC2"); 
+    uncSources.push_back("EC2_2017");
+    uncSources.push_back("FlavorQCD");
+    uncSources.push_back("HF"); 
+    uncSources.push_back("HF_2017");
+    uncSources.push_back("RelativeBal");
+    uncSources.push_back("RelativeSample_2017");
+  }
+  else if(applyJEC_ && isMC_ && setup == 2018){ 
+    edm::FileInPath jecUncFile("ZZXAnalysis/AnalysisStep/data/JetUncertaintySources/Regrouped_Autumn18_V19_MC_UncertaintySources_AK4PFchs.txt");
+    jecUncFile_ = jecUncFile.fullPath();
+    uncSources.push_back("Total"); 
+    uncSources.push_back("Absolute"); 
+    uncSources.push_back("Absolute_2018");
+    uncSources.push_back("BBEC1"); 
+    uncSources.push_back("BBEC1_2018");
+    uncSources.push_back("EC2"); 
+    uncSources.push_back("EC2_2018");
+    uncSources.push_back("FlavorQCD");
+    uncSources.push_back("HF"); 
+    uncSources.push_back("HF_2018");
+    uncSources.push_back("RelativeBal");
+    uncSources.push_back("RelativeSample_2018");
+  }
+  else cout << "jecUncFile NOT FOUND!";
+
+  //JetCorrectorParameters *corrParams_ = new JetCorrectorParameters(jecUncFile_, uncSources[0]); //Considering only "Total"
+  //JetCorrectionUncertainty *uncert_ = new JetCorrectionUncertainty(*corrParams_);
+  std::vector<JetCorrectionUncertainty*> splittedUncerts_;
+  for (unsigned s_unc = 0; s_unc < uncSources.size(); s_unc++){
+    JetCorrectorParameters corrParams = JetCorrectorParameters(jecUncFile_, uncSources[s_unc]); 
+    splittedUncerts_.push_back(new JetCorrectionUncertainty(corrParams));
+  }
+
 
   //--- Output collection
   auto result = std::make_unique<pat::JetCollection>();
@@ -152,10 +219,27 @@ JetFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     //--- Get JEC uncertainties 
     jecUnc.setJetEta(jeta);
     jecUnc.setJetPt(jpt);
-    float jes_unc = jecUnc.getUncertainty(true);
+    float jes_unc = jecUnc.getUncertainty(true); //It takes as argument "bool fDirection": true = up, false = dn; symmetric values
      
-    float pt_jesup = jpt * (1.0 + jes_unc);
-    float pt_jesdn = jpt * (1.0 - jes_unc);
+    float pt_jesup = jpt * (1.0 + jes_unc); // set the shifted pT up
+    float pt_jesdn = jpt * (1.0 - jes_unc); // set the shifted pT dn
+
+    // --- Get JEC uncetrainties splitted
+    vector<float> jes_unc_split {};
+    vector<float> pt_jesup_split {};
+    vector<float> pt_jesdn_split {};
+    float singleContr_jes_unc = 0;
+
+    for(unsigned s_unc = 0; s_unc < uncSources.size(); s_unc++){
+      singleContr_jes_unc = 0;
+      splittedUncerts_[s_unc]->setJetEta(jeta); // set the shifted pT up
+      splittedUncerts_[s_unc]->setJetPt(jpt);   // set the shifted pT dn
+      singleContr_jes_unc = splittedUncerts_[s_unc]->getUncertainty(true); //It takes as argument "bool fDirection": true = up, false = dn; symmetric values
+      jes_unc_split.push_back(singleContr_jes_unc);
+      pt_jesup_split.push_back( jpt * (1.0 + singleContr_jes_unc));
+      pt_jesdn_split.push_back( jpt * (1.0 - singleContr_jes_unc));
+    }
+
 
 
     //--- loose jet ID, cf. https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetID13TeVRun2016 
@@ -311,6 +395,46 @@ JetFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     j.addUserFloat("jes_unc", jes_unc);
     j.addUserFloat("pt_jesup", pt_jesup);
     j.addUserFloat("pt_jesdn", pt_jesdn);
+    // Adding variables to take into account single contributions to the total JEC uncertainty:
+    // UNCERTAINTY...
+    j.addUserFloat("jes_unc_split_Total",          jes_unc_split[0]);
+    j.addUserFloat("jes_unc_split_Abs",            jes_unc_split[1]);
+    j.addUserFloat("jes_unc_split_Abs_YEAR",       jes_unc_split[2]);
+    j.addUserFloat("jes_unc_split_BBEC1",          jes_unc_split[3]);
+    j.addUserFloat("jes_unc_split_BBEC1_YEAR",     jes_unc_split[4]);
+    j.addUserFloat("jes_unc_split_EC2",            jes_unc_split[5]);
+    j.addUserFloat("jes_unc_split_EC2_YEAR",       jes_unc_split[6]);
+    j.addUserFloat("jes_unc_split_FlavQCD",        jes_unc_split[7]);
+    j.addUserFloat("jes_unc_split_HF",             jes_unc_split[8]);
+    j.addUserFloat("jes_unc_split_HF_YEAR",        jes_unc_split[9]);
+    j.addUserFloat("jes_unc_split_RelBal",         jes_unc_split[10]);
+    j.addUserFloat("jes_unc_split_RelSample_YEAR", jes_unc_split[11]);
+    // ... and pT UP/DN VARIATIONS 
+    j.addUserFloat("pt_jesup_split_Total",          pt_jesup_split[0]);
+    j.addUserFloat("pt_jesdn_split_Total",          pt_jesdn_split[0]);
+    j.addUserFloat("pt_jesup_split_Abs",            pt_jesup_split[1]);
+    j.addUserFloat("pt_jesdn_split_Abs",            pt_jesdn_split[1]);
+    j.addUserFloat("pt_jesup_split_Abs_YEAR",       pt_jesup_split[2]);
+    j.addUserFloat("pt_jesdn_split_Abs_YEAR",       pt_jesdn_split[2]);
+    j.addUserFloat("pt_jesup_split_BBEC1",          pt_jesup_split[3]);
+    j.addUserFloat("pt_jesdn_split_BBEC1",          pt_jesdn_split[3]);
+    j.addUserFloat("pt_jesup_split_BBEC1_YEAR",     pt_jesup_split[4]);
+    j.addUserFloat("pt_jesdn_split_BBEC1_YEAR",     pt_jesdn_split[4]);
+    j.addUserFloat("pt_jesup_split_EC2",            pt_jesup_split[5]);
+    j.addUserFloat("pt_jesdn_split_EC2",            pt_jesdn_split[5]);
+    j.addUserFloat("pt_jesup_split_EC2_YEAR",       pt_jesup_split[6]);
+    j.addUserFloat("pt_jesdn_split_EC2_YEAR",       pt_jesdn_split[6]);
+    j.addUserFloat("pt_jesup_split_FlavQCD",        pt_jesup_split[7]);
+    j.addUserFloat("pt_jesdn_split_FlavQCD",        pt_jesdn_split[7]);
+    j.addUserFloat("pt_jesup_split_HF",             pt_jesup_split[8]);
+    j.addUserFloat("pt_jesdn_split_HF",             pt_jesdn_split[8]);
+    j.addUserFloat("pt_jesup_split_HF_YEAR",        pt_jesup_split[9]);
+    j.addUserFloat("pt_jesdn_split_HF_YEAR",        pt_jesdn_split[9]);
+    j.addUserFloat("pt_jesup_split_RelBal",         pt_jesup_split[10]);
+    j.addUserFloat("pt_jesdn_split_RelBal",         pt_jesdn_split[10]);
+    j.addUserFloat("pt_jesup_split_RelSample_YEAR", pt_jesup_split[11]);
+    j.addUserFloat("pt_jesdn_split_RelSample_YEAR", pt_jesdn_split[11]);
+    //////////////////////////////////////////////////////////////////////////////////////////////
     j.addUserFloat("pt_jerup", pt_jerup);
     j.addUserFloat("pt_jerdn", pt_jerdn);
     j.addUserFloat("RawPt", raw_jpt);
