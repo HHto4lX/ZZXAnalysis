@@ -238,12 +238,12 @@ JetFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     if(applyJEC_ && isMC_){
       for(int s_unc = 0; s_unc < nJECuncSources; s_unc++){
         singleContr_jes_unc = 0;
-        splittedUncerts_[s_unc]->setJetEta(jeta); // set the shifted pT up
-        splittedUncerts_[s_unc]->setJetPt(jpt);   // set the shifted pT dn
+        splittedUncerts_[s_unc]->setJetEta(jeta); 
+        splittedUncerts_[s_unc]->setJetPt(jpt);   
         singleContr_jes_unc = splittedUncerts_[s_unc]->getUncertainty(true); //It takes as argument "bool fDirection": true = up, false = dn; symmetric values
         jes_unc_split[s_unc]  = singleContr_jes_unc;
-        pt_jesup_split[s_unc] = jpt * (1.0 + singleContr_jes_unc);
-        pt_jesdn_split[s_unc] = jpt * (1.0 - singleContr_jes_unc);
+        pt_jesup_split[s_unc] = jpt * (1.0 + singleContr_jes_unc); // set the shifted pT up
+        pt_jesdn_split[s_unc] = jpt * (1.0 - singleContr_jes_unc); // set the shifted pT dn
       }
     }
     else{
