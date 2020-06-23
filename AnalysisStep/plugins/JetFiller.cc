@@ -66,6 +66,9 @@ class JetFiller : public edm::EDProducer {
   JME::JetResolution resolution;
   JME::JetResolutionScaleFactor resolution_sf;
 
+  std::string jecUncFile_;
+  std::vector<string> uncSources{};  
+
 };
 
 
@@ -95,6 +98,59 @@ JetFiller::JetFiller(const edm::ParameterSet& iConfig) :
   ptDToken = consumes<edm::ValueMap<float> >(edm::InputTag("QGTagger", "ptD"));
 
   produces<pat::JetCollection>();
+
+
+  if(setup == 2016){
+    edm::FileInPath jecUncFile("ZZXAnalysis/AnalysisStep/data/JetUncertaintySources/Regrouped_Summer16_07Aug2017_V11_MC_UncertaintySources_AK4PFchs.txt");
+    jecUncFile_ = jecUncFile.fullPath();
+    uncSources.push_back("Total"); 
+    uncSources.push_back("Absolute"); 
+    uncSources.push_back("Absolute_2016");
+    uncSources.push_back("BBEC1");
+    uncSources.push_back("BBEC1_2016");
+    uncSources.push_back("EC2"); 
+    uncSources.push_back("EC2_2016");
+    uncSources.push_back("FlavorQCD");
+    uncSources.push_back("HF"); 
+    uncSources.push_back("HF_2016");
+    uncSources.push_back("RelativeBal");
+    uncSources.push_back("RelativeSample_2016");
+  }
+  else if(setup == 2017){      
+    edm::FileInPath jecUncFile("ZZXAnalysis/AnalysisStep/data/JetUncertaintySources/Regrouped_Fall17_17Nov2017_V32_MC_UncertaintySources_AK4PFchs.txt");
+    jecUncFile_ = jecUncFile.fullPath();    
+    uncSources.push_back("Total"); 
+    uncSources.push_back("Absolute"); 
+    uncSources.push_back("Absolute_2017");
+    uncSources.push_back("BBEC1"); 
+    uncSources.push_back("BBEC1_2017");
+    uncSources.push_back("EC2"); 
+    uncSources.push_back("EC2_2017");
+    uncSources.push_back("FlavorQCD");
+    uncSources.push_back("HF"); 
+    uncSources.push_back("HF_2017");
+    uncSources.push_back("RelativeBal");
+    uncSources.push_back("RelativeSample_2017");
+  }
+  else if(setup == 2018){ 
+    edm::FileInPath jecUncFile("ZZXAnalysis/AnalysisStep/data/JetUncertaintySources/Regrouped_Autumn18_V19_MC_UncertaintySources_AK4PFchs.txt");
+    jecUncFile_ = jecUncFile.fullPath();
+    uncSources.push_back("Total"); 
+    uncSources.push_back("Absolute"); 
+    uncSources.push_back("Absolute_2018");
+    uncSources.push_back("BBEC1"); 
+    uncSources.push_back("BBEC1_2018");
+    uncSources.push_back("EC2"); 
+    uncSources.push_back("EC2_2018");
+    uncSources.push_back("FlavorQCD");
+    uncSources.push_back("HF"); 
+    uncSources.push_back("HF_2018");
+    uncSources.push_back("RelativeBal");
+    uncSources.push_back("RelativeSample_2018");
+  }
+  else cout << "jecUncFile NOT FOUND!";
+
+
 }
 
 
@@ -132,60 +188,8 @@ JetFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // Run 2 reduced set of uncertainties from here: https://twiki.cern.ch/twiki/bin/viewauth/CMS/JECUncertaintySources#Run_2_reduced_set_of_uncertainty
   // List of uncertainties: ['Absolute', 'Absolute_201*', 'BBEC1', 'BBEC1_201*', 'EC2', 'EC2_201*', 'FlavorQCD', 'HF', 'HF_201*', 'RelativeBal', 'RelativeSample_201*'] + 'Total'
   int nJECuncSources = 12; // 11 + total
-  std::string jecUncFile_;
-  std::vector<string> uncSources {};
   std::vector<JetCorrectionUncertainty*> splittedUncerts_;
   if(applyJEC_ && isMC_){
-    if(setup == 2016){
-      edm::FileInPath jecUncFile("ZZXAnalysis/AnalysisStep/data/JetUncertaintySources/Regrouped_Summer16_07Aug2017_V11_MC_UncertaintySources_AK4PFchs.txt");
-      jecUncFile_ = jecUncFile.fullPath();
-      uncSources.push_back("Total"); 
-      uncSources.push_back("Absolute"); 
-      uncSources.push_back("Absolute_2016");
-      uncSources.push_back("BBEC1");
-      uncSources.push_back("BBEC1_2016");
-      uncSources.push_back("EC2"); 
-      uncSources.push_back("EC2_2016");
-      uncSources.push_back("FlavorQCD");
-      uncSources.push_back("HF"); 
-      uncSources.push_back("HF_2016");
-      uncSources.push_back("RelativeBal");
-      uncSources.push_back("RelativeSample_2016");
-    }
-    else if(setup == 2017){      
-      edm::FileInPath jecUncFile("ZZXAnalysis/AnalysisStep/data/JetUncertaintySources/Regrouped_Fall17_17Nov2017_V32_MC_UncertaintySources_AK4PFchs.txt");
-      jecUncFile_ = jecUncFile.fullPath();    
-      uncSources.push_back("Total"); 
-      uncSources.push_back("Absolute"); 
-      uncSources.push_back("Absolute_2017");
-      uncSources.push_back("BBEC1"); 
-      uncSources.push_back("BBEC1_2017");
-      uncSources.push_back("EC2"); 
-      uncSources.push_back("EC2_2017");
-      uncSources.push_back("FlavorQCD");
-      uncSources.push_back("HF"); 
-      uncSources.push_back("HF_2017");
-      uncSources.push_back("RelativeBal");
-      uncSources.push_back("RelativeSample_2017");
-    }
-    else if(setup == 2018){ 
-      edm::FileInPath jecUncFile("ZZXAnalysis/AnalysisStep/data/JetUncertaintySources/Regrouped_Autumn18_V19_MC_UncertaintySources_AK4PFchs.txt");
-      jecUncFile_ = jecUncFile.fullPath();
-      uncSources.push_back("Total"); 
-      uncSources.push_back("Absolute"); 
-      uncSources.push_back("Absolute_2018");
-      uncSources.push_back("BBEC1"); 
-      uncSources.push_back("BBEC1_2018");
-      uncSources.push_back("EC2"); 
-      uncSources.push_back("EC2_2018");
-      uncSources.push_back("FlavorQCD");
-      uncSources.push_back("HF"); 
-      uncSources.push_back("HF_2018");
-      uncSources.push_back("RelativeBal");
-      uncSources.push_back("RelativeSample_2018");
-    }
-    else cout << "jecUncFile NOT FOUND!";
-  
     //JetCorrectorParameters *corrParams_ = new JetCorrectorParameters(jecUncFile_, uncSources[0]); //Considering only "Total"
     //JetCorrectionUncertainty *uncert_ = new JetCorrectionUncertainty(*corrParams_);
     for (int s_unc = 0; s_unc < nJECuncSources; s_unc++){

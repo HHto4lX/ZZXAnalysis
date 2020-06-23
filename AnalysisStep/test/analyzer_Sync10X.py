@@ -39,12 +39,12 @@ MCFILTER = ""
 
 # ***************************
 # xsec for sync
-XSEC=48.58 * 0.0002745 #ggH
+#XSEC=48.58 * 0.0002745 #ggH
 # ***************************
 
 #For DATA: 
-#IsMC = False
-#PD = "DoubleMu"
+IsMC = False
+PD = "DoubleMu"
 
 # var parsing
 import FWCore.ParameterSet.VarParsing as VarParsing
@@ -53,12 +53,8 @@ import sys
 options = VarParsing.VarParsing()
 
 options.register('inputFile',
-                  '/store/mc/RunIIFall17MiniAODv2/GluGluHToZZTo4L_M125_13TeV_powheg2_JHUGenV7011_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14_ext1-v1/10000/2E4D9C7C-EE42-E811-A64A-001E675811CC.root', #ggH per sync
-#                 'root://eoscms//eos/cms/store/user/covarell/HH/SM/4lbb/testMINIAOD_HHSM_4lbb_1.root', #default value  #2018
-#                 '/store/user/ilmargje/HH_bb4l_Signal_48kDR_MiniAOD/HH_bb4l_2018_NLO_gen-sim/processed_gen-sim-premix_step2/200119_190213/0000/HIG_GluGluToHHTobbZZ4L-RunIIAutumn18MiniAOD_99.root',#2018
-#                  '/store/user/ilmargje/HH_bb4l_2016_Signal_152k_MINIAOD/HH_bb4l_2016_NLO_152kPart2_gen-sim/MiniAOD/200206_143727/0001/HIG-RunIISummer16MiniAODv3-00549_1520.root',#2016
-#                  '/store/mc/RunIIFall17MiniAODv2/GluGluToHHTo2B2ZTo4L_node_SM_13TeV-madgraph_correctedcfg/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/120000/AA92C380-A8CD-E811-8B40-FA163E90125F.root',#2017
-#                  '/store/user/ilmargje/HH_bb4l_2016Signal_152k_MINIAOD/HH_bb4l_2017_NLO_152kPart2_gen-sim/processed_MiniAOD/200122_190437/0000/SMP-RunIIFall17MiniAODv2-00071_509.root', #2017
+'/store/data/Run2018B/DoubleMuon/MINIAOD/17Sep2018-v1/60000/FF098453-BB5E-5049-BE8E-6F144AC12FBA.root', #data2018B
+#'/store/mc/RunIIAutumn18MiniAOD/GluGluHToZZTo4L_M125_13TeV_powheg2_JHUGenV7011_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/80000/D65A4D51-2E80-AD41-B50D-E4083BA2A668.root', #ggH 2018
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.string,
                  "inputFile")
