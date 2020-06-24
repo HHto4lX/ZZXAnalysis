@@ -187,12 +187,12 @@ JetFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // JEC uncertainty (Part 2) - 11 Splitted sources
   // Run 2 reduced set of uncertainties from here: https://twiki.cern.ch/twiki/bin/viewauth/CMS/JECUncertaintySources#Run_2_reduced_set_of_uncertainty
   // List of uncertainties: ['Absolute', 'Absolute_201*', 'BBEC1', 'BBEC1_201*', 'EC2', 'EC2_201*', 'FlavorQCD', 'HF', 'HF_201*', 'RelativeBal', 'RelativeSample_201*'] + 'Total'
-  int nJECuncSources = 12; // 11 + total
+  //  int nJECuncSources = 12; // 11 + total
   std::vector<JetCorrectionUncertainty*> splittedUncerts_;
   if(applyJEC_ && isMC_){
     //JetCorrectorParameters *corrParams_ = new JetCorrectorParameters(jecUncFile_, uncSources[0]); //Considering only "Total"
     //JetCorrectionUncertainty *uncert_ = new JetCorrectionUncertainty(*corrParams_);
-    for (int s_unc = 0; s_unc < nJECuncSources; s_unc++){
+    for (unsigned s_unc = 0; s_unc < uncSources.size(); s_unc++){
       JetCorrectorParameters corrParams = JetCorrectorParameters(jecUncFile_, uncSources[s_unc]); 
       splittedUncerts_.push_back(new JetCorrectionUncertainty(corrParams));
     }
@@ -234,27 +234,30 @@ JetFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     float pt_jesdn = jpt * (1.0 - jes_unc); // set the shifted pT dn
 
     // --- Get JEC uncetrainties splitted
-    float jes_unc_split[nJECuncSources];
-    float pt_jesup_split[nJECuncSources];
-    float pt_jesdn_split[nJECuncSources];
+    // float jes_unc_split[nJECuncSources];
+    // float pt_jesup_split[nJECuncSources];
+    // float pt_jesdn_split[nJECuncSources];
+    vector<float> jes_unc_split {};
+    vector<float> pt_jesup_split {};
+    vector<float> pt_jesdn_split {};
     float singleContr_jes_unc = 0;
     
     if(applyJEC_ && isMC_){
-      for(int s_unc = 0; s_unc < nJECuncSources; s_unc++){
+      for(unsigned s_unc = 0; s_unc < uncSources.size(); s_unc++){
         singleContr_jes_unc = 0;
         splittedUncerts_[s_unc]->setJetEta(jeta); 
         splittedUncerts_[s_unc]->setJetPt(jpt);   
         singleContr_jes_unc = splittedUncerts_[s_unc]->getUncertainty(true); //It takes as argument "bool fDirection": true = up, false = dn; symmetric values
-        jes_unc_split[s_unc]  = singleContr_jes_unc;
-        pt_jesup_split[s_unc] = jpt * (1.0 + singleContr_jes_unc); // set the shifted pT up
-        pt_jesdn_split[s_unc] = jpt * (1.0 - singleContr_jes_unc); // set the shifted pT dn
+        jes_unc_split.push_back(singleContr_jes_unc);
+	pt_jesup_split.push_back( jpt * (1.0 + singleContr_jes_unc)); // set the shifted pT up
+	pt_jesdn_split.push_back( jpt * (1.0 - singleContr_jes_unc)); // set the shifted pT dn
       }
     }
     else{
-      for(int i = 0; i < nJECuncSources; i++){
-        jes_unc_split[i]  = -9999.;
-        pt_jesup_split[i] = -9999.;
-        pt_jesdn_split[i] = -9999.;
+      for(unsigned s_unc = 0; s_unc < uncSources.size(); s_unc++){
+        jes_unc_split.push_back(-9999.);
+        pt_jesup_split.push_back(-9999.);
+        pt_jesdn_split.push_back(-9999.);
       }
     }
 
