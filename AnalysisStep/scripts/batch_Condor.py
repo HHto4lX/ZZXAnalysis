@@ -111,7 +111,7 @@ error                   = error/$(ClusterId).$(ProcId).err
 log                     = log/$(ClusterId).log
 Initialdir              = $(directory)
 
-request_memory          = 4000M
+request_memory          = 10000M
 +JobFlavour             = "tomorrow"
 
 x509userproxy           = {home}/x509up_u{uid}

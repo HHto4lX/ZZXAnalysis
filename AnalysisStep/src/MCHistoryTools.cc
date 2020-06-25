@@ -100,8 +100,8 @@ MCHistoryTools::MCHistoryTools(const edm::Event & event, std::string sampleName,
     if (boost::starts_with(sampleName,"TTW")) processID=900107;
     // for HToWW sample
     if (boost::starts_with(sampleName,"HToWW")) processID=900110;
-    cout<<"************* processID "<<processID<<endl;
-    cout<<"sampleName "<<sampleName<<endl;
+    // cout<<"************* processID "<<processID<<endl;
+    // cout<<"sampleName "<<sampleName<<endl;
     
 
     // take the MC weight
