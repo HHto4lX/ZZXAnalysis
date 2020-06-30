@@ -102,9 +102,9 @@ void jetMatchingStudy(){
   TH1F* h_matches_Method2_eff = new TH1F("h_matches_Method2_eff","reco-GEN jet matches;# reco jet with GEN match;eff", 3,-0.5,2.5);
   TH1F* h_matches_Method3_eff = new TH1F("h_matches_Method3_eff","reco-GEN jet matches;# reco jet with GEN match;eff", 3,-0.5,2.5);
 
-  TH2F* h2_matches_Method1VsMethod2 = new TH2F("h2_matches_Method1VsMethod2",";#reco jet with GEN match (2high pT);#reco jet with GEN match (2high btag)", 3,-0.5,2.5,3,-0.5,2.5);
-  TH2F* h2_matches_Method1VsMethod3 = new TH2F("h2_matches_Method1VsMethod3",";#reco jet with GEN match (2high pT);#reco jet with GEN match (1high pT+1high btag)", 3,-0.5,2.5,3,-0.5,2.5);
-  TH2F* h2_matches_Method3VsMethod2 = new TH2F("h2_matches_Method3VsMethod2",";#reco jet with GEN match (1high pT+1high btag);#reco jet with GEN match (1high pT+1high btag)", 3,-0.5,2.5,3,-0.5,2.5);
+  TH2F* h2_matches_Method1onx_Method2ony = new TH2F("h2_matches_Method1onx_Method2ony",";# reco jet with GEN match (2high pT);# reco jet with GEN match (2high btag)", 3,-0.5,2.5,3,-0.5,2.5);
+  TH2F* h2_matches_Method1onx_Method3ony = new TH2F("h2_matches_Method1onx_Method3ony",";# reco jet with GEN match (2high pT);# reco jet with GEN match (1high pT+1high btag)", 3,-0.5,2.5,3,-0.5,2.5);
+  TH2F* h2_matches_Method3onx_Method2ony = new TH2F("h2_matches_Method3onx_Method2ony",";# reco jet with GEN match (1high pT+1high btag);# reco jet with GEN match (2high btag)", 3,-0.5,2.5,3,-0.5,2.5);
 
 
   TH1F* h_bbmass_Method1 = new TH1F("h_bbmass_Method1", ";bbMass;events", 50, 0., 500.); h_bbmass_Method1->Sumw2(true);
@@ -430,49 +430,65 @@ void jetMatchingStudy(){
 
 
 
-    //FILL HISTOS
+    //CONDIZIONI PER FILL HISTOS
+    Float_t x_Method1 = -999.;
+    Float_t x_Method2 = -999.;
+    Float_t x_Method3 = -999.;
+
     //method1
     if(bool_match1_Method1 && bool_match2_Method1){
       count2match_Method1++; 
-      h_matches_Method1->Fill(2., 1.);
+      x_Method1 = 2.;
     }
     else if( (bool_match1_Method1 && !bool_match2_Method1) || (!bool_match1_Method1 && bool_match2_Method1) ){
       count1match_Method1++;
-      h_matches_Method1->Fill(1., 1.);
+      x_Method1 = 1.;
     }
     else{
       count0match_Method1++;
-      h_matches_Method1->Fill(0., 1.);
+      x_Method1 = 0.;
     }
 
     //method2
     if(bool_match1_Method2 && bool_match2_Method2){
       count2match_Method2++; 
-      h_matches_Method2->Fill(2., 1.);
+      x_Method2 = 2.;
     }
     else if( (bool_match1_Method2 && !bool_match2_Method2) || (!bool_match1_Method2 && bool_match2_Method2) ){
       count1match_Method2++;
-      h_matches_Method2->Fill(1., 1.);
+      x_Method2 = 1.;
     }
     else{
       count0match_Method2++;
-      h_matches_Method2->Fill(0., 1.);
+      x_Method2 = 0.;
     }
 
     //method3
     if(bool_match1_Method3 && bool_match2_Method3){
       count2match_Method3++; 
-      h_matches_Method3->Fill(2., 1.);
+      x_Method3 = 2.;
     }
     else if( (bool_match1_Method3 && !bool_match2_Method3) || (!bool_match1_Method3 && bool_match2_Method3) ){
       count1match_Method3++;
-      h_matches_Method3->Fill(1., 1.);
+      x_Method3 = 1.;
     }
     else{
       count0match_Method3++;
-      h_matches_Method3->Fill(0., 1.);
+      x_Method3 = 0.;
     }
 
+
+    //FILL HISTOS
+    h_matches_Method1->Fill(x_Method1);
+    h_matches_Method2->Fill(x_Method2);
+    h_matches_Method3->Fill(x_Method3);
+    //FILL HISTOS 2D
+    // histo with Method1 on x axis and Method2 on y axis
+    h2_matches_Method1onx_Method2ony->Fill(x_Method1,x_Method2);
+    // histo with Method1 on x axis and Method3 on y axis
+    h2_matches_Method1onx_Method3ony->Fill(x_Method1,x_Method3);
+    // histo with Method3 on x axis and Method2 on y axis
+    h2_matches_Method3onx_Method2ony->Fill(x_Method3,x_Method2);
 
 
 
@@ -630,5 +646,25 @@ void jetMatchingStudy(){
   h_weights3->Draw("hist");
 
   c_weights->SaveAs("weights.png");
+
+
+
+  //2D HISTOS
+  TCanvas* c_h2_jetmatching_1onx_2ony = new TCanvas();
+  c_h2_jetmatching_1onx_2ony->cd();
+  h2_matches_Method1onx_Method2ony->Draw("COLZ");
+  c_h2_jetmatching_1onx_2ony->SaveAs("jetmatching_2D_1onx_2ony.png");
+
+  TCanvas* c_h2_jetmatching_1onx_3ony = new TCanvas();
+  c_h2_jetmatching_1onx_3ony->cd();
+  h2_matches_Method1onx_Method3ony->Draw("COLZ");
+  c_h2_jetmatching_1onx_3ony->SaveAs("jetmatching_2D_1onx_3ony.png");
+
+  TCanvas* c_h2_jetmatching_3onx_2ony = new TCanvas();
+  c_h2_jetmatching_3onx_2ony->cd();
+  h2_matches_Method3onx_Method2ony->Draw("COLZ");
+  c_h2_jetmatching_3onx_2ony->SaveAs("jetmatching_2D_3onx_2ony.png");
+
+
 
 }
