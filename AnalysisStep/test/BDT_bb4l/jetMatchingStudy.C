@@ -652,17 +652,17 @@ void jetMatchingStudy(){
   //2D HISTOS
   TCanvas* c_h2_jetmatching_1onx_2ony = new TCanvas();
   c_h2_jetmatching_1onx_2ony->cd();
-  h2_matches_Method1onx_Method2ony->Draw("COLZ");
+  h2_matches_Method1onx_Method2ony->Draw("TEXTCOLZ");
   c_h2_jetmatching_1onx_2ony->SaveAs("jetmatching_2D_1onx_2ony.png");
 
   TCanvas* c_h2_jetmatching_1onx_3ony = new TCanvas();
   c_h2_jetmatching_1onx_3ony->cd();
-  h2_matches_Method1onx_Method3ony->Draw("COLZ");
+  h2_matches_Method1onx_Method3ony->Draw("TEXTCOLZ");
   c_h2_jetmatching_1onx_3ony->SaveAs("jetmatching_2D_1onx_3ony.png");
 
   TCanvas* c_h2_jetmatching_3onx_2ony = new TCanvas();
   c_h2_jetmatching_3onx_2ony->cd();
-  h2_matches_Method3onx_Method2ony->Draw("COLZ");
+  h2_matches_Method3onx_Method2ony->Draw("TEXTCOLZ");
   c_h2_jetmatching_3onx_2ony->SaveAs("jetmatching_2D_3onx_2ony.png");
 
 
