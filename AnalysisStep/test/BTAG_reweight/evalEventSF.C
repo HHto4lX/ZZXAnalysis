@@ -1,4 +1,4 @@
-double * evalEventSF( int nAK4Jets, vector<float> AK4JetFlavor, vector<float> AK4JetEta, vector<float> AK4JetPt, vector<float> AK4JetBtag, BTagCalibrationReader CSV_nominal, BTagCalibrationReader CSV_JESUp, BTagCalibrationReader CSV_JESDown, BTagCalibrationReader CSV_HFUp, BTagCalibrationReader CSV_HFDown, BTagCalibrationReader CSV_LFUp, BTagCalibrationReader CSV_LFDown, BTagCalibrationReader CSV_hfstats1Up, BTagCalibrationReader CSV_hfstats1Down, BTagCalibrationReader CSV_hfstats2Up, BTagCalibrationReader CSV_hfstats2Down, BTagCalibrationReader CSV_lfstats1Up, BTagCalibrationReader CSV_lfstats1Down, BTagCalibrationReader CSV_lfstats2Up, BTagCalibrationReader CSV_lfstats2Down, BTagCalibrationReader CSV_cfErr1Up, BTagCalibrationReader CSV_cfErr1Down, BTagCalibrationReader CSV_cfErr2Up, BTagCalibrationReader CSV_cfErr2Down ) {
+double * evalEventSF( int nAK4Jets, vector<float> * AK4JetFlavor, vector<float> * AK4JetEta, vector<float> * AK4JetPt, vector<float> * AK4JetBtag, BTagCalibrationReader CSV_nominal, BTagCalibrationReader CSV_JESUp, BTagCalibrationReader CSV_JESDown, BTagCalibrationReader CSV_HFUp, BTagCalibrationReader CSV_HFDown, BTagCalibrationReader CSV_LFUp, BTagCalibrationReader CSV_LFDown, BTagCalibrationReader CSV_hfstats1Up, BTagCalibrationReader CSV_hfstats1Down, BTagCalibrationReader CSV_hfstats2Up, BTagCalibrationReader CSV_hfstats2Down, BTagCalibrationReader CSV_lfstats1Up, BTagCalibrationReader CSV_lfstats1Down, BTagCalibrationReader CSV_lfstats2Up, BTagCalibrationReader CSV_lfstats2Down, BTagCalibrationReader CSV_cfErr1Up, BTagCalibrationReader CSV_cfErr1Down, BTagCalibrationReader CSV_cfErr2Up, BTagCalibrationReader CSV_cfErr2Down ) {
     
         double * output;
         output = new double[22]; //returned by evalEventSF
@@ -197,25 +197,25 @@ double * evalEventSF( int nAK4Jets, vector<float> AK4JetFlavor, vector<float> AK
         
             for (int i = 0; i < nAK4Jets; i++) {
                 
-                if ( fabs(AK4JetFlavor.at(i)) == 5 ) { /*b flavor*/
+                if ( fabs(AK4JetFlavor->at(i)) == 5 ) { /*b flavor*/
                     
                     nB++;
                 
-                    double mycsv_weight_BF_ak4             = CSV_nominal.eval(BTagEntry::FLAV_B,      fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_BF_ak4JESUp        = CSV_JESUp.eval(BTagEntry::FLAV_B,        fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_BF_ak4JESDown      = CSV_JESDown.eval(BTagEntry::FLAV_B,      fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_BF_ak4HFUp         = CSV_HFUp.eval(BTagEntry::FLAV_B,         fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_BF_ak4HFDown       = CSV_HFDown.eval(BTagEntry::FLAV_B,       fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_BF_ak4LFUp         = CSV_LFUp.eval(BTagEntry::FLAV_B,         fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_BF_ak4LFDown       = CSV_LFDown.eval(BTagEntry::FLAV_B,       fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_BF_ak4hfstats1Up   = CSV_hfstats1Up.eval(BTagEntry::FLAV_B,   fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_BF_ak4hfstats1Down = CSV_hfstats1Down.eval(BTagEntry::FLAV_B, fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_BF_ak4hfstats2Up   = CSV_hfstats2Up.eval(BTagEntry::FLAV_B,   fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_BF_ak4hfstats2Down = CSV_hfstats2Down.eval(BTagEntry::FLAV_B, fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_BF_ak4lfstats1Up   = CSV_lfstats1Up.eval(BTagEntry::FLAV_B,   fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_BF_ak4lfstats1Down = CSV_lfstats1Down.eval(BTagEntry::FLAV_B, fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_BF_ak4lfstats2Up   = CSV_lfstats2Up.eval(BTagEntry::FLAV_B,   fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_BF_ak4lfstats2Down = CSV_lfstats2Down.eval(BTagEntry::FLAV_B, fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_BF_ak4             = CSV_nominal.eval(BTagEntry::FLAV_B,      fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_BF_ak4JESUp        = CSV_JESUp.eval(BTagEntry::FLAV_B,        fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_BF_ak4JESDown      = CSV_JESDown.eval(BTagEntry::FLAV_B,      fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_BF_ak4HFUp         = CSV_HFUp.eval(BTagEntry::FLAV_B,         fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_BF_ak4HFDown       = CSV_HFDown.eval(BTagEntry::FLAV_B,       fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_BF_ak4LFUp         = CSV_LFUp.eval(BTagEntry::FLAV_B,         fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_BF_ak4LFDown       = CSV_LFDown.eval(BTagEntry::FLAV_B,       fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_BF_ak4hfstats1Up   = CSV_hfstats1Up.eval(BTagEntry::FLAV_B,   fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_BF_ak4hfstats1Down = CSV_hfstats1Down.eval(BTagEntry::FLAV_B, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_BF_ak4hfstats2Up   = CSV_hfstats2Up.eval(BTagEntry::FLAV_B,   fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_BF_ak4hfstats2Down = CSV_hfstats2Down.eval(BTagEntry::FLAV_B, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_BF_ak4lfstats1Up   = CSV_lfstats1Up.eval(BTagEntry::FLAV_B,   fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_BF_ak4lfstats1Down = CSV_lfstats1Down.eval(BTagEntry::FLAV_B, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_BF_ak4lfstats2Up   = CSV_lfstats2Up.eval(BTagEntry::FLAV_B,   fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_BF_ak4lfstats2Down = CSV_lfstats2Down.eval(BTagEntry::FLAV_B, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
                     //no cfErr is computed for b-flavored jets
                     
                     if (mycsv_weight_BF_ak4 != 0)             csv_weight_BF_ak4             *= mycsv_weight_BF_ak4;
@@ -235,15 +235,15 @@ double * evalEventSF( int nAK4Jets, vector<float> AK4JetFlavor, vector<float> AK
                     if (mycsv_weight_BF_ak4lfstats2Down != 0) csv_weight_BF_ak4lfstats2Down *= mycsv_weight_BF_ak4lfstats2Down;
                 }
                 
-                else if ( fabs(AK4JetFlavor.at(i)) == 4 ) { /*c flavor*/
+                else if ( fabs(AK4JetFlavor->at(i)) == 4 ) { /*c flavor*/
                     
                     nC++;
                 
-                    double mycsv_weight_CF_ak4           = CSV_nominal.eval(BTagEntry::FLAV_C,    fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_CF_ak4cfErr1Up   = CSV_cfErr1Up.eval(BTagEntry::FLAV_C,   fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_CF_ak4cfErr1Down = CSV_cfErr1Down.eval(BTagEntry::FLAV_C, fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_CF_ak4cfErr2Up   = CSV_cfErr2Up.eval(BTagEntry::FLAV_C,   fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_CF_ak4cfErr2Down = CSV_cfErr2Down.eval(BTagEntry::FLAV_C, fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_CF_ak4           = CSV_nominal.eval(BTagEntry::FLAV_C,    fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_CF_ak4cfErr1Up   = CSV_cfErr1Up.eval(BTagEntry::FLAV_C,   fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_CF_ak4cfErr1Down = CSV_cfErr1Down.eval(BTagEntry::FLAV_C, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_CF_ak4cfErr2Up   = CSV_cfErr2Up.eval(BTagEntry::FLAV_C,   fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_CF_ak4cfErr2Down = CSV_cfErr2Down.eval(BTagEntry::FLAV_C, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
                     //for c-flavored jets only the cfErr uncertainty is applied
                     
                     if (mycsv_weight_CF_ak4 != 0)           csv_weight_CF_ak4           *= mycsv_weight_CF_ak4;
@@ -258,21 +258,21 @@ double * evalEventSF( int nAK4Jets, vector<float> AK4JetFlavor, vector<float> AK
                     
                     nL++;
                 
-                    double mycsv_weight_LF_ak4             = CSV_nominal.eval(BTagEntry::FLAV_UDSG,      fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_LF_ak4JESUp        = CSV_JESUp.eval(BTagEntry::FLAV_UDSG,        fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_LF_ak4JESDown      = CSV_JESDown.eval(BTagEntry::FLAV_UDSG,      fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_LF_ak4HFUp         = CSV_HFUp.eval(BTagEntry::FLAV_UDSG,         fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_LF_ak4HFDown       = CSV_HFDown.eval(BTagEntry::FLAV_UDSG,       fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_LF_ak4LFUp         = CSV_LFUp.eval(BTagEntry::FLAV_UDSG,         fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_LF_ak4LFDown       = CSV_LFDown.eval(BTagEntry::FLAV_UDSG,       fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_LF_ak4hfstats1Up   = CSV_hfstats1Up.eval(BTagEntry::FLAV_UDSG,   fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_LF_ak4hfstats1Down = CSV_hfstats1Down.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_LF_ak4hfstats2Up   = CSV_hfstats2Up.eval(BTagEntry::FLAV_UDSG,   fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_LF_ak4hfstats2Down = CSV_hfstats2Down.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_LF_ak4lfstats1Up   = CSV_lfstats1Up.eval(BTagEntry::FLAV_UDSG,   fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_LF_ak4lfstats1Down = CSV_lfstats1Down.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_LF_ak4lfstats2Up   = CSV_lfstats2Up.eval(BTagEntry::FLAV_UDSG,   fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
-                    double mycsv_weight_LF_ak4lfstats2Down = CSV_lfstats2Down.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta.at(i)), AK4JetPt.at(i), AK4JetBtag.at(i));
+                    double mycsv_weight_LF_ak4             = CSV_nominal.eval(BTagEntry::FLAV_UDSG,      fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_LF_ak4JESUp        = CSV_JESUp.eval(BTagEntry::FLAV_UDSG,        fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_LF_ak4JESDown      = CSV_JESDown.eval(BTagEntry::FLAV_UDSG,      fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_LF_ak4HFUp         = CSV_HFUp.eval(BTagEntry::FLAV_UDSG,         fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_LF_ak4HFDown       = CSV_HFDown.eval(BTagEntry::FLAV_UDSG,       fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_LF_ak4LFUp         = CSV_LFUp.eval(BTagEntry::FLAV_UDSG,         fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_LF_ak4LFDown       = CSV_LFDown.eval(BTagEntry::FLAV_UDSG,       fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_LF_ak4hfstats1Up   = CSV_hfstats1Up.eval(BTagEntry::FLAV_UDSG,   fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_LF_ak4hfstats1Down = CSV_hfstats1Down.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_LF_ak4hfstats2Up   = CSV_hfstats2Up.eval(BTagEntry::FLAV_UDSG,   fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_LF_ak4hfstats2Down = CSV_hfstats2Down.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_LF_ak4lfstats1Up   = CSV_lfstats1Up.eval(BTagEntry::FLAV_UDSG,   fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_LF_ak4lfstats1Down = CSV_lfstats1Down.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_LF_ak4lfstats2Up   = CSV_lfstats2Up.eval(BTagEntry::FLAV_UDSG,   fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
+                    double mycsv_weight_LF_ak4lfstats2Down = CSV_lfstats2Down.eval(BTagEntry::FLAV_UDSG, fabs(AK4JetEta->at(i)), AK4JetPt->at(i), AK4JetBtag->at(i));
                     //no cfErr is computed for light-flavored jets
                     
                     if (mycsv_weight_LF_ak4 != 0)             csv_weight_LF_ak4 *= mycsv_weight_LF_ak4;
