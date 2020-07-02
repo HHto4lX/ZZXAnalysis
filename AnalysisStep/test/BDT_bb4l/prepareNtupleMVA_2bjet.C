@@ -215,6 +215,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   Float_t KFactor_QCD_qqZZ_dPhi;
   Float_t KFactor_QCD_qqZZ_M;
   Float_t KFactor_QCD_qqZZ_Pt;
+  Float_t ggH_NNLOPS_weight;
 
   Short_t ZZsel;
   vector<Float_t> *LepEta = 0;
@@ -314,6 +315,11 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
     inputTree->SetBranchAddress("KFactor_QCD_qqZZ_dPhi", &KFactor_QCD_qqZZ_dPhi);
     inputTree->SetBranchAddress("KFactor_QCD_qqZZ_M", &KFactor_QCD_qqZZ_M);
     inputTree->SetBranchAddress("KFactor_QCD_qqZZ_Pt", &KFactor_QCD_qqZZ_Pt);
+  }
+  // ggH samples
+  if(inFile.Contains("ggH125"))
+  {
+    inputTree->SetBranchAddress("ggH_NNLOPS_weight", &ggH_NNLOPS_weight); 
   }
   inputTree->SetBranchAddress("LHEweight_QCDscale_muR1_muF1",     &LHEweight_QCDscale_muR1_muF1);
   inputTree->SetBranchAddress("LHEweight_QCDscale_muR1_muF2",     &LHEweight_QCDscale_muR1_muF2);
@@ -536,6 +542,7 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
     Float_t kfactor = 1.;
     if(inFile.Contains("ZZTo4l")) { kfactor = KFactor_EW_qqZZ * KFactor_QCD_qqZZ_M; } // qqZZ sample
     else if(inFile.Contains("ggTo")) { kfactor = KFactor_QCD_ggZZ_Nominal; }  //ggZZ samples 
+    else if(inFile.Contains("ggH125")) { kfactor = ggH_NNLOPS_weight; }  //ggH samples 
 
     // compute SF
     double * scaleFactors;

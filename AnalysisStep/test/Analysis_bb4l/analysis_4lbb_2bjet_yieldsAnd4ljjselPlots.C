@@ -319,6 +319,7 @@ void doHistos()
   Float_t KFactor_QCD_qqZZ_dPhi;
   Float_t KFactor_QCD_qqZZ_M;
   Float_t KFactor_QCD_qqZZ_Pt;
+  Float_t ggH_NNLOPS_weight;
 
   Short_t ZZsel;
   vector<Float_t> *LepEta = 0;
@@ -631,6 +632,9 @@ void doHistos()
       inputTree[d]->SetBranchAddress("KFactor_QCD_qqZZ_M", &KFactor_QCD_qqZZ_M);
       inputTree[d]->SetBranchAddress("KFactor_QCD_qqZZ_Pt", &KFactor_QCD_qqZZ_Pt);
     }
+    if(currentProcess == ggH){
+      inputTree[d]->SetBranchAddress("ggH_NNLOPS_weight", &ggH_NNLOPS_weight);
+    }
 
 
     // --------------------------------------------------------
@@ -700,6 +704,7 @@ void doHistos()
       Float_t kfactor = 1.;
       if(currentProcess == qqZZ) { kfactor = KFactor_EW_qqZZ * KFactor_QCD_qqZZ_M; } // qqZZ sample                      
       else if(currentProcess == ggZZ) { kfactor = KFactor_QCD_ggZZ_Nominal; } //ggZZ samples 
+      else if(currentProcess == ggH)  { kfactor = ggH_NNLOPS_weight; } //ggH samples 
 
       // compute SF
       double * scaleFactors;
