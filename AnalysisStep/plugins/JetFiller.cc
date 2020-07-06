@@ -68,6 +68,7 @@ class JetFiller : public edm::EDProducer {
 
   std::string jecUncFile_;
   std::vector<string> uncSources{};  
+  std::vector<JetCorrectionUncertainty*> splittedUncerts_;
 
 };
 
@@ -150,6 +151,30 @@ JetFiller::JetFiller(const edm::ParameterSet& iConfig) :
   }
   else cout << "jecUncFile NOT FOUND!";
 
+  // JEC uncertainty (Part 2) - 11 Splitted sources
+  // Run 2 reduced set of uncertainties from here: https://twiki.cern.ch/twiki/bin/viewauth/CMS/JECUncertaintySources#Run_2_reduced_set_of_uncertainty
+  // List of uncertainties: ['Absolute', 'Absolute_201*', 'BBEC1', 'BBEC1_201*', 'EC2', 'EC2_201*', 'FlavorQCD', 'HF', 'HF_201*', 'RelativeBal', 'RelativeSample_201*'] + 'Total'
+  //  int nJECuncSources = 12; // 11 + total
+
+  if(applyJEC_ && isMC_){
+    //JetCorrectorParameters *corrParams_ = new JetCorrectorParameters(jecUncFile_, uncSources[0]); //Considering only "Total"
+    //JetCorrectionUncertainty *uncert_ = new JetCorrectionUncertainty(*corrParams_);
+    JetCorrectorParameters *corrParams;
+    JetCorrectionUncertainty *uncert_;
+    for (unsigned s_unc = 0; s_unc < uncSources.size(); s_unc++){
+      // JetCorrectorParameters corrParams = JetCorrectorParameters(jecUncFile_, uncSources[s_unc]); 
+      // splittedUncerts_.push_back(new JetCorrectionUncertainty(corrParams));
+      corrParams = new JetCorrectorParameters(jecUncFile_, uncSources[s_unc]);
+      uncert_    = new JetCorrectionUncertainty(*corrParams);
+      splittedUncerts_.push_back(uncert_);
+    }
+    // delete corrParams;
+    // delete uncert_;
+    // corrParams = NULL;
+    // uncert_ = NULL;
+  }//end if isMC and applyjec
+
+
 
 }
 
@@ -183,20 +208,6 @@ JetFiller::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iSetup.get<JetCorrectionsRecord>().get(jecType,JetCorParColl);
   JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
   JetCorrectionUncertainty jecUnc(JetCorPar);
-
-  // JEC uncertainty (Part 2) - 11 Splitted sources
-  // Run 2 reduced set of uncertainties from here: https://twiki.cern.ch/twiki/bin/viewauth/CMS/JECUncertaintySources#Run_2_reduced_set_of_uncertainty
-  // List of uncertainties: ['Absolute', 'Absolute_201*', 'BBEC1', 'BBEC1_201*', 'EC2', 'EC2_201*', 'FlavorQCD', 'HF', 'HF_201*', 'RelativeBal', 'RelativeSample_201*'] + 'Total'
-  //  int nJECuncSources = 12; // 11 + total
-  std::vector<JetCorrectionUncertainty*> splittedUncerts_;
-  if(applyJEC_ && isMC_){
-    //JetCorrectorParameters *corrParams_ = new JetCorrectorParameters(jecUncFile_, uncSources[0]); //Considering only "Total"
-    //JetCorrectionUncertainty *uncert_ = new JetCorrectionUncertainty(*corrParams_);
-    for (unsigned s_unc = 0; s_unc < uncSources.size(); s_unc++){
-      JetCorrectorParameters corrParams = JetCorrectorParameters(jecUncFile_, uncSources[s_unc]); 
-      splittedUncerts_.push_back(new JetCorrectionUncertainty(corrParams));
-    }
-  }//end if isMC and applyjec
 
 
 
