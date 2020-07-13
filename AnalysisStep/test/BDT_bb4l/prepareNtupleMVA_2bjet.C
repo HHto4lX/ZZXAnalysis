@@ -249,10 +249,49 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   Float_t LHEweight_PDFVariation_Up;
   Float_t LHEweight_PDFVariation_Dn;
 
+  vector<float> *JetSigma_Total          = 0;
+  vector<float> *JetSigma_Abs            = 0;
+  vector<float> *JetSigma_Abs_YEAR       = 0;
+  vector<float> *JetSigma_BBEC1          = 0;
+  vector<float> *JetSigma_BBEC1_YEAR     = 0;
+  vector<float> *JetSigma_EC2            = 0;
+  vector<float> *JetSigma_EC2_YEAR       = 0;
+  vector<float> *JetSigma_FlavQCD        = 0;
+  vector<float> *JetSigma_HF             = 0;
+  vector<float> *JetSigma_HF_YEAR        = 0;
+  vector<float> *JetSigma_RelBal         = 0;
+  vector<float> *JetSigma_RelSample_YEAR = 0;
+
+  vector<float> *JetPt_JESUp_Total          = 0;
+  vector<float> *JetPt_JESUp_Abs            = 0;
+  vector<float> *JetPt_JESUp_Abs_YEAR       = 0;
+  vector<float> *JetPt_JESUp_BBEC1          = 0;
+  vector<float> *JetPt_JESUp_BBEC1_YEAR     = 0;
+  vector<float> *JetPt_JESUp_EC2            = 0;
+  vector<float> *JetPt_JESUp_EC2_YEAR       = 0;
+  vector<float> *JetPt_JESUp_FlavQCD        = 0;
+  vector<float> *JetPt_JESUp_HF             = 0;
+  vector<float> *JetPt_JESUp_HF_YEAR        = 0;
+  vector<float> *JetPt_JESUp_RelBal         = 0;
+  vector<float> *JetPt_JESUp_RelSample_YEAR = 0;
+
+  vector<float> *JetPt_JESDown_Total          = 0;
+  vector<float> *JetPt_JESDown_Abs            = 0;
+  vector<float> *JetPt_JESDown_Abs_YEAR       = 0;
+  vector<float> *JetPt_JESDown_BBEC1          = 0;
+  vector<float> *JetPt_JESDown_BBEC1_YEAR     = 0;
+  vector<float> *JetPt_JESDown_EC2            = 0;
+  vector<float> *JetPt_JESDown_EC2_YEAR       = 0;
+  vector<float> *JetPt_JESDown_FlavQCD        = 0;
+  vector<float> *JetPt_JESDown_HF             = 0;
+  vector<float> *JetPt_JESDown_HF_YEAR        = 0;
+  vector<float> *JetPt_JESDown_RelBal         = 0;
+  vector<float> *JetPt_JESDown_RelSample_YEAR = 0;
+  
   // vector<Float_t> *JetPt_JESUp = 0;
   // vector<Float_t> *JetPt_JESDown = 0;
-  // vector<Float_t> *JetPt_JERUp = 0;
-  // vector<Float_t> *JetPt_JERDown = 0;
+  vector<Float_t> *JetPt_JERUp = 0;
+  vector<Float_t> *JetPt_JERDown = 0;
 
   Float_t yield_4e = 0.;
   Float_t yield_4mu = 0.;
@@ -293,16 +332,44 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   inputTree->SetBranchAddress("ZZEta", &ZZEta);
   inputTree->SetBranchAddress("ZZPhi", &ZZPhi);
   inputTree->SetBranchAddress("JetPt", &JetPt);
-  // inputTree->SetBranchAddress("JetPt_JESUp", &JetPt_JESUp);
-  // inputTree->SetBranchAddress("JetPt_JESDown", &JetPt_JESDown);
-  // inputTree->SetBranchAddress("JetPt_JERUp", &JetPt_JERUp);
-  // inputTree->SetBranchAddress("JetPt_JERDown", &JetPt_JERDown);
   inputTree->SetBranchAddress("JetEta", &JetEta);
   inputTree->SetBranchAddress("JetMass", &JetMass);
   inputTree->SetBranchAddress("JetPhi",  &JetPhi);
   inputTree->SetBranchAddress("JetBTagger",  &JetBTagger);
   inputTree->SetBranchAddress("JetHadronFlavour",  &JetHadronFlavour);
-  inputTree->SetBranchAddress("PFMET",  &PFMET);  
+  inputTree->SetBranchAddress("PFMET",  &PFMET);
+
+  // inputTree->SetBranchAddress("JetPt_JESUp", &JetPt_JESUp);
+  // inputTree->SetBranchAddress("JetPt_JESDown", &JetPt_JESDown);
+  inputTree->SetBranchAddress("JetPt_JERUp", &JetPt_JERUp);
+  inputTree->SetBranchAddress("JetPt_JERDown", &JetPt_JERDown);  
+
+  inputTree->SetBranchAddress("JetPt_JESUp_Total",         &JetPt_JESUp_Total);
+  inputTree->SetBranchAddress("JetPt_JESUp_Abs",           &JetPt_JESUp_Abs);
+  inputTree->SetBranchAddress("JetPt_JESUp_Abs_YEAR",      &JetPt_JESUp_Abs_YEAR);
+  inputTree->SetBranchAddress("JetPt_JESUp_BBEC1",         &JetPt_JESUp_BBEC1);
+  inputTree->SetBranchAddress("JetPt_JESUp_BBEC1_YEAR",    &JetPt_JESUp_BBEC1_YEAR);
+  inputTree->SetBranchAddress("JetPt_JESUp_EC2",           &JetPt_JESUp_EC2);            
+  inputTree->SetBranchAddress("JetPt_JESUp_EC2_YEAR",      &JetPt_JESUp_EC2_YEAR);
+  inputTree->SetBranchAddress("JetPt_JESUp_FlavQCD",       &JetPt_JESUp_FlavQCD);
+  inputTree->SetBranchAddress("JetPt_JESUp_HF",            &JetPt_JESUp_HF);            
+  inputTree->SetBranchAddress("JetPt_JESUp_HF_YEAR",       &JetPt_JESUp_HF_YEAR);
+  inputTree->SetBranchAddress("JetPt_JESUp_RelBal",        &JetPt_JESUp_RelBal);
+  inputTree->SetBranchAddress("JetPt_JESUp_RelSample_YEAR",&JetPt_JESUp_RelSample_YEAR); 
+
+  inputTree->SetBranchAddress("JetPt_JESDown_Total",         &JetPt_JESDown_Total);
+  inputTree->SetBranchAddress("JetPt_JESDown_Abs",           &JetPt_JESDown_Abs);
+  inputTree->SetBranchAddress("JetPt_JESDown_Abs_YEAR",      &JetPt_JESDown_Abs_YEAR);
+  inputTree->SetBranchAddress("JetPt_JESDown_BBEC1",         &JetPt_JESDown_BBEC1);
+  inputTree->SetBranchAddress("JetPt_JESDown_BBEC1_YEAR",    &JetPt_JESDown_BBEC1_YEAR);
+  inputTree->SetBranchAddress("JetPt_JESDown_EC2",           &JetPt_JESDown_EC2);            
+  inputTree->SetBranchAddress("JetPt_JESDown_EC2_YEAR",      &JetPt_JESDown_EC2_YEAR);
+  inputTree->SetBranchAddress("JetPt_JESDown_FlavQCD",       &JetPt_JESDown_FlavQCD);
+  inputTree->SetBranchAddress("JetPt_JESDown_HF",            &JetPt_JESDown_HF);            
+  inputTree->SetBranchAddress("JetPt_JESDown_HF_YEAR",       &JetPt_JESDown_HF_YEAR);
+  inputTree->SetBranchAddress("JetPt_JESDown_RelBal",        &JetPt_JESDown_RelBal);
+  inputTree->SetBranchAddress("JetPt_JESDown_RelSample_YEAR",&JetPt_JESDown_RelSample_YEAR); 
+
   // ggZZ samples
   if(inFile.Contains("ggTo"))
   {
@@ -394,6 +461,64 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   Float_t f_LHEweight_QCDscale_muR0p5_muF0p5 = -9999.;
   Float_t f_LHEweight_PDFVariation_Up        = -9999.;
   Float_t f_LHEweight_PDFVariation_Dn        = -9999.;
+  // branches for jes/jer syst
+  Float_t f_JetPt_JERUp_jet1   = -9999.;
+  Float_t f_JetPt_JERUp_jet2   = -9999.;
+  Float_t f_JetPt_JERDown_jet1 = -9999.;
+  Float_t f_JetPt_JERDown_jet2 = -9999.;
+
+  Float_t f_JetPt_JESUp_Total_jet1          = -9999.;
+  Float_t f_JetPt_JESUp_Abs_jet1            = -9999.;
+  Float_t f_JetPt_JESUp_Abs_YEAR_jet1       = -9999.;
+  Float_t f_JetPt_JESUp_BBEC1_jet1          = -9999.;
+  Float_t f_JetPt_JESUp_BBEC1_YEAR_jet1     = -9999.;
+  Float_t f_JetPt_JESUp_EC2_jet1            = -9999.;
+  Float_t f_JetPt_JESUp_EC2_YEAR_jet1       = -9999.;
+  Float_t f_JetPt_JESUp_FlavQCD_jet1        = -9999.;
+  Float_t f_JetPt_JESUp_HF_jet1             = -9999.;         
+  Float_t f_JetPt_JESUp_HF_YEAR_jet1        = -9999.;
+  Float_t f_JetPt_JESUp_RelBal_jet1         = -9999.;
+  Float_t f_JetPt_JESUp_RelSample_YEAR_jet1 = -9999.; 
+
+  Float_t f_JetPt_JESUp_Total_jet2          = -9999.;
+  Float_t f_JetPt_JESUp_Abs_jet2            = -9999.;
+  Float_t f_JetPt_JESUp_Abs_YEAR_jet2       = -9999.;
+  Float_t f_JetPt_JESUp_BBEC1_jet2          = -9999.;
+  Float_t f_JetPt_JESUp_BBEC1_YEAR_jet2     = -9999.;
+  Float_t f_JetPt_JESUp_EC2_jet2            = -9999.;
+  Float_t f_JetPt_JESUp_EC2_YEAR_jet2       = -9999.;
+  Float_t f_JetPt_JESUp_FlavQCD_jet2        = -9999.;
+  Float_t f_JetPt_JESUp_HF_jet2             = -9999.;         
+  Float_t f_JetPt_JESUp_HF_YEAR_jet2        = -9999.;
+  Float_t f_JetPt_JESUp_RelBal_jet2         = -9999.;
+  Float_t f_JetPt_JESUp_RelSample_YEAR_jet2 = -9999.; 
+
+  Float_t f_JetPt_JESDown_Total_jet1          = -9999.;
+  Float_t f_JetPt_JESDown_Abs_jet1            = -9999.;
+  Float_t f_JetPt_JESDown_Abs_YEAR_jet1       = -9999.;
+  Float_t f_JetPt_JESDown_BBEC1_jet1          = -9999.;
+  Float_t f_JetPt_JESDown_BBEC1_YEAR_jet1     = -9999.;
+  Float_t f_JetPt_JESDown_EC2_jet1            = -9999.;
+  Float_t f_JetPt_JESDown_EC2_YEAR_jet1       = -9999.;
+  Float_t f_JetPt_JESDown_FlavQCD_jet1        = -9999.;
+  Float_t f_JetPt_JESDown_HF_jet1             = -9999.;         
+  Float_t f_JetPt_JESDown_HF_YEAR_jet1        = -9999.;
+  Float_t f_JetPt_JESDown_RelBal_jet1         = -9999.;
+  Float_t f_JetPt_JESDown_RelSample_YEAR_jet1 = -9999.; 
+
+  Float_t f_JetPt_JESDown_Total_jet2          = -9999.;
+  Float_t f_JetPt_JESDown_Abs_jet2            = -9999.;
+  Float_t f_JetPt_JESDown_Abs_YEAR_jet2       = -9999.;
+  Float_t f_JetPt_JESDown_BBEC1_jet2          = -9999.;
+  Float_t f_JetPt_JESDown_BBEC1_YEAR_jet2     = -9999.;
+  Float_t f_JetPt_JESDown_EC2_jet2            = -9999.;
+  Float_t f_JetPt_JESDown_EC2_YEAR_jet2       = -9999.;
+  Float_t f_JetPt_JESDown_FlavQCD_jet2        = -9999.;
+  Float_t f_JetPt_JESDown_HF_jet2             = -9999.;         
+  Float_t f_JetPt_JESDown_HF_YEAR_jet2        = -9999.;
+  Float_t f_JetPt_JESDown_RelBal_jet2         = -9999.;
+  Float_t f_JetPt_JESDown_RelSample_YEAR_jet2 = -9999.; 
+  
   // branches in piu'
   float f_Z1Mass = -9999.;
   float f_Z2Mass = -9999.;
@@ -468,6 +593,64 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   tnew->Branch("f_LHEweight_QCDscale_muR0p5_muF0p5", &f_LHEweight_QCDscale_muR0p5_muF0p5);
   tnew->Branch("f_LHEweight_PDFVariation_Up",        &f_LHEweight_PDFVariation_Up);
   tnew->Branch("f_LHEweight_PDFVariation_Dn",        &f_LHEweight_PDFVariation_Dn);
+
+  tnew->Branch("f_JetPt_JERUp_jet1",   &f_JetPt_JERUp_jet1);
+  tnew->Branch("f_JetPt_JERUp_jet2",   &f_JetPt_JERUp_jet2);
+  tnew->Branch("f_JetPt_JERDown_jet1", &f_JetPt_JERDown_jet1);
+  tnew->Branch("f_JetPt_JERDown_jet2", &f_JetPt_JERDown_jet2);
+
+  tnew->Branch("f_JetPt_JESUp_Total_jet1",         &f_JetPt_JESUp_Total_jet1         );
+  tnew->Branch("f_JetPt_JESUp_Abs_jet1",           &f_JetPt_JESUp_Abs_jet1           );
+  tnew->Branch("f_JetPt_JESUp_Abs_YEAR_jet1",      &f_JetPt_JESUp_Abs_YEAR_jet1      );
+  tnew->Branch("f_JetPt_JESUp_BBEC1_jet1",         &f_JetPt_JESUp_BBEC1_jet1         );
+  tnew->Branch("f_JetPt_JESUp_BBEC1_YEAR_jet1",    &f_JetPt_JESUp_BBEC1_YEAR_jet1    );
+  tnew->Branch("f_JetPt_JESUp_EC2_jet1",           &f_JetPt_JESUp_EC2_jet1           );
+  tnew->Branch("f_JetPt_JESUp_EC2_YEAR_jet1",      &f_JetPt_JESUp_EC2_YEAR_jet1      );
+  tnew->Branch("f_JetPt_JESUp_FlavQCD_jet1",       &f_JetPt_JESUp_FlavQCD_jet1       );
+  tnew->Branch("f_JetPt_JESUp_HF_jet1",            &f_JetPt_JESUp_HF_jet1            );         
+  tnew->Branch("f_JetPt_JESUp_HF_YEAR_jet1",       &f_JetPt_JESUp_HF_YEAR_jet1       );
+  tnew->Branch("f_JetPt_JESUp_RelBal_jet1",        &f_JetPt_JESUp_RelBal_jet1        );
+  tnew->Branch("f_JetPt_JESUp_RelSample_YEAR_jet1",&f_JetPt_JESUp_RelSample_YEAR_jet1); 
+
+  tnew->Branch("f_JetPt_JESUp_Total_jet2",         &f_JetPt_JESUp_Total_jet2         );
+  tnew->Branch("f_JetPt_JESUp_Abs_jet2",           &f_JetPt_JESUp_Abs_jet2           );
+  tnew->Branch("f_JetPt_JESUp_Abs_YEAR_jet2",      &f_JetPt_JESUp_Abs_YEAR_jet2      );
+  tnew->Branch("f_JetPt_JESUp_BBEC1_jet2",         &f_JetPt_JESUp_BBEC1_jet2         );
+  tnew->Branch("f_JetPt_JESUp_BBEC1_YEAR_jet2",    &f_JetPt_JESUp_BBEC1_YEAR_jet2    );
+  tnew->Branch("f_JetPt_JESUp_EC2_jet2",           &f_JetPt_JESUp_EC2_jet2           );
+  tnew->Branch("f_JetPt_JESUp_EC2_YEAR_jet2",      &f_JetPt_JESUp_EC2_YEAR_jet2      );
+  tnew->Branch("f_JetPt_JESUp_FlavQCD_jet2",       &f_JetPt_JESUp_FlavQCD_jet2       );
+  tnew->Branch("f_JetPt_JESUp_HF_jet2",            &f_JetPt_JESUp_HF_jet2            );         
+  tnew->Branch("f_JetPt_JESUp_HF_YEAR_jet2",       &f_JetPt_JESUp_HF_YEAR_jet2       );
+  tnew->Branch("f_JetPt_JESUp_RelBal_jet2",        &f_JetPt_JESUp_RelBal_jet2        );
+  tnew->Branch("f_JetPt_JESUp_RelSample_YEAR_jet2",&f_JetPt_JESUp_RelSample_YEAR_jet2); 
+
+  tnew->Branch("f_JetPt_JESDown_Total_jet1",         &f_JetPt_JESDown_Total_jet1         );
+  tnew->Branch("f_JetPt_JESDown_Abs_jet1",           &f_JetPt_JESDown_Abs_jet1           );
+  tnew->Branch("f_JetPt_JESDown_Abs_YEAR_jet1",      &f_JetPt_JESDown_Abs_YEAR_jet1      );
+  tnew->Branch("f_JetPt_JESDown_BBEC1_jet1",         &f_JetPt_JESDown_BBEC1_jet1         );
+  tnew->Branch("f_JetPt_JESDown_BBEC1_YEAR_jet1",    &f_JetPt_JESDown_BBEC1_YEAR_jet1    );
+  tnew->Branch("f_JetPt_JESDown_EC2_jet1",           &f_JetPt_JESDown_EC2_jet1           );
+  tnew->Branch("f_JetPt_JESDown_EC2_YEAR_jet1",      &f_JetPt_JESDown_EC2_YEAR_jet1      );
+  tnew->Branch("f_JetPt_JESDown_FlavQCD_jet1",       &f_JetPt_JESDown_FlavQCD_jet1       );
+  tnew->Branch("f_JetPt_JESDown_HF_jet1",            &f_JetPt_JESDown_HF_jet1            );         
+  tnew->Branch("f_JetPt_JESDown_HF_YEAR_jet1",       &f_JetPt_JESDown_HF_YEAR_jet1       );
+  tnew->Branch("f_JetPt_JESDown_RelBal_jet1",        &f_JetPt_JESDown_RelBal_jet1        );
+  tnew->Branch("f_JetPt_JESDown_RelSample_YEAR_jet1",&f_JetPt_JESDown_RelSample_YEAR_jet1); 
+
+  tnew->Branch("f_JetPt_JESDown_Total_jet2",         &f_JetPt_JESDown_Total_jet2         );
+  tnew->Branch("f_JetPt_JESDown_Abs_jet2",           &f_JetPt_JESDown_Abs_jet2           );
+  tnew->Branch("f_JetPt_JESDown_Abs_YEAR_jet2",      &f_JetPt_JESDown_Abs_YEAR_jet2      );
+  tnew->Branch("f_JetPt_JESDown_BBEC1_jet2",         &f_JetPt_JESDown_BBEC1_jet2         );
+  tnew->Branch("f_JetPt_JESDown_BBEC1_YEAR_jet2",    &f_JetPt_JESDown_BBEC1_YEAR_jet2    );
+  tnew->Branch("f_JetPt_JESDown_EC2_jet2",           &f_JetPt_JESDown_EC2_jet2           );
+  tnew->Branch("f_JetPt_JESDown_EC2_YEAR_jet2",      &f_JetPt_JESDown_EC2_YEAR_jet2      );
+  tnew->Branch("f_JetPt_JESDown_FlavQCD_jet2",       &f_JetPt_JESDown_FlavQCD_jet2       );
+  tnew->Branch("f_JetPt_JESDown_HF_jet2",            &f_JetPt_JESDown_HF_jet2            );         
+  tnew->Branch("f_JetPt_JESDown_HF_YEAR_jet2",       &f_JetPt_JESDown_HF_YEAR_jet2       );
+  tnew->Branch("f_JetPt_JESDown_RelBal_jet2",        &f_JetPt_JESDown_RelBal_jet2        );
+  tnew->Branch("f_JetPt_JESDown_RelSample_YEAR_jet2",&f_JetPt_JESDown_RelSample_YEAR_jet2); 
+
 
 
   int currentFinalState;
@@ -667,6 +850,64 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
     f_HadronFlavourjet1 = JetHadronFlavour->at(d1_maxbtag);
     f_HadronFlavourjet2 = JetHadronFlavour->at(d2_maxbtag);
 
+    // save jet pT for jer and jes systs
+    f_JetPt_JERUp_jet1   = JetPt_JERUp->at(d1_maxbtag);
+    f_JetPt_JERUp_jet2   = JetPt_JERUp->at(d2_maxbtag);
+    f_JetPt_JERDown_jet1 = JetPt_JERDown->at(d1_maxbtag);
+    f_JetPt_JERDown_jet2 = JetPt_JERDown->at(d2_maxbtag);
+
+    f_JetPt_JESUp_Total_jet1          = JetPt_JESUp_Total         ->at(d1_maxbtag);
+    f_JetPt_JESUp_Abs_jet1            = JetPt_JESUp_Abs           ->at(d1_maxbtag);
+    f_JetPt_JESUp_Abs_YEAR_jet1       = JetPt_JESUp_Abs_YEAR      ->at(d1_maxbtag);
+    f_JetPt_JESUp_BBEC1_jet1          = JetPt_JESUp_BBEC1         ->at(d1_maxbtag);
+    f_JetPt_JESUp_BBEC1_YEAR_jet1     = JetPt_JESUp_BBEC1_YEAR    ->at(d1_maxbtag);
+    f_JetPt_JESUp_EC2_jet1            = JetPt_JESUp_EC2           ->at(d1_maxbtag);
+    f_JetPt_JESUp_EC2_YEAR_jet1       = JetPt_JESUp_EC2_YEAR      ->at(d1_maxbtag);
+    f_JetPt_JESUp_FlavQCD_jet1        = JetPt_JESUp_FlavQCD       ->at(d1_maxbtag);
+    f_JetPt_JESUp_HF_jet1             = JetPt_JESUp_HF            ->at(d1_maxbtag);         
+    f_JetPt_JESUp_HF_YEAR_jet1        = JetPt_JESUp_HF_YEAR       ->at(d1_maxbtag);
+    f_JetPt_JESUp_RelBal_jet1         = JetPt_JESUp_RelBal        ->at(d1_maxbtag);
+    f_JetPt_JESUp_RelSample_YEAR_jet1 = JetPt_JESUp_RelSample_YEAR->at(d1_maxbtag); 
+
+    f_JetPt_JESUp_Total_jet2          = JetPt_JESUp_Total         ->at(d2_maxbtag);
+    f_JetPt_JESUp_Abs_jet2            = JetPt_JESUp_Abs           ->at(d2_maxbtag);
+    f_JetPt_JESUp_Abs_YEAR_jet2       = JetPt_JESUp_Abs_YEAR      ->at(d2_maxbtag);
+    f_JetPt_JESUp_BBEC1_jet2          = JetPt_JESUp_BBEC1         ->at(d2_maxbtag);
+    f_JetPt_JESUp_BBEC1_YEAR_jet2     = JetPt_JESUp_BBEC1_YEAR    ->at(d2_maxbtag);
+    f_JetPt_JESUp_EC2_jet2            = JetPt_JESUp_EC2           ->at(d2_maxbtag);
+    f_JetPt_JESUp_EC2_YEAR_jet2       = JetPt_JESUp_EC2_YEAR      ->at(d2_maxbtag);
+    f_JetPt_JESUp_FlavQCD_jet2        = JetPt_JESUp_FlavQCD       ->at(d2_maxbtag);
+    f_JetPt_JESUp_HF_jet2             = JetPt_JESUp_HF            ->at(d2_maxbtag);         
+    f_JetPt_JESUp_HF_YEAR_jet2        = JetPt_JESUp_HF_YEAR       ->at(d2_maxbtag);
+    f_JetPt_JESUp_RelBal_jet2         = JetPt_JESUp_RelBal        ->at(d2_maxbtag);
+    f_JetPt_JESUp_RelSample_YEAR_jet2 = JetPt_JESUp_RelSample_YEAR->at(d2_maxbtag); 
+
+    f_JetPt_JESDown_Total_jet1          = JetPt_JESDown_Total         ->at(d1_maxbtag);
+    f_JetPt_JESDown_Abs_jet1            = JetPt_JESDown_Abs           ->at(d1_maxbtag);
+    f_JetPt_JESDown_Abs_YEAR_jet1       = JetPt_JESDown_Abs_YEAR      ->at(d1_maxbtag);
+    f_JetPt_JESDown_BBEC1_jet1          = JetPt_JESDown_BBEC1         ->at(d1_maxbtag);
+    f_JetPt_JESDown_BBEC1_YEAR_jet1     = JetPt_JESDown_BBEC1_YEAR    ->at(d1_maxbtag);
+    f_JetPt_JESDown_EC2_jet1            = JetPt_JESDown_EC2           ->at(d1_maxbtag);
+    f_JetPt_JESDown_EC2_YEAR_jet1       = JetPt_JESDown_EC2_YEAR      ->at(d1_maxbtag);
+    f_JetPt_JESDown_FlavQCD_jet1        = JetPt_JESDown_FlavQCD       ->at(d1_maxbtag);
+    f_JetPt_JESDown_HF_jet1             = JetPt_JESDown_HF            ->at(d1_maxbtag);         
+    f_JetPt_JESDown_HF_YEAR_jet1        = JetPt_JESDown_HF_YEAR       ->at(d1_maxbtag);
+    f_JetPt_JESDown_RelBal_jet1         = JetPt_JESDown_RelBal        ->at(d1_maxbtag);
+    f_JetPt_JESDown_RelSample_YEAR_jet1 = JetPt_JESDown_RelSample_YEAR->at(d1_maxbtag); 
+
+    f_JetPt_JESDown_Total_jet2          = JetPt_JESDown_Total         ->at(d2_maxbtag);
+    f_JetPt_JESDown_Abs_jet2            = JetPt_JESDown_Abs           ->at(d2_maxbtag);
+    f_JetPt_JESDown_Abs_YEAR_jet2       = JetPt_JESDown_Abs_YEAR      ->at(d2_maxbtag);
+    f_JetPt_JESDown_BBEC1_jet2          = JetPt_JESDown_BBEC1         ->at(d2_maxbtag);
+    f_JetPt_JESDown_BBEC1_YEAR_jet2     = JetPt_JESDown_BBEC1_YEAR    ->at(d2_maxbtag);
+    f_JetPt_JESDown_EC2_jet2            = JetPt_JESDown_EC2           ->at(d2_maxbtag);
+    f_JetPt_JESDown_EC2_YEAR_jet2       = JetPt_JESDown_EC2_YEAR      ->at(d2_maxbtag);
+    f_JetPt_JESDown_FlavQCD_jet2        = JetPt_JESDown_FlavQCD       ->at(d2_maxbtag);
+    f_JetPt_JESDown_HF_jet2             = JetPt_JESDown_HF            ->at(d2_maxbtag);         
+    f_JetPt_JESDown_HF_YEAR_jet2        = JetPt_JESDown_HF_YEAR       ->at(d2_maxbtag);
+    f_JetPt_JESDown_RelBal_jet2         = JetPt_JESDown_RelBal        ->at(d2_maxbtag);
+    f_JetPt_JESDown_RelSample_YEAR_jet2 = JetPt_JESDown_RelSample_YEAR->at(d2_maxbtag); 
+
 
     // build 2 jets tlorentzvectors
     TLorentzVector tlzvec_j1_;
@@ -828,48 +1069,54 @@ void prepareNtupleMVA_2bjet()
   //  TString finalstate = "fs2e2mu";
   
   // -- year
-  TString syear = "2016";
-  //  TString syear = "2017";
+  //  TString syear = "2016";
+  TString syear = "2017";
   //  TString syear = "2018";
 
   // --- lumi
-  float lumi = 35.8; //fb-1 2016
-  //  float lumi = 41.5; //fb-1 2017
+  //  float lumi = 35.8; //fb-1 2016
+  float lumi = 41.5; //fb-1 2017
   //  float lumi = 59.7; //fb-1 2018
   cout<<lumi<<endl;
 
-
-  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
+  //  TString inputFilePath = "../";
+  //  TString inputFilePath = "/eos/user/a/acappati/200708_ZXEstimate/";
+  //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
   //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
   //  TString inputFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
+  //  TString inputFilePath = "/eos/user/a/atalierc/20200619_HH4lbb/samples_2017_MC/";
+  TString inputFilePath = "/eos/user/a/atalierc/20200619_HH4lbb/samples_2017_MC/PROD_samples_2017_MC_86cd390/AAAOK/"; 
   TString inputFileName[] = {
-    // "AllData", 
-    // "HH4lbb_Angela",
-    // "HH4lbb_Ilirjan",
-    "ggH125",
-    // "ggH125minlo",
-    "VBFH125",
-    "WplusH125",
-    "WminusH125",
-    "ZH125",
-    "bbH125",
-    "ttH125",
-    // "ZZTo4lext2",
-    "ZZTo4l",
-    "ggTo4e_Contin_MCFM701",
-    "ggTo4mu_Contin_MCFM701",
-    "ggTo4tau_Contin_MCFM701",
-    "ggTo2e2mu_Contin_MCFM701",
-    "ggTo2e2tau_Contin_MCFM701",
-    "ggTo2mu2tau_Contin_MCFM701",
-    // "TTZToLLNuNu_M10",
-    // "TTWJetsToLNu",
-    // "WWZ",
-    // "WZZ",
+    // // "AllData", 
+    // // "HH4lbb_Angela",
+    // // "HH4lbb_Ilirjan",
+    "HH4lbb_Angela_Chunk287",
+    //    "ggH125",
+    // // "ggH125minlo",
+    // "VBFH125",
+    // "WplusH125",
+    // "WminusH125",
+    // "ZH125",
+    // "bbH125",
+    // "ttH125",
+    // // "ZZTo4lext2",
+    // "ZZTo4l",
+    // "ggTo4e_Contin_MCFM701",
+    // "ggTo4mu_Contin_MCFM701",
+    // "ggTo4tau_Contin_MCFM701",
+    // "ggTo2e2mu_Contin_MCFM701",
+    // "ggTo2e2tau_Contin_MCFM701",
+    // "ggTo2mu2tau_Contin_MCFM701",
+    // // "TTZToLLNuNu_M10",
+    // // "TTWJetsToLNu",
+    // // "WWZ",
+    // // "WZZ",
     // "ZZZ",
     // "ZXbkg_4ljjsel",
     // "DYJetsToLL_M50",
     // "TTTo2L2Nu",
+    //    "ZXbkg_2018_fr4lsel_withNegBins",
+    //    "vbs_2e2mu_2k_2018",
   };
 
 
