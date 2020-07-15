@@ -49,8 +49,8 @@ using namespace std;
 
 //******************
 //int year = 2016;
-//int year = 2017;
-int year = 2018;
+int year = 2017;
+//int year = 2018;
 //******************
 
 
@@ -82,6 +82,7 @@ void doHistos()
   float lumi = 0.;
   TString inFilePath;
   TString inDataPath;
+  TString inZXbkgPath;
   TString sYear;
   Float_t rescale_ZX[nFinalStates];
   if(year==2016){
@@ -96,8 +97,12 @@ void doHistos()
   else if(year==2017){
     lumi       = 41.5; //fb-1 2017
     sYear      = "2017";
-    inFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
+    // inFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
+    // inDataPath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
+    inFilePath = "/eos/user/a/atalierc/20200619_HH4lbb/samples_2017_MC/";
+    // inDataPath = "/eos/user/a/atalierc/20200619_HH4lbb/samples_2017_Data/";
     inDataPath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
+    inZXbkgPath = "/eos/user/a/acappati/samples_HH4lbb/samples_2017/";
     rescale_ZX[fs_4mu]   = 1.48; //FIXME
     rescale_ZX[fs_4e]    = 0.52; //FIXME
     rescale_ZX[fs_2e2mu] = 2.00; //FIXME:da levare
@@ -131,8 +136,8 @@ void doHistos()
     "bbH125",
     "ttH125",
     //"ZZTo4lamcatnlo",
-    "ZZTo4lext2",
-    //"ZZTo4l",
+    //    "ZZTo4lext2",
+    "ZZTo4l",
     "ggTo4e_Contin_MCFM701",
     "ggTo4mu_Contin_MCFM701",
     "ggTo4tau_Contin_MCFM701",
@@ -557,8 +562,8 @@ void doHistos()
     if(datasets[d]=="ttH125") currentProcess = ttH;
     if(datasets[d]=="bbH125") currentProcess = bbH;
     //    if(datasets[d]=="ZZTo4lamcatnlo") currentProcess = qqZZ;
-    if(datasets[d]=="ZZTo4lext2") currentProcess = qqZZ;
-    //if(datasets[d]=="ZZTo4l") currentProcess = qqZZ;
+    //    if(datasets[d]=="ZZTo4lext2") currentProcess = qqZZ;
+    if(datasets[d]=="ZZTo4l") currentProcess = qqZZ;
     if(datasets[d]=="ggTo4e_Contin_MCFM701" ||
        datasets[d]=="ggTo4mu_Contin_MCFM701" ||
        datasets[d]=="ggTo4tau_Contin_MCFM701" ||
@@ -576,8 +581,9 @@ void doHistos()
 
     // select input file
     TString inputFileName;
-    if(currentProcess == Data) inputFileName = inDataPath + datasets[d] + "/ZZXAnalysis.root";
-    else inputFileName = inFilePath + datasets[d] + "/ZZXAnalysis.root";
+    if(currentProcess == Data)       inputFileName = inDataPath  + datasets[d] + "/ZZXAnalysis.root";
+    else if(currentProcess == ZXbkg) inputFileName = inZXbkgPath + datasets[d] + "/ZZXAnalysis.root";
+    else                             inputFileName = inFilePath  + datasets[d] + "/ZZXAnalysis.root";
     cout<<"Opening file "<<inputFileName<<" ..."<<endl;
     inputFile[d] = TFile::Open(inputFileName);
 
@@ -2137,6 +2143,7 @@ void doPlots_inputBDT_withZX(){
       pad1_BDTinput_4ljjsel[bdtIn][fs]->Draw();
       pad1_BDTinput_4ljjsel[bdtIn][fs]->cd();
     
+      //      hs_BDTinput_4ljjsel[bdtIn][fs]->SetMaximum(1.5 * max(hs_BDTinput_4ljjsel[bdtIn][fs]->GetMaximum(),h1_BDTinput_4ljjsel[bdtIn][Data][fs]->GetMaximum()));
       hs_BDTinput_4ljjsel[bdtIn][fs]->SetMaximum(10e04);
       hs_BDTinput_4ljjsel[bdtIn][fs]->SetMinimum(10e-04);
     
