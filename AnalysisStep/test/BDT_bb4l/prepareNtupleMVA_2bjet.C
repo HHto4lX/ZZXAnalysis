@@ -559,6 +559,11 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   Float_t f_JetPt_JESDown_RelSample_YEAR_jet2 = -9999.; 
 
   // deltaR and massjj with modif jet pt
+  Float_t f_deltarsignal_JERUp   = -9999.;
+  Float_t f_deltarsignal_JERDown = -9999.;
+  Float_t f_massjetjet_JERUp     = -9999.;
+  Float_t f_massjetjet_JERDown   = -9999.;
+
   Float_t f_deltarsignal_JESUp_Total          = -9999.;
   Float_t f_deltarsignal_JESUp_Abs            = -9999.;
   Float_t f_deltarsignal_JESUp_Abs_YEAR       = -9999.;
@@ -768,6 +773,11 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
   tnew->Branch("f_JetPt_JESDown_HF_YEAR_jet2",       &f_JetPt_JESDown_HF_YEAR_jet2       );
   tnew->Branch("f_JetPt_JESDown_RelBal_jet2",        &f_JetPt_JESDown_RelBal_jet2        );
   tnew->Branch("f_JetPt_JESDown_RelSample_YEAR_jet2",&f_JetPt_JESDown_RelSample_YEAR_jet2); 
+
+  tnew->Branch("f_deltarsignal_JERUp",   &f_deltarsignal_JERUp  );
+  tnew->Branch("f_deltarsignal_JERDown", &f_deltarsignal_JERDown);
+  tnew->Branch("f_massjetjet_JERUp",     &f_massjetjet_JERUp    );
+  tnew->Branch("f_massjetjet_JERDown",   &f_massjetjet_JERDown  );
 
   tnew->Branch("f_deltarsignal_JESUp_Total",         &f_deltarsignal_JESUp_Total         );
   tnew->Branch("f_deltarsignal_JESUp_Abs",           &f_deltarsignal_JESUp_Abs           );
@@ -1143,8 +1153,42 @@ void doNtuplesForMVA(TString inFile, TString outFile, float lumi, TString syear,
 
 
     // ---------------------------------------------------------------
-    // save deltaR and mjj for all the (11 + 1) x 2 jetpt variants
+    // save deltaR and mjj for all the 2 x 2 [JER] + (11 + 1) x 2 [JES] jetpt variants
+    // jerup
+    // _JERUp
+    TLorentzVector tlzvec_j1__JERUp;
+    tlzvec_j1__JERUp.SetPtEtaPhiM(JetPt_JERUp->at(d1_maxbtag), JetEta->at(d1_maxbtag), JetPhi->at(d1_maxbtag), JetMass->at(d1_maxbtag));
+    TLorentzVector tlzvec_j2__JERUp;
+    tlzvec_j2__JERUp.SetPtEtaPhiM(JetPt_JERUp->at(d2_maxbtag), JetEta->at(d2_maxbtag), JetPhi->at(d2_maxbtag), JetMass->at(d2_maxbtag));
 
+    TLorentzVector Hbb_Vec_JERUp = tlzvec_j1__JERUp + tlzvec_j2__JERUp;
+
+    float DeltaPhi_JERUp = ZZPhi - Hbb_Vec_JERUp.Phi();
+    if( fabs(DeltaPhi_JERUp) > acos(-1) ) { DeltaPhi_JERUp = (2*acos(-1)) - fabs(DeltaPhi_JERUp); }
+    float DeltaEta_JERUp = ZZEta - Hbb_Vec_JERUp.Eta();
+    float DeltaR_JERUp = sqrt( DeltaPhi_JERUp*DeltaPhi_JERUp + DeltaEta_JERUp*DeltaEta_JERUp );
+
+    f_deltarsignal_JERUp = DeltaR_JERUp;
+    f_massjetjet_JERUp = Hbb_Vec_JERUp.M();
+
+    // jerdown
+    // _JERDown
+    TLorentzVector tlzvec_j1__JERDown;
+    tlzvec_j1__JERDown.SetPtEtaPhiM(JetPt_JERDown->at(d1_maxbtag), JetEta->at(d1_maxbtag), JetPhi->at(d1_maxbtag), JetMass->at(d1_maxbtag));
+    TLorentzVector tlzvec_j2__JERDown;
+    tlzvec_j2__JERDown.SetPtEtaPhiM(JetPt_JERDown->at(d2_maxbtag), JetEta->at(d2_maxbtag), JetPhi->at(d2_maxbtag), JetMass->at(d2_maxbtag));
+
+    TLorentzVector Hbb_Vec_JERDown = tlzvec_j1__JERDown + tlzvec_j2__JERDown;
+
+    float DeltaPhi_JERDown = ZZPhi - Hbb_Vec_JERDown.Phi();
+    if( fabs(DeltaPhi_JERDown) > acos(-1) ) { DeltaPhi_JERDown = (2*acos(-1)) - fabs(DeltaPhi_JERDown); }
+    float DeltaEta_JERDown = ZZEta - Hbb_Vec_JERDown.Eta();
+    float DeltaR_JERDown = sqrt( DeltaPhi_JERDown*DeltaPhi_JERDown + DeltaEta_JERDown*DeltaEta_JERDown );
+
+    f_deltarsignal_JERDown = DeltaR_JERDown;
+    f_massjetjet_JERDown = Hbb_Vec_JERDown.M();
+
+    // jesup
     // _JESUp_Total
     TLorentzVector tlzvec_j1__JESUp_Total;
     tlzvec_j1__JESUp_Total.SetPtEtaPhiM(JetPt_JESUp_Total->at(d1_maxbtag), JetEta->at(d1_maxbtag), JetPhi->at(d1_maxbtag), JetMass->at(d1_maxbtag));
