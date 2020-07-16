@@ -49,8 +49,8 @@ using namespace std;
 
 //******************
 //int year = 2016;
-int year = 2017;
-//int year = 2018;
+//int year = 2017;
+int year = 2018;
 //******************
 
 
@@ -110,8 +110,9 @@ void doHistos()
   else if(year==2018){
     lumi       = 59.7; //fb-1 2018
     sYear      = "2018";
-    inFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
+    inFilePath = "/eos/user/a/atalierc/20200619_HH4lbb/samples_2018_MC/";
     inDataPath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
+    inZXbkgPath = "/eos/user/a/acappati/samples_HH4lbb/samples_2018/";
     rescale_ZX[fs_4mu]   = 1.60; //FIXME
     rescale_ZX[fs_4e]    = 0.72; //FIXME
     rescale_ZX[fs_2e2mu] = 2.22; //FIXME:da levare
@@ -136,8 +137,9 @@ void doHistos()
     "bbH125",
     "ttH125",
     //"ZZTo4lamcatnlo",
-    //    "ZZTo4lext2",
-    "ZZTo4l",
+    //"ZZTo4lext2",
+    "ZZTo4lext1",
+    //"ZZTo4l",
     "ggTo4e_Contin_MCFM701",
     "ggTo4mu_Contin_MCFM701",
     "ggTo4tau_Contin_MCFM701",
@@ -563,7 +565,8 @@ void doHistos()
     if(datasets[d]=="bbH125") currentProcess = bbH;
     //    if(datasets[d]=="ZZTo4lamcatnlo") currentProcess = qqZZ;
     //    if(datasets[d]=="ZZTo4lext2") currentProcess = qqZZ;
-    if(datasets[d]=="ZZTo4l") currentProcess = qqZZ;
+    if(datasets[d]=="ZZTo4lext1") currentProcess = qqZZ;
+    //    if(datasets[d]=="ZZTo4l") currentProcess = qqZZ;
     if(datasets[d]=="ggTo4e_Contin_MCFM701" ||
        datasets[d]=="ggTo4mu_Contin_MCFM701" ||
        datasets[d]=="ggTo4tau_Contin_MCFM701" ||
