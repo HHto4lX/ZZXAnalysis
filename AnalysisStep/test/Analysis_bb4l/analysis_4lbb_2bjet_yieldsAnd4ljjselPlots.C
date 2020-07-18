@@ -48,9 +48,9 @@ using namespace std;
 #define REDOHISTOS 1
 
 //******************
-//int year = 2016;
+int year = 2016;
 //int year = 2017;
-int year = 2018;
+//int year = 2018;
 //******************
 
 
@@ -88,8 +88,9 @@ void doHistos()
   if(year==2016){
     lumi       = 35.8; //fb-1 2016
     sYear      = "2016";
-    inFilePath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
+    inFilePath = "/eos/user/a/atalierc/20200619_HH4lbb/samples_2016_MC/";
     inDataPath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
+    inZXbkgPath = "/eos/user/a/acappati/samples_HH4lbb/samples_2016/";
     rescale_ZX[fs_4mu]   = 0.79; //FIXME
     rescale_ZX[fs_4e]    = 1.40; //FIXME
     rescale_ZX[fs_2e2mu] = 2.64; //FIXME:da levare
@@ -127,8 +128,8 @@ void doHistos()
   //  static int nDatasets = 22;
   TString datasets[] = {
     "AllData", 
-    "HH4lbb_Angela",
-    //"HH4lbb_Ilirjan",
+    //"HH4lbb_Angela",
+    "HH4lbb_Ilirjan",
     "ggH125",
     "VBFH125",
     "WplusH125",
@@ -137,9 +138,9 @@ void doHistos()
     "bbH125",
     "ttH125",
     //"ZZTo4lamcatnlo",
-    "ZZTo4lext2",
-    //    "ZZTo4lext1",
-    //"ZZTo4l",
+    //"ZZTo4lext2",
+    //"ZZTo4lext1",
+    "ZZTo4l",
     "ggTo4e_Contin_MCFM701",
     "ggTo4mu_Contin_MCFM701",
     "ggTo4tau_Contin_MCFM701",
@@ -554,8 +555,8 @@ void doHistos()
     currentProcess = -1;
 
     if(datasets[d]=="AllData") currentProcess = Data;
-    if(datasets[d]=="HH4lbb_Angela") currentProcess = HH;
-    //    if(datasets[d]=="HH4lbb_Ilirjan") currentProcess = HH;
+    //    if(datasets[d]=="HH4lbb_Angela") currentProcess = HH;
+    if(datasets[d]=="HH4lbb_Ilirjan") currentProcess = HH;
     if(datasets[d]=="ggH125") currentProcess = ggH;
     if(datasets[d]=="VBFH125") currentProcess = VBF;
     if(datasets[d]=="WplusH125" ||
@@ -564,9 +565,9 @@ void doHistos()
     if(datasets[d]=="ttH125") currentProcess = ttH;
     if(datasets[d]=="bbH125") currentProcess = bbH;
     //    if(datasets[d]=="ZZTo4lamcatnlo") currentProcess = qqZZ;
-    if(datasets[d]=="ZZTo4lext2") currentProcess = qqZZ;
+    //    if(datasets[d]=="ZZTo4lext2") currentProcess = qqZZ;
     //    if(datasets[d]=="ZZTo4lext1") currentProcess = qqZZ;
-    //    if(datasets[d]=="ZZTo4l") currentProcess = qqZZ;
+    if(datasets[d]=="ZZTo4l") currentProcess = qqZZ;
     if(datasets[d]=="ggTo4e_Contin_MCFM701" ||
        datasets[d]=="ggTo4mu_Contin_MCFM701" ||
        datasets[d]=="ggTo4tau_Contin_MCFM701" ||
