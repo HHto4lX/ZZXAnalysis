@@ -67,7 +67,8 @@ void doPlots(){
 
 
   // --- retrieve histos from file 2016
-  TString inFileName_2016 = "~/www/HH4lX/20200420_plots/plots_4ljjselAndYields_2016/f_histos_h1_4ljjsel_2016.root";     
+  //  TString inFileName_2016 = "~/www/HH4lX/20200420_plots/plots_4ljjselAndYields_2016/f_histos_h1_4ljjsel_2016.root";     
+  TString inFileName_2016 = "f_histos_h1_4ljjsel_2016.root";
   cout<<"Retrieving Data and MC 2016 histos from file "<<inFileName_2016<<" ..."<<endl;
   TFile* fInhistos_2016 = TFile::Open(inFileName_2016);
 
@@ -81,7 +82,8 @@ void doPlots(){
 
 
   // --- retrieve histos from file 2017
-  TString inFileName_2017 = "~/www/HH4lX/20200420_plots/plots_4ljjselAndYields_2017/f_histos_h1_4ljjsel_2017.root";     
+  //  TString inFileName_2017 = "~/www/HH4lX/20200420_plots/plots_4ljjselAndYields_2017/f_histos_h1_4ljjsel_2017.root";     
+  TString inFileName_2017 = "f_histos_h1_4ljjsel_2017.root";
   cout<<"Retrieving Data and MC 2017 histos from file "<<inFileName_2017<<" ..."<<endl;
   TFile* fInhistos_2017 = TFile::Open(inFileName_2017);
 
@@ -95,7 +97,8 @@ void doPlots(){
 
 
   // --- retrieve histos from file 2018
-  TString inFileName_2018 = "~/www/HH4lX/20200420_plots/plots_4ljjselAndYields_2018/f_histos_h1_4ljjsel_2018.root";     
+  //  TString inFileName_2018 = "~/www/HH4lX/20200420_plots/plots_4ljjselAndYields_2018/f_histos_h1_4ljjsel_2018.root";     
+  TString inFileName_2018 = "f_histos_h1_4ljjsel_2018.root";
   cout<<"Retrieving Data and MC 2018 histos from file "<<inFileName_2018<<" ..."<<endl;
   TFile* fInhistos_2018 = TFile::Open(inFileName_2018);
 
@@ -177,6 +180,7 @@ void doPlots(){
     h1_4ljjsel[pl][bbH]->SetLineColor(kViolet+6);
     hs_4ljjsel[pl]->Add(h1_4ljjsel[pl][bbH]); //add to hs
     // HH signal
+    h1_4ljjsel[pl][HH]->SetLineStyle(7);
     h1_4ljjsel[pl][HH]->SetLineColor(kRed);
     h1_4ljjsel[pl][HH]->SetLineWidth(2);
     h1_4ljjsel[pl][HH]->Scale(100.);
@@ -205,29 +209,31 @@ void doPlots(){
     h1_4ljjsel[pl][HH]->Draw("histosame");
     h1_4ljjsel[pl][Data]->Draw("samepe");
 
-    hs_4ljjsel[pl]->GetXaxis()->SetLabelFont(43);
-    hs_4ljjsel[pl]->GetXaxis()->SetLabelSize(15);
+    //    hs_4ljjsel[pl]->GetXaxis()->SetLabelFont(43);
+    //    hs_4ljjsel[pl]->GetXaxis()->SetLabelSize(15);
     hs_4ljjsel[pl]->GetXaxis()->SetTitle(h1_4ljjsel[pl][HH]->GetXaxis()->GetTitle());
-    hs_4ljjsel[pl]->GetYaxis()->SetTitleSize(20);
-    hs_4ljjsel[pl]->GetYaxis()->SetTitleFont(43);
-    hs_4ljjsel[pl]->GetYaxis()->SetTitleOffset(1.4);
-    hs_4ljjsel[pl]->GetYaxis()->SetLabelFont(43);
-    hs_4ljjsel[pl]->GetYaxis()->SetLabelSize(15);
+    //    hs_4ljjsel[pl]->GetYaxis()->SetTitleSize(20);
+    //    hs_4ljjsel[pl]->GetYaxis()->SetTitleFont(43);
+    //    hs_4ljjsel[pl]->GetYaxis()->SetTitleOffset(1.4);
+    //    hs_4ljjsel[pl]->GetYaxis()->SetLabelFont(43);
+    //    hs_4ljjsel[pl]->GetYaxis()->SetLabelSize(15);
     hs_4ljjsel[pl]->GetYaxis()->SetTitle(h1_4ljjsel[pl][HH]->GetYaxis()->GetTitle());
 
     // --- legend
-    leg_4ljjsel[pl] = new TLegend(0.78,0.61,0.94,0.87);
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][Data], "Data",          "lp");
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][HH],   "HH->4lbb x100", "f");
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ggH],  "SM Higgs",      "f");
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][qqZZ], "qq->ZZ",        "f");
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ggZZ], "gg->ZZ",        "f");
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][TTZ],  "TTV; V=Z,W",    "f");
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ZXbkg],"Z+X",           "f");
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][VVV],  "VVV; V=Z,W",    "f");
+    leg_4ljjsel[pl] = new TLegend(0.47,0.57,0.67,0.89);
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ggZZ], "gg #rightarrow ZZ #rightarrow 4l",       "f");
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][qqZZ], "q#bar{q} #rightarrow ZZ #rightarrow 4l", "f");
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ggH],  "SM Higgs",                               "f");
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][TTZ],  "ttV where V=Z,W",                        "f");
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][VVV],  "VVV where V=Z,W",                        "f");
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ZXbkg],"Z+X",                                    "f");
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][Data], "Data",                                   "lp");
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][HH],   "HH #rightarrow b#bar{b}4l x100",         "l");
+    leg_4ljjsel[pl]->SetTextSize(0.030);
+    leg_4ljjsel[pl]->SetLineColor(0);
+    leg_4ljjsel[pl]->SetLineWidth(1);
     leg_4ljjsel[pl]->SetFillColor(kWhite);
-    leg_4ljjsel[pl]->SetLineColor(kBlack);
-    leg_4ljjsel[pl]->SetTextFont(43);
+    leg_4ljjsel[pl]->SetBorderSize(0);
     leg_4ljjsel[pl]->Draw();
 
     c_4ljjsel[pl]->Update();
@@ -267,7 +273,7 @@ void doPlots(){
     rp_4ljjsel[pl]->SetMarkerColor(kBlack);
     rp_4ljjsel[pl]->SetTitle("");
 
-    rp_4ljjsel[pl]->SetYTitle("Data/MC");
+    rp_4ljjsel[pl]->SetYTitle("Data/#Sigma Bkg.");
     rp_4ljjsel[pl]->GetYaxis()->SetNdivisions(505);
     rp_4ljjsel[pl]->GetYaxis()->SetTitleSize(20);
     rp_4ljjsel[pl]->GetYaxis()->SetTitleFont(43);
@@ -312,6 +318,9 @@ void doPlots(){
     lumiTextSize   = 0.46;
     extraOverCmsTextSize = 0.75;
     relPosX = 0.12;
+    relPosY = 0.065;
+    relExtraDY = 1.1;
+    //    outOfFrame = false;
     CMS_lumi(pad1_4ljjsel[pl], 0, 0);
 
 

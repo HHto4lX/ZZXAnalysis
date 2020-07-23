@@ -48,9 +48,9 @@ using namespace std;
 #define REDOHISTOS 1
 
 //******************
-int year = 2016;
+//int year = 2016;
 //int year = 2017;
-//int year = 2018;
+int year = 2018;
 //******************
 
 
@@ -128,8 +128,8 @@ void doHistos()
   //  static int nDatasets = 22;
   TString datasets[] = {
     "AllData", 
-    //"HH4lbb_Angela",
-    "HH4lbb_Ilirjan",
+    "HH4lbb_Angela",
+    //    "HH4lbb_Ilirjan",
     "ggH125",
     "VBFH125",
     "WplusH125",
@@ -138,9 +138,9 @@ void doHistos()
     "bbH125",
     "ttH125",
     //"ZZTo4lamcatnlo",
-    //"ZZTo4lext2",
+    "ZZTo4lext2",
     //"ZZTo4lext1",
-    "ZZTo4l",
+    //    "ZZTo4l",
     "ggTo4e_Contin_MCFM701",
     "ggTo4mu_Contin_MCFM701",
     "ggTo4tau_Contin_MCFM701",
@@ -435,7 +435,7 @@ void doHistos()
     for(int fs=0; fs<nFinalStates+1; fs++){
       // --- 4ljjsel
       // fullmass range
-      h1_m4l_4ljjsel  [pr][fs] = new TH1F("h1_m4l_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events/4 GeV", 33, 70., 202.);
+      h1_m4l_4ljjsel  [pr][fs] = new TH1F("h1_m4l_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{4l} (GeV); Events/4 GeV", 20, 100., 180.);
       h1_m4l_4ljjsel  [pr][fs]->Sumw2(true);
       // sidebands
       h1_pT4l_4ljjsel_sidebands    [pr][fs] = new TH1F("h1_pT4l_4ljjsel_sidebands_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";4 leptons pT (GeV); Events/2 GeV", 50, 0., 100.);
@@ -531,7 +531,7 @@ void doHistos()
       h1_MET_4ljjsel     [pr][fs]->Sumw2(true);
       h1_DeltaRhh_4ljjsel[pr][fs] = new TH1F("h1_DeltaRhh_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";Delta R H4l-Hbb; Events/0.4 ", 25, 0., 10.);
       h1_DeltaRhh_4ljjsel[pr][fs]->Sumw2(true);
-      h1_mbb_4ljjsel     [pr][fs] = new TH1F("h1_mbb_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{jj} (GeV); Events/5 GeV", 40, 0., 200.); 
+      h1_mbb_4ljjsel     [pr][fs] = new TH1F("h1_mbb_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_"+sYear,";m_{jj} (GeV); Events/8 GeV", 25, 0., 200.); 
       h1_mbb_4ljjsel     [pr][fs]->Sumw2(true);
     }
   }
@@ -555,8 +555,8 @@ void doHistos()
     currentProcess = -1;
 
     if(datasets[d]=="AllData") currentProcess = Data;
-    //    if(datasets[d]=="HH4lbb_Angela") currentProcess = HH;
-    if(datasets[d]=="HH4lbb_Ilirjan") currentProcess = HH;
+    if(datasets[d]=="HH4lbb_Angela") currentProcess = HH;
+    //    if(datasets[d]=="HH4lbb_Ilirjan") currentProcess = HH;
     if(datasets[d]=="ggH125") currentProcess = ggH;
     if(datasets[d]=="VBFH125") currentProcess = VBF;
     if(datasets[d]=="WplusH125" ||
@@ -565,9 +565,9 @@ void doHistos()
     if(datasets[d]=="ttH125") currentProcess = ttH;
     if(datasets[d]=="bbH125") currentProcess = bbH;
     //    if(datasets[d]=="ZZTo4lamcatnlo") currentProcess = qqZZ;
-    //    if(datasets[d]=="ZZTo4lext2") currentProcess = qqZZ;
+    if(datasets[d]=="ZZTo4lext2") currentProcess = qqZZ;
     //    if(datasets[d]=="ZZTo4lext1") currentProcess = qqZZ;
-    if(datasets[d]=="ZZTo4l") currentProcess = qqZZ;
+    //    if(datasets[d]=="ZZTo4l") currentProcess = qqZZ;
     if(datasets[d]=="ggTo4e_Contin_MCFM701" ||
        datasets[d]=="ggTo4mu_Contin_MCFM701" ||
        datasets[d]=="ggTo4tau_Contin_MCFM701" ||
