@@ -317,8 +317,8 @@ void doPlots(){
     cmsTextSize    = 0.6;
     lumiTextSize   = 0.46;
     extraOverCmsTextSize = 0.75;
-    relPosX = 0.12;
-    relPosY = 0.065;
+    relPosX = 0.05;//0.12;
+    relPosY = 0.12;//0.065;
     relExtraDY = 1.1;
     //    outOfFrame = false;
     CMS_lumi(pad1_4ljjsel[pl], 0, 0);
