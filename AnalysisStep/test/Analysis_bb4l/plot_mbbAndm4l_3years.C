@@ -49,7 +49,16 @@ TString sProcess[nProcesses] = {"Data", "HH", "ggH", "VBF", "VH", "ttH", "bbH", 
 void doPlots(){
 
   // lumi 3 years
-  TString lumiText = "137 fb^{-1}";
+  TString lumiText = "138 fb^{-1}";
+
+  // update lumi for new Run2 recommendations (comb)
+  // https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiLUM
+  float lumi2016_old = 35.8; //fb^-1
+  float lumi2016_new = 36.3;
+  float lumi2017_old = 41.5;
+  float lumi2017_new = 41.5;
+  float lumi2018_old = 59.7;
+  float lumi2018_new = 59.8;
 
   // -- input names
   Int_t nPlots = 2;
@@ -76,7 +85,12 @@ void doPlots(){
   for(int pl=0; pl<nPlots; pl++){
     for(int pr=0; pr<nProcesses; pr++){
       h1_2016[pl][pr] = (TH1F*)fInhistos_2016->Get("h1_"+sPlots[pl]+"_"+sProcess[pr]+"_4l_2016");
-      cout<<h1_2016[pl][pr]->GetName()<<endl;
+      if(pr != 0){ // scale histos to new lumi only for MC
+        cout<<h1_2016[pl][pr]->GetName()<<endl;
+        cout<<h1_2016[pl][pr]->Integral()<<" "<<h1_2016[pl][pr]->Integral() * (lumi2016_new / lumi2016_old)<<endl;
+        h1_2016[pl][pr]->Scale(lumi2016_new / lumi2016_old); // scale to new lumi
+        cout<<h1_2016[pl][pr]->Integral()<<endl;
+      }
     }
   }
 
@@ -106,7 +120,12 @@ void doPlots(){
   for(int pl=0; pl<nPlots; pl++){
     for(int pr=0; pr<nProcesses; pr++){
       h1_2018[pl][pr] = (TH1F*)fInhistos_2018->Get("h1_"+sPlots[pl]+"_"+sProcess[pr]+"_4l_2018");
-      cout<<h1_2018[pl][pr]->GetName()<<endl;
+      if(pr != 0){ // scale histos to new lumi only for MC
+        cout<<h1_2018[pl][pr]->GetName()<<endl;
+        cout<<h1_2018[pl][pr]->Integral()<<" "<<h1_2018[pl][pr]->Integral() * (lumi2018_new / lumi2018_old)<<endl;
+        h1_2018[pl][pr]->Scale(lumi2018_new / lumi2018_old); // scale to new lumi
+        cout<<h1_2018[pl][pr]->Integral()<<endl;
+      }
     }
   }
 
