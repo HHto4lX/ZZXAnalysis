@@ -427,7 +427,7 @@ void scaleYields(){
   TString f_yields4ljjsel_name = "yields4ljjsel_FullRun2.txt";
   f_yields4ljjsel.open(string(outPath_yields) + "/" + string(f_yields4ljjsel_name));
   f_yields4ljjsel<<"--- 2016 ---"<<endl;
-  f_yields4ljjsel<<"|Final state |signal HH |ttZ |ttH |bbH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |ZH+WH |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  f_yields4ljjsel<<"|Final state |signal HH |ttZ |ttH |bbH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |ZH+WH |others(=VVV+TTW) |Z+X |"<<endl;
   for(int fs=0; fs<nFinalStates+1; fs++){
     f_yields4ljjsel<<"|"<<sFinalState[fs]<<" |"<<yield_4ljjsel_2016[HH][fs]
                                          <<" |"<<yield_4ljjsel_2016[TTZ][fs]  
@@ -442,7 +442,7 @@ void scaleYields(){
   }
   f_yields4ljjsel<<endl;
   f_yields4ljjsel<<"--- 2016 scaled to new lumi ---"<<endl;
-  f_yields4ljjsel<<"|Final state |signal HH |ttZ |ttH |bbH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |ZH+WH |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  f_yields4ljjsel<<"|Final state |signal HH |ttZ |ttH |bbH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |ZH+WH |others(=VVV+TTW) |Z+X |"<<endl;
   for(int fs=0; fs<nFinalStates+1; fs++){
     f_yields4ljjsel<<"|"<<sFinalState[fs]<<" |"<<yield_4ljjsel_2016_lumiScaled[HH][fs]
                                          <<" |"<<yield_4ljjsel_2016_lumiScaled[TTZ][fs]  
@@ -457,7 +457,7 @@ void scaleYields(){
   }
   f_yields4ljjsel<<endl;
   f_yields4ljjsel<<"--- 2017 ---"<<endl;
-  f_yields4ljjsel<<"|Final state |signal HH |ttZ |ttH |bbH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |ZH+WH |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  f_yields4ljjsel<<"|Final state |signal HH |ttZ |ttH |bbH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |ZH+WH |others(=VVV+TTW) |Z+X |"<<endl;
   for(int fs=0; fs<nFinalStates+1; fs++){
     f_yields4ljjsel<<"|"<<sFinalState[fs]<<" |"<<yield_4ljjsel_2017[HH][fs]
                                          <<" |"<<yield_4ljjsel_2017[TTZ][fs]  
@@ -472,7 +472,7 @@ void scaleYields(){
   }
   f_yields4ljjsel<<endl;
   f_yields4ljjsel<<"--- 2018 ---"<<endl;
-  f_yields4ljjsel<<"|Final state |signal HH |ttZ |ttH |bbH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |ZH+WH |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  f_yields4ljjsel<<"|Final state |signal HH |ttZ |ttH |bbH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |ZH+WH |others(=VVV+TTW) |Z+X |"<<endl;
   for(int fs=0; fs<nFinalStates+1; fs++){
     f_yields4ljjsel<<"|"<<sFinalState[fs]<<" |"<<yield_4ljjsel_2018[HH][fs]
                                          <<" |"<<yield_4ljjsel_2018[TTZ][fs]  
@@ -487,7 +487,7 @@ void scaleYields(){
   }
   f_yields4ljjsel<<endl;
   f_yields4ljjsel<<"--- full Run2 ---"<<endl;
-  f_yields4ljjsel<<"|Final state |signal HH |ttZ |ttH |bbH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |ZH+WH |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  f_yields4ljjsel<<"|Final state |signal HH |ttZ |ttH |bbH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |ZH+WH |others(=VVV+TTW) |Z+X |"<<endl;
   for(int fs=0; fs<nFinalStates+1; fs++){
     f_yields4ljjsel<<"|"<<sFinalState[fs]<<" |"<<yield_4ljjsel_2016[HH][fs]
                                                 +yield_4ljjsel_2017[HH][fs]
@@ -520,7 +520,7 @@ void scaleYields(){
   }
   f_yields4ljjsel<<endl;
   f_yields4ljjsel<<"--- full Run2 with 2016 scaled to new lumi ---"<<endl;
-  f_yields4ljjsel<<"|Final state |signal HH |ttZ |ttH |bbH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |ZH+WH |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  f_yields4ljjsel<<"|Final state |signal HH |ttZ |ttH |bbH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |ZH+WH |others(=VVV+TTW) |Z+X |"<<endl;
   for(int fs=0; fs<nFinalStates+1; fs++){
     f_yields4ljjsel<<"|"<<sFinalState[fs]<<" |"<<yield_4ljjsel_2016_lumiScaled[HH][fs]
                                                 +yield_4ljjsel_2017[HH][fs]
