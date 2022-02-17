@@ -38,27 +38,36 @@ using namespace std;
 
 
 //*************************************************************************************
+// FINAL STATES
+enum FinalState {fs_4mu=0, fs_4e=1, fs_2e2mu=2};  // 4mu, 4e, 2e2mu
+const int nFinalStates = 3;
+TString sFinalState[nFinalStates+1] = {"4mu", "4e","2e2mu","4l"};
+//*************************************************************************************
 // PROCESSES
 enum Process {Data=0, HH=1, ggH=2, VBF=3, VH=4, ttH=5, bbH=6, qqZZ=7, ggZZ=8, TTZ=9, TTW=10, VVV=11, ZXbkg=12}; 
 const int nProcesses = 13;
 TString sProcess[nProcesses] = {"Data", "HH", "ggH", "VBF", "VH", "ttH", "bbH", "qqZZ", "ggZZ", "TTZ", "TTW", "VVV", "ZXbkg"};
 //*************************************************************************************
 
+// lumi 3 years
+TString lumiText = "138 fb^{-1}";
+
+// update lumi for new Run2 recommendations (comb)
+// https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiLUM
+float lumi2016_old = 35.8; //fb^-1
+float lumi2016_new = 36.3;
+float lumi2017_old = 41.5;
+float lumi2017_new = 41.5;
+float lumi2018_old = 59.7;
+float lumi2018_new = 59.8;
+
+float lumiScaleComb = 1.01135794221; // ratio between new and old 2016 lumi - comb way..
+
+
+
 
 
 void doPlots(){
-
-  // lumi 3 years
-  TString lumiText = "138 fb^{-1}";
-
-  // update lumi for new Run2 recommendations (comb)
-  // https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiLUM
-  float lumi2016_old = 35.8; //fb^-1
-  float lumi2016_new = 36.3;
-  float lumi2017_old = 41.5;
-  float lumi2017_new = 41.5;
-  float lumi2018_old = 59.7;
-  float lumi2018_new = 59.8;
 
   // -- input names
   Int_t nPlots = 2;
@@ -85,10 +94,13 @@ void doPlots(){
   for(int pl=0; pl<nPlots; pl++){
     for(int pr=0; pr<nProcesses; pr++){
       h1_2016[pl][pr] = (TH1F*)fInhistos_2016->Get("h1_"+sPlots[pl]+"_"+sProcess[pr]+"_4l_2016");
+      cout<<h1_2016[pl][pr]->GetName()<<endl;
       if(pr != 0){ // scale histos to new lumi only for MC
         cout<<h1_2016[pl][pr]->GetName()<<endl;
-        cout<<h1_2016[pl][pr]->Integral()<<" "<<h1_2016[pl][pr]->Integral() * (lumi2016_new / lumi2016_old)<<endl;
-        h1_2016[pl][pr]->Scale(lumi2016_new / lumi2016_old); // scale to new lumi
+	cout<<h1_2016[pl][pr]->Integral()<<" "<<h1_2016[pl][pr]->Integral() * (lumi2016_new / lumi2016_old)<<endl;
+        cout<<h1_2016[pl][pr]->Integral()<<" "<<h1_2016[pl][pr]->Integral() * (lumiScaleComb)<<endl;
+        //h1_2016[pl][pr]->Scale(lumi2016_new / lumi2016_old); // scale to new lumi
+        h1_2016[pl][pr]->Scale(lumiScaleComb); // scale to new lumi Comb way..
         cout<<h1_2016[pl][pr]->Integral()<<endl;
       }
     }
@@ -120,12 +132,13 @@ void doPlots(){
   for(int pl=0; pl<nPlots; pl++){
     for(int pr=0; pr<nProcesses; pr++){
       h1_2018[pl][pr] = (TH1F*)fInhistos_2018->Get("h1_"+sPlots[pl]+"_"+sProcess[pr]+"_4l_2018");
-      if(pr != 0){ // scale histos to new lumi only for MC
-        cout<<h1_2018[pl][pr]->GetName()<<endl;
-        cout<<h1_2018[pl][pr]->Integral()<<" "<<h1_2018[pl][pr]->Integral() * (lumi2018_new / lumi2018_old)<<endl;
-        h1_2018[pl][pr]->Scale(lumi2018_new / lumi2018_old); // scale to new lumi
-        cout<<h1_2018[pl][pr]->Integral()<<endl;
-      }
+      cout<<h1_2018[pl][pr]->GetName()<<endl;
+      // if(pr != 0){ // scale histos to new lumi only for MC
+      //   cout<<h1_2018[pl][pr]->GetName()<<endl;
+      //   cout<<h1_2018[pl][pr]->Integral()<<" "<<h1_2018[pl][pr]->Integral() * (lumi2018_new / lumi2018_old)<<endl;
+      //   h1_2018[pl][pr]->Scale(lumi2018_new / lumi2018_old); // scale to new lumi
+      //   cout<<h1_2018[pl][pr]->Integral()<<endl;
+      // }
     }
   }
 
@@ -330,7 +343,7 @@ void doPlots(){
     c_4ljjsel[pl]->Update();
 
     // --- draw CMS and lumi text
-    writeExtraText = true;
+    writeExtraText = false;
     extraText      = "Preliminary";
     lumi_sqrtS     = lumiText + " (13 TeV)";
     cmsTextSize    = 0.6;
@@ -353,11 +366,200 @@ void doPlots(){
 }
 
 
+void scaleYields(){
 
+  // --- output dir
+  TString outPath_yields = "yields_3years";
+  cout<<"creating output dir "<<outPath_yields<<" ... "<<endl;
+  gSystem->Exec(("mkdir -p "+string(outPath_yields)).c_str()); // create output dir
+
+
+  // --- retrieve yields from file 2016
+  TString inFileName_2016 = "f_yields_2016.root";
+  cout<<"Retrieving 2016 yields from file "<<inFileName_2016<<" ..."<<endl;
+  TFile* fInYields_2016 = TFile::Open(inFileName_2016);
+
+  TH1F* hTemp2016;
+  Float_t yield_4ljjsel_2016            [nProcesses][nFinalStates+1];
+  Float_t yield_4ljjsel_2016_lumiScaled [nProcesses][nFinalStates+1];
+  for(int pr=0; pr<nProcesses; pr++){
+    for(int fs=0; fs<nFinalStates+1; fs++){
+      hTemp2016 = (TH1F*)fInYields_2016->Get("hYields_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_2016");
+      yield_4ljjsel_2016[pr][fs]            = hTemp2016->GetBinContent(1);
+      yield_4ljjsel_2016_lumiScaled[pr][fs] = hTemp2016->GetBinContent(1) * lumiScaleComb;
+    }
+  }
+
+  // --- retrieve yields from file 2017
+  TString inFileName_2017 = "f_yields_2017.root";
+  cout<<"Retrieving 2017 yields from file "<<inFileName_2017<<" ..."<<endl;
+  TFile* fInYields_2017 = TFile::Open(inFileName_2017);
+
+  TH1F* hTemp2017;
+  Float_t yield_4ljjsel_2017[nProcesses][nFinalStates+1];
+  for(int pr=0; pr<nProcesses; pr++){
+    for(int fs=0; fs<nFinalStates+1; fs++){
+      hTemp2017 = (TH1F*)fInYields_2017->Get("hYields_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_2017");
+      yield_4ljjsel_2017[pr][fs] = hTemp2017->GetBinContent(1);
+    }
+  }
+
+  // --- retrieve yields from file 2018
+  TString inFileName_2018 = "f_yields_2018.root";
+  cout<<"Retrieving 2018 yields from file "<<inFileName_2018<<" ..."<<endl;
+  TFile* fInYields_2018 = TFile::Open(inFileName_2018);
+
+  TH1F* hTemp2018;
+  Float_t yield_4ljjsel_2018[nProcesses][nFinalStates+1];
+  for(int pr=0; pr<nProcesses; pr++){
+    for(int fs=0; fs<nFinalStates+1; fs++){
+      hTemp2018 = (TH1F*)fInYields_2018->Get("hYields_4ljjsel_"+sProcess[pr]+"_"+sFinalState[fs]+"_2018");
+      yield_4ljjsel_2018[pr][fs] = hTemp2018->GetBinContent(1);
+    }
+  }
+
+
+
+
+  // --- print yields after 4ljj sel for full Run2 
+  cout<<"print yields after 4ljj sel for full Run2 ... "<<endl;
+  ofstream f_yields4ljjsel;
+  TString f_yields4ljjsel_name = "yields4ljjsel_FullRun2.txt";
+  f_yields4ljjsel.open(string(outPath_yields) + "/" + string(f_yields4ljjsel_name));
+  f_yields4ljjsel<<"--- 2016 ---"<<endl;
+  f_yields4ljjsel<<"|Final state |signal HH |ttZ |ttH |bbH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |ZH+WH |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  for(int fs=0; fs<nFinalStates+1; fs++){
+    f_yields4ljjsel<<"|"<<sFinalState[fs]<<" |"<<yield_4ljjsel_2016[HH][fs]
+                                         <<" |"<<yield_4ljjsel_2016[TTZ][fs]  
+                                         <<" |"<<yield_4ljjsel_2016[ttH][fs]
+                                         <<" |"<<yield_4ljjsel_2016[bbH][fs]
+                                         <<" |"<<yield_4ljjsel_2016[qqZZ][fs]+yield_4ljjsel_2016[ggZZ][fs]
+                                         <<" |"<<yield_4ljjsel_2016[ggH][fs]+yield_4ljjsel_2016[VBF][fs]
+                                         <<" |"<<yield_4ljjsel_2016[VH][fs]
+                                         <<" |"<<yield_4ljjsel_2016[VVV][fs]+yield_4ljjsel_2016[TTW][fs]
+                                         <<" |"<<yield_4ljjsel_2016[ZXbkg][fs]
+                                         <<" |"<<endl;
+  }
+  f_yields4ljjsel<<endl;
+  f_yields4ljjsel<<"--- 2016 scaled to new lumi ---"<<endl;
+  f_yields4ljjsel<<"|Final state |signal HH |ttZ |ttH |bbH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |ZH+WH |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  for(int fs=0; fs<nFinalStates+1; fs++){
+    f_yields4ljjsel<<"|"<<sFinalState[fs]<<" |"<<yield_4ljjsel_2016_lumiScaled[HH][fs]
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[TTZ][fs]  
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[ttH][fs]
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[bbH][fs]
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[qqZZ][fs]+yield_4ljjsel_2016_lumiScaled[ggZZ][fs]
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[ggH][fs]+yield_4ljjsel_2016_lumiScaled[VBF][fs]
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[VH][fs]
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[VVV][fs]+yield_4ljjsel_2016_lumiScaled[TTW][fs]
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[ZXbkg][fs]
+                                         <<" |"<<endl;
+  }
+  f_yields4ljjsel<<endl;
+  f_yields4ljjsel<<"--- 2017 ---"<<endl;
+  f_yields4ljjsel<<"|Final state |signal HH |ttZ |ttH |bbH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |ZH+WH |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  for(int fs=0; fs<nFinalStates+1; fs++){
+    f_yields4ljjsel<<"|"<<sFinalState[fs]<<" |"<<yield_4ljjsel_2017[HH][fs]
+                                         <<" |"<<yield_4ljjsel_2017[TTZ][fs]  
+                                         <<" |"<<yield_4ljjsel_2017[ttH][fs]
+                                         <<" |"<<yield_4ljjsel_2017[bbH][fs]
+                                         <<" |"<<yield_4ljjsel_2017[qqZZ][fs]+yield_4ljjsel_2017[ggZZ][fs]
+                                         <<" |"<<yield_4ljjsel_2017[ggH][fs]+yield_4ljjsel_2017[VBF][fs]
+                                         <<" |"<<yield_4ljjsel_2017[VH][fs]
+                                         <<" |"<<yield_4ljjsel_2017[VVV][fs]+yield_4ljjsel_2017[TTW][fs]
+                                         <<" |"<<yield_4ljjsel_2017[ZXbkg][fs]
+                                         <<" |"<<endl;
+  }
+  f_yields4ljjsel<<endl;
+  f_yields4ljjsel<<"--- 2018 ---"<<endl;
+  f_yields4ljjsel<<"|Final state |signal HH |ttZ |ttH |bbH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |ZH+WH |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  for(int fs=0; fs<nFinalStates+1; fs++){
+    f_yields4ljjsel<<"|"<<sFinalState[fs]<<" |"<<yield_4ljjsel_2018[HH][fs]
+                                         <<" |"<<yield_4ljjsel_2018[TTZ][fs]  
+                                         <<" |"<<yield_4ljjsel_2018[ttH][fs]
+                                         <<" |"<<yield_4ljjsel_2018[bbH][fs]
+                                         <<" |"<<yield_4ljjsel_2018[qqZZ][fs]+yield_4ljjsel_2018[ggZZ][fs]
+                                         <<" |"<<yield_4ljjsel_2018[ggH][fs]+yield_4ljjsel_2018[VBF][fs]
+                                         <<" |"<<yield_4ljjsel_2018[VH][fs]
+                                         <<" |"<<yield_4ljjsel_2018[VVV][fs]+yield_4ljjsel_2018[TTW][fs]
+                                         <<" |"<<yield_4ljjsel_2018[ZXbkg][fs]
+                                         <<" |"<<endl;
+  }
+  f_yields4ljjsel<<endl;
+  f_yields4ljjsel<<"--- full Run2 ---"<<endl;
+  f_yields4ljjsel<<"|Final state |signal HH |ttZ |ttH |bbH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |ZH+WH |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  for(int fs=0; fs<nFinalStates+1; fs++){
+    f_yields4ljjsel<<"|"<<sFinalState[fs]<<" |"<<yield_4ljjsel_2016[HH][fs]
+                                                +yield_4ljjsel_2017[HH][fs]
+                                                +yield_4ljjsel_2018[HH][fs]
+                                         <<" |"<<yield_4ljjsel_2016[TTZ][fs]
+                                                +yield_4ljjsel_2017[TTZ][fs]
+                                                +yield_4ljjsel_2018[TTZ][fs]
+                                         <<" |"<<yield_4ljjsel_2016[ttH][fs]
+                                                +yield_4ljjsel_2017[ttH][fs]
+                                                +yield_4ljjsel_2018[ttH][fs]
+                                         <<" |"<<yield_4ljjsel_2016[bbH][fs]
+                                                +yield_4ljjsel_2017[bbH][fs]
+                                                +yield_4ljjsel_2018[bbH][fs]
+                                         <<" |"<<yield_4ljjsel_2016[qqZZ][fs]+yield_4ljjsel_2016[ggZZ][fs]
+                                                +yield_4ljjsel_2017[qqZZ][fs]+yield_4ljjsel_2017[ggZZ][fs]
+                                                +yield_4ljjsel_2018[qqZZ][fs]+yield_4ljjsel_2018[ggZZ][fs]
+                                         <<" |"<<yield_4ljjsel_2016[ggH][fs]+yield_4ljjsel_2016[VBF][fs]
+                                                +yield_4ljjsel_2017[ggH][fs]+yield_4ljjsel_2017[VBF][fs]
+                                                +yield_4ljjsel_2018[ggH][fs]+yield_4ljjsel_2018[VBF][fs]
+                                         <<" |"<<yield_4ljjsel_2016[VH][fs]
+                                                +yield_4ljjsel_2017[VH][fs]
+                                                +yield_4ljjsel_2018[VH][fs]
+                                         <<" |"<<yield_4ljjsel_2016[VVV][fs]+yield_4ljjsel_2016[TTW][fs]
+                                                +yield_4ljjsel_2017[VVV][fs]+yield_4ljjsel_2017[TTW][fs]
+                                                +yield_4ljjsel_2018[VVV][fs]+yield_4ljjsel_2018[TTW][fs]
+                                         <<" |"<<yield_4ljjsel_2016[ZXbkg][fs]
+                                                +yield_4ljjsel_2017[ZXbkg][fs]
+                                                +yield_4ljjsel_2018[ZXbkg][fs]
+                                         <<" |"<<endl;
+  }
+  f_yields4ljjsel<<endl;
+  f_yields4ljjsel<<"--- full Run2 with 2016 scaled to new lumi ---"<<endl;
+  f_yields4ljjsel<<"|Final state |signal HH |ttZ |ttH |bbH |ZZ(=qqZZ+ggZZ) |Higgs+VBF(=ggH+VBF) |ZH+WH |others(=VVV+VH+TTW) |Z+X |"<<endl;
+  for(int fs=0; fs<nFinalStates+1; fs++){
+    f_yields4ljjsel<<"|"<<sFinalState[fs]<<" |"<<yield_4ljjsel_2016_lumiScaled[HH][fs]
+                                                +yield_4ljjsel_2017[HH][fs]
+                                                +yield_4ljjsel_2018[HH][fs]
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[TTZ][fs]
+                                                +yield_4ljjsel_2017[TTZ][fs]
+                                                +yield_4ljjsel_2018[TTZ][fs]
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[ttH][fs]
+                                                +yield_4ljjsel_2017[ttH][fs]
+                                                +yield_4ljjsel_2018[ttH][fs]
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[bbH][fs]
+                                                +yield_4ljjsel_2017[bbH][fs]
+                                                +yield_4ljjsel_2018[bbH][fs]
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[qqZZ][fs]+yield_4ljjsel_2016_lumiScaled[ggZZ][fs]
+                                                +yield_4ljjsel_2017[qqZZ][fs]+yield_4ljjsel_2017[ggZZ][fs]
+                                                +yield_4ljjsel_2018[qqZZ][fs]+yield_4ljjsel_2018[ggZZ][fs]
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[ggH][fs]+yield_4ljjsel_2016_lumiScaled[VBF][fs]
+                                                +yield_4ljjsel_2017[ggH][fs]+yield_4ljjsel_2017[VBF][fs]
+                                                +yield_4ljjsel_2018[ggH][fs]+yield_4ljjsel_2018[VBF][fs]
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[VH][fs]
+                                                +yield_4ljjsel_2017[VH][fs]
+                                                +yield_4ljjsel_2018[VH][fs]
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[VVV][fs]+yield_4ljjsel_2016_lumiScaled[TTW][fs]
+                                                +yield_4ljjsel_2017[VVV][fs]+yield_4ljjsel_2017[TTW][fs]
+                                                +yield_4ljjsel_2018[VVV][fs]+yield_4ljjsel_2018[TTW][fs]
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[ZXbkg][fs]
+                                                +yield_4ljjsel_2017[ZXbkg][fs]
+                                                +yield_4ljjsel_2018[ZXbkg][fs]
+                                         <<" |"<<endl;
+  }
+  f_yields4ljjsel.close();
+ 
+ 
+}
 
 
 
 void plot_mbbAndm4l_3years(){
   
   doPlots();
+  scaleYields();
 }
