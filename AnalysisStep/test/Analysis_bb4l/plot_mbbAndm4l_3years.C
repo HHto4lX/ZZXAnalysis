@@ -177,7 +177,7 @@ void doPlots(){
     h1_4ljjsel[pl][VVV]->SetLineColor(kGreen-1);
     hs_4ljjsel[pl]->Add(h1_4ljjsel[pl][VVV]); //add to hs
     // Z+X process
-    h1_4ljjsel[pl][ZXbkg]->SetFillColor(kGreen+3);
+    h1_4ljjsel[pl][ZXbkg]->SetFillColor(kGreen+4);
     h1_4ljjsel[pl][ZXbkg]->SetLineColor(kGreen+4);
     hs_4ljjsel[pl]->Add(h1_4ljjsel[pl][ZXbkg]); //add to hs
     // TTV process: TTW + TTV
@@ -220,6 +220,7 @@ void doPlots(){
     h1_4ljjsel[pl][Data]->SetMarkerColor(kBlack);
     h1_4ljjsel[pl][Data]->SetLineColor(kBlack);
     h1_4ljjsel[pl][Data]->SetMarkerStyle(20);
+    h1_4ljjsel[pl][Data]->SetMarkerSize(1.2);
 
     // --- upper plot pad
     pad1_4ljjsel[pl] = new TPad("pad1_"+sPlots[pl],"pad1_"+sPlots[pl], 0, 0.3, 1, 1.0);
@@ -239,20 +240,23 @@ void doPlots(){
       
     hs_4ljjsel[pl]->Draw("histo");
     h1_4ljjsel[pl][HH]->Draw("histosame");
-    h1_4ljjsel[pl][Data]->Draw("samepe");
+    h1_4ljjsel[pl][Data]->Draw("samep e x0"); // option x0 removes orizzontal error bars
 
-    //    hs_4ljjsel[pl]->GetXaxis()->SetLabelFont(43);
-    //    hs_4ljjsel[pl]->GetXaxis()->SetLabelSize(15);
+    hs_4ljjsel[pl]->GetXaxis()->SetTitleSize(25);
+    hs_4ljjsel[pl]->GetXaxis()->SetTitleFont(43);
+    hs_4ljjsel[pl]->GetXaxis()->SetTitleOffset(1.1);
+    hs_4ljjsel[pl]->GetXaxis()->SetLabelFont(43);
+    hs_4ljjsel[pl]->GetXaxis()->SetLabelSize(23);
     hs_4ljjsel[pl]->GetXaxis()->SetTitle(h1_4ljjsel[pl][HH]->GetXaxis()->GetTitle());
-    //    hs_4ljjsel[pl]->GetYaxis()->SetTitleSize(20);
-    //    hs_4ljjsel[pl]->GetYaxis()->SetTitleFont(43);
-    //    hs_4ljjsel[pl]->GetYaxis()->SetTitleOffset(1.4);
-    //    hs_4ljjsel[pl]->GetYaxis()->SetLabelFont(43);
-    //    hs_4ljjsel[pl]->GetYaxis()->SetLabelSize(15);
+    hs_4ljjsel[pl]->GetYaxis()->SetTitleSize(25);
+    hs_4ljjsel[pl]->GetYaxis()->SetTitleFont(43);
+    hs_4ljjsel[pl]->GetYaxis()->SetTitleOffset(1.1);
+    hs_4ljjsel[pl]->GetYaxis()->SetLabelFont(43);
+    hs_4ljjsel[pl]->GetYaxis()->SetLabelSize(23);
     hs_4ljjsel[pl]->GetYaxis()->SetTitle(h1_4ljjsel[pl][HH]->GetYaxis()->GetTitle());
 
     // --- legend
-    leg_4ljjsel[pl] = new TLegend(0.47,0.57,0.67,0.89);
+    leg_4ljjsel[pl] = new TLegend(0.52,0.55,0.75,0.89);
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ggZZ], "gg #rightarrow ZZ #rightarrow 4l",       "f");
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][qqZZ], "q#bar{q} #rightarrow ZZ #rightarrow 4l", "f");
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ggH],  "SM Higgs",                               "f");
@@ -261,7 +265,7 @@ void doPlots(){
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ZXbkg],"Z+X",                                    "f");
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][Data], "Data",                                   "lp");
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][HH],   "HH #rightarrow b#bar{b}4l x100",         "l");
-    leg_4ljjsel[pl]->SetTextSize(0.030);
+    leg_4ljjsel[pl]->SetTextSize(0.035);
     leg_4ljjsel[pl]->SetLineColor(0);
     leg_4ljjsel[pl]->SetLineWidth(1);
     leg_4ljjsel[pl]->SetFillColor(kWhite);
@@ -303,21 +307,22 @@ void doPlots(){
     rp_4ljjsel[pl]->Divide(hMCtot_4ljjsel[pl]); //divide histo rp/MC
     rp_4ljjsel[pl]->SetMarkerStyle(20);
     rp_4ljjsel[pl]->SetMarkerColor(kBlack);
+    rp_4ljjsel[pl]->SetMarkerSize(1.2);
     rp_4ljjsel[pl]->SetTitle("");
 
     rp_4ljjsel[pl]->SetYTitle("Data/#Sigma Bkg.");
     rp_4ljjsel[pl]->GetYaxis()->SetNdivisions(505);
-    rp_4ljjsel[pl]->GetYaxis()->SetTitleSize(20);
+    rp_4ljjsel[pl]->GetYaxis()->SetTitleSize(25);
     rp_4ljjsel[pl]->GetYaxis()->SetTitleFont(43);
-    rp_4ljjsel[pl]->GetYaxis()->SetTitleOffset(1.4);
+    rp_4ljjsel[pl]->GetYaxis()->SetTitleOffset(1.1);
     rp_4ljjsel[pl]->GetYaxis()->SetLabelFont(43);
-    rp_4ljjsel[pl]->GetYaxis()->SetLabelSize(15);
+    rp_4ljjsel[pl]->GetYaxis()->SetLabelSize(23);
 
-    rp_4ljjsel[pl]->GetXaxis()->SetTitleSize(20);
+    rp_4ljjsel[pl]->GetXaxis()->SetTitleSize(25);
     rp_4ljjsel[pl]->GetXaxis()->SetTitleFont(43);
     rp_4ljjsel[pl]->GetXaxis()->SetTitleOffset(4.);
     rp_4ljjsel[pl]->GetXaxis()->SetLabelFont(43);
-    rp_4ljjsel[pl]->GetXaxis()->SetLabelSize(15);
+    rp_4ljjsel[pl]->GetXaxis()->SetLabelSize(23);
 
     // --- define mc shadow unc plot
     hUncMC_4ljjsel[pl] = (TH1F*)hMCtot_4ljjsel[pl]->Clone("hUncMC_4ljjsel_"+sPlots[pl]);
@@ -337,7 +342,7 @@ void doPlots(){
     hUncMC_4ljjsel[pl]->SetStats(0);
 
     // ---draw
-    rp_4ljjsel[pl]->Draw("ep");
+    rp_4ljjsel[pl]->Draw("pe x0");
     hUncMC_4ljjsel[pl]->Draw("e2 same");
 
     c_4ljjsel[pl]->Update();

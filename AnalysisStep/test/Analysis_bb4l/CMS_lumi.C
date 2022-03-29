@@ -10,10 +10,10 @@ void
 CMS_lumi( TPad* pad, int iPeriod, int iPosX )
 {            
   bool outOfFrame    = false;
-  if( iPosX/10==0 ) 
-    {
-      outOfFrame = true;
-    }
+  // if( iPosX/10==0 ) 
+  //   {
+  //     outOfFrame = true;
+  //   }
   int alignY_=3;
   int alignX_=2;
   if( iPosX/10==0 ) alignX_=1;
