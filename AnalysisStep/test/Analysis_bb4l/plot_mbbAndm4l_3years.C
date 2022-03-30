@@ -217,6 +217,7 @@ void doPlots(){
     h1_4ljjsel[pl][HH]->SetLineWidth(2);
     h1_4ljjsel[pl][HH]->Scale(100.);
     // data
+    //h1_4ljjsel[pl][Data]->SetBinErrorOption(TH1::kPoisson); // https://twiki.cern.ch/twiki/bin/viewauth/CMS/PoissonErrorBars
     h1_4ljjsel[pl][Data]->SetMarkerColor(kBlack);
     h1_4ljjsel[pl][Data]->SetLineColor(kBlack);
     h1_4ljjsel[pl][Data]->SetMarkerStyle(8);
