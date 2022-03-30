@@ -219,8 +219,8 @@ void doPlots(){
     // data
     h1_4ljjsel[pl][Data]->SetMarkerColor(kBlack);
     h1_4ljjsel[pl][Data]->SetLineColor(kBlack);
-    h1_4ljjsel[pl][Data]->SetMarkerStyle(20);
-    h1_4ljjsel[pl][Data]->SetMarkerSize(1.2);
+    h1_4ljjsel[pl][Data]->SetMarkerStyle(8);
+    //    h1_4ljjsel[pl][Data]->SetMarkerSize(1.2);
 
     // --- upper plot pad
     pad1_4ljjsel[pl] = new TPad("pad1_"+sPlots[pl],"pad1_"+sPlots[pl], 0, 0.3, 1, 1.0);
@@ -244,10 +244,13 @@ void doPlots(){
 
     hs_4ljjsel[pl]->GetXaxis()->SetTitleSize(25);
     hs_4ljjsel[pl]->GetXaxis()->SetTitleFont(43);
-    hs_4ljjsel[pl]->GetXaxis()->SetTitleOffset(1.1);
+    hs_4ljjsel[pl]->GetXaxis()->SetTitleOffset(1.3);
     hs_4ljjsel[pl]->GetXaxis()->SetLabelFont(43);
     hs_4ljjsel[pl]->GetXaxis()->SetLabelSize(23);
     hs_4ljjsel[pl]->GetXaxis()->SetTitle(h1_4ljjsel[pl][HH]->GetXaxis()->GetTitle());
+    if(sPlots[pl] == "m4l_4ljjsel"){
+      hs_4ljjsel[pl]->GetXaxis()->SetTitle("m_{4#font[12]{l}} (GeV)");
+    }
     hs_4ljjsel[pl]->GetYaxis()->SetTitleSize(25);
     hs_4ljjsel[pl]->GetYaxis()->SetTitleFont(43);
     hs_4ljjsel[pl]->GetYaxis()->SetTitleOffset(1.1);
@@ -255,16 +258,17 @@ void doPlots(){
     hs_4ljjsel[pl]->GetYaxis()->SetLabelSize(23);
     hs_4ljjsel[pl]->GetYaxis()->SetTitle(h1_4ljjsel[pl][HH]->GetYaxis()->GetTitle());
 
+
     // --- legend
     leg_4ljjsel[pl] = new TLegend(0.52,0.55,0.75,0.89);
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ggZZ], "gg #rightarrow ZZ #rightarrow 4l",       "f");
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][qqZZ], "q#bar{q} #rightarrow ZZ #rightarrow 4l", "f");
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ggH],  "SM Higgs",                               "f");
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][TTZ],  "ttV, where V=Z,W",                       "f");
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][VVV],  "VVV, where V=Z,W",                       "f");
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ZXbkg],"Z+X",                                    "f");
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][Data], "Data",                                   "lp");
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][HH],   "HH #rightarrow b#bar{b}4l x100",         "l");
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ggZZ], "gg #rightarrow ZZ #rightarrow 4#font[12]{l}",       "f");
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][qqZZ], "q#bar{q} #rightarrow ZZ #rightarrow 4#font[12]{l}", "f");
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ggH],  "SM H",                                              "f");
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][TTZ],  "t#bar{t}V, where V=Z,W",                            "f");
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][VVV],  "VVV, where V=Z,W",                                  "f");
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ZXbkg],"Z+X",                                               "f");
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][Data], "Data",                                              "lp");
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][HH],   "HH #rightarrow b#bar{b}4#font[12]{l} x100",         "l");
     leg_4ljjsel[pl]->SetTextSize(0.035);
     leg_4ljjsel[pl]->SetLineColor(0);
     leg_4ljjsel[pl]->SetLineWidth(1);
@@ -305,9 +309,9 @@ void doPlots(){
     rp_4ljjsel[pl]->SetMaximum(2.);
     rp_4ljjsel[pl]->SetStats(0);
     rp_4ljjsel[pl]->Divide(hMCtot_4ljjsel[pl]); //divide histo rp/MC
-    rp_4ljjsel[pl]->SetMarkerStyle(20);
+    rp_4ljjsel[pl]->SetMarkerStyle(8);
     rp_4ljjsel[pl]->SetMarkerColor(kBlack);
-    rp_4ljjsel[pl]->SetMarkerSize(1.2);
+    //    rp_4ljjsel[pl]->SetMarkerSize(1.2);
     rp_4ljjsel[pl]->SetTitle("");
 
     rp_4ljjsel[pl]->SetYTitle("Data/#Sigma Bkg.");
