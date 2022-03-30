@@ -260,8 +260,8 @@ void doPlots(){
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ggZZ], "gg #rightarrow ZZ #rightarrow 4l",       "f");
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][qqZZ], "q#bar{q} #rightarrow ZZ #rightarrow 4l", "f");
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ggH],  "SM Higgs",                               "f");
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][TTZ],  "ttV where V=Z,W",                        "f");
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][VVV],  "VVV where V=Z,W",                        "f");
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][TTZ],  "ttV, where V=Z,W",                       "f");
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][VVV],  "VVV, where V=Z,W",                       "f");
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ZXbkg],"Z+X",                                    "f");
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][Data], "Data",                                   "lp");
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][HH],   "HH #rightarrow b#bar{b}4l x100",         "l");
