@@ -165,6 +165,7 @@ void doPlots(){
   TPad*    pad2_4ljjsel   [nPlots];
   TH1F*    rp_4ljjsel     [nPlots];
   TH1F*    hUncMC_4ljjsel [nPlots];
+  TLegend* leg2_4ljjsel   [nPlots];
 
   //4ljjsel plots
   for(int pl=0; pl<nPlots; pl++){
@@ -349,6 +350,18 @@ void doPlots(){
     // ---draw
     rp_4ljjsel[pl]->Draw("pe x0");
     hUncMC_4ljjsel[pl]->Draw("e2 same");
+
+    // --- legend ratio plot
+    leg2_4ljjsel[pl] = new TLegend(0.67,0.75,0.87,0.89);
+    leg2_4ljjsel[pl]->AddEntry(hUncMC_4ljjsel[pl], "stat unc", "f");
+    leg2_4ljjsel[pl]->SetTextSize(0.08);
+    leg2_4ljjsel[pl]->SetLineColor(0);
+    leg2_4ljjsel[pl]->SetLineWidth(1);
+    leg2_4ljjsel[pl]->SetFillColor(kWhite);
+    leg2_4ljjsel[pl]->SetBorderSize(0);
+
+    leg2_4ljjsel[pl]->Draw("same");
+
 
     c_4ljjsel[pl]->Update();
 
