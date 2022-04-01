@@ -353,7 +353,7 @@ void doPlots(){
 
     // --- legend ratio plot
     leg2_4ljjsel[pl] = new TLegend(0.67,0.75,0.87,0.89);
-    leg2_4ljjsel[pl]->AddEntry(hUncMC_4ljjsel[pl], "Stat. Unc.", "f");
+    leg2_4ljjsel[pl]->AddEntry(hUncMC_4ljjsel[pl], "Stat. unc.", "f");
     leg2_4ljjsel[pl]->SetTextSize(0.08);
     leg2_4ljjsel[pl]->SetLineColor(0);
     leg2_4ljjsel[pl]->SetLineWidth(1);
