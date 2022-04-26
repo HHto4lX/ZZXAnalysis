@@ -178,8 +178,8 @@ void doPlots(){
     h1_4ljjsel[pl][VVV]->SetLineColor(kGreen-1);
     hs_4ljjsel[pl]->Add(h1_4ljjsel[pl][VVV]); //add to hs
     // Z+X process
-    h1_4ljjsel[pl][ZXbkg]->SetFillColor(kGreen+4);
-    h1_4ljjsel[pl][ZXbkg]->SetLineColor(kGreen+4);
+    h1_4ljjsel[pl][ZXbkg]->SetFillColor(kGreen+3);
+    h1_4ljjsel[pl][ZXbkg]->SetLineColor(kGreen+3);
     hs_4ljjsel[pl]->Add(h1_4ljjsel[pl][ZXbkg]); //add to hs
     // TTV process: TTW + TTV
     h1_4ljjsel[pl][TTW]->SetFillColor(kBlue+3);
@@ -353,7 +353,7 @@ void doPlots(){
 
     // --- legend ratio plot
     leg2_4ljjsel[pl] = new TLegend(0.67,0.75,0.87,0.89);
-    leg2_4ljjsel[pl]->AddEntry(hUncMC_4ljjsel[pl], "Stat. unc.", "f");
+    leg2_4ljjsel[pl]->AddEntry(hUncMC_4ljjsel[pl], "MC Stat. Unc.", "f");
     leg2_4ljjsel[pl]->SetTextSize(0.08);
     leg2_4ljjsel[pl]->SetLineColor(0);
     leg2_4ljjsel[pl]->SetLineWidth(1);
