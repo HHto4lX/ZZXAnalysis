@@ -267,6 +267,9 @@ void doPlots(){
     if(sPlots[pl] == "m4l_4ljjsel"){
       hs_4ljjsel[pl]->GetXaxis()->SetTitle("m_{4#font[12]{l}} (GeV)");
     }
+    if(sPlots[pl] == "mbb_4ljjsel"){
+      hs_4ljjsel[pl]->GetXaxis()->SetTitle("m_{b#bar{b}} (GeV)");
+    }
     hs_4ljjsel[pl]->GetYaxis()->SetTitleSize(25);
     hs_4ljjsel[pl]->GetYaxis()->SetTitleFont(43);
     hs_4ljjsel[pl]->GetYaxis()->SetTitleOffset(1.1);
