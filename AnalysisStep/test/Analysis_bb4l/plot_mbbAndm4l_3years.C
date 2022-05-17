@@ -64,6 +64,20 @@ float lumi2018_new = 59.8;
 float lumiScaleComb = 1.01135794221; // ratio between new and old 2016 lumi - comb way..
 
 
+// yields ZX angela
+float yield_ZX_2016_4mu   = 0.790;
+float yield_ZX_2016_4e    = 1.400;
+float yield_ZX_2016_2e2mu = 2.640;
+float yield_ZX_2017_4mu   = 1.480;
+float yield_ZX_2017_4e    = 0.520;
+float yield_ZX_2017_2e2mu = 2.000;
+float yield_ZX_2018_4mu   = 1.600;
+float yield_ZX_2018_4e    = 0.720;
+float yield_ZX_2018_2e2mu = 2.220;
+
+float yield_ZX_2016[] = {0.790, 1.400, 2.640, 0.790+1.400+2.640};
+float yield_ZX_2017[] = {1.480, 0.520, 2.000, 1.480+0.520+2.000};
+float yield_ZX_2018[] = {1.600, 0.720, 2.220, 1.600+0.720+2.220};
 
 
 
@@ -341,7 +355,9 @@ void doPlots(){
     }
     hUncMC_4ljjsel[pl]->SetLineColor(1);
     hUncMC_4ljjsel[pl]->SetFillStyle(3005);
-    hUncMC_4ljjsel[pl]->SetFillColor(kGray+3);
+    //hUncMC_4ljjsel[pl]->SetFillStyle(3144);
+    //hUncMC_4ljjsel[pl]->SetFillColor(kGray+3);
+    hUncMC_4ljjsel[pl]->SetFillColor(kBlack);
     hUncMC_4ljjsel[pl]->SetMarkerColor(1);
     hUncMC_4ljjsel[pl]->SetMarkerStyle(1);
     hUncMC_4ljjsel[pl]->SetTitle("");
@@ -572,6 +588,82 @@ void scaleYields(){
                                          <<" |"<<yield_4ljjsel_2016_lumiScaled[ZXbkg][fs]
                                                 +yield_4ljjsel_2017[ZXbkg][fs]
                                                 +yield_4ljjsel_2018[ZXbkg][fs]
+                                         <<" |"<<endl;
+  }
+  f_yields4ljjsel<<endl;
+  f_yields4ljjsel<<"--- full Run2, scheme as plots, with 2016 scaled to new lumi ---"<<endl;
+  f_yields4ljjsel<<"|Final state |signal HH |SM H |qqZZ |ggZZ |others | Z+X | total but Z+X"<<endl;
+  for(int fs=0; fs<nFinalStates+1; fs++){
+    f_yields4ljjsel<<"|"<<sFinalState[fs]<<" |"<<yield_4ljjsel_2016_lumiScaled[HH][fs]
+                                                +yield_4ljjsel_2017[HH][fs]
+                                                +yield_4ljjsel_2018[HH][fs]
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[ggH][fs]
+                                                +yield_4ljjsel_2017[ggH][fs]
+                                                +yield_4ljjsel_2018[ggH][fs]
+                                                +yield_4ljjsel_2016_lumiScaled[VBF][fs]
+                                                +yield_4ljjsel_2017[VBF][fs]
+                                                +yield_4ljjsel_2018[VBF][fs]
+                                                +yield_4ljjsel_2016_lumiScaled[VH][fs]
+                                                +yield_4ljjsel_2017[VH][fs]
+                                                +yield_4ljjsel_2018[VH][fs]
+                                                +yield_4ljjsel_2016_lumiScaled[ttH][fs]
+                                                +yield_4ljjsel_2017[ttH][fs]
+                                                +yield_4ljjsel_2018[ttH][fs]
+                                                +yield_4ljjsel_2016_lumiScaled[bbH][fs]
+                                                +yield_4ljjsel_2017[bbH][fs]
+                                                +yield_4ljjsel_2018[bbH][fs]
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[qqZZ][fs]
+                                                +yield_4ljjsel_2017[qqZZ][fs]
+                                                +yield_4ljjsel_2018[qqZZ][fs]
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[ggZZ][fs]
+                                                +yield_4ljjsel_2017[ggZZ][fs]
+                                                +yield_4ljjsel_2018[ggZZ][fs]
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[TTZ][fs]
+                                                +yield_4ljjsel_2017[TTZ][fs]
+                                                +yield_4ljjsel_2018[TTZ][fs]
+                                                +yield_4ljjsel_2016_lumiScaled[TTW][fs]
+                                                +yield_4ljjsel_2017[TTW][fs]
+                                                +yield_4ljjsel_2018[TTW][fs]
+                                                +yield_4ljjsel_2016_lumiScaled[VVV][fs]
+                                                +yield_4ljjsel_2017[VVV][fs]
+                                                +yield_4ljjsel_2018[VVV][fs]
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[ZXbkg][fs]
+                                                +yield_4ljjsel_2017[ZXbkg][fs]
+                                                +yield_4ljjsel_2018[ZXbkg][fs]
+                                        // total but ZX
+                                         <<" |"<<yield_4ljjsel_2016_lumiScaled[HH][fs]
+                                                +yield_4ljjsel_2017[HH][fs]
+                                                +yield_4ljjsel_2018[HH][fs]
+                                                +yield_4ljjsel_2016_lumiScaled[ggH][fs]
+                                                +yield_4ljjsel_2017[ggH][fs]
+                                                +yield_4ljjsel_2018[ggH][fs]
+                                                +yield_4ljjsel_2016_lumiScaled[VBF][fs]
+                                                +yield_4ljjsel_2017[VBF][fs]
+                                                +yield_4ljjsel_2018[VBF][fs]
+                                                +yield_4ljjsel_2016_lumiScaled[VH][fs]
+                                                +yield_4ljjsel_2017[VH][fs]
+                                                +yield_4ljjsel_2018[VH][fs]
+                                                +yield_4ljjsel_2016_lumiScaled[ttH][fs]
+                                                +yield_4ljjsel_2017[ttH][fs]
+                                                +yield_4ljjsel_2018[ttH][fs]
+                                                +yield_4ljjsel_2016_lumiScaled[bbH][fs]
+                                                +yield_4ljjsel_2017[bbH][fs]
+                                                +yield_4ljjsel_2018[bbH][fs]
+                                                +yield_4ljjsel_2016_lumiScaled[qqZZ][fs]
+                                                +yield_4ljjsel_2017[qqZZ][fs]
+                                                +yield_4ljjsel_2018[qqZZ][fs]
+                                                +yield_4ljjsel_2016_lumiScaled[ggZZ][fs]
+                                                +yield_4ljjsel_2017[ggZZ][fs]
+                                                +yield_4ljjsel_2018[ggZZ][fs]
+                                                +yield_4ljjsel_2016_lumiScaled[TTZ][fs]
+                                                +yield_4ljjsel_2017[TTZ][fs]
+                                                +yield_4ljjsel_2018[TTZ][fs]
+                                                +yield_4ljjsel_2016_lumiScaled[TTW][fs]
+                                                +yield_4ljjsel_2017[TTW][fs]
+                                                +yield_4ljjsel_2018[TTW][fs]
+                                                +yield_4ljjsel_2016_lumiScaled[VVV][fs]
+                                                +yield_4ljjsel_2017[VVV][fs]
+                                                +yield_4ljjsel_2018[VVV][fs]
                                          <<" |"<<endl;
   }
   f_yields4ljjsel.close();
