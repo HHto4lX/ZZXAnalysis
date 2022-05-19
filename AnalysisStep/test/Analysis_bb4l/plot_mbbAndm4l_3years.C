@@ -286,7 +286,7 @@ void doPlots(){
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][TTZ],  "t#bar{t}V, where V=Z,W",                            "f");
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][VVV],  "VVV, where V=Z,W",                                  "f");
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ZXbkg],"Z+X",                                               "f");
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][Data], "Data",                                              "lp");
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][Data], "Data",                                              "ep"); //vertical error bar in legend
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][HH],   "HH #rightarrow b#bar{b}4#font[12]{l} x100",         "l");
     leg_4ljjsel[pl]->SetTextSize(0.035);
     leg_4ljjsel[pl]->SetLineColor(0);
