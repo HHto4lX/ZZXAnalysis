@@ -188,12 +188,12 @@ void doPlots(){
     // hstack
     hs_4ljjsel[pl] = new THStack("hs_"+sPlots[pl],"");
     // VVV process
-    h1_4ljjsel[pl][VVV]->SetFillColor(kGreen-3);
-    h1_4ljjsel[pl][VVV]->SetLineColor(kGreen-1);
+    h1_4ljjsel[pl][VVV]->SetFillColor(kOrange+1);
+    h1_4ljjsel[pl][VVV]->SetLineColor(kOrange+1);
     hs_4ljjsel[pl]->Add(h1_4ljjsel[pl][VVV]); //add to hs
     // Z+X process
-    h1_4ljjsel[pl][ZXbkg]->SetFillColor(kGreen+3);
-    h1_4ljjsel[pl][ZXbkg]->SetLineColor(kGreen+3);
+    h1_4ljjsel[pl][ZXbkg]->SetFillColor(kGreen-2);
+    h1_4ljjsel[pl][ZXbkg]->SetLineColor(kGreen-2);
     hs_4ljjsel[pl]->Add(h1_4ljjsel[pl][ZXbkg]); //add to hs
     // TTV process: TTW + TTV
     h1_4ljjsel[pl][TTW]->SetFillColor(kBlue+3);
@@ -357,8 +357,8 @@ void doPlots(){
       hUncMC_4ljjsel[pl]->SetBinError(xbin, err);
     }
     hUncMC_4ljjsel[pl]->SetLineColor(1);
-    hUncMC_4ljjsel[pl]->SetFillStyle(3005);
-    //hUncMC_4ljjsel[pl]->SetFillStyle(3144);
+    //hUncMC_4ljjsel[pl]->SetFillStyle(3005);
+    hUncMC_4ljjsel[pl]->SetFillStyle(3244);
     //hUncMC_4ljjsel[pl]->SetFillColor(kGray+3);
     hUncMC_4ljjsel[pl]->SetFillColor(kBlack);
     hUncMC_4ljjsel[pl]->SetMarkerColor(1);
