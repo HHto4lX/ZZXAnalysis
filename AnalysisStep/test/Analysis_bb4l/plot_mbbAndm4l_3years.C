@@ -279,7 +279,8 @@ void doPlots(){
 
 
     // --- legend
-    leg_4ljjsel[pl] = new TLegend(0.52,0.55,0.75,0.89);
+    //leg_4ljjsel[pl] = new TLegend(0.52,0.55,0.75,0.89);
+    leg_4ljjsel[pl] = new TLegend(0.60,0.48,0.82,0.89);
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ggZZ], "gg #rightarrow ZZ #rightarrow 4#font[12]{l}",       "f");
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][qqZZ], "q#bar{q} #rightarrow ZZ #rightarrow 4#font[12]{l}", "f");
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ggH],  "SM H",                                              "f");
