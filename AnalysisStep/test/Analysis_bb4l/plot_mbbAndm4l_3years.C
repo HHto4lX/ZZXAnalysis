@@ -258,11 +258,11 @@ void doPlots(){
     h1_4ljjsel[pl][HH]->Draw("histosame");
     h1_4ljjsel[pl][Data]->Draw("samep e x0"); // option x0 removes orizzontal error bars
 
-    hs_4ljjsel[pl]->GetXaxis()->SetTitleSize(25);
+    hs_4ljjsel[pl]->GetXaxis()->SetTitleSize(27);//25
     hs_4ljjsel[pl]->GetXaxis()->SetTitleFont(43);
     hs_4ljjsel[pl]->GetXaxis()->SetTitleOffset(1.3);
     hs_4ljjsel[pl]->GetXaxis()->SetLabelFont(43);
-    hs_4ljjsel[pl]->GetXaxis()->SetLabelSize(23);
+    hs_4ljjsel[pl]->GetXaxis()->SetLabelSize(25);//23
     hs_4ljjsel[pl]->GetXaxis()->SetTitle(h1_4ljjsel[pl][HH]->GetXaxis()->GetTitle());
     if(sPlots[pl] == "m4l_4ljjsel"){
       hs_4ljjsel[pl]->GetXaxis()->SetTitle("m_{4#font[12]{l}} (GeV)");
@@ -270,11 +270,11 @@ void doPlots(){
     if(sPlots[pl] == "mbb_4ljjsel"){
       hs_4ljjsel[pl]->GetXaxis()->SetTitle("m_{b#bar{b}} (GeV)");
     }
-    hs_4ljjsel[pl]->GetYaxis()->SetTitleSize(25);
+    hs_4ljjsel[pl]->GetYaxis()->SetTitleSize(27);//25
     hs_4ljjsel[pl]->GetYaxis()->SetTitleFont(43);
     hs_4ljjsel[pl]->GetYaxis()->SetTitleOffset(1.1);
     hs_4ljjsel[pl]->GetYaxis()->SetLabelFont(43);
-    hs_4ljjsel[pl]->GetYaxis()->SetLabelSize(23);
+    hs_4ljjsel[pl]->GetYaxis()->SetLabelSize(25);//23
     hs_4ljjsel[pl]->GetYaxis()->SetTitle(h1_4ljjsel[pl][HH]->GetYaxis()->GetTitle());
 
 
@@ -284,12 +284,12 @@ void doPlots(){
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ggZZ], "gg #rightarrow ZZ #rightarrow 4#font[12]{l}",       "f");
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][qqZZ], "q#bar{q} #rightarrow ZZ #rightarrow 4#font[12]{l}", "f");
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ggH],  "SM H",                                              "f");
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][TTZ],  "t#bar{t}V, where V=Z,W",                            "f");
-    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][VVV],  "VVV, where V=Z,W",                                  "f");
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][TTZ],  "t#bar{t}V, where V = Z, W",                         "f");
+    leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][VVV],  "VVV, where V = Z, W",                               "f");
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][ZXbkg],"Z+X",                                               "f");
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][Data], "Data",                                              "ep"); //vertical error bar in legend
     leg_4ljjsel[pl]->AddEntry(h1_4ljjsel[pl][HH],   "HH #rightarrow b#bar{b}4#font[12]{l} x100",         "l");
-    leg_4ljjsel[pl]->SetTextSize(0.035);
+    leg_4ljjsel[pl]->SetTextSize(0.037); //35
     leg_4ljjsel[pl]->SetLineColor(0);
     leg_4ljjsel[pl]->SetLineWidth(1);
     leg_4ljjsel[pl]->SetFillColor(kWhite);
@@ -317,7 +317,7 @@ void doPlots(){
 
     // --- lower pad plot
     c_4ljjsel[pl]->cd();
-    pad2_4ljjsel[pl] = new TPad("pad2","pad2", 0, 0.05, 1, 0.3);
+    pad2_4ljjsel[pl] = new TPad("pad2","pad2", 0, 0.02, 1, 0.3);//0.05
     pad2_4ljjsel[pl]->SetGridy();
     pad2_4ljjsel[pl]->Draw();
     pad2_4ljjsel[pl]->cd();
@@ -336,17 +336,17 @@ void doPlots(){
 
     rp_4ljjsel[pl]->SetYTitle("Data/#Sigma Bkg.");
     rp_4ljjsel[pl]->GetYaxis()->SetNdivisions(505);
-    rp_4ljjsel[pl]->GetYaxis()->SetTitleSize(25);
+    rp_4ljjsel[pl]->GetYaxis()->SetTitleSize(27);//25
     rp_4ljjsel[pl]->GetYaxis()->SetTitleFont(43);
     rp_4ljjsel[pl]->GetYaxis()->SetTitleOffset(1.1);
     rp_4ljjsel[pl]->GetYaxis()->SetLabelFont(43);
-    rp_4ljjsel[pl]->GetYaxis()->SetLabelSize(23);
+    rp_4ljjsel[pl]->GetYaxis()->SetLabelSize(25);//23
 
-    rp_4ljjsel[pl]->GetXaxis()->SetTitleSize(25);
+    rp_4ljjsel[pl]->GetXaxis()->SetTitleSize(27);//25
     rp_4ljjsel[pl]->GetXaxis()->SetTitleFont(43);
     rp_4ljjsel[pl]->GetXaxis()->SetTitleOffset(4.);
     rp_4ljjsel[pl]->GetXaxis()->SetLabelFont(43);
-    rp_4ljjsel[pl]->GetXaxis()->SetLabelSize(23);
+    rp_4ljjsel[pl]->GetXaxis()->SetLabelSize(25);//23
 
     // --- define mc shadow unc plot
     hUncMC_4ljjsel[pl] = (TH1F*)hMCtot_4ljjsel[pl]->Clone("hUncMC_4ljjsel_"+sPlots[pl]);
@@ -373,8 +373,8 @@ void doPlots(){
 
     // --- legend ratio plot
     leg2_4ljjsel[pl] = new TLegend(0.67,0.75,0.87,0.89);
-    leg2_4ljjsel[pl]->AddEntry(hUncMC_4ljjsel[pl], "MC Stat. Unc.", "f");
-    leg2_4ljjsel[pl]->SetTextSize(0.08);
+    leg2_4ljjsel[pl]->AddEntry(hUncMC_4ljjsel[pl], "MC stat. unc.", "f");
+    leg2_4ljjsel[pl]->SetTextSize(0.09);//08
     leg2_4ljjsel[pl]->SetLineColor(0);
     leg2_4ljjsel[pl]->SetLineWidth(1);
     leg2_4ljjsel[pl]->SetFillColor(kWhite);
