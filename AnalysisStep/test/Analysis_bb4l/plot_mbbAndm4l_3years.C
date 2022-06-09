@@ -360,7 +360,7 @@ void doPlots(){
     hUncMC_4ljjsel[pl]->SetLineColor(1);
     //hUncMC_4ljjsel[pl]->SetFillStyle(3005);
     hUncMC_4ljjsel[pl]->SetFillStyle(3244);
-    hUncMC_4ljjsel[pl]->SetFillColor(kGray+3);
+    hUncMC_4ljjsel[pl]->SetFillColorAlpha(kGray+3, 0.7);
     hUncMC_4ljjsel[pl]->SetMarkerColor(1);
     hUncMC_4ljjsel[pl]->SetMarkerStyle(1);
     hUncMC_4ljjsel[pl]->SetTitle("");
